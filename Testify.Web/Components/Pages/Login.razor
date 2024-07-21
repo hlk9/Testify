@@ -1,12 +1,36 @@
-@page "/Login"
+﻿@page "/Login"
 
 <MudGrid Spacing="8" Class="m-0 w-100 h-100" Justify="Justify.FlexStart" Style="background-color:#29A69A">
-    <MudItem Class="rounded-5 w-75" Style="background-color: #FFFFFF">
-        <MudPaper Height="100vh" Width="60%">
-            
+    <MudItem sm=12 md=12 xs=12 lg=6 Class="rounded-r-xl rounded-r-xl d-flex justify-center rounded-xs-0" Style="background-color: #FFFFFF">
+     
+        <MudPaper Elevation="0" Class="p-5 w-75" Height="100vh">
+            <MudText Typo="Typo.h4" Class="text-center">Đăng nhập bằng tải khoản Testify của bạn</MudText>
+            <MudTextField T="string" Placeholder="Email/Số điện thoại" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
+            <MudTextField T="string" Placeholder="Mật khẩu" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" FullWidth="true"></MudTextField>
+        
         </MudPaper>
+       
     </MudItem>
 </MudGrid>
 @code {
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
     
 }
