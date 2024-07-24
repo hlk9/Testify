@@ -13,15 +13,14 @@
         <MudButton Class="me-4">Trang chủ</MudButton>
         <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="GoToRegister">Đăng ký</MudButton>
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        
-    </MudAppBar>
+    </MudAppBar> 
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
-    </MudDrawer>
-    <MudMainContent Class="mt-16">
+    </MudDrawer>  
+    <MudMainContent Class="ma-0 pa-0">
         @Body
     </MudMainContent>
-</MudLayout>
+</MudLayout> 
 
 
 <div id="blazor-error-ui">
