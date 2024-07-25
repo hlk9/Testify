@@ -1,0 +1,15 @@
+﻿<MudPaper Width="100%" Class="d-inline-flex py-3" Elevation="0">
+    <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered="true">
+        <MudText Typo="Typo.h6" Class="px-4">Testify</MudText>
+        <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Quản trị</MudText>
+        <MudDivider Class="my-2" />
+        <MudNavLink Href="/servers" Icon="@Icons.Material.Filled.Home">Dashboard</MudNavLink>
+        <MudNavGroup Title="Quản lý" Icon="@Icons.Material.Filled.ManageAccounts" Expanded="true">
+            <MudNavLink Href="/users" Icon="@Icons.Material.Filled.SupervisedUserCircle">Giảng viên</MudNavLink>
+            <MudNavLink Href="/security" Icon="@Icons.Material.Filled.People">Sinh viên</MudNavLink>
+        </MudNavGroup>
+        <MudNavLink Href="/servers" Icon="@Icons.Material.Filled.LibraryBooks">Quán lý môn học</MudNavLink>
+        <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.QueryStats">Thống kê</MudNavLink>
+       
+    </MudNavMenu>
+</MudPaper> 
