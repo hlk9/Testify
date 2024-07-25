@@ -1,4 +1,4 @@
-﻿@page "/Student/Class"
+@page "/Examiner/ClassManagement"
 @layout AdminLayout
 
 <style>
@@ -14,10 +14,9 @@
     }
 
     .add-button-end {
-        margin-top: 80px;
-        margin-left: 1487px;
         background-color: #29A69A;
         color: white;
+        width: 100%;
     }
 
         .add-button-end:hover {
@@ -29,51 +28,68 @@
         padding-left: 100px;
     }
 
-    /*     .button-details-end:hover {
-            background-color: #29a69a;
-            color: white;
-        }
-        .button-details-end{
-            color:#29a69a;
-        }
-     */
 </style>
-<div class="pt-3 ps-5" style="font-family:Roboto">
-    <div class="bg-white border-1 mt-3 rounded-3" style="width:1590px; height:65px">
-        <MudText Class="fw-bold pt-3 ps-4" Style="font-size:22px; color:#29A69A">LỚP HỌC</MudText>
-    </div>
-    <div>
-        <MudButton Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
-    </div>
+<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">LỚP HỌC</MudText>
+    </MudPaper>
+    <MudGrid Style="padding:20px 0 ">
+        <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
 
-    <div class="bg-white border-1 rounded-3" style="width:1590px; height:100vh; margin-top:10px;">
-        <div class="d-inline-flex mt-2">
-            <img class=" ms-4 mt-4 img-icon-listclass" style="color:#29a69a" src="https://www.svgrepo.com/show/456444/list-clipboard.svg" />
+        </MudItem>
+        <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
+            <MudButton Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+        </MudItem>
+    </MudGrid>
 
-            <MudText Class="fw-bold ps-3 mt-2" Style="font-size:22px; color:#29A69A; padding-top:13px;">Danh sách lớp học</MudText>
-
-            <div class="border rounded-pill mb-1" style=" margin-top:10px;margin-left:920px; ">
-                <MudText Class=" input-search-end">Tìm kiếm theo tên hoặc theo mã   <MudIconButton Class="icon-input-search" Icon="@Icons.Material.Filled.Search"></MudIconButton> </MudText>
-            </div>
+    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+        @* <div class="d-flex mt-2">
+        <div>
+        <img class=" ms-4 mt-4 img-icon-listclass" style="color:#29a69a" src="https://www.svgrepo.com/show/456444/list-clipboard.svg" />
         </div>
-        <hr />
 
-        <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="600px">
+        <div>
+        <MudText Class="fw-bold ps-3 mt-2" Style="font-size:22px; color:#29A69A; padding-top:13px;">Danh sách lớp học</MudText>
+        </div>
+
+
+        <div class="border rounded-pill mb-1 justify-content-end" style=" margin-top:10px;">
+        <MudText Class=" input-search-end">Tìm kiếm theo tên hoặc theo mã   <MudIconButton Class="icon-input-search" Icon="@Icons.Material.Filled.Search"></MudIconButton> </MudText>
+        </div>
+        </div> *@
+        @*     <hr /> *@
+
+
+        <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+
+            <ToolBarContent>
+                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách lớp học</MudText>
+
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+
+            </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="nr_field" T="string">Họ tên</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="sign_field" T="string">Ngày sinh</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="name_field" T="string">Số điện thoại</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="position_field" T="string">Email</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="mass_field" T="string">Lớp</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="mass_field" T="string">Thao tác</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Mã lớp học" T="string">Họ tên</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên lớp học" T="string">Ngày sinh</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Số lượng" T="string">Số điện thoại</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Email</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Lớp</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Nr">@context.Column1</MudTd>
-                <MudTd DataLabel="Sign">@context.Column2</MudTd>
-                <MudTd DataLabel="Name">@context.Column3</MudTd>
-                <MudTd DataLabel="Position">@context.Column4</MudTd>
-                <MudTd DataLabel="Molar mass">@context.Column5</MudTd>
-                <MudTd DataLabel="Molar mass"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Thao tác</MudButton></MudTd>
+                <MudTd DataLabel="Mã lớp học">@context.Column1</MudTd>
+                <MudTd DataLabel="Tên lớp học">@context.Column2</MudTd>
+                <MudTd DataLabel="Số lượng">@context.Column3</MudTd>
+                <MudTd DataLabel="Mô tả">@context.Column4</MudTd>
+                <MudTd DataLabel="Trạng thái">@context.Column5</MudTd>
+                <MudTd DataLabel="Thao tác"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Thao tác</MudButton></MudTd>
             </RowTemplate>
             <NoRecordsContent>
                 <MudText>No matching records found</MudText>
