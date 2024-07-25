@@ -43,7 +43,7 @@
         <NavAdmin></NavAdmin>
     </MudDrawer>
     <MudMainContent>
-        <MudAppBar Style="box-shadow: 1px 1px #d9d9d9" Dense="@_dense">
+        <MudAppBar Style="box-shadow: 1px 1px #d9d9d9; background-color: #fff" Dense="@_dense">
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer"/>
             <MudSpacer />
             <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
@@ -58,7 +58,7 @@
                 </ChildContent>
             </MudMenu>
         </MudAppBar>
-        <div style="height: calc(100vh - 64px); width: 100%">
+        <div>
             @Body
         </div>
     </MudMainContent>

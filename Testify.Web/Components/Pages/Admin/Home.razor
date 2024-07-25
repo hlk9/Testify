@@ -3,9 +3,9 @@
 
 @using Testify.Web.Components.Pages.Examiner.Component
 
-<div style="padding: 10px 20px; background-color: #fafafa; height: 100%">
-    <MudText Style="font-size: 22px; font-weight: bolder; margin-bottom: 20px">Tổng quan</MudText>
-    <MudGrid>
+<div style="padding:20px; background-color: #fafafa; height: 100%">
+    <MudText Style="font-size: 22px; font-weight: bolder;">Tổng quan</MudText>
+    <MudGrid Style="margin-top: 2rem">
         <MudItem xl="3" xs="12" sm="6" md="6" lg="3" Style="padding: 10px 0 0 24px">
             <MudPaper Style="background-color: #E7E6FB; padding: 20px; box-shadow: none">
                 <MudGrid>
@@ -98,8 +98,7 @@
         </MudItem>
     </MudGrid>
 
-    <MudPaper Style="background-color: transparent; box-shadow: none; margin-top: 20px">
-        <MudGrid>
+    <MudGrid Style="margin-top: 2rem">
             <MudItem xl="9" lg="8" md="12" sm="12" xs="12">
                 <MudPaper Style="padding: 15px">
                     <MudGrid Style="align-items: center">
@@ -134,62 +133,80 @@
                 </MudPaper>
             </MudItem>
         </MudGrid>
-    </MudPaper>
 
-    <MudPaper Style="margin-top: 20px">
-        <MudGrid>
-            <MudItem xl="6" lg="12" md="12" sm="12" xs="12">
-                <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
-                    <ToolBarContent>
-                        <MudText Style="font-size: 16px; font-weight: bold">Giảng viên</MudText>
-                        <MudSpacer />
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Họ tên</MudTh>
-                        <MudTh>Ngày sinh</MudTh>
-                        <MudTh>Số điện thoại</MudTh>
-                        <MudTh>Quyền</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Họ tên">@context.name</MudTd>
-                        <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
-                        <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
-                        <MudTd DataLabel="Quyền">@context.role</MudTd>
-                    </RowTemplate>
-                </MudTable>
-            </MudItem>
+    <MudGrid Style="margin-top: 2rem">
+        <MudItem xl="6" lg="12" md="12" sm="12" xs="12">
+            <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
+                <ToolBarContent>
+                    <MudText Style="font-size: 16px; font-weight: bold">Giảng viên</MudText>
+                    <MudSpacer />
+                    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Họ tên</MudTh>
+                    <MudTh>Ngày sinh</MudTh>
+                    <MudTh>Số điện thoại</MudTh>
+                    <MudTh>Quyền</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Họ tên">@context.name</MudTd>
+                    <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
+                    <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
+                    <MudTd DataLabel="Quyền">@context.role</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
 
-            <MudItem xl="6" lg="12" md="12" sm="12" xs="12">
-                <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
-                    <ToolBarContent>
-                        <MudText Style="font-size: 16px; font-weight: bold">Lớp học</MudText>
-                        <MudSpacer />
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </ToolBarContent>
-                    <HeaderContent>
-                        <MudTh>Họ tên</MudTh>
-                        <MudTh>Ngày sinh</MudTh>
-                        <MudTh>Số điện thoại</MudTh>
-                        <MudTh>Lớp</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Họ tên">@context.name</MudTd>
-                        <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
-                        <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
-                        <MudTd DataLabel="Lớp">@context.role</MudTd>
-                    </RowTemplate>
-                </MudTable>
+        <MudItem xl="6" lg="12" md="12" sm="12" xs="12">
+            <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
+                <ToolBarContent>
+                    <MudText Style="font-size: 16px; font-weight: bold">Lớp học</MudText>
+                    <MudSpacer />
+                    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Họ tên</MudTh>
+                    <MudTh>Ngày sinh</MudTh>
+                    <MudTh>Số điện thoại</MudTh>
+                    <MudTh>Lớp</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Họ tên">@context.name</MudTd>
+                    <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
+                    <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
+                    <MudTd DataLabel="Lớp">@context.role</MudTd>
+                </RowTemplate>
+            </MudTable>
 
-            </MudItem>
-        </MudGrid>
-    </MudPaper>
+        </MudItem>
+    </MudGrid>
 
-    <MudPaper>
-
-    </MudPaper>
+    <MudGrid Style="margin-top: 2rem">
+        <MudItem xl="12" lg="12" md="12" sm="12" xs="12">
+            <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
+                <ToolBarContent>
+                    <MudText Style="font-size: 16px; font-weight: bold">Lớp học</MudText>
+                    <MudSpacer />
+                    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>Họ tên</MudTh>
+                    <MudTh>Ngày sinh</MudTh>
+                    <MudTh>Số điện thoại</MudTh>
+                    <MudTh>Lớp</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Họ tên">@context.name</MudTd>
+                    <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
+                    <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
+                    <MudTd DataLabel="Lớp">@context.role</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
 </div>
 
 @code {
