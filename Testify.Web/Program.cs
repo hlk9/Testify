@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Localization;
 using MudBlazor.Services;
+using System.Globalization;
 using Testify.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +12,18 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
+
+
 var app = builder.Build();
+
+var supportedCultures = new[] { new CultureInfo("vi") };
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("vi"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
