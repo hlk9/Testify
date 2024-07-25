@@ -6,8 +6,8 @@
     <MudGrid>
         <MudItem xs="12">
             <MudText Style="font-size: 22px; font-weight: bolder; margin-bottom: 20px">Tổng quan</MudText>
-            <MudGrid>
-                <MudItem xs="3" Style="padding: 10px 0 0 24px">
+            <MudGrid Style="margin-top: 2rem">
+                <MudItem xl="3" xs="12" sm="6" md="6" lg="3" Style="padding: 10px 0 0 24px">
                     <MudPaper Style="background-color: #E7E6FB; padding: 20px; box-shadow: none">
                         <MudGrid>
                             <MudItem xs="3">
@@ -34,7 +34,7 @@
                     </MudPaper>
                 </MudItem>
 
-                <MudItem xs="3" Style="padding: 10px 0 0 24px">
+                <MudItem xl="3" xs="12" sm="6" md="6" lg="3" Style="padding: 10px 0 0 24px">
                     <MudPaper Style="background-color: #F9E5EA; padding: 20px; box-shadow: none">
                         <MudGrid>
                             <MudItem xs="3">
@@ -64,7 +64,7 @@
                     </MudPaper>
                 </MudItem>
 
-                <MudItem xs="3" Style="padding: 10px 0 0 24px">
+                <MudItem xl="3" xs="12" sm="6" md="6" lg="3" Style="padding: 10px 0 0 24px">
                     <MudPaper Style="background-color: #DFEDF7; padding: 20px; box-shadow: none">
                         <MudGrid>
                             <MudItem xs="3">
@@ -81,7 +81,7 @@
                     </MudPaper>
                 </MudItem>
 
-                <MudItem xs="3" Style="padding: 10px 0 0 24px">
+                <MudItem xl="3" xs="12" sm="6" md="6" lg="3" Style="padding: 10px 0 0 24px">
                     <MudPaper Style="background-color: #FBEDD9; padding: 20px; box-shadow: none">
                         <MudGrid>
                             <MudItem xs="3">
@@ -101,8 +101,8 @@
         </MudItem>
     </MudGrid>
 
-    <MudGrid Style="margin-top: 10px">
-        <MudItem xs="8" Style="padding: 10px 0 0 24px">
+    <MudGrid Style="margin-top: 2rem">
+        <MudItem xl="8" lg="7" md="12" sm="12" xs="12" Style="padding: 10px 0 0 24px">
             <MudPaper Style="padding: 10px">
                 <MudText Style="font-size: 18px; font-weight: bold">Điểm thi</MudText>
                 <div>
@@ -111,8 +111,8 @@
             </MudPaper>
         </MudItem>
 
-        <MudItem xs="4" Style="padding: 10px 0 0 24px">
-            <MudPaper Style="background-color: transparent; box-shadow: none">
+        <MudItem xl="4" lg="5" md="12" sm="12" xs="12" Style="padding: 10px 0 0 24px">
+            <MudPaper Height="100%" Style="padding: 15px">
                 <MudText Style="font-size: 18px; font-weight: bold;">Lịch thi sắp tới</MudText>
                 <ScheduleListItems></ScheduleListItems>
                 <ScheduleListItems></ScheduleListItems>
@@ -121,9 +121,9 @@
         </MudItem>
     </MudGrid>
 
-    <MudGrid Style="margin-top: 10px">
+    <MudGrid Style="margin-top: 2rem">
         <MudItem xs="12" Style="padding: 10px 0 0 24px">
-            <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="160px">
+            <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="350px">
                 <ToolBarContent>
                     <MudText Style="font-size: 18px; font-weight: bold">Học sinh</MudText>
                     <MudSpacer />
