@@ -6,30 +6,61 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
+    @* <MudGrid>
+    <MudItem xs="3">
+    <MudPaper>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="0">
+    <NavAdmin></NavAdmin>
+    </MudDrawer>
+    </MudPaper>
+    </MudItem>
+
+    <MudItem xs="9">
+    <MudMainContent Class="pt-0">
     <MudAppBar Elevation="1">
-      
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudLink Typo="Typo.h5" Class="ml-3" Color="Color.Primary" Href="/">Testify</MudLink>
-        <MudSpacer />        
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudMenu>
-            <ActivatorContent>
-                <MudAvatar Color="Color.Tertiary">L</MudAvatar>
-            </ActivatorContent>
-            <ChildContent>
-                <MudMenuItem>Thông tin cá nhân</MudMenuItem>
-                <MudMenuItem>Đăng xuất</MudMenuItem>
-              
-            </ChildContent>
-        </MudMenu>
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+    <MudLink Typo="Typo.h5" Class="ml-3" Color="Color.Primary" Href="/">Testify</MudLink>
+    <MudSpacer />
+    <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+    <MudMenu>
+    <ActivatorContent>
+    <MudAvatar Color="Color.Tertiary">L</MudAvatar>
+    </ActivatorContent>
+    <ChildContent>
+    <MudMenuItem>Thông tin cá nhân</MudMenuItem>
+    <MudMenuItem>Đăng xuất</MudMenuItem>
+
+    </ChildContent>
+    </MudMenu>
 
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="0">
+
+    @Body
+    </MudMainContent>
+    </MudItem>
+    </MudGrid> *@
+    <MudDrawer @bind-Open="@_open" ClipMode="_clipMode" Elevation="1" Variant="@DrawerVariant.Responsive">
         <NavAdmin></NavAdmin>
     </MudDrawer>
-    <MudMainContent Class="pt-0 mt-16">
-        @Body
-       
+    <MudMainContent>
+        <MudAppBar Style="box-shadow: 1px 1px #d9d9d9" Dense="@_dense">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer"/>
+            <MudSpacer />
+            <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+            <MudMenu>
+                <ActivatorContent>
+                    <MudAvatar Color="Color.Tertiary">L</MudAvatar>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem>Thông tin cá nhân</MudMenuItem>
+                    <MudMenuItem>Đăng xuất</MudMenuItem>
+
+                </ChildContent>
+            </MudMenu>
+        </MudAppBar>
+        <div style="height: calc(100vh - 64px); width: 100%">
+            @Body
+        </div>
     </MudMainContent>
 </MudLayout>
 
@@ -41,6 +72,15 @@
 </div>
 
 @code {
+    private bool _open = false;
+    private bool _dense = false;
+    private DrawerClipMode _clipMode = DrawerClipMode.Never;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+
     private bool _drawerOpen = true;
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
