@@ -1,0 +1,72 @@
+﻿@page "/Student/Ranked"
+@layout StudentLayout
+
+<div style=" height: calc(100vh - 64px); padding: 30px 0">
+    <MudGrid Style="padding: 0; margin: 0; width: 100%; height: 100%">
+        <MudItem xs="3" Style="height: 100%; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center">
+            <MudImage Width="400" Src="Asset/image/Ranked/Remove-bg.ai_1721806662094.png" />
+        </MudItem>
+
+        <MudItem xs="6" Style="height: 100%; padding: 0; margin: 0">
+            <MudPaper Style="height: 100%; border-radius: 2%; padding: 30px" Elevation="3">
+                <div style="width: 100%; padding: 15px 0; background-color: #29a69a; border-radius: 10px; text-align: center">
+                    <MudText Style="font-size: 22px; font-weight: bolder; color: #fff">Tên bài thi</MudText>
+                </div>
+
+                <div style="display: flex; justify-content: center; align-items: center; margin: 20px 0">
+                    <div style="width: 30%">
+                        <div style="width: 100%; border: 1px solid #d9d9d9"></div>
+                    </div>
+                    <div>
+                        <MudText Style="font-size: 16px; font-weight: bold; color: #8e8e8e">Top 50 thí sinh có điểm thi cao nhất</MudText>
+                    </div>
+                    <div style="width: 30%">
+                        <div style="width: 100%; border: 1px solid #d9d9d9"></div>
+                    </div>
+                </div>
+
+                <div style="width: 100%;">
+                    <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" HorizontalScrollbar="true" Height="590px">
+                        <RowTemplate>
+                            <MudTd DataLabel="Nr">@context.Column1</MudTd>
+                            <MudTd DataLabel="Sign">@context.Column2</MudTd>
+                            <MudTd DataLabel="Name">@context.Column3</MudTd>
+                            <MudTd DataLabel="Position">@context.Column4</MudTd>
+                            <MudTd DataLabel="Molar mass">@context.Column5</MudTd>
+                            <MudTd DataLabel="Molar mass"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Thao tác</MudButton></MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </div>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="1" Style="height: 100%; padding: 0; margin: 0">
+            <MudImage Width="200" Src="Asset/image/Ranked/Remove-bg.ai_1721807053397.png" />
+        </MudItem>
+
+        <MudItem xs="2" Style="display: flex; align-items: end; padding: 0; margin: 0">
+            <MudImage Width="300" Src="https://img.freepik.com/free-vector/flat-design-go-further-illustration_23-2150077095.jpg?ga=GA1.1.982374425.1721139678&semt=ais_user" />
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    public record ModelTable(string Column1, string Column2, string Column3, string Column4, string Column5);
+
+    public record Model(string Column1, string Column2, string Column3);
+
+    private List<Model> _items = new List<Model>();
+
+    private List<ModelTable> itemTable = new List<ModelTable>();
+
+    protected override void OnInitialized()
+    {
+        for (var i = 0; i < 20; i++)
+        {
+
+            _items.Add(new Model($"Value_{i}", $"Value_{i}", $"Value_{i}"));
+            itemTable.Add(new ModelTable($"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}"));
+        }
+
+    }
+}
