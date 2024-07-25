@@ -67,11 +67,25 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="height: 50px; width: 100%;">Đăng ký</MudButton>
                 </MudItem>
 
-                <div class="d-flex align-items-center justify-content-center" style="margin: 20px 0;">
+                @* <div class="d-flex align-items-center justify-content-center" style="margin: 20px 0;">
                     <MudDivider Style="flex-grow: 1; border-width: 2px; background-color: black;" Color="Color.Dark" />
                     <MudText Class="mx-2" Style="padding: 0 10px; color: black;">Hoặc</MudText>
                     <MudDivider Style="flex-grow: 1; border-width: 2px; background-color: black;" Color="Color.Dark" />
-                </div>
+                </div> *@
+
+                <MudPaper Style="margin: 15px 0; background-color: transparent; box-shadow: none">
+                    <MudGrid Style="padding: 0; margin: 0; width: 100%; align-items: center">
+                        <MudItem xl="5" Style="padding: 0; margin: 0">
+                            <div style="width: 100%; border: 1px solid #d9d9d9"></div>
+                        </MudItem>
+                        <MudItem xl="2" Style="padding: 0; margin: 0; text-align: center">
+                            <MudText Style="font-size: 12px; color: #8e8e8e">Hoặc</MudText>
+                        </MudItem>
+                        <MudItem xl="5" Style="padding: 0; margin: 0">
+                            <div style="width: 100%; border: 1px solid #d9d9d9"></div>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
 
                 <div class="d-flex justify-space-between">
                     <MudItem xs="12" sm="6" style="width: 48%;">
