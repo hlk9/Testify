@@ -1,0 +1,124 @@
+﻿@page "/Student/Class"
+@layout AdminLayout
+
+<style>
+    .img-icon-listclass {
+        width: 25px;
+        height: 25px;
+        margin-top: 15px;
+    }
+
+    .input-search-end {
+        color: #8e8e8e;
+        padding-left: 15px;
+    }
+
+    .add-button-end {
+        margin-top: 80px;
+        margin-left: 1487px;
+        background-color: #29A69A;
+        color: white;
+    }
+
+        .add-button-end:hover {
+            background-color: white;
+            color: #29a69a;
+        }
+
+    .icon-input-search {
+        padding-left: 100px;
+    }
+
+    /*     .button-details-end:hover {
+            background-color: #29a69a;
+            color: white;
+        }
+        .button-details-end{
+            color:#29a69a;
+        }
+     */
+</style>
+<div class="pt-3 ps-5" style="font-family:Roboto">
+    <div class="bg-white border-1 mt-3 rounded-3" style="width:1590px; height:65px">
+        <MudText Class="fw-bold pt-3 ps-4" Style="font-size:22px; color:#29A69A">LỚP HỌC</MudText>
+    </div>
+    <div>
+        <MudButton Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+    </div>
+
+    <div class="bg-white border-1 rounded-3" style="width:1590px; height:100vh; margin-top:10px;">
+        <div class="d-inline-flex mt-2">
+            <img class=" ms-4 mt-4 img-icon-listclass" style="color:#29a69a" src="https://www.svgrepo.com/show/456444/list-clipboard.svg" />
+
+            <MudText Class="fw-bold ps-3 mt-2" Style="font-size:22px; color:#29A69A; padding-top:13px;">Danh sách lớp học</MudText>
+
+            <div class="border rounded-pill mb-1" style=" margin-top:10px;margin-left:920px; ">
+                <MudText Class=" input-search-end">Tìm kiếm theo tên hoặc theo mã   <MudIconButton Class="icon-input-search" Icon="@Icons.Material.Filled.Search"></MudIconButton> </MudText>
+            </div>
+        </div>
+        <hr />
+
+        <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="600px">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="nr_field" T="string">Họ tên</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="sign_field" T="string">Ngày sinh</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="name_field" T="string">Số điện thoại</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="position_field" T="string">Email</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="mass_field" T="string">Lớp</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="mass_field" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nr">@context.Column1</MudTd>
+                <MudTd DataLabel="Sign">@context.Column2</MudTd>
+                <MudTd DataLabel="Name">@context.Column3</MudTd>
+                <MudTd DataLabel="Position">@context.Column4</MudTd>
+                <MudTd DataLabel="Molar mass">@context.Column5</MudTd>
+                <MudTd DataLabel="Molar mass"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Thao tác</MudButton></MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No matching records found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+
+    </div>
+
+
+
+</div>
+@code {
+    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+
+    public List<ChartSeries> Series = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
+        new ChartSeries() { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
+        new ChartSeries() { Name = "Sweden", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
+    };
+    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+
+    private int a;
+    public record Model(string Column1, string Column2, string Column3);
+
+    public record ModelTable(string Column1, string Column2, string Column3, string Column4, string Column5);
+
+    private List<Model> _items = new List<Model>();
+
+    private List<ModelTable> itemTable = new List<ModelTable>();
+
+    protected override void OnInitialized()
+    {
+        for (var i = 0; i < 20; i++)
+        {
+
+            _items.Add(new Model($"Value_{i}", $"Value_{i}", $"Value_{i}"));
+            itemTable.Add(new ModelTable($"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}"));
+        }
+
+    }
+}
