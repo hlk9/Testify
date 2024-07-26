@@ -1,0 +1,111 @@
+﻿@page "/Examiner/StaffManagement"
+@layout AdminLayout
+<style>
+    .add-button-end {
+        background-color: #29A69A;
+        color: white;
+        width: 100%;
+    }
+
+        .add-button-end:hover {
+            background-color: white;
+            color: #29a69a;
+        }
+
+</style>
+<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">NHÂN VIÊN</MudText>
+    </MudPaper>
+    <MudGrid Style="padding:20px 0 ">
+        <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
+
+        </MudItem>
+        <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
+            <MudButton Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+        </MudItem>
+    </MudGrid>
+
+    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+
+
+        <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+
+            <ToolBarContent>
+                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách nhân viên</MudText>
+
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="Mã nhân viên" T="string">Mã nhân viên</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên nhân viên" T="string">Tên nhân viên</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Mã sinh viên">@context.Column1</MudTd>
+                <MudTd DataLabel="Tên sinh viên">@context.Column2</MudTd>
+                <MudTd DataLabel="Số điện thoại">@context.Column3</MudTd>
+                <MudTd DataLabel="Trạng thái">@context.Column4</MudTd>
+                <MudTd DataLabel="Thao tác"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Thao tác</MudButton></MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No matching records found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+
+    </div>
+
+
+
+</div>
+@code {
+    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+
+    public List<ChartSeries> Series = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
+        new ChartSeries() { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
+        new ChartSeries() { Name = "Sweden", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
+    };
+    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+
+    private int a;
+    public record Model(string Column1, string Column2, string Column3);
+
+    public record ModelTable(string Column1, string Column2, string Column3, string Column4, string Column5);
+
+    private List<Model> _items = new List<Model>();
+
+    private List<ModelTable> itemTable = new List<ModelTable>();
+
+    protected override void OnInitialized()
+    {
+        for (var i = 0; i < 20; i++)
+        {
+
+            _items.Add(new Model($"Value_{i}", $"Value_{i}", $"Value_{i}"));
+            itemTable.Add(new ModelTable($"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}"));
+        }
+
+    }
+}
+
+
+
+
