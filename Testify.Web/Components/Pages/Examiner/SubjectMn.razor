@@ -1,6 +1,6 @@
-﻿@page "/"
+﻿@page "/Examiner/SubjectManagement"
 @layout AdminLayout
-
+@inject IDialogService DialogService
 <style>
 
     .add-button-end {
@@ -24,7 +24,7 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -62,20 +62,22 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Mã lớp học" T="string">Mã Môn</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Tên lớp học" T="string">Tên môn</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Số lượng" T="string">Số điện thoại</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Email</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Lớp</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Mã môn học" T="string">Mã môn học</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên môn học" T="string">Tên môn học</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Mô tả</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Mã lớp học">@context.Column1</MudTd>
-                <MudTd DataLabel="Tên lớp học">@context.Column2</MudTd>
-                <MudTd DataLabel="Số lượng">@context.Column3</MudTd>
-                <MudTd DataLabel="Mô tả">@context.Column4</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Column5</MudTd>
-                <MudTd DataLabel="Thao tác"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Thao tác</MudButton></MudTd>
+                <MudTd DataLabel="Mã môn học">@context.Column1</MudTd>
+                <MudTd DataLabel="Tên môn học">@context.Column2</MudTd>
+                <MudTd DataLabel="Mô tả">@context.Column3</MudTd>
+                <MudTd DataLabel="Trạng thái">@context.Column4</MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                </MudTd>
             </RowTemplate>
             <NoRecordsContent>
                 <MudText>No matching records found</MudText>
@@ -120,6 +122,29 @@
 
             _items.Add(new Model($"Value_{i}", $"Value_{i}", $"Value_{i}"));
             itemTable.Add(new ModelTable($"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}"));
+        }
+
+    }
+
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    private Task OpenDialogAsync(DialogOptions options, string name)
+    {
+        if (name.Equals("create"))
+        {
+            return DialogService.ShowAsync<Dialog.Subject.CreateSubjectDialog>("Options Dialog", options);
+        }
+        else if (name.Equals("update"))
+        {
+            return DialogService.ShowAsync<Dialog.Subject.UpdateSubjectDialog>("Options Dialog", options);
+        }
+        else if (name.Equals("details"))
+        {
+            return DialogService.ShowAsync<Dialog.Subject.DetailsSubjectDialog>("Options Dialog", options);
+        }
+        else
+        {
+            return DialogService.ShowAsync<Dialog.Subject.DeleteSubjectDialog>("Options Dialog", options);
         }
 
     }

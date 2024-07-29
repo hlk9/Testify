@@ -1,5 +1,6 @@
 ﻿@page "/Examiner/RoomManagement"
 @layout AdminLayout
+@inject IDialogService DialogService
 <style>
     .add-button-end {
         background-color: #29A69A;
@@ -22,7 +23,7 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -58,7 +59,11 @@
                 <MudTd DataLabel="Số lượng">@context.Column3</MudTd>
                 <MudTd DataLabel="Địa chỉ">@context.Column4</MudTd>
                 <MudTd DataLabel="Trạng thái">@context.Column5</MudTd>
-                <MudTd DataLabel="Thao tác"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Thao tác</MudButton></MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                </MudTd>
             </RowTemplate>
             <NoRecordsContent>
                 <MudText>No matching records found</MudText>
@@ -103,6 +108,29 @@
 
             _items.Add(new Model($"Value_{i}", $"Value_{i}", $"Value_{i}"));
             itemTable.Add(new ModelTable($"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}"));
+        }
+
+    }
+
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    private Task OpenDialogAsync(DialogOptions options, string name)
+    {
+        if (name.Equals("create"))
+        {
+            return DialogService.ShowAsync<Dialog.Room.CreateRoomDialog>("Options Dialog", options);
+        }
+        else if (name.Equals("update"))
+        {
+            return DialogService.ShowAsync<Dialog.Room.UpdateRoomDialog>("Options Dialog", options);
+        }
+        else if (name.Equals("details"))
+        {
+            return DialogService.ShowAsync<Dialog.Room.DetailsRoomDialog>("Options Dialog", options);
+        }
+        else
+        {
+            return DialogService.ShowAsync<Dialog.Room.DeleteRoomDialog>("Options Dialog", options);
         }
 
     }
