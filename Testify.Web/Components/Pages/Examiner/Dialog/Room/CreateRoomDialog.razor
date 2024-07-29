@@ -1,0 +1,27 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Thêm mới phòng
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Label="Mã phòng" ReadOnly="true" />
+        <MudTextField T="string" Label="Tên phòng" ReadOnly="true" />
+        <MudTextField T="string" Label="Số lượng" ReadOnly="true" />
+        <MudTextField T="string" Label="Địa chỉ" ReadOnly="true" />
+        <MudTextField T="string" Label="Trạng thái" ReadOnly="true" />
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">Tạo</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}

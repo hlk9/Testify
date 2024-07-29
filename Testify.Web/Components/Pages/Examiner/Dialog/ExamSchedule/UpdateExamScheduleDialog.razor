@@ -1,0 +1,29 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+
+            Sửa lịch thi
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Disabled Label="Mã lịch thi" ReadOnly="true" />
+        <MudTextField T="string" Label="Mã bài thi" ReadOnly="true" />
+        <MudTextField T="string" Label="Thời gian bắt đầu" ReadOnly="true" />
+        <MudTextField T="string" Label="Thời gian kết thúc" ReadOnly="true" />
+        <MudTextField T="string"  Label="Trạng thái" ReadOnly="true" />
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick=" Cancel">Quay lại</MudButton>
+        <MudButton Color="@Color.Warning" OnClick="Submit">Sửa</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}
+
