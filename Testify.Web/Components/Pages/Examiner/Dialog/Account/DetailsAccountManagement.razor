@@ -1,0 +1,33 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Class="mr-3 mb-n1" />
+            Chi tiết tài khoản
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Disabled Label="Mã tài khoản" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Họ và tên" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Ngày sinh" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Số điện thoại" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Địa chỉ" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Level" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Tên tài khoản" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Email" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Lần cuối đăng nhập" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Trạng thái" ReadOnly="true" />
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Quay lại</MudButton>
+     
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}

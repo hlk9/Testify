@@ -21,12 +21,69 @@
                     </MudItem>
                 </MudGrid>
 
+<<<<<<< HEAD
                 <MudGrid style="align-items: center; padding: 0; margin: 0; width: 100%; height: 100%">
                     <MudItem xl="3" lg="3" md="2" sm="1" xs="12" style="padding: 0; margin: 0"></MudItem>
                     <MudItem xl="6" lg="6" md="8" sm="10" xs="12" style="padding: 0; margin: 0">
                         <div style="height: 100%; width: 100%">
                             <MudItem xs="12" style="text-align: center;">
                                 <MudText Typo="Typo.h5" style="font-weight: bold;">Đăng ký tài khoản Testify của bạn</MudText>
+=======
+                <MudText Style="font-weight: bold; margin-top: 15px">Thông tin tài khoản</MudText>
+                <MudItem xs="12" style="width: 100%;">
+                    <MudTextField T="string" Placeholder="Số điện thoại" Variant="Variant.Outlined"
+                                  Style="height: 50px; border-radius: 10px; padding-left: 10px;" />
+                </MudItem>
+                <MudItem xs="12" style="width: 100%;">
+                    <MudTextField T="string" Placeholder="Email" Variant="Variant.Outlined"
+                                  Style="height: 50px; border-radius: 10px; padding-left: 10px;" />
+                </MudItem>
+                <MudItem xs="12" style="width: 100%;">
+                    <MudTextField T="string" Placeholder="Mật khẩu" Variant="Variant.Outlined"
+                                  Style="height: 50px; border-radius: 10px; padding-left: 10px;" />
+                </MudItem>
+                <MudItem xs="12" style="width: 100%;">
+                    <MudTextField T="string" Placeholder="Xác nhận mật khẩu" Variant="Variant.Outlined"
+                                  Style="height: 50px; border-radius: 10px; padding-left: 10px;" />
+                </MudItem>
+                <MudItem xs="12" style="text-align: center; margin-top: 10px;">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="height: 50px; width: 100%;">Đăng ký</MudButton>
+                </MudItem>
+
+                @* <div class="d-flex align-items-center justify-content-center" style="margin: 20px 0;">
+                    <MudDivider Style="flex-grow: 1; border-width: 2px; background-color: black;" Color="Color.Dark" />
+                    <MudText Class="mx-2" Style="padding: 0 10px; color: black;">Hoặc</MudText>
+                    <MudDivider Style="flex-grow: 1; border-width: 2px; background-color: black;" Color="Color.Dark" />
+                </div> *@
+
+                <MudPaper Style="margin: 15px 0; background-color: transparent; box-shadow: none">
+                    <MudGrid Style="padding: 0; margin: 0; width: 100%; align-items: center">
+                        <MudItem xl="5" Style="padding: 0; margin: 0">
+                            <div style="width: 100%; border: 1px solid #d9d9d9"></div>
+                        </MudItem>
+                        <MudItem xl="2" Style="padding: 0; margin: 0; text-align: center">
+                            <MudText Style="font-size: 12px; color: #8e8e8e">Hoặc</MudText>
+                        </MudItem>
+                        <MudItem xl="5" Style="padding: 0; margin: 0">
+                            <div style="width: 100%; border: 1px solid #d9d9d9"></div>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+
+                <div class="d-flex justify-space-between">
+                    <MudItem xs="12" sm="6" style="width: 48%;">
+                        <MudButton Variant="Variant.Outlined" Style="height: 50px; border-radius: 5px; padding-left: 15px; width: 265px">
+                            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 40 40" width="25" height="25">
+                                <linearGradient id="a" x1="-277.375" x2="-277.375" y1="406.6018" y2="407.5726" gradientTransform="matrix(40 0 0 -39.7778 11115.001 16212.334)" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0" stop-color="#0062e0" />
+                                    <stop offset="1" stop-color="#19afff" />
+                                </linearGradient>
+                                <path fill="url(#a)" d="M16.7 39.8C7.2 38.1 0 29.9 0 20 0 9 9 0 20 0s20 9 20 20c0 9.9-7.2 18.1-16.7 19.8l-1.1-.9h-4.4l-1.1.9z" />
+                                <path fill="#fff" d="m27.8 25.6.9-5.6h-5.3v-3.9c0-1.6.6-2.8 3-2.8H29V8.2c-1.4-.2-3-.4-4.4-.4-4.6 0-7.8 2.8-7.8 7.8V20h-5v5.6h5v14.1c1.1.2 2.2.3 3.3.3 1.1 0 2.2-.1 3.3-.3V25.6h4.4z" />
+                            </svg>
+                            <MudItem style="text-align: center;">
+                                <MudText Style="font-weight: bold; padding-left: 5px">Facebook</MudText>
+>>>>>>> 487042476c9b5ce21258a7b74c8d1f2c66c76c44
                             </MudItem>
                             <MudText style="font-weight: bold; margin-top: 15px">Thông tin cá nhân</MudText>
                             <MudItem xs="12" style="width: 100%;">

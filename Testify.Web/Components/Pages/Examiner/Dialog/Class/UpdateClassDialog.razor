@@ -1,0 +1,28 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Class="mr-3 mb-n1" />
+            Sửa lớp học
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string" Disabled Label="Mã lớp học" ReadOnly="true" />
+        <MudTextField T="string"  Label="Tên lớp học" ReadOnly="true" />
+        <MudTextField T="string"  Label="Số lượng" ReadOnly="true" />
+        <MudTextField T="string"  Label="Mô tả" ReadOnly="true" />
+        <MudTextField T="string"  Label="Trạng thái" ReadOnly="true" />
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Warning" Variant="@Variant.Filled" OnClick="Submit">Sửa</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}
