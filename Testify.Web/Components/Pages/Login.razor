@@ -1,5 +1,8 @@
 ﻿@page "/Login"
 <style>
+
+  
+
     @@media (max-width: 720px) {
         .rounded-custom {
             border-radius: 0px !important; /* Change 10px to your desired width */
@@ -9,6 +12,13 @@
             width:100%!important;
         }
     }
+
+    @@media (min-width: 1500px) {
+        .loginRange {
+            width: 70%!important;
+        }
+    }
+
 </style>
 
 <MudGrid Spacing="0" Class="m-0 w-100 align-items-center" Justify="Justify.SpaceBetween" Style="background-color:#29A69A; height:100vh">
@@ -20,13 +30,13 @@
                     Logo
                 </MudItem>
                 <MudItem lg="6" Class="d-flex justify-end">
-                    <MudButton Color="Color.Primary" Class=" p-1 ps-5 pe-5" Variant="Variant.Outlined">Đăng ký</MudButton>
+                    <MudButton Color="Color.Primary" Class=" ps-3 pe-3 pt-2 pb-2" Variant="Variant.Outlined">Đăng ký</MudButton>
                 </MudItem>
             </MudGrid>
         </MudPaper>
 
 
-        <MudPaper Elevation="0" Class="p-0 w-75 p-md-5 loginRange" Height="100%">
+        <MudPaper Elevation="0" Class="p-0 p-md-5 loginRange" Style="width:60%" Height="100%">
 
 
 
@@ -56,7 +66,7 @@
 
         </MudPaper>
     </MudItem>
-    <MudItem Class="p-0 pe-5 d-none d-lg-block">
+    <MudItem Class="p-0 pe-5 d-none d-md-none d-lg-block" Style="margin-right:4%">
         <svg width="496" height="555" viewBox="0 0 496 555" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <rect width="496" height="555" fill="url(#pattern0_130_221)" />
             <defs>
