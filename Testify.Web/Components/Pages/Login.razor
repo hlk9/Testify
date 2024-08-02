@@ -1,4 +1,4 @@
-﻿@page "/Login"
+﻿@page "/"
 <style>
 
   
@@ -30,7 +30,7 @@
                     Logo
                 </MudItem>
                 <MudItem lg="6" Class="d-flex justify-end">
-                    <MudButton Color="Color.Primary" Class=" ps-3 pe-3 pt-2 pb-2" Variant="Variant.Outlined">Đăng ký</MudButton>
+                    <MudButton Color="Color.Primary" Class=" ps-3 pe-3 pt-2 pb-2" Variant="Variant.Outlined" @onclick="NavigateToRegister">Đăng ký</MudButton>
                 </MudItem>
             </MudGrid>
         </MudPaper>
@@ -43,7 +43,7 @@
             <MudText Style="font-size:22px; font-weight:bold" Class="text-center">Đăng nhập bằng tải khoản Testify của bạn</MudText>
             <MudTextField T="string" Class="mt-3 mb-3" Placeholder="Email/Số điện thoại" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
             <MudTextField T="string" Class="mt-3 mb-3" Placeholder="Mật khẩu" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" FullWidth="true"></MudTextField>
-            <MudText Class="mt-3 mb-3" Align="Align.End">Quên mật khẩu?</MudText>
+            <MudText Class="mt-3 mb-3" Align="Align.End" @onclick="NavigateToPasswordRetrieval">Quên mật khẩu?</MudText>
 
             <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w-100 rounded-4">Tiếp tục</MudButton>
 
@@ -80,6 +80,20 @@
     </MudItem>
 </MudGrid>
 @code {
+    [Inject] NavigationManager Navigation { get; set; }
+
+    private void NavigateToPasswordRetrieval()
+    {
+        Navigation.NavigateTo("/PasswordRetrieval");
+    }
+
+    [Inject] NavigationManager NavigationRegister { get; set; }
+
+    private void NavigateToRegister()
+    {
+        NavigationRegister.NavigateTo("/Register");
+    }
+
     bool isShow;
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
