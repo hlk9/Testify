@@ -8,7 +8,7 @@
                     Logo
                 </MudItem>
                 <MudItem lg="6" Class="d-flex justify-end">
-                    <MudButton Color="Color.Primary" Class=" ps-3 pe-3 pt-2 pb-2" Variant="Variant.Outlined">Đăng nhập</MudButton>
+                    <MudButton Color="Color.Primary" Class=" ps-3 pe-3 pt-2 pb-2" Variant="Variant.Outlined" @onclick="NavigateToLogin">Đăng nhập</MudButton>
                 </MudItem>
             </MudGrid>
         </MudPaper>
@@ -78,5 +78,10 @@
 </MudGrid>
 
 @code {
+    [Inject] NavigationManager NavigationLogin { get; set; }
 
+    private void NavigateToLogin()
+    {
+        NavigationLogin.NavigateTo("/");
+    }
 }
