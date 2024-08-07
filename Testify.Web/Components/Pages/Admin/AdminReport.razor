@@ -1,0 +1,94 @@
+﻿@page "/Admin/Report"
+@layout AdminLayout
+<div style="padding:20px; background-color: #F2F3F4; height: 100%">
+    <MudGrid>
+        <MudItem xl="12" lg="12" md="12" sm="12" xs="12">
+            <MudText Style="font-size:24px; font-weight:bold" Class="float-md-start">BÁO CÁO TỔNG HỢP</MudText>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xl="8" lg="8" md="12" sm="12" xs="12">
+            <MudText Style="font-size:20px; font-weight:normal" Class="float-md-start">Danh sách biểu mẫu báo cáo</MudText>
+
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" @onclick="() => ShowAdditionalSelect(1)">Tổng hợp thi đua khen thưởng</MudButton>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" @onclick="() => ShowAdditionalSelect(2)">Tổng hợp kết quả đánh giá</MudButton>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" @onclick="() => ShowAdditionalSelect(3)">Danh sách danh hiệu thi đua</MudButton>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" FullWidth="true" @onclick="() => ShowAdditionalSelect(4)">Danh sách tập thể, cá nhân khen thưởng</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xl="4" lg="4" md="12" sm="12" xs="12">
+            <MudText Style="font-size:20px; font-weight:normal" Class="float-md-start">Dữ liệu báo cáo</MudText>
+
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudSelect T="int" Label="Năm" @bind-Value="selectedYear">
+                        @foreach (var year in years)
+                        {
+                            <MudSelectItem Value="year">@year</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudSelect T="int" Label="Tháng" @bind-Value="selectedMonth">
+                        @for (int month = 1; month <= 12; month++)
+                        {
+                            <MudSelectItem Value="month">@month</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+
+            @if (showAdditionalSelect)
+            {
+                <MudItem xs="12" md="6">
+                    <MudSelect T="string" Label="Đơn vị" @bind-Value="selectedUnit">
+                        @foreach (var unit in units)
+                        {
+                            <MudSelectItem Value="unit">@unit</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" FullWidth="true" >In biểu mẫu</MudButton>
+        </MudItem>
+    </MudGrid>
+</div>
+
+
+
+@code {
+    private int selectedYear;
+    private int selectedMonth;
+    private string selectedUnit;
+    private bool showAdditionalSelect = false;
+
+    private List<int> years;
+    private List<string> units = new List<string> { "Khối Đại Học","Khối Cao Đẳng","Khối 12", "Khối 11", "Khối 10", "Khối 9", "Khối 8", "Khối 7", "Khối 6", "Khối 5", "Khối 4", "Khối 3", "Khối 2", "Khối 1", };
+
+    protected override void OnInitialized()
+    {
+        years = Enumerable.Range(DateTime.Now.Year - 20, 21).ToList(); // Từ năm nay lùi lại 20 năm
+    }
+
+    private void ShowAdditionalSelect(int index)
+    {
+        if (index ==  3 || index ==4)
+        {
+            showAdditionalSelect = true;
+        }
+        else
+        {
+            showAdditionalSelect = false;
+        }
+    }
+}
