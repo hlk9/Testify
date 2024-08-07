@@ -23,7 +23,11 @@ namespace Testify.DAL.Models
         public DateTime? LastLogin {  get; set; }
         public byte Status { get; set; } = 1;
         [ForeignKey("LevelId")]
-        public string LevelId { get; set; }
+        public string LevelId { get; set; } 
+        public virtual Level? Level { get; set; }
+        public virtual ICollection<ClassUser>? ClassUsers { get; set; }
+        public virtual ICollection<UserPermission>? UserPermissions { get; set; }
+        public virtual ICollection<Submission>? Submissions { get; set; }
 
     }
 }
