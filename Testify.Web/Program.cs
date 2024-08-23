@@ -14,6 +14,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<QuestionService>();
+builder.Services.AddScoped<QuestionTypeService>();
+builder.Services.AddScoped<QuestionLevelService>();
 
 
 var app = builder.Build();
