@@ -13,8 +13,8 @@
 @using Testify.Web.Components.Layout
 @using Heron.MudCalendar
 @using Testify.Web.Services
-@inject QuestionService questionService
-@inject QuestionTypeService questionTypeService
-@inject QuestionLevelService questionLevelService
+@inject QuestionService _serQuestion
+@inject QuestionTypeService _serQuestionType
+@inject QuestionLevelService _serQuestionLevel
 @inject NavigationManager navigation
-@inject Snackbar snackbar
+@inject ISnackbar snackbar

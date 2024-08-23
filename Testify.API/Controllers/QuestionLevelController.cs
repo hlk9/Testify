@@ -37,14 +37,14 @@ namespace Testify.API.Controllers
             return Ok(createQuestionType);
         }
 
-        [HttpPost("Update-Question-Level")]
+        [HttpPut("Update-Question-Level")]
         public async Task<ActionResult<QuestionLevel>> Update(QuestionLevel QuestionLevel)
         {
             var updateQuestionType = await _repo.UpdateLevel(QuestionLevel);
             return Ok(updateQuestionType);
         }
 
-        [HttpPost("Delete-Question-Level")]
+        [HttpDelete("Delete-Question-Level")]
         public async Task<ActionResult<QuestionLevel>> Delete(int id)
         {
             var deleteQuestionType = await _repo.DeleteLevel(id);
