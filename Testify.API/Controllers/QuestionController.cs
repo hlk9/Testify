@@ -18,21 +18,21 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-All-Questions")]
-        public async Task<ActionResult> GetlAllQuestions()
+        public async Task<ActionResult<List<Question>>> GetlAllQuestions()
         {
             var lstQuestion = await _repoQuestion.GetAllQuestions();
             return Ok(lstQuestion);        
         }
 
         [HttpGet("Get-Question-By-Id")]
-        public async Task<ActionResult> GetQuestionById(int id)
+        public async Task<ActionResult<Question>> GetQuestionById(int id)
         {
             var question = await _repoQuestion.GetQuestionById(id);
             return Ok(question);
         }
 
         [HttpPost("Create-Question")]
-        public async Task<ActionResult> Create(Question question)
+        public async Task<ActionResult<Question>> Create(Question question)
         {
             var createQuestion = await _repoQuestion.CreateQuestion(question);
             return Ok(createQuestion);
@@ -46,7 +46,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("Delete-Question")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult<Question>> Delete(int id)
         {
             var deleteQuestion = await _repoQuestion.DeleteQuestion(id);
             return Ok(deleteQuestion);
