@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Localization;
 using MudBlazor.Services;
 using System.Globalization;
 using Testify.Web.Components;
+using Testify.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-
+builder.Services.AddScoped<QuestionService>();
 
 
 var app = builder.Build();
