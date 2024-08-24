@@ -1,1 +1,51 @@
-﻿
+﻿@using Testify.DAL.Models;
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới thể loại</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Spacing="5" Model="@questionLevel" @ref="@form">
+            <MudTextField @bind-Value="questionLevel.Name" For="@(() => questionLevel.Name)" Style="padding: 0" T="string" Label="Tên Mức Độ Câu Hỏi" />
+            <MudTextField @bind-Value="questionLevel.Description" For="@(() => questionLevel.Description)" Style="padding: 0" T="string" Label="Mô Tả" />
+            <MudRadioGroup @bind-Value="StatusQuestionLevel">
+                <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
+                <MudRadio Value="@(false)">Không hoạt động</MudRadio>
+            </MudRadioGroup>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Thêm mới</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    MudForm form;
+
+    private QuestionLevel questionLevel { get; set; } = new();
+
+    private bool StatusQuestionLevel { get; set; } = true;
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private async void Submit()
+    {
+        questionLevel.Status = StatusQuestionLevel;
+        var check = await _serQuestionLevel.CreateQuestionLevel(questionLevel);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
