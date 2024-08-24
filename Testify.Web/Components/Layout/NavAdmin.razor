@@ -3,13 +3,24 @@
         <MudText Typo="Typo.h6" Class="px-4">Testify</MudText>
         <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Quản trị</MudText>
         <MudDivider Class="my-2" />
-        <MudNavLink Href="/servers" Icon="@Icons.Material.Filled.Home">Dashboard</MudNavLink>
-        <MudNavGroup Title="Quản lý" Icon="@Icons.Material.Filled.ManageAccounts" Expanded="true">
-            <MudNavLink Href="/users" Icon="@Icons.Material.Filled.SupervisedUserCircle">Giảng viên</MudNavLink>
-            <MudNavLink Href="/security" Icon="@Icons.Material.Filled.People">Sinh viên</MudNavLink>
+        <MudNavGroup Title="Dasboard" Icon="@Icons.Material.Filled.ManageAccounts" Expanded="true">
+            <MudNavLink Href="/Admin/Home" Icon="@Icons.Material.Filled.Home">Dashboard Admin</MudNavLink>
+            <MudNavLink Href="/Examiner/Home" Icon="@Icons.Material.Filled.Home">Dashboard Examiner</MudNavLink>
+            <MudNavLink Href="/Student/Home" Icon="@Icons.Material.Filled.Home">Dashboard Student</MudNavLink>
         </MudNavGroup>
-        <MudNavLink Href="/servers" Icon="@Icons.Material.Filled.LibraryBooks">Quán lý môn học</MudNavLink>
-        <MudNavLink Href="/billing" Icon="@Icons.Material.Filled.QueryStats">Thống kê</MudNavLink>
-       
+        <MudNavLink Href="/Examiner/ExamScheduleManagement" Icon="@Icons.Material.Filled.CalendarToday">Lịch Thi</MudNavLink>
+        <MudNavLink Href="/Examiner/ClassManagement" Icon="@Icons.Material.Filled.Subject">Lớp Học</MudNavLink>
+        <MudNavLink Href="/Examiner/AccountManagement" Icon="@Icons.Material.Filled.ManageAccounts">Tài Khoản</MudNavLink>
+        <MudNavLink Href="/Examiner/ExamScheduleManagement" Icon="@Icons.Material.Filled.FilterNone">Bài Thi</MudNavLink>
+        <MudNavLink Href="/Examiner/SubjectManagement" Icon="@Icons.Material.Filled.MenuBook">Môn Học</MudNavLink>
+        <MudNavLink Href="/Examiner/RoomManagement" Icon="@Icons.Material.Filled.DoorFront">Phòng Học</MudNavLink>
+        <MudNavLink Href="/Examiner/StaffManagement" Icon="@Icons.Material.Filled.PeopleOutline">Nhân Viên</MudNavLink>
+        <MudNavLink Href="/Examiner/StudentManagement" Icon="@Icons.Material.Filled.People">Học Sinh/Sinh Viên</MudNavLink>
+        <MudNavLink Href="/Admin/Report" Icon="@Icons.Material.Filled.Equalizer">Báo Cáo Admin</MudNavLink>
+        <MudNavGroup Title="Quản Lý Câu Hỏi" Icon="@Icons.Material.Filled.QuestionMark" Expanded="true">
+            <MudNavLink Href="/Examiner/QuestionManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Câu Hỏi</MudNavLink>
+            <MudNavLink Href="/Examiner/QuestionTypeManagement" Icon="@Icons.Material.Filled.QuestionAnswer"> Loại Câu Hỏi</MudNavLink>
+            <MudNavLink Href="/Examiner/QuestionLevelManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Mức Độ Của Câu Hỏi</MudNavLink>
+        </MudNavGroup>
     </MudNavMenu>
 </MudPaper> 
