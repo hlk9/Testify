@@ -92,30 +92,55 @@
 @code {
     private List<QuestionLevel> _lstQuestionLevels;
 
-    protected override async Task OnInitializedAsync()
+    private async Task loadData()
     {
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await loadData();
+    }
+
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, string name)
     {
         if (name.Equals("create"))
         {
-            return DialogService.ShowAsync<Dialog.QuestionLevel.CreateQuestionLevelDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.CreateQuestionLevelDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await loadData();
+            }
         }
         else if (name.Equals("update"))
         {
-            return DialogService.ShowAsync<Dialog.QuestionLevel.UpdateQuestionLevelDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.UpdateQuestionLevelDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await loadData();
+            }
         }
         else if (name.Equals("details"))
         {
-            return DialogService.ShowAsync<Dialog.QuestionLevel.DetailQuestionLevelDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.DetailQuestionLevelDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await loadData();
+            }
         }
         else
         {
-            return DialogService.ShowAsync<Dialog.QuestionLevel.DeleteQuestionLevelDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.DeleteQuestionLevelDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await loadData();
+            }
         }
 
     }
