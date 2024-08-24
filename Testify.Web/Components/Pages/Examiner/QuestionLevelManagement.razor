@@ -1,4 +1,4 @@
-﻿@page "/Examiner/QuestionManagement"
+﻿@page "/Examiner/QuestionLevelManagement"
 @using Testify.DAL.Models
 @layout AdminLayout
 @inject IDialogService DialogService
@@ -27,7 +27,7 @@
 
 <div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-63px)); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
-        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI</MudText>
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">LOẠI MỨC ĐỘ CỦA CÂU HỎI</MudText>
     </MudPaper>
     <MudGrid Style="padding:20px 0 ">
         <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
@@ -39,12 +39,12 @@
     </MudGrid>
 
     <div class="bg-white rounded-3 mb-4" style="width:100%;">
-        <MudTable Items="@_lstQuestion" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@_lstQuestionLevels" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
                     <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách câu hỏi</MudText>
+                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách loại mức độ của câu hỏi</MudText>
 
                     </MudItem>
                     <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
@@ -55,22 +55,16 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id câu hỏi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Tên câu hỏi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Mức độ" T="string">Mức độ</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Loại câu hỏi" T="string">Loại câu hỏi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thuộc môn" T="string">Thuộc môn</MudTableSortLabel></MudTh>
+                <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id loại câu hỏi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Tên loại câu hỏi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thuộc môn" T="string">Mô tả</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
-                <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
-                <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
-                <MudTd DataLabel="Mức độ">@context.QuestionLevelId</MudTd>
-                <MudTd DataLabel="Loại câu hỏi">@context.QuestionTypeId</MudTd>
-                <MudTd DataLabel="Thuộc môn">@context.SubjectId</MudTd>
+                <MudTd DataLabel="Id loại câu hỏi" hidden>@context.Id</MudTd>
+                <MudTd DataLabel="Tên loại câu hỏi">@context.Name</MudTd>
+                <MudTd DataLabel="Mô tả">@context.Description</MudTd>
                 <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
 
                 <MudTd DataLabel="Thao tác">
@@ -96,11 +90,11 @@
 
 
 @code {
-    private List<Question> _lstQuestion;
+    private List<QuestionLevel> _lstQuestionLevels;
 
     protected override async Task OnInitializedAsync()
     {
-        _lstQuestion = await _serQuestion.GetAllQuestions();
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
@@ -109,19 +103,19 @@
     {
         if (name.Equals("create"))
         {
-            return DialogService.ShowAsync<Dialog.Question.CreateQuestionDialog>("Options Dialog", options);
+            return DialogService.ShowAsync<Dialog.QuestionLevel.CreateQuestionLevelDialog>("Options Dialog", options);
         }
         else if (name.Equals("update"))
         {
-            return DialogService.ShowAsync<Dialog.Question.UpdateQuestionDialog>("Options Dialog", options);
+            return DialogService.ShowAsync<Dialog.QuestionLevel.UpdateQuestionLevelDialog>("Options Dialog", options);
         }
         else if (name.Equals("details"))
         {
-            return DialogService.ShowAsync<Dialog.Question.DetailQuestionDialog>("Options Dialog", options);
+            return DialogService.ShowAsync<Dialog.QuestionLevel.DetailQuestionLevelDialog>("Options Dialog", options);
         }
         else
         {
-            return DialogService.ShowAsync<Dialog.Question.DeleteQuestionDialog>("Options Dialog", options);
+            return DialogService.ShowAsync<Dialog.QuestionLevel.DeleteQuestionLevelDialog>("Options Dialog", options);
         }
 
     }
