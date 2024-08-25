@@ -34,12 +34,12 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create", -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
     <div class="bg-white rounded-3 mb-4" style="width:100%;">
-        <MudTable Items="@_lstQuestion" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@_lstQuestions" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -68,15 +68,50 @@
                 <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
                 <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
                 <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
-                <MudTd DataLabel="Mức độ">@context.QuestionLevelId</MudTd>
-                <MudTd DataLabel="Loại câu hỏi">@context.QuestionTypeId</MudTd>
-                <MudTd DataLabel="Thuộc môn">@context.SubjectId</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
+                <MudTd DataLabel="Mức độ">
+                    @if(_lstQuestionLevels != null)
+                    {
+                        foreach (var item in _lstQuestionLevels)
+                        {
+                            if(item.Id == context.QuestionLevelId)
+                            {
+                                @item.Name;
+                                break;
+                            }
+                        }
+                    }
+                </MudTd> 
+                <MudTd DataLabel="Loại câu hỏi">
+                    @if (_lstQuestionTypes != null)
+                    {
+                        foreach (var item in _lstQuestionTypes)
+                        {
+                            if (item.Id == context.QuestionTypeId)
+                            {
+                                @item.Name;
+                                break;
+                            }
+                        }
+                    }
+                </MudTd>
+                <MudTd DataLabel="Thuộc môn">
+                    @if (_lstSubjects != null)
+                    {
+                        foreach (var item in _lstSubjects)
+                        {
+                            if (item.Id == context.SubjectId)
+                            {
+                                @item.Name;
+                                break;
+                            }
+                        }
+                    }
+                </MudTd>
+                <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Không Hoạt Động")</MudTd>
 
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"", context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                 </MudTd>
             </RowTemplate>
 
@@ -96,32 +131,66 @@
 
 
 @code {
-    private List<Question> _lstQuestion;
+    private List<Question> _lstQuestions;
+    private List<Subject> _lstSubjects;
+    private List<QuestionLevel> _lstQuestionLevels;
+    private List<QuestionType> _lstQuestionTypes;
+
+    private async Task LoadData()
+    {
+        _lstQuestions = await _serQuestion.GetAllQuestions();
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        _lstQuestion = await _serQuestion.GetAllQuestions();
+
+        _lstSubjects = await _serSub.GetAllSub();
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
+        await LoadData();
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
+        var dialogParametersUpdate = new DialogParameters<Dialog.Question.UpdateQuestionDialog>
+        {
+            {x => x.QuestionId, id}
+        };
+
+        var dialogParametersDel = new DialogParameters<Dialog.Question.DeleteQuestionDialog>
+        {
+            {x => x.QuestionId, id}
+        };
+
         if (name.Equals("create"))
         {
-            return DialogService.ShowAsync<Dialog.Question.CreateQuestionDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Question.CreateQuestionDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if(!result.Canceled)
+            {
+                await LoadData();
+            }
+
         }
         else if (name.Equals("update"))
         {
-            return DialogService.ShowAsync<Dialog.Question.UpdateQuestionDialog>("Options Dialog", options);
-        }
-        else if (name.Equals("details"))
-        {
-            return DialogService.ShowAsync<Dialog.Question.DetailQuestionDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Question.UpdateQuestionDialog>("Options Dialog", dialogParametersUpdate, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
         else
         {
-            return DialogService.ShowAsync<Dialog.Question.DeleteQuestionDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Question.DeleteQuestionDialog>("Options Dialog", dialogParametersDel, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
 
     }
