@@ -22,7 +22,7 @@ namespace Testify.DAL.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("");
+            optionsBuilder.UseSqlServer("Data Source=20.5.250.222,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
         }
 
         public DbSet<Answer> Answers { get; set; }
@@ -75,6 +75,12 @@ namespace Testify.DAL.Context
                 .WithMany()
                 .HasForeignKey(s => s.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Answer>()
+               .HasOne(s => s.Question)
+               .WithMany()
+               .HasForeignKey(s => s.QuestionId)
+               .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
