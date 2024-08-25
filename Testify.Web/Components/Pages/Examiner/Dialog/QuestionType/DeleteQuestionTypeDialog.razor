@@ -1,5 +1,51 @@
-﻿<h3>Create</h3>
+﻿@using Testify.DAL.Models;
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa mức độ câu hỏi</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Bạn chắc chắn muốn xóa mức độ câu hỏi <MudText Style="font-weight: bold">@questionType?.Name</MudText> không?</MudText>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="Submit">Xóa</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
 
+    private QuestionType questionType { get; set; }
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public int QuestionTypeId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (QuestionTypeId != null)
+        {
+            questionType = await _serQuestionType.GetQuestionTypesById(QuestionTypeId);
+        }
+    }
+
+    private async void Submit()
+    {
+        var check = await _serQuestionType.DeleteQuestionType(QuestionTypeId);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
 }
