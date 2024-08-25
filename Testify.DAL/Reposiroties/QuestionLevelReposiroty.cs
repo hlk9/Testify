@@ -52,7 +52,7 @@ namespace Testify.DAL.Reposiroties
                 objLevel.Description = QuestionLevel.Description;
                 objLevel.Status = QuestionLevel.Status;
 
-                var update = _context.QuestionLevels.Add(objLevel).Entity;
+                var update = _context.QuestionLevels.Update(objLevel).Entity;
                 await _context.SaveChangesAsync();
                 return update;
             }

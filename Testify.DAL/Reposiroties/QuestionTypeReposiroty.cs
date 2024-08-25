@@ -52,7 +52,7 @@ namespace Testify.DAL.Reposiroties
                 objType.Description = questionType.Description;
                 objType.Status = questionType.Status;
 
-                var update = _context.QuestionTypes.Add(objType).Entity;
+                var update = _context.QuestionTypes.Update(objType).Entity;
                 await _context.SaveChangesAsync();
                 return update;
             }

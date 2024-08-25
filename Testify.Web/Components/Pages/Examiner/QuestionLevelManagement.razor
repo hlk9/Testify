@@ -34,7 +34,7 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, "create", 0))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -65,32 +65,34 @@
                 <MudTd DataLabel="Id loại câu hỏi" hidden>@context.Id</MudTd>
                 <MudTd DataLabel="Tên loại câu hỏi">@context.Name</MudTd>
                 <MudTd DataLabel="Mô tả">@context.Description</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
+                <MudTd DataLabel="Trạng thái">
+                        @(context.Status == true ? "Hoạt Động" : "Không Hoạt Động")
+                    </MudTd>
 
-                <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                </MudTd>
-            </RowTemplate>
+                    <MudTd DataLabel="Thao tác">
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"", context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTd>
+                </RowTemplate>
 
-            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
+                <NoRecordsContent>
+                    <MudText>No matching records found</MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Loading...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
 
+        </div>
     </div>
-</div>
 
 
-@code {
+    @code {
     private List<QuestionLevel> _lstQuestionLevels;
+    private const string V = "Không Hoạt Động";
 
     private async Task loadData()
     {
@@ -104,8 +106,18 @@
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private async Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
+        var dialogParametersDel = new DialogParameters<Dialog.QuestionLevel.DeleteQuestionLevelDialog>
+        {
+            {x => x.QuestionLevelId, id}
+        };
+
+        var dialogParametersUpdate = new DialogParameters<Dialog.QuestionLevel.UpdateQuestionLevelDialog>
+        {
+            {x => x.QuestionLevelId, id}
+        };
+
         if (name.Equals("create"))
         {
             var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.CreateQuestionLevelDialog>("Options Dialog", options);
@@ -117,16 +129,7 @@
         }
         else if (name.Equals("update"))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.UpdateQuestionLevelDialog>("Options Dialog", options);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await loadData();
-            }
-        }
-        else if (name.Equals("details"))
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.DetailQuestionLevelDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.UpdateQuestionLevelDialog>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -135,7 +138,7 @@
         }
         else
         {
-            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.DeleteQuestionLevelDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.QuestionLevel.DeleteQuestionLevelDialog>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -145,17 +148,3 @@
 
     }
 }
-@* 
-    openDialog
-    crete
-    detail
-    update
-    delete
-
-    @class.
-
-    status
-    public int HoatDong = 1;
-    public int KhongHoatDong = 0;
-    public int AnVinhVien = 255;
-*@
