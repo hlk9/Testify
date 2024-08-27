@@ -75,6 +75,12 @@ namespace Testify.DAL.Context
                 .WithMany()
                 .HasForeignKey(s => s.OrganizationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Answer>()
+               .HasOne(s => s.Question)
+               .WithMany()
+               .HasForeignKey(s => s.QuestionId)
+               .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
