@@ -1,0 +1,119 @@
+﻿@using Testify.DAL.Models;
+@using Testify.Web.Components.Pages.Examiner.Component;
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới đáp án cho câu hỏi</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Spacing="5"  @ref="form">
+            <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue("Question"))">
+                @if(lstQuestion != null)
+                {
+                    foreach (var item in lstQuestion)
+                    {
+                        <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+
+            <MudSelect T="int" @bind-Value="@ValueQuestionTypeChoice" Label="Chọn loại câu hỏi" SelectedValuesChanged="@(() =>ChangeValue("QuestionType"))" Disabled="IsDisableQuestionType">
+                @if (lstQuestionType != null)
+                {
+                    foreach (var item in lstQuestionType)
+                    {
+                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+
+            
+            <div class="w-100 d-flex justify-content-between align-items-center">
+                <MudText>Thêm đáp án:</MudText>
+                <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNeuAnswer" Disabled="IsDisableNewAnswer" OnClick="AddNewAnswer"></MudIconButton>
+            </div>
+
+            @foreach (var item in answers)
+                {   
+                    <AnswerForm answer="item" questionId="questionId" OnAnswerChanged="HandleAnswerChange" />
+                }
+            
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Primary" Variant="@Variant.Filled" OnClick="Submit">Tạo</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    MudForm form;
+    private Answer answer { get; set; } = new();
+    private List<Question>? lstQuestion;
+    private List<QuestionType>? lstQuestionType;
+    private bool IsDisableQuestionType = true;
+    private bool IsDisableNewAnswer = true;
+    private int ValueQuestionTypeChoice;
+    private int newAnswerCount = 0;
+    private int questionId = 0;
+    private List<Answer> answers = new List<Answer>();
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        lstQuestion = await _serQuestion.GetAllQuestions();
+        lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
+    }
+
+    private async Task ChangeValue(string name)
+    {
+        if(name.ToUpper().Equals("Question".ToUpper()))
+        {
+            IsDisableQuestionType = false;
+        }
+        else if (name.ToUpper().Equals("QuestionType".ToUpper()))
+        {
+            IsDisableNewAnswer = false;
+        }
+    }
+
+    private void AddNewAnswer()
+    {
+        // Chỉ thêm form mới nếu form hiện tại đã có nội dung
+        if (answers.Count == 0 || IsLastAnswerFilled())
+        {
+            answers.Add(new Answer());
+        }
+    }
+
+    private void HandleAnswerChange(Answer updatedAnswer)
+    {
+        // Tìm và cập nhật câu trả lời trong danh sách
+        var answer = answers.FirstOrDefault(a => a == updatedAnswer);
+        if (answer != null)
+        {
+            answer.Content = updatedAnswer.Content;
+            answer.IsCorrect = updatedAnswer.IsCorrect;
+        }
+    }
+
+    private bool IsLastAnswerFilled()
+    {
+        var lastAnswer = answers.LastOrDefault();
+        return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
+    }
+
+    private async Task Submit()
+    {
+        for (int i = 0; i < answers.Count; i++)
+        {
+            answers[i].Status = true;
+            var check = await _serAnswer.Create(answers[i]);
+        }
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

@@ -21,34 +21,25 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<Question>($"Question/Get-Question-By-Id?id={id}");
         }
 
-        public async Task<bool> CreateQuestion(Question question)
+        public async Task<Question> CreateQuestion(Question question)
         {
-            var statusCreate = await _httpClient.PostAsJsonAsync<Question>("Question/Create-Question", question);
-            if(statusCreate.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            return false;
+            var newQuestion = await _httpClient.PostAsJsonAsync("Question/Create-Question", question);
+            var reponse = await newQuestion.Content.ReadFromJsonAsync<Question>();
+            return reponse;
         }
 
-        public async Task<bool> UpdateQuestion(Question question)
+        public async Task<Question> UpdateQuestion(Question question)
         {
-            var statusUpdate = await _httpClient.PutAsJsonAsync<Question>("Question/Update-Question", question);
-            if (statusUpdate.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            return false;
+            var updateQuestion = await _httpClient.PutAsJsonAsync("Question/Update-Question", question);
+            var reponse = await updateQuestion.Content.ReadFromJsonAsync<Question>();
+            return reponse;
         }
 
-        public async Task<bool> DeleteQuestion(int id)
+        public async Task<Question> DeleteQuestion(int id)
         {
-            var statusDelete = await _httpClient.DeleteAsync($"Question/Delete-Question?id={id}");
-            if (statusDelete.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            return false;
+            var deleteQuestion = await _httpClient.DeleteAsync($"Question/Delete-Question?id={id}");
+            var reponse = await deleteQuestion.Content.ReadFromJsonAsync<Question>();
+            return reponse;
         }
     }
 }

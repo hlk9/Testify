@@ -1,53 +1,72 @@
 ﻿@using Testify.DAL.Models
+@using Testify.Web.Components.Pages.Examiner.Component
+@using Testify.Web.utils
 
 <MudDialog>
     <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới mức độ câu hỏi</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án</MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Spacing="5" Model="@question" @ref="@form">
-            <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
-            <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
-            <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                @if (_lstQuestionLevels != null)
-                {
-                    @foreach (var itemLevel in _lstQuestionLevels)
-                    {
-                        <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
-                    }
+        <MudGrid>
+            <MudItem xl="6" lg="6" md="7" sm="12" xs="12">
+                <div class="w-100 mb-2">
+                    <MudText Style="font-size: 16px">Câu Hỏi:</MudText>
+                </div>
+                <MudForm Spacing="4" Model="@question" @ref="@form">
+                    <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
+                    <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
+                    <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        @if (_lstQuestionLevels != null)
+                        {
+                            @foreach (var itemLevel in _lstQuestionLevels)
+                            {
+                                <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                            }
+                        }
+
+                    </MudSelect>
+
+                    <MudSelect T="int" @bind-Value="questionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueQuestionType">
+
+                        @if (_lstQuestionTypes != null)
+                        {
+                            @foreach (var itemType in _lstQuestionTypes)
+                            {
+                                <MudSelectItem Value="itemType.Id">@itemType.Name</MudSelectItem>
+                            }
+                        }
+
+                    </MudSelect>
+
+                    <MudSelect T="int" @bind-Value="question.SubjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+
+                        @if (_lstSubjects != null)
+                        {
+                            @foreach (var item in _lstSubjects)
+                            {
+                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                    <MudRadioGroup @bind-Value="statusQuestion">
+                        <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
+                        <MudRadio Value="@(false)">Không hoạt động</MudRadio>
+                    </MudRadioGroup>
+                </MudForm>
+            </MudItem>
+
+            <MudItem xl="6" lg="6" md="5" sm="12" xs="12">
+                <div class="w-100 d-flex justify-content-between align-items-center">
+                    <MudText Style="font-size: 16px" Disabled="isDisableAddNewAnswer">Đáp Án:</MudText>
+                    <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNewAnswer" Disabled="isDisableAddNewAnswer" OnClick="AddNewAnswer"></MudIconButton>
+                </div>
+                <MudText Class="mt-2">@nofication</MudText>
+                @foreach (var item in lstAnswers)
+                {   
+                    <AnswerForm answer="item" questionId="questionId" OnAnswerChanged="HandleAnswerChange" />
                 }
-
-            </MudSelect>
-
-            <MudSelect T="int" @bind-Value="question.QuestionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-
-                @if (_lstQuestionTypes != null)
-                {
-                    @foreach (var itemType in _lstQuestionTypes)
-                    {
-                        <MudSelectItem Value="itemType.Id">@itemType.Name</MudSelectItem>
-                    }
-                }
-
-            </MudSelect>
-
-            <MudSelect T="int" @bind-Value="question.SubjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                
-                @if (_lstSubjects != null)
-                {
-                    @foreach (var item in _lstSubjects)
-                    {
-                        <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
-                    }
-                }
-                    
-
-            </MudSelect>
-            <MudRadioGroup @bind-Value="statusQuestion">
-                <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
-                <MudRadio Value="@(false)">Không hoạt động</MudRadio>
-            </MudRadioGroup>
-        </MudForm>
+            </MudItem>
+        </MudGrid>
     </DialogContent>
     <DialogActions>
 
@@ -61,9 +80,12 @@
     private List<QuestionLevel> _lstQuestionLevels;
     private List<QuestionType> _lstQuestionTypes;
     private List<Subject> _lstSubjects;
-
+    private List<Answer> lstAnswers = new List<Answer>();
+    private int questionTypeId = 0;
+    private int questionId = 0;
+    private string nofication = "";
+    private bool isDisableAddNewAnswer = true;
     private bool statusQuestion { get; set; }
-
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -78,6 +100,44 @@
         _lstSubjects = await _serSub.GetAllSub();
     }
 
+    private async Task ChangeValueQuestionType()
+    {
+        var obj = await _serQuestionType.GetQuestionTypesById(questionTypeId);
+        if (obj.Name.ToLower().Contains(listQuestionTypes.trueFalse.ToLower()))
+        {
+            nofication = "Loại câu hỏi đúng sai tự động tạo đáp án.";
+            isDisableAddNewAnswer = true;
+            return;
+        }
+        isDisableAddNewAnswer = false;
+        nofication = "";
+    }
+
+    private void AddNewAnswer()
+    {
+        if (lstAnswers.Count == 0 || IsLastAnswerFilled())
+        {
+            lstAnswers.Add(new Answer());
+        }
+    }
+
+    private void HandleAnswerChange(Answer updatedAnswer)
+    {
+        // Tìm và cập nhật câu trả lời trong danh sách
+        var answer = lstAnswers.FirstOrDefault(a => a == updatedAnswer);
+        if (answer != null)
+        {
+            answer.Content = updatedAnswer.Content;
+            answer.IsCorrect = updatedAnswer.IsCorrect;
+        }
+    }
+
+    private bool IsLastAnswerFilled()
+    {
+        var lastAnswer = lstAnswers.LastOrDefault();
+        return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -87,11 +147,19 @@
     {
         question.Status = statusQuestion;
         question.CreatedDate = DateTime.Now;
-        var check = await _serQuestion.CreateQuestion(question);
-        if(check == true)
+        question.QuestionTypeId = questionTypeId;
+        var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
+        if (checkAddNewQuestion != null)
         {
+            for (int i = 0; i < lstAnswers.Count; i++)
+            {
+                lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
+                lstAnswers[i].Status = true;
+                var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
+            }
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Thêm thành công", Severity.Success);
+            lstAnswers.Clear();
         }
         else
         {
