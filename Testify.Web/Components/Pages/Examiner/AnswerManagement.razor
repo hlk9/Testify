@@ -38,22 +38,20 @@
         </MudItem> 
     </MudGrid>
 
+    <div class="mb-3">
+        <MudSelect @bind-Value="@questionId" T="int" Label="Lưa chọn câu hỏi" SelectedValuesChanged="@(() => reloadAnswers())" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            @if (lstQuestion != null)
+            {
+                foreach (var item in lstQuestion)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
+                }
+            }
+        </MudSelect>
+    </div>
+
     <div class="bg-white rounded-3 mb-4" style="width:100%;">
         <MudTable Items="@lstAnswers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
-
-            <ToolBarContent>
-                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách đáp án</MudText>
-
-                    </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </MudItem>
-                </MudGrid>
-
-            </ToolBarContent>
             <HeaderContent>
                 <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id đáp án</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Nội dung đáp án</MudTableSortLabel></MudTh>
@@ -106,15 +104,22 @@
 @code {
     private List<Answer> lstAnswers;
     private List<Question> lstQuestion;
+    private int questionId;
 
     private async Task loadData()
     {
-        lstAnswers = await _serAnswer.GetAll();
+        lstAnswers = await _serAnswer.GetAllByQuestionId(questionId);
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
         lstQuestion = await _serQuestion.GetAllQuestions();
+        await loadData();
+    }
+
+    private async Task reloadAnswers()
+    {
         await loadData();
     }
 

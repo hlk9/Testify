@@ -33,7 +33,7 @@
     private async Task Submit()
     {
         var check = await _serQuestion.DeleteQuestion(QuestionId);
-        if (check == true)
+        if (check != null)
         {
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Xóa thành công", Severity.Success);

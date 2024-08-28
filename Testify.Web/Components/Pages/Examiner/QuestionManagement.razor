@@ -25,7 +25,7 @@
     }
 </style>
 
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-63px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding:30px; background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI</MudText>
     </MudPaper>
@@ -39,7 +39,7 @@
     </MudGrid>
 
     <div class="bg-white rounded-3 mb-4" style="width:100%;">
-        <MudTable Items="@_lstQuestions" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@_lstQuestions" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -55,66 +55,68 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id câu hỏi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Tên câu hỏi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Mức độ" T="string">Mức độ</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Loại câu hỏi" T="string">Loại câu hỏi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thuộc môn" T="string">Thuộc môn</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                    <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id câu hỏi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Tên câu hỏi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Mức độ" T="string">Mức độ</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Loại câu hỏi" T="string">Loại câu hỏi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thuộc môn" T="string">Thuộc môn</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
-                <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
-                <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
-                <MudTd DataLabel="Mức độ">
-                    @if(_lstQuestionLevels != null)
-                    {
-                        foreach (var item in _lstQuestionLevels)
+                    <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
+                    <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
+                    <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
+                    <MudTd DataLabel="Mức độ">
+                        @if (_lstQuestionLevels != null)
                         {
-                            if(item.Id == context.QuestionLevelId)
+                            foreach (var item in _lstQuestionLevels)
                             {
-                                @item.Name;
-                                break;
+                                if (item.Id == context.QuestionLevelId)
+                                {
+                                    @item.Name
+                                    ;
+                                    break;
+                                }
                             }
                         }
-                    }
-                </MudTd> 
-                <MudTd DataLabel="Loại câu hỏi">
-                    @if (_lstQuestionTypes != null)
-                    {
-                        foreach (var item in _lstQuestionTypes)
+                    </MudTd>
+                    <MudTd DataLabel="Loại câu hỏi">
+                        @if (_lstQuestionTypes != null)
                         {
-                            if (item.Id == context.QuestionTypeId)
+                            foreach (var item in _lstQuestionTypes)
                             {
-                                @item.Name;
-                                break;
+                                if (item.Id == context.QuestionTypeId)
+                                {
+                                    @item.Name
+                                    ;
+                                    break;
+                                }
                             }
                         }
-                    }
-                </MudTd>
-                <MudTd DataLabel="Thuộc môn">
-                    @if (_lstSubjects != null)
-                    {
-                        foreach (var item in _lstSubjects)
+                    </MudTd>
+                    <MudTd DataLabel="Thuộc môn">
+                        @if (_lstSubjects != null)
                         {
-                            if (item.Id == context.SubjectId)
+                            foreach (var item in _lstSubjects)
                             {
-                                @item.Name;
-                                break;
+                                if (item.Id == context.SubjectId)
+                                {
+                                    @item.Name
+                                    ;
+                                    break;
+                                }
                             }
                         }
-                    }
-                </MudTd>
-                <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Không Hoạt Động")</MudTd>
+                    </MudTd>
+                    <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Không Hoạt Động")</MudTd>
 
-                <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"", context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                </MudTd>
+                    <MudTd DataLabel="Thao tác">
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"", context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTd>
             </RowTemplate>
-
             <NoRecordsContent>
                 <MudText>No matching records found</MudText>
             </NoRecordsContent>
@@ -125,10 +127,8 @@
                 <MudTablePager />
             </PagerContent>
         </MudTable>
-
     </div>
 </div>
-
 
 @code {
     private List<Question> _lstQuestions;

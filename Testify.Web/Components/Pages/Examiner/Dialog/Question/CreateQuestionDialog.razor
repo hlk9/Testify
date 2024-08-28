@@ -62,8 +62,8 @@
                 </div>
                 <MudText Class="mt-2">@nofication</MudText>
                 @foreach (var item in lstAnswers)
-                {   
-                    <AnswerForm answer="item" questionId="questionId" OnAnswerChanged="HandleAnswerChange" />
+                {
+                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" OnAnswerChanged="HandleAnswerChange" />
                 }
             </MudItem>
         </MudGrid>
@@ -83,8 +83,10 @@
     private List<Answer> lstAnswers = new List<Answer>();
     private int questionTypeId = 0;
     private int questionId = 0;
+    private int indexAnswer = 1;
     private string nofication = "";
     private bool isDisableAddNewAnswer = true;
+    private bool chooseAdd = true;
     private bool statusQuestion { get; set; }
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
@@ -136,6 +138,17 @@
     {
         var lastAnswer = lstAnswers.LastOrDefault();
         return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
+    }
+
+    private void RemoveAnswerForm(Answer answerToRemove)
+    {
+        // Xóa form khỏi danh sách
+        lstAnswers.Remove(answerToRemove);
+    }
+
+    private void changeType(bool type)
+    {
+        
     }
 
     protected override async Task OnInitializedAsync()

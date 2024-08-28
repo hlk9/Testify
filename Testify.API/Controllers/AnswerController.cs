@@ -23,6 +23,13 @@ namespace Testify.API.Controllers
             return Ok(lstAnswers);
         }
 
+        [HttpGet("Get-All-Answer-By-QuestionId")]
+        public async Task<ActionResult<List<Answer>>> GetAllAnswerByQuestionId(int questionId)
+        {
+            var lstAnswersByQuestionId = await _repoAnswer.GetAllAnswerByQuestionId(questionId);
+            return Ok(lstAnswersByQuestionId);
+        }
+
         [HttpGet("Get-Answer-By-Id")]
         public async Task<ActionResult<Answer>> GetAnswerById(int id)
         {

@@ -87,7 +87,7 @@
     {
         question.Status = statusQuestion;
         var check = await _serQuestion.UpdateQuestion(question);
-        if (check == true)
+        if (check != null)
         {
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Cập nhật thành công", Severity.Success);
