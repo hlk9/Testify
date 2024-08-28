@@ -1,0 +1,35 @@
+﻿@* @using Testify.DAL.Models
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật mức độ câu hỏi</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Spacing="4" Model="@answer" @ref="@form">
+            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Submit">Cập nhật</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private Answer answer { get; set; } = new();
+
+    [Parameter]
+    public int answerId { get; set; }
+
+    MudForm form;
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        answer = await _serAnswer.GetById(answerId);
+    }
+}
+ *@

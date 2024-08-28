@@ -106,7 +106,7 @@
     private async Task ChangeValueQuestionType()
     {
         var obj = await _serQuestionType.GetQuestionTypesById(questionTypeId);
-        if (obj.Name.ToLower().Contains(listQuestionTypes.trueFalse.ToLower()))
+        if (obj.Name.ToLower().Contains("Đúng/Sai".ToLower()))
         {
             nofication = "Loại câu hỏi đúng sai tự động tạo đáp án.";
             isDisableAddNewAnswer = true;

@@ -1,5 +1,6 @@
 ﻿@page "/Examiner/QuestionManagement"
 @using Testify.DAL.Models
+@using Testify.Web.utils
 @layout AdminLayout
 @inject IDialogService DialogService
 
@@ -27,14 +28,17 @@
 
 <div style="font-family:Roboto; padding:30px; background-color:#fafafa">
     <MudPaper Style="padding:15px;">
-        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI</MudText>
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI VÀ ĐÁP ÁN</MudText>
     </MudPaper>
     <MudGrid Style="padding:20px 0 ">
-        <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
+        <MudItem xl="7" lg="5" md="3" sm="1" xs="12">
 
         </MudItem>
+        <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Style="background-color: transparent; border: 1px solid #29a69a; color: #29a69a; width: 100%;" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
+        </MudItem> 
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create", -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.Create, -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -63,6 +67,7 @@
                     <MudTh><MudTableSortLabel SortLabel="Thuộc môn" T="string">Thuộc môn</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                    <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
                     <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
@@ -110,11 +115,14 @@
                             }
                         }
                     </MudTd>
-                <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : (context.Status == null ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
+                    <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : (context.Status == null ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
 
                     <MudTd DataLabel="Thao tác">
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"", context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Updatre, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTd>
+                <MudTd>
+                    <MudButton Disabled="@(context.Status == null ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
                     </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -135,6 +143,7 @@
     private List<Subject> _lstSubjects;
     private List<QuestionLevel> _lstQuestionLevels;
     private List<QuestionType> _lstQuestionTypes;
+    private bool IsDisableShowAnswer;
 
     private async Task LoadData()
     {
@@ -164,7 +173,30 @@
             {x => x.QuestionId, id}
         };
 
-        if (name.Equals("create"))
+        var dialogParametersQuestionId = new DialogParameters<Dialog.Answer.ListAnswerDialog>
+        {
+            {x => x.questionId, id}
+        };
+
+        if(name.Equals(OpenDialogType.ShowAnswer))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.ListAnswerDialog>("Options Dialog", dialogParametersQuestionId, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
+        } 
+        else if (name.Equals(OpenDialogType.ShowDialogAddNewAnswer))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
+        }
+        else if (name.Equals(OpenDialogType.Create))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Question.CreateQuestionDialog>("Options Dialog", options);
             var result = await dialog.Result;
@@ -174,7 +206,7 @@
             }
 
         }
-        else if (name.Equals("update"))
+        else if (name.Equals(OpenDialogType.Updatre))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Question.UpdateQuestionDialog>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
