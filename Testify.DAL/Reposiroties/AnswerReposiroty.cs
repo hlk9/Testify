@@ -53,12 +53,12 @@ namespace Testify.DAL.Reposiroties
             {
                 var obj = await _context.Answers.FindAsync(answer.Id);
 
-                obj.QuestionId = answer.Id;
+                obj.QuestionId = answer.QuestionId;
                 obj.Content = answer.Content;
                 obj.IsCorrect = answer.IsCorrect;
                 obj.Status = answer.Status;
 
-                var update = _context.Answers.Remove(answer).Entity;
+                var update = _context.Answers.Update(answer).Entity;
                 await _context.SaveChangesAsync();
                 return update;
             }
