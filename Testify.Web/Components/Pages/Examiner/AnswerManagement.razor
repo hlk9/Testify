@@ -1,5 +1,6 @@
 ﻿@page "/Examiner/AnswerManagement"
 @using Testify.DAL.Models
+@using Testify.Web.utils
 @layout Layout.AdminLayout
 @inject IDialogService DialogService
 
@@ -34,7 +35,7 @@
 
         </MudItem>
         <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
-            <MudButton Class="add-button-end" OnClick="@(() => OpenDialogAsync(_MediumWidth, "create", -1))" Variant="Variant.Filled">Thêm đáp án cho câu hỏi đã có</MudButton>
+            <MudButton Class="add-button-end" OnClick="@(() => OpenDialogAsync(_MediumWidth, OpenDialogType.Create, -1))" Variant="Variant.Filled">Thêm đáp án cho câu hỏi đã có</MudButton>
         </MudItem> 
     </MudGrid>
 
@@ -67,7 +68,7 @@
                 </MudTd>
                 <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, "update", context.Id))"></MudIconButton>
+                    <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                 </MudTd>
             </RowTemplate>
@@ -120,7 +121,7 @@
             {x => x.answerId, id}
         };
 
-        if(name.Equals("create"))
+        if(name.Equals(OpenDialogType.Create))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", options);
             var result = await dialog.Result;
@@ -129,7 +130,7 @@
                 await loadData();
             }
         }
-        else if (name.Equals("update"))
+        else if (name.Equals(OpenDialogType.Updatre))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.UpdateAnswerDialog>("Options dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
