@@ -48,10 +48,10 @@
                             }
                         }
                     </MudSelect>
-                    <MudRadioGroup @bind-Value="statusQuestion">
+                    @* <MudRadioGroup @bind-Value="statusQuestion">
                         <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
                         <MudRadio Value="@(false)">Không hoạt động</MudRadio>
-                    </MudRadioGroup>
+                    </MudRadioGroup> *@
                 </MudForm>
             </MudItem>
 
@@ -63,7 +63,7 @@
                 <MudText Class="mt-2">@nofication</MudText>
                 @foreach (var item in lstAnswers)
                 {
-                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" OnAnswerChanged="HandleAnswerChange" />
+                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
                 }
             </MudItem>
         </MudGrid>
@@ -87,7 +87,8 @@
     private string nofication = "";
     private bool isDisableAddNewAnswer = true;
     private bool chooseAdd = true;
-    private bool statusQuestion { get; set; }
+    private List<AnswerForm> answerForms = new List<AnswerForm>();
+    // private bool statusQuestion { get; set; }
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -115,40 +116,42 @@
         nofication = "";
     }
 
-    private void AddNewAnswer()
+    private async Task AddNewAnswer()
     {
-        if (lstAnswers.Count == 0 || IsLastAnswerFilled())
+        if (lstAnswers.Count == 0 || await answerForms.Last().ValidateAsync())
         {
-            lstAnswers.Add(new Answer());
+            var newAnswer = new Answer();
+            lstAnswers.Add(newAnswer);
+            answerForms.Add(new AnswerForm { answer = newAnswer });
         }
     }
 
-    private void HandleAnswerChange(Answer updatedAnswer)
-    {
-        // Tìm và cập nhật câu trả lời trong danh sách
-        var answer = lstAnswers.FirstOrDefault(a => a == updatedAnswer);
-        if (answer != null)
-        {
-            answer.Content = updatedAnswer.Content;
-            answer.IsCorrect = updatedAnswer.IsCorrect;
-        }
-    }
+    // private void HandleAnswerChange(Answer updatedAnswer)
+    // {
+    //     var answer = lstAnswers.FirstOrDefault(a => a == updatedAnswer);
+    //     if (answer != null)
+    //     {
+    //         answer.Content = updatedAnswer.Content;
+    //         answer.IsCorrect = updatedAnswer.IsCorrect;
+    //     }
+    // }
 
-    private bool IsLastAnswerFilled()
-    {
-        var lastAnswer = lstAnswers.LastOrDefault();
-        return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
-    }
+
+
+    // private bool IsLastAnswerFilled()
+    // {
+    //     var lastAnswer = lstAnswers.LastOrDefault();
+    //     return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
+    // }
 
     private void RemoveAnswerForm(Answer answerToRemove)
     {
-        // Xóa form khỏi danh sách
-        lstAnswers.Remove(answerToRemove);
-    }
-
-    private void changeType(bool type)
-    {
-        
+        var index = lstAnswers.IndexOf(answerToRemove);
+        if (index >= 0)
+        {
+            lstAnswers.RemoveAt(index);
+            answerForms.RemoveAt(index);
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -158,26 +161,50 @@
 
     private async Task Submit()
     {
-        question.Status = statusQuestion;
-        question.CreatedDate = DateTime.Now;
-        question.QuestionTypeId = questionTypeId;
-        var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
-        if (checkAddNewQuestion != null)
+        // question.Status = statusQuestion;
+        bool allValid = true;
+
+        foreach (var form in answerForms)
         {
-            for (int i = 0; i < lstAnswers.Count; i++)
+            if (!await form.ValidateAsync())
             {
-                lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
-                lstAnswers[i].Status = true;
-                var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
+                allValid = false;
             }
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thành công", Severity.Success);
-            lstAnswers.Clear();
+        }
+
+        if(allValid)
+        {
+            if(lstAnswers == null || lstAnswers.Count == 0)
+            {
+                question.Status = null;
+            } else
+            {
+                question.Status = true;
+            }
+            question.CreatedDate = DateTime.Now;
+            question.QuestionTypeId = questionTypeId;
+            var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
+            if (checkAddNewQuestion != null)
+            {
+                for (int i = 0; i < lstAnswers.Count; i++)
+                {
+                    lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
+                    lstAnswers[i].Status = true;
+                    var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
+                }
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thành công", Severity.Success);
+                lstAnswers.Clear();
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thất bại", Severity.Error);
+            }
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thất bại", Severity.Error);
+            snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
         }
     }
 

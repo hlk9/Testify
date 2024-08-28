@@ -66,6 +66,25 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
+
+        public async Task<Question> UpdateStatusQuestion(int  questionId, bool status)
+        {
+            try
+            {
+                var objUpdateQuestion = await _context.Questions.FindAsync(questionId);
+
+                objUpdateQuestion.Status = status;
+
+                var updateQuestion = _context.Questions.Update(objUpdateQuestion).Entity;
+                await _context.SaveChangesAsync();
+                return updateQuestion;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<Question> DeleteQuestion(int id)
         {
             try

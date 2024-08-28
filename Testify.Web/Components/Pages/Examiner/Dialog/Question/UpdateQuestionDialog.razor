@@ -43,10 +43,10 @@
 
 
             </MudSelect>
-            <MudRadioGroup @bind-Value="statusQuestion">
+            @* <MudRadioGroup @bind-Value="statusQuestion">
                 <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
                 <MudRadio Value="@(false)">Không hoạt động</MudRadio>
-            </MudRadioGroup>
+            </MudRadioGroup> *@
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -62,7 +62,7 @@
     private List<QuestionType> _lstQuestionTypes;
     private List<Subject> _lstSubjects;
 
-    private bool statusQuestion { get; set; }
+    // private bool statusQuestion { get; set; }
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
@@ -84,8 +84,8 @@
     }
 
     private async Task Submit()
-    {
-        question.Status = statusQuestion;
+     {
+    //     question.Status = statusQuestion;
         var check = await _serQuestion.UpdateQuestion(question);
         if (check != null)
         {

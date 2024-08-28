@@ -7,37 +7,37 @@
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="5"  @ref="form">
-            <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue("Question"))">
-                @if(lstQuestion != null)
+            <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue())" Required="true" RequiredError="Chưa chọn câu hỏi">
+                @if(lstQuestion == null ||lstQuestion?.Count == 0)
+                {
+                    <MudSelectItem T="int" Value="-1">Không có câu hỏi nào!</MudSelectItem>
+                }
+                else
                 {
                     foreach (var item in lstQuestion)
                     {
+                        if (item.Status == true || item.Status == false)
+                        {
+                            continue;
+                        }
                         <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
                     }
                 }
             </MudSelect>
 
-            <MudSelect T="int" @bind-Value="@ValueQuestionTypeChoice" Label="Chọn loại câu hỏi" SelectedValuesChanged="@(() =>ChangeValue("QuestionType"))" Disabled="IsDisableQuestionType">
-                @if (lstQuestionType != null)
-                {
-                    foreach (var item in lstQuestionType)
-                    {
-                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                    }
-                }
-            </MudSelect>
-
-            
             <div class="w-100 d-flex justify-content-between align-items-center">
                 <MudText>Thêm đáp án:</MudText>
                 <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNeuAnswer" Disabled="IsDisableNewAnswer" OnClick="AddNewAnswer"></MudIconButton>
             </div>
 
-            @foreach (var item in answers)
-                {   
-                    <AnswerForm answer="item" questionId="questionId" OnAnswerChanged="HandleAnswerChange" />
+            @if(lstAnswers != null)
+            {
+                @foreach (var item in lstAnswers)
+                {
+                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
                 }
-            
+            }
+
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -51,12 +51,11 @@
     private Answer answer { get; set; } = new();
     private List<Question>? lstQuestion;
     private List<QuestionType>? lstQuestionType;
-    private bool IsDisableQuestionType = true;
     private bool IsDisableNewAnswer = true;
     private int ValueQuestionTypeChoice;
-    private int newAnswerCount = 0;
-    private int questionId = 0;
-    private List<Answer> answers = new List<Answer>();
+    private int questionId = -1;
+    private List<Answer> lstAnswers = new List<Answer>();
+    private List<AnswerForm> answerForms = new List<AnswerForm>();
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -66,53 +65,88 @@
         lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
     }
 
-    private async Task ChangeValue(string name)
+    private async Task ChangeValue()
     {
-        if(name.ToUpper().Equals("Question".ToUpper()))
+        IsDisableNewAnswer = false;
+    }
+
+    private async Task AddNewAnswer()
+    {
+        if (lstAnswers.Count == 0 || await answerForms.Last().ValidateAsync())
         {
-            IsDisableQuestionType = false;
-        }
-        else if (name.ToUpper().Equals("QuestionType".ToUpper()))
-        {
-            IsDisableNewAnswer = false;
+            var newAnswer = new Answer();
+            lstAnswers.Add(newAnswer);
+            answerForms.Add(new AnswerForm { answer = newAnswer });
         }
     }
 
-    private void AddNewAnswer()
+    private void RemoveAnswerForm(Answer answerToRemove)
     {
-        // Chỉ thêm form mới nếu form hiện tại đã có nội dung
-        if (answers.Count == 0 || IsLastAnswerFilled())
+        var index = lstAnswers.IndexOf(answerToRemove);
+        if (index >= 0)
         {
-            answers.Add(new Answer());
+            lstAnswers.RemoveAt(index);
+            answerForms.RemoveAt(index);
         }
     }
 
-    private void HandleAnswerChange(Answer updatedAnswer)
-    {
-        // Tìm và cập nhật câu trả lời trong danh sách
-        var answer = answers.FirstOrDefault(a => a == updatedAnswer);
-        if (answer != null)
-        {
-            answer.Content = updatedAnswer.Content;
-            answer.IsCorrect = updatedAnswer.IsCorrect;
-        }
-    }
+    // private void HandleAnswerChange(Answer updatedAnswer)
+    // {
+    //     // Tìm và cập nhật câu trả lời trong danh sách
+    //     var answer = answers.FirstOrDefault(a => a == updatedAnswer);
+    //     if (answer != null)
+    //     {
+    //         answer.Content = updatedAnswer.Content;
+    //         answer.IsCorrect = updatedAnswer.IsCorrect;
+    //     }
+    // }
 
-    private bool IsLastAnswerFilled()
-    {
-        var lastAnswer = answers.LastOrDefault();
-        return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
-    }
+    // private bool IsLastAnswerFilled()
+    // {
+    //     var lastAnswer = answers.LastOrDefault();
+    //     return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
+    // }
 
     private async Task Submit()
     {
-        for (int i = 0; i < answers.Count; i++)
+        if (questionId == -1)  
         {
-            answers[i].Status = true;
-            var check = await _serAnswer.Create(answers[i]);
+            snackbar.Add("Chưa chọn câu hỏi", Severity.Warning);
+            return;
         }
+        else if (answerForms.Count == 0 || answerForms == null)
+        {
+            snackbar.Add("Chưa nhập đáp án", Severity.Warning);
+            return;
+        }
+
+        bool allValid = true;
+
+        foreach (var form in answerForms)
+        {
+            if (!await form.ValidateAsync())
+            {
+                allValid = false;
+            }
+        }
+
+        if (allValid)
+        {
+
+            for (int i = 0; i < lstAnswers.Count; i++)
+            {
+                lstAnswers[i].Status = true;
+                var check = await _serAnswer.Create(lstAnswers[i]);
+            }
+
+            var question = await _serQuestion.UpdateStatus(questionId, true);
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);            
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();

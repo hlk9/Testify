@@ -1,10 +1,13 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.Reposiroties;
 
 namespace Testify.Web.Services
 {
     public class QuestionService
     {
         private readonly HttpClient _httpClient;
+
+        private QuestionReposiroty _repoQuestion = new QuestionReposiroty();
 
         public QuestionService(HttpClient httpClient)
         {
@@ -33,6 +36,11 @@ namespace Testify.Web.Services
             var updateQuestion = await _httpClient.PutAsJsonAsync("Question/Update-Question", question);
             var reponse = await updateQuestion.Content.ReadFromJsonAsync<Question>();
             return reponse;
+        }
+
+        public async Task<Question> UpdateStatus(int id, bool status)
+        {
+            return await _repoQuestion.UpdateStatusQuestion(id, status);
         }
 
         public async Task<Question> DeleteQuestion(int id)
