@@ -1,0 +1,62 @@
+﻿@using Testify.DAL.Models
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật mức độ câu hỏi</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Spacing="4" Model="@answer" @ref="@form">
+            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" />
+            <MudRadioGroup T="bool" @bind-Value="@answer.IsCorrect" For="@(() => answer.IsCorrect)">
+                <MudRadio T="bool" Value="true">Đúng</MudRadio>
+                <MudRadio T="bool" Value="false">Sai</MudRadio>
+            </MudRadioGroup>
+
+            <MudRadioGroup T="bool" @bind-Value="@statusAnswer">
+                <MudRadio T="bool" Value="true">Hoạt động</MudRadio>
+                <MudRadio T="bool" Value="false">Vô hiệu hóa</MudRadio>
+            </MudRadioGroup>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Submit">Cập nhật</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private Answer answer { get; set; } = new();
+
+    [Parameter]
+    public int answerId { get; set; }
+
+    private bool statusAnswer = true;
+    MudForm form;
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        answer = await _serAnswer.GetById(answerId);
+    }
+
+    private async Task Submit()
+    {
+        answer.Status = statusAnswer;
+        var updateAnswer = await _serAnswer.Update(answer);
+        if (updateAnswer != null)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Cập nhật thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Cập nhật thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

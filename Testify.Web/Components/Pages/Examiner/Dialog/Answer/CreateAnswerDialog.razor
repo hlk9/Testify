@@ -90,23 +90,6 @@
         }
     }
 
-    // private void HandleAnswerChange(Answer updatedAnswer)
-    // {
-    //     // Tìm và cập nhật câu trả lời trong danh sách
-    //     var answer = answers.FirstOrDefault(a => a == updatedAnswer);
-    //     if (answer != null)
-    //     {
-    //         answer.Content = updatedAnswer.Content;
-    //         answer.IsCorrect = updatedAnswer.IsCorrect;
-    //     }
-    // }
-
-    // private bool IsLastAnswerFilled()
-    // {
-    //     var lastAnswer = answers.LastOrDefault();
-    //     return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
-    // }
-
     private async Task Submit()
     {
         if (questionId == -1)  

@@ -34,7 +34,7 @@
 
         </MudItem>
         <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
-            <MudButton Class="add-button-end" OnClick="@(() => OpenDialogAsync(_maxWidth, "create"))" Variant="Variant.Filled">Thêm đáp án cho câu hỏi đã có</MudButton>
+            <MudButton Class="add-button-end" OnClick="@(() => OpenDialogAsync(_MediumWidth, "create", -1))" Variant="Variant.Filled">Thêm đáp án cho câu hỏi đã có</MudButton>
         </MudItem> 
     </MudGrid>
 
@@ -67,7 +67,7 @@
                 </MudTd>
                 <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, "update", context.Id))"></MudIconButton>
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                 </MudTd>
             </RowTemplate>
@@ -109,15 +109,31 @@
         await loadData();
     }
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+    private readonly DialogOptions _MediumWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
-    private async Task OpenDialogAsync(DialogOptions options, string name)
+    private readonly DialogOptions _SmallWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
+        var dialogParametersUpdate = new DialogParameters<Dialog.Answer.UpdateAnswerDialog>
+        {
+            {x => x.answerId, id}
+        };
+
         if(name.Equals("create"))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", options);
             var result = await dialog.Result;
             if(!result.Canceled)
+            {
+                await loadData();
+            }
+        }
+        else if (name.Equals("update"))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.UpdateAnswerDialog>("Options dialog", dialogParametersUpdate, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
             {
                 await loadData();
             }

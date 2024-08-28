@@ -23,7 +23,9 @@ namespace Testify.Web.Services
 
         public async Task<Answer> GetById(int id)
         {
-            return await _httpClient.GetFromJsonAsync<Answer>($"Answer/Get-Answer-By-Id?id={id}");
+            var answer = await _httpClient.GetAsync($"Answer/Get-Answer-By-Id?id={id}");
+            var response = await answer.Content.ReadFromJsonAsync<Answer>();
+            return response;
         }
 
         public async Task<bool> Create(Answer answer)
@@ -36,14 +38,11 @@ namespace Testify.Web.Services
             return false;
         }
 
-        public async Task<bool> Update(Answer answer)
+        public async Task<Answer> Update(Answer answer)
         {
-            var result = await _httpClient.PutAsJsonAsync<Answer>("Answer/Update-Answer", answer);
-            if (result.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            return false;
+            var updateAnswer = await _httpClient.PutAsJsonAsync("Answer/Update-Answer", answer);
+            var response = await updateAnswer.Content.ReadFromJsonAsync<Answer>();
+            return response;
         }
 
         public async Task<bool> Delete(int id)
