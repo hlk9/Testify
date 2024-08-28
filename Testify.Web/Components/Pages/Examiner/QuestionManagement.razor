@@ -110,7 +110,7 @@
                             }
                         }
                     </MudTd>
-                    <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Không Hoạt Động")</MudTd>
+                <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : (context.Status == null ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
 
                     <MudTd DataLabel="Thao tác">
                         <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>

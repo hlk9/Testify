@@ -1,24 +1,28 @@
 ﻿@using Testify.DAL.Models
 <div style="border-top: 1px solid #ccc">
-    <MudForm Model="@answer">
+    <MudForm Model="@answer" IsValid="isValid" @ref="form">
         <div class="d-flex justify-content-between align-items-center">
-            <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" @oninput="OnInputChange" />
+            <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
             <MudIconButton Icon="@Icons.Material.Outlined.DeleteOutline" OnClick="RemoveForm"></MudIconButton>
         </div>
 
-        <MudTextField T="string" @bind-Value="@answer.Content" Label="Nội dung câu hỏi" @onchange="OnInputChange" Required="true" RequiredError="Không được để trống!"/>
+        <MudTextField @bind-Value="@answer.Content" Label="Nội dung câu hỏi" Required="true" RequiredError="Không được để trống!" Immediate="true" Validation="@((string v) => string.IsNullOrWhiteSpace(v) ? "Không được để trống!" : null)" />
     </MudForm>
 </div>
 
 @code {
     [Parameter]
-    public Answer answer { get; set; }
+    public Answer answer { get; set; } = new();
 
     [Parameter]
     public int questionId { get; set; }
 
     [Parameter]
     public EventCallback<Answer> OnRemove { get; set; }
+
+    private bool isValid;
+
+    MudForm form;
 
     protected override async Task OnInitializedAsync()
     {
@@ -28,19 +32,25 @@
     [Parameter]
     public EventCallback<Answer> OnAnswerChanged { get; set; }
 
-    private void RemoveForm()
+    private async void RemoveForm()
     {
         if (OnRemove.HasDelegate)
         {
-            OnRemove.InvokeAsync(answer);
+            await OnRemove.InvokeAsync(answer);
         }
     }
 
-    private void OnInputChange(ChangeEventArgs e)
+    // private void OnInputChange(ChangeEventArgs e)
+    // {
+    //     if (OnAnswerChanged.HasDelegate)
+    //     {
+    //         OnAnswerChanged.InvokeAsync(answer);
+    //     }
+    // }
+
+    public async Task<bool> ValidateAsync()
     {
-        if (OnAnswerChanged.HasDelegate)
-        {
-            OnAnswerChanged.InvokeAsync(answer);
-        }
+        await form.Validate();
+        return form.IsValid;
     }
 }
