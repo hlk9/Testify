@@ -2,11 +2,11 @@
 <div style="border-top: 1px solid #ccc">
     <MudForm Model="@answer">
         <div class="d-flex justify-content-between align-items-center">
-            <MudText>Đáp án:</MudText>
             <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" @oninput="OnInputChange" />
+            <MudIconButton Icon="@Icons.Material.Outlined.DeleteOutline" OnClick="RemoveForm"></MudIconButton>
         </div>
 
-        <MudTextField T="string" @bind-Value="@answer.Content" Label="Nội dung câu hỏi" @onchange="OnInputChange" />
+        <MudTextField T="string" @bind-Value="@answer.Content" Label="Nội dung câu hỏi" @onchange="OnInputChange" Required="true" RequiredError="Không được để trống!"/>
     </MudForm>
 </div>
 
@@ -17,13 +17,24 @@
     [Parameter]
     public int questionId { get; set; }
 
+    [Parameter]
+    public EventCallback<Answer> OnRemove { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-         answer.QuestionId = questionId;
+        answer.QuestionId = questionId;
     }
 
     [Parameter]
     public EventCallback<Answer> OnAnswerChanged { get; set; }
+
+    private void RemoveForm()
+    {
+        if (OnRemove.HasDelegate)
+        {
+            OnRemove.InvokeAsync(answer);
+        }
+    }
 
     private void OnInputChange(ChangeEventArgs e)
     {

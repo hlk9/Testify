@@ -23,6 +23,11 @@ namespace Testify.DAL.Reposiroties
             return await _context.Answers.ToListAsync();
         }
 
+        public async Task<List<Answer>> GetAllAnswerByQuestionId(int questionId)
+        {
+            return await _context.Answers.Where(x => x.QuestionId == questionId).ToListAsync();
+        }
+
         public async Task<Answer> GetAnSwerById(int id)
         {
             return await _context.Answers.FindAsync(id);
