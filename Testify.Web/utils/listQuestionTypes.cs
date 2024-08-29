@@ -1,11 +1,10 @@
 ﻿namespace Testify.Web.utils
 {
-    public static class listQuestionTypes 
+    public enum listQuestionTypes : int
     {
-        public static string trueFalse = "Đúng/Sai";
-
-        public static string singleAnswer = "Một đáp án đúng";
-
-        public static string multiAnswer = "Nhiều đáp án đúng";
+        YesNo = 1,
+        SingleChoice = 2,
+        MultipleChoices = 3,
+        FillAnswer = 4
     }
 }

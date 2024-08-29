@@ -67,7 +67,7 @@ namespace Testify.DAL.Reposiroties
         }
 
 
-        public async Task<Question> UpdateStatusQuestion(int  questionId, bool status)
+        public async Task<Question> UpdateStatusQuestion(int  questionId, bool? status)
         {
             try
             {

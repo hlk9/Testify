@@ -1,13 +1,11 @@
-﻿@* @using Testify.DAL.Models
+﻿@using Testify.DAL.Models
 
 <MudDialog>
     <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật mức độ câu hỏi</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa đáp án</MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Spacing="4" Model="@answer" @ref="@form">
-            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" />
-        </MudForm>
+        <MudText>Bạn chắc chắn muốn xóa đáp án <span style="font-weight: bold">@answer?.Content</span> không?</MudText>
     </DialogContent>
     <DialogActions>
 
@@ -31,5 +29,26 @@
     {
         answer = await _serAnswer.GetById(answerId);
     }
+
+    private async Task Submit()
+    {
+        var deleteAnswer = await _serAnswer.Delete(answerId);
+        var lstAnswer = await _serAnswer.GetAllByQuestionId(answer.QuestionId);
+        if(deleteAnswer == true)
+        {
+            if(lstAnswer.Count == 0 || lstAnswer == null)
+            {
+                await _serQuestion.UpdateStatus(answer.QuestionId, null);
+            }
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thành công!!", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thất bại!!", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
 }
- *@

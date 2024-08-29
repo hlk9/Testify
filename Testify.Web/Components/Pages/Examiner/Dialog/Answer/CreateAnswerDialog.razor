@@ -1,5 +1,6 @@
 ﻿@using Testify.DAL.Models;
 @using Testify.Web.Components.Pages.Examiner.Component;
+@using Testify.Web.utils
 
 <MudDialog>
     <TitleContent>
@@ -34,7 +35,7 @@
             {
                 @foreach (var item in lstAnswers)
                 {
-                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
+                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
                 }
             }
 
@@ -54,6 +55,7 @@
     private bool IsDisableNewAnswer = true;
     private int ValueQuestionTypeChoice;
     private int questionId = -1;
+    private int questionTypeId = -1;
     private List<Answer> lstAnswers = new List<Answer>();
     private List<AnswerForm> answerForms = new List<AnswerForm>();
     [CascadingParameter]
@@ -67,6 +69,8 @@
 
     private async Task ChangeValue()
     {
+        var objQuestion = await _serQuestion.GetQuestionById(questionId);
+        questionTypeId = objQuestion.QuestionTypeId;
         IsDisableNewAnswer = false;
     }
 
@@ -100,6 +104,30 @@
         else if (answerForms.Count == 0 || answerForms == null)
         {
             snackbar.Add("Chưa nhập đáp án", Severity.Warning);
+            return;
+        }
+
+        int count = 0;
+        for (int i = 0; i < lstAnswers.Count; i++)
+        {
+            if (lstAnswers[i].IsCorrect == true)
+            {
+                count++;
+            }
+        }
+
+        if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+        {
+            if (count > 1)
+            {
+                snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                return;
+            }
+        }
+
+        if (count == 0)
+        {
+            snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
             return;
         }
 

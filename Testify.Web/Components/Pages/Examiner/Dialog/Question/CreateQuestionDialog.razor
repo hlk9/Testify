@@ -26,7 +26,7 @@
 
                     </MudSelect>
 
-                    <MudSelect T="int" @bind-Value="questionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueQuestionType">
+                    <MudSelect T="int" @bind-Value="QuestionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueQuestionType">
 
                         @if (_lstQuestionTypes != null)
                         {
@@ -48,10 +48,6 @@
                             }
                         }
                     </MudSelect>
-                    @* <MudRadioGroup @bind-Value="statusQuestion">
-                        <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
-                        <MudRadio Value="@(false)">Không hoạt động</MudRadio>
-                    </MudRadioGroup> *@
                 </MudForm>
             </MudItem>
 
@@ -60,16 +56,14 @@
                     <MudText Style="font-size: 16px" Disabled="isDisableAddNewAnswer">Đáp Án:</MudText>
                     <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNewAnswer" Disabled="isDisableAddNewAnswer" OnClick="AddNewAnswer"></MudIconButton>
                 </div>
-                <MudText Class="mt-2">@nofication</MudText>
                 @foreach (var item in lstAnswers)
                 {
-                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
+                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionTypeId="QuestionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
                 }
             </MudItem>
         </MudGrid>
     </DialogContent>
     <DialogActions>
-
         <MudButton OnClick="Cancel">Cancel</MudButton>
         <MudButton Color="Color.Primary" OnClick="Submit">Thêm mới</MudButton>
     </DialogActions>
@@ -81,10 +75,8 @@
     private List<QuestionType> _lstQuestionTypes;
     private List<Subject> _lstSubjects;
     private List<Answer> lstAnswers = new List<Answer>();
-    private int questionTypeId = 0;
-    private int questionId = 0;
+    private int QuestionTypeId = 0;
     private int indexAnswer = 1;
-    private string nofication = "";
     private bool isDisableAddNewAnswer = true;
     private bool chooseAdd = true;
     private List<AnswerForm> answerForms = new List<AnswerForm>();
@@ -105,15 +97,23 @@
 
     private async Task ChangeValueQuestionType()
     {
-        var obj = await _serQuestionType.GetQuestionTypesById(questionTypeId);
-        if (obj.Name.ToLower().Contains("Đúng/Sai".ToLower()))
+        if (QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
         {
-            nofication = "Loại câu hỏi đúng sai tự động tạo đáp án.";
+
+            lstAnswers = new List<Answer>
+            {
+                new Answer{Content = "Đúng"},
+                new Answer{Content = "Sai"},
+            };
+
+            answerForms.Add(new AnswerForm { answer = { Content = "Đúng" }, questionTypeId = QuestionTypeId });
+            answerForms.Add(new AnswerForm { answer = { Content = "Sai" }, questionTypeId = QuestionTypeId });
             isDisableAddNewAnswer = true;
             return;
         }
+        lstAnswers.Clear();
+        answerForms.Clear();
         isDisableAddNewAnswer = false;
-        nofication = "";
     }
 
     private async Task AddNewAnswer()
@@ -125,24 +125,6 @@
             answerForms.Add(new AnswerForm { answer = newAnswer });
         }
     }
-
-    // private void HandleAnswerChange(Answer updatedAnswer)
-    // {
-    //     var answer = lstAnswers.FirstOrDefault(a => a == updatedAnswer);
-    //     if (answer != null)
-    //     {
-    //         answer.Content = updatedAnswer.Content;
-    //         answer.IsCorrect = updatedAnswer.IsCorrect;
-    //     }
-    // }
-
-
-
-    // private bool IsLastAnswerFilled()
-    // {
-    //     var lastAnswer = lstAnswers.LastOrDefault();
-    //     return lastAnswer != null && !string.IsNullOrWhiteSpace(lastAnswer.Content);
-    // }
 
     private void RemoveAnswerForm(Answer answerToRemove)
     {
@@ -161,7 +143,30 @@
 
     private async Task Submit()
     {
-        // question.Status = statusQuestion;
+        int count = 0;
+        for (int i = 0; i < lstAnswers.Count; i++)
+        {
+            if (lstAnswers[i].IsCorrect == true)
+            {
+                count++;
+            }
+        }
+
+        if (QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+        {
+            if(count > 1)
+            {
+                snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                return;
+            }
+        }
+        
+        if(count == 0)
+        {
+            snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
+            return;
+        }
+
         bool allValid = true;
 
         foreach (var form in answerForms)
@@ -182,7 +187,7 @@
                 question.Status = true;
             }
             question.CreatedDate = DateTime.Now;
-            question.QuestionTypeId = questionTypeId;
+            question.QuestionTypeId = QuestionTypeId;
             var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
             if (checkAddNewQuestion != null)
             {

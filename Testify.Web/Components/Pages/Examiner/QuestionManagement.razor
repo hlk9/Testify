@@ -1,8 +1,10 @@
 ﻿@page "/Examiner/QuestionManagement"
+@using Testify.DAL.IReposiroties
 @using Testify.DAL.Models
 @using Testify.Web.utils
 @layout AdminLayout
 @inject IDialogService DialogService
+@inject ISessionServices SessionService
 
 <style>
     .input-search-end {
@@ -148,14 +150,16 @@
     private async Task LoadData()
     {
         _lstQuestions = await _serQuestion.GetAllQuestions();
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-
         _lstSubjects = await _serSub.GetAllSub();
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
+
+
         await LoadData();
     }
 
