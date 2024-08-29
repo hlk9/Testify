@@ -32,7 +32,7 @@
                     <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
                     <MudTd DataLabel="Thao tác">
                         <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))"></MudIconButton>
                     </MudTd>
                 </RowTemplate>
 
@@ -81,10 +81,23 @@
         {
             {x => x.answerId, id}
         };
+        var dialogParametersDelete = new DialogParameters<Dialog.Answer.DeleteAnswerDialog>
+        {
+            {x => x.answerId, id}
+        };
 
         if (name.Equals(OpenDialogType.Updatre))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.UpdateAnswerDialog>("Options dialog", dialogParametersUpdate, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await loadData();
+            }
+        }
+        else if (name.Equals(OpenDialogType.Delete))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.DeleteAnswerDialog>("Options dialog", dialogParametersDelete, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {

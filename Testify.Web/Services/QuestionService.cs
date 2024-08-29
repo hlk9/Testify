@@ -38,7 +38,7 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<Question> UpdateStatus(int id, bool status)
+        public async Task<Question> UpdateStatus(int id, bool? status)
         {
             return await _repoQuestion.UpdateStatusQuestion(id, status);
         }
