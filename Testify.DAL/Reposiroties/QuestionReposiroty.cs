@@ -67,13 +67,13 @@ namespace Testify.DAL.Reposiroties
         }
 
 
-        public async Task<Question> UpdateStatusQuestion(int  questionId, bool? status)
+        public async Task<Question> UpdateStatusQuestion(int  questionId, string? status)
         {
             try
             {
                 var objUpdateQuestion = await _context.Questions.FindAsync(questionId);
 
-                objUpdateQuestion.Status = status;
+                objUpdateQuestion.Status = Convert.ToBoolean(status);
 
                 var updateQuestion = _context.Questions.Update(objUpdateQuestion).Entity;
                 await _context.SaveChangesAsync();

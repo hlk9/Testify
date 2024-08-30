@@ -1,11 +1,12 @@
 ﻿@using Testify.DAL.Models;
+@using Testify.Web.Utils
 
 <MudDialog>
     <TitleContent>
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa câu hỏi</MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Bạn chắc chắn muốn xóa mức độ câu hỏi <MudText Style="font-weight: bold">@question?.Content</MudText> không?</MudText>
+        <MudText>Bạn chắc chắn muốn vô hiệu hóa câu hỏi <MudText Style="font-weight: bold">@question?.Content</MudText> không?</MudText>
     </DialogContent>
     <DialogActions>
 
@@ -32,16 +33,16 @@
 
     private async Task Submit()
     {
-        var check = await _serQuestion.DeleteQuestion(QuestionId);
+        var check = await _serQuestion.UpdateStatus(QuestionId, StatusType.falseStatus);
         if (check != null)
         {
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thành công", Severity.Success);
+            snackbar.Add("Vô hiệu hóa thành công", Severity.Success);
         }
         else
         {
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thất bại", Severity.Error);
+            snackbar.Add("Vô hiệu hóa thất bại", Severity.Error);
         }
     }
 

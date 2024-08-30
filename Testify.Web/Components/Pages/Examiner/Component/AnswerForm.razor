@@ -16,6 +16,9 @@
     public Answer answer { get; set; } = new();
 
     [Parameter]
+    public int questionId { get; set; }
+
+    [Parameter]
     public int questionTypeId { get; set; }
 
     [Parameter]
@@ -37,6 +40,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        answer.QuestionId = questionId;
         checkQuestionType();
     }
 

@@ -7,8 +7,6 @@ namespace Testify.Web.Services
     {
         private readonly HttpClient _httpClient;
 
-        private QuestionReposiroty _repoQuestion = new QuestionReposiroty();
-
         public QuestionService(HttpClient httpClient)
         {
             _httpClient = httpClient;   
@@ -38,9 +36,11 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<Question> UpdateStatus(int id, bool? status)
+        public async Task<Question> UpdateStatus(int id, string? status)
         {
-            return await _repoQuestion.UpdateStatusQuestion(id, status);
+            var updateStatus = await _httpClient.PutAsJsonAsync($"Question/Update-Status?questionId={id}&status={status}", status);
+            var reponse = await updateStatus.Content.ReadFromJsonAsync<Question>();
+            return reponse;
         }
 
         public async Task<Question> DeleteQuestion(int id)

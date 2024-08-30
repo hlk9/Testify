@@ -51,6 +51,13 @@ namespace Testify.API.Controllers
             return Ok(updateAnswer);
         }
 
+        [HttpPut("Update-Status-Answer")]
+        public async Task<ActionResult<Answer>> UpdateSatus(int questionId, string? status)
+        {
+            var updateSatus = await _repoAnswer.UpdateStatusAnswer(questionId, status);
+            return Ok(updateSatus);
+        }
+
         [HttpDelete("Delete-Answer")]
         public async Task<ActionResult<Answer>> Delete(int id)
         {

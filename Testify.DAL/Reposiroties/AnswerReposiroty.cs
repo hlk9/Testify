@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using Testify.DAL.Context;
@@ -61,6 +62,23 @@ namespace Testify.DAL.Reposiroties
                 var update = _context.Answers.Update(obj).Entity;
                 await _context.SaveChangesAsync();
                 return update;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<Answer> UpdateStatusAnswer(int answerId, string? status) {
+            try
+            {
+                var obj = await _context.Answers.FindAsync(answerId);
+
+                obj.Status = Convert.ToBoolean(status);
+
+                var updateStatus = _context.Answers.Update(obj).Entity;
+                await _context.SaveChangesAsync();
+                return updateStatus;
             }
             catch
             {

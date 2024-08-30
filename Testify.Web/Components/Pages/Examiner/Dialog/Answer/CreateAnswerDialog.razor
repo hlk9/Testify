@@ -1,5 +1,6 @@
 ﻿@using Testify.DAL.Models;
 @using Testify.Web.Components.Pages.Examiner.Component;
+@using Testify.Web.Utils
 @using Testify.Web.utils
 
 <MudDialog>
@@ -35,15 +36,15 @@
             {
                 @foreach (var item in lstAnswers)
                 {
-                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
+                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
                 }
             }
 
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
-        <MudButton Color="Color.Primary" Variant="@Variant.Filled" OnClick="Submit">Tạo</MudButton>
+        <MudButton OnClick="Cancel">Cancle</MudButton>
+        <MudButton Style="color: gold" OnClick="Submit">Thêm mới</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -55,7 +56,7 @@
     private bool IsDisableNewAnswer = true;
     private int ValueQuestionTypeChoice;
     private int questionId = -1;
-    private int questionTypeId = -1;
+    private int questionTypeId;
     private List<Answer> lstAnswers = new List<Answer>();
     private List<AnswerForm> answerForms = new List<AnswerForm>();
     [CascadingParameter]
@@ -69,9 +70,12 @@
 
     private async Task ChangeValue()
     {
-        var objQuestion = await _serQuestion.GetQuestionById(questionId);
-        questionTypeId = objQuestion.QuestionTypeId;
-        IsDisableNewAnswer = false;
+        if(lstAnswers.Count > 0 || lstAnswers != null)
+        {
+            var objQuestion = await _serQuestion.GetQuestionById(questionId);
+            questionTypeId = objQuestion.QuestionTypeId;
+            IsDisableNewAnswer = false;
+        }
     }
 
     private async Task AddNewAnswer()
@@ -150,7 +154,7 @@
                 var check = await _serAnswer.Create(lstAnswers[i]);
             }
 
-            var question = await _serQuestion.UpdateStatus(questionId, true);
+            var question = await _serQuestion.UpdateStatus(questionId, StatusType.trueStatus);
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Thêm thành công", Severity.Success);
         }
