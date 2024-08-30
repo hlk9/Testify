@@ -8,10 +8,10 @@
     <DialogContent>
         <MudForm Spacing="4" Model="@answer" @ref="@form">
             <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" />
-            <MudRadioGroup T="bool" @bind-Value="@answer.IsCorrect" For="@(() => answer.IsCorrect)">
-                <MudRadio T="bool" Value="true">Đúng</MudRadio>
-                <MudRadio T="bool" Value="false">Sai</MudRadio>
-            </MudRadioGroup>
+            <MudSelect T="bool" @bind-Value="@valueIsCorrect" Label="Đúng/Sai">
+                <MudSelectItem Value="true">Đúng</MudSelectItem>
+                <MudSelectItem Value="false">Sai</MudSelectItem>
+            </MudSelect>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -32,30 +32,16 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
+    private bool valueIsCorrect;
+
     protected override async Task OnInitializedAsync()
     {
         answer = await _serAnswer.GetById(answerId);
+        valueIsCorrect = answer.IsCorrect;
     }
 
     private async Task Submit()
     {
-        var objQuestion = await _serQuestion.GetQuestionById(answer.QuestionId);
-        var lstAnswers = await _serAnswer.GetAllByQuestionId(answer.QuestionId);
-        int countTrue = 0;
-        foreach (var item in lstAnswers)
-        {
-            if (item.IsCorrect == true) countTrue++;
-        }
-
-        if (objQuestion.QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || objQuestion.QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
-        {
-            if (countTrue > 0 && answer.IsCorrect == true)
-            {
-                snackbar.Add("Chỉ được 1 đáp án đúng", Severity.Warning);
-                return;
-            }
-        }
-
         var updateAnswer = await _serAnswer.Update(answer);
         if (updateAnswer != null)
         {

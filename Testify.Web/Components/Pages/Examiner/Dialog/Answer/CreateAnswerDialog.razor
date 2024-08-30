@@ -56,7 +56,7 @@
     private bool IsDisableNewAnswer = true;
     private int ValueQuestionTypeChoice;
     private int questionId = -1;
-    private int questionTypeId = -1;
+    private int questionTypeId;
     private List<Answer> lstAnswers = new List<Answer>();
     private List<AnswerForm> answerForms = new List<AnswerForm>();
     [CascadingParameter]
@@ -70,9 +70,12 @@
 
     private async Task ChangeValue()
     {
-        var objQuestion = await _serQuestion.GetQuestionById(questionId);
-        questionTypeId = objQuestion.QuestionTypeId;
-        IsDisableNewAnswer = false;
+        if(lstAnswers.Count > 0 || lstAnswers != null)
+        {
+            var objQuestion = await _serQuestion.GetQuestionById(questionId);
+            questionTypeId = objQuestion.QuestionTypeId;
+            IsDisableNewAnswer = false;
+        }
     }
 
     private async Task AddNewAnswer()
