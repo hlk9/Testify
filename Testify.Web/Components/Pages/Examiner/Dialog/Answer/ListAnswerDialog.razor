@@ -32,7 +32,8 @@
                     <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
                     <MudTd DataLabel="Thao tác">
                         <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))"></MudIconButton>
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))" Disabled="CheckTypeQuestion"></MudIconButton>
                     </MudTd>
                 </RowTemplate>
 
@@ -60,14 +61,24 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
+    private int questionTypeId = -1;
+    private bool CheckTypeQuestion = false;
+
     private async Task loadData()
     {
         lstAnswers = await _serAnswer.GetAllByQuestionId(questionId);
+
         StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
+        var objQuestion = await _serQuestion.GetQuestionById(questionId);
+        questionTypeId = objQuestion.QuestionTypeId;
+        if(questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
+        {
+            CheckTypeQuestion = true;
+        }
         await loadData();
     }
 

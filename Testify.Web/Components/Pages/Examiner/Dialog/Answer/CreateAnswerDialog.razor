@@ -1,5 +1,6 @@
 ﻿@using Testify.DAL.Models;
 @using Testify.Web.Components.Pages.Examiner.Component;
+@using Testify.Web.Utils
 @using Testify.Web.utils
 
 <MudDialog>
@@ -35,15 +36,15 @@
             {
                 @foreach (var item in lstAnswers)
                 {
-                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
+                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
                 }
             }
 
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
-        <MudButton Color="Color.Primary" Variant="@Variant.Filled" OnClick="Submit">Tạo</MudButton>
+        <MudButton OnClick="Cancel">Cancle</MudButton>
+        <MudButton Style="color: gold" OnClick="Submit">Thêm mới</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -150,7 +151,7 @@
                 var check = await _serAnswer.Create(lstAnswers[i]);
             }
 
-            var question = await _serQuestion.UpdateStatus(questionId, true);
+            var question = await _serQuestion.UpdateStatus(questionId, StatusType.trueStatus);
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Thêm thành công", Severity.Success);
         }

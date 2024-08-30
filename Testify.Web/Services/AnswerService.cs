@@ -45,6 +45,12 @@ namespace Testify.Web.Services
             return response;
         }
 
+        public async Task<Answer> UpdateStatus(int id,  string? status)
+        {
+            var updateStatus = await _httpClient.PutAsJsonAsync($"Answer/Update-Status-Answer?questionId={id}&status={status}", status);
+            var response = await updateStatus.Content.ReadFromJsonAsync<Answer>();
+            return response;
+        }
         public async Task<bool> Delete(int id)
         {
             var result = await _httpClient.DeleteAsync($"Answer/Delete-Answer?id={id}");

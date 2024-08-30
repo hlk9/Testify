@@ -1,10 +1,8 @@
 ﻿@page "/Examiner/QuestionManagement"
-@using Testify.DAL.IReposiroties
 @using Testify.DAL.Models
 @using Testify.Web.utils
 @layout AdminLayout
 @inject IDialogService DialogService
-@inject ISessionServices SessionService
 
 <style>
     .input-search-end {
@@ -12,19 +10,42 @@
         padding-left: 15px;
     }
 
-    .add-button-end {
+    .button-add-new-hover {
         background-color: #29A69A;
         color: white;
         width: 100%;
     }
 
-        .add-button-end:hover {
-            background-color: white;
-            color: #29a69a;
-        }
+    .button-add-new-hover:hover {
+        background-color: white;
+        color: #29a69a;
+    }
 
     .icon-input-search {
         padding-left: 100px;
+    }
+
+    .button-add-answer-to-question {
+        background-color: gold;
+        color: #fff;
+        width: 100%;
+    }
+
+    .button-add-answer-to-question:hover {
+        background-color: transparent;
+        color: gold;
+    }
+
+    .button-import {
+        background-color: red;
+        color: #fff;
+        width: 100%;
+    }
+
+    .button-import:hover {
+        background-color: transparent;
+        color: red;
+        width: 100%;
     }
 </style>
 
@@ -33,14 +54,17 @@
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI VÀ ĐÁP ÁN</MudText>
     </MudPaper>
     <MudGrid Style="padding:20px 0 ">
-        <MudItem xl="7" lg="5" md="3" sm="1" xs="12">
+        <MudItem xl="4" lg="12" md="12" sm="12" xs="12" Class="p-0">
 
         </MudItem>
-        <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Style="background-color: transparent; border: 1px solid #29a69a; color: #29a69a; width: 100%;" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
+        <MudItem xl="2" lg="4" md="2" sm="12" xs="12">
+            <MudButton Class="button-import" Variant="Variant.Filled">Import</MudButton>
+        </MudItem>
+        <MudItem xl="3" lg="4" md="5" sm="12" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Class="button-add-answer-to-question" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
         </MudItem> 
-        <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.Create, -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
+        <MudItem xl="3" lg="4" md="5" sm="12" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.Create, -1))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -72,6 +96,8 @@
                     <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
+                @if(context.Status == true || context.Status == null) {
+
                     <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
                     <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
                     <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
@@ -120,12 +146,14 @@
                     <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : (context.Status == null ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
 
                     <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Updatre, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Updatre, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTd>
-                <MudTd>
-                    <MudButton Disabled="@(context.Status == null ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
+                    <MudTd>
+                        <MudButton Disabled="@(context.Status == null ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
                     </MudTd>
+                }
+                    
             </RowTemplate>
             <NoRecordsContent>
                 <MudText>No matching records found</MudText>
@@ -141,7 +169,7 @@
 </div>
 
 @code {
-    private List<Question> _lstQuestions;
+    private List<Question> _lstQuestions = new List<Question>();
     private List<Subject> _lstSubjects;
     private List<QuestionLevel> _lstQuestionLevels;
     private List<QuestionType> _lstQuestionTypes;
@@ -150,6 +178,7 @@
     private async Task LoadData()
     {
         _lstQuestions = await _serQuestion.GetAllQuestions();
+        
         StateHasChanged();
     }
 

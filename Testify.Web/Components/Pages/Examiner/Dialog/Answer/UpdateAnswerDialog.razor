@@ -12,11 +12,6 @@
                 <MudRadio T="bool" Value="true">Đúng</MudRadio>
                 <MudRadio T="bool" Value="false">Sai</MudRadio>
             </MudRadioGroup>
-
-            <MudRadioGroup T="bool" @bind-Value="@statusAnswer">
-                <MudRadio T="bool" Value="true">Hoạt động</MudRadio>
-                <MudRadio T="bool" Value="false">Vô hiệu hóa</MudRadio>
-            </MudRadioGroup>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -31,8 +26,6 @@
 
     [Parameter]
     public int answerId { get; set; }
-
-    private bool statusAnswer;
 
     MudForm form;
 
@@ -63,7 +56,6 @@
             }
         }
 
-        answer.Status = statusAnswer;
         var updateAnswer = await _serAnswer.Update(answer);
         if (updateAnswer != null)
         {

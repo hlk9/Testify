@@ -1,4 +1,5 @@
 ﻿@using Testify.DAL.Models
+@using Testify.Web.Utils
 
 <MudDialog>
     <TitleContent>
@@ -10,7 +11,7 @@
     <DialogActions>
 
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Warning" OnClick="Submit">Cập nhật</MudButton>
+        <MudButton Color="Color.Error" OnClick="Submit">Xóa</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -32,13 +33,23 @@
 
     private async Task Submit()
     {
-        var deleteAnswer = await _serAnswer.Delete(answerId);
-        var lstAnswer = await _serAnswer.GetAllByQuestionId(answer.QuestionId);
-        if(deleteAnswer == true)
+        var deleteAnswer = await _serAnswer.UpdateStatus(answerId, StatusType.falseStatus);
+
+        if(deleteAnswer != null)
         {
-            if(lstAnswer.Count == 0 || lstAnswer == null)
+            var lstAnswer = await _serAnswer.GetAllByQuestionId(answer.QuestionId);
+            var count = 0;
+            foreach (var item in lstAnswer)
             {
-                await _serQuestion.UpdateStatus(answer.QuestionId, null);
+                if(item.Status == true)
+                {
+                    count++;
+                    break;
+                }
+            }
+            if(count == 0)
+            {
+                await _serQuestion.UpdateStatus(answer.QuestionId, StatusType.nullStatus);
             }
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Xóa thành công!!", Severity.Success);
