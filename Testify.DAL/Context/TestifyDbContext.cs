@@ -52,6 +52,13 @@ namespace Testify.DAL.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<Class>()
+                .HasIndex(c => c.ClassCode).IsUnique();
+
+            modelBuilder.Entity<Organization>()
+                .HasIndex(c => c.OrganizationCode).IsUnique();
+
             modelBuilder.Entity<Submission>()
             .HasOne(s => s.User)
             .WithMany()
@@ -81,6 +88,15 @@ namespace Testify.DAL.Context
                .WithMany()
                .HasForeignKey(s => s.QuestionId)
                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<QuestionType>()
+                .HasData(                
+                new QuestionType { Id = 1,Name="Đúng / Sai",Description="Chọn câu trả lời Đúng hoặc Sai", Status=true},
+                new QuestionType { Id = 2, Name = "Chọn đáp án đúng nhất", Description = "Chọn đáp án đúng nhất", Status = true },
+                new QuestionType { Id = 3, Name = "Chọn nhiều đáp án đúng", Description = "Chọn các đáp án đúng", Status = true },
+                new QuestionType { Id = 4, Name = "Nhập đáp án đúng", Description = "Nhập câu trả lời", Status = true }
+                );
+
         }
     }
 }

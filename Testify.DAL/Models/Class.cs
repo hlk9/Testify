@@ -11,6 +11,7 @@ namespace Testify.DAL.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string ClassCode { get; set; }
         public string Description { get; set; }
         public int Capacity { get; set; }
         [ForeignKey("OrganizationId")]
@@ -20,8 +21,8 @@ namespace Testify.DAL.Models
         public int? SubjectId { get; set; }
         public virtual Subject? Subject { get; set; }
 
-        public virtual ICollection<ClassUser>? ClassUsers { get; set; } 
+        public virtual ICollection<ClassUser>? ClassUsers { get; set; }
 
-        public bool? Status { get; set; } 
+        public bool? Status { get; set; }
     }
 }
