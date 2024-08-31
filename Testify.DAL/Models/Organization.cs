@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,6 +12,9 @@ namespace Testify.DAL.Models
     {
         [Key]
         public int Id { get; set; }
+        [MaxLength(6)]
+        [Required]
+        public string OrganizationCode { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string? ContactPhone { get; set; }
