@@ -17,6 +17,6 @@ namespace Testify.DAL.Models
         public virtual Question? Question { get; set; }
         public string Content { get; set; }
         public bool IsCorrect { get; set; }
-        public bool? Status { get; set; }
+        public byte Status { get; set; }
     } 
 }
