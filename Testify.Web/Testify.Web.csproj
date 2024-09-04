@@ -8,6 +8,7 @@
 
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Heron.MudCalendar" Version="2.0.0" />
     <PackageReference Include="MudBlazor" Version="7.*" />
   </ItemGroup>
