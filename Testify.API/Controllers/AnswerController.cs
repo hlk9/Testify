@@ -52,7 +52,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpPut("Update-Status-Answer")]
-        public async Task<ActionResult<Answer>> UpdateSatus(int questionId, string? status)
+        public async Task<ActionResult<Answer>> UpdateSatus(int questionId, byte status)
         {
             var updateSatus = await _repoAnswer.UpdateStatusAnswer(questionId, status);
             return Ok(updateSatus);

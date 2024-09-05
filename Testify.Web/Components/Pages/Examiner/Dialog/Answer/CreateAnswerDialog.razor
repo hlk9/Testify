@@ -18,11 +18,10 @@
                 {
                     foreach (var item in lstQuestion)
                     {
-                        if (item.Status == true || item.Status == false)
-                        {
-                            continue;
+                        if(item.Status == Convert.ToByte(StatusType.statusNull))
+                        {   
+                            <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
                         }
-                        <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
                     }
                 }
             </MudSelect>
@@ -150,11 +149,11 @@
 
             for (int i = 0; i < lstAnswers.Count; i++)
             {
-                lstAnswers[i].Status = true;
+                lstAnswers[i].Status = Convert.ToByte(StatusType.statusTrue);
                 var check = await _serAnswer.Create(lstAnswers[i]);
             }
 
-            var question = await _serQuestion.UpdateStatus(questionId, StatusType.trueStatus);
+            var question = await _serQuestion.UpdateStatus(questionId, Convert.ToByte(StatusType.statusTrue));
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Thêm thành công", Severity.Success);
         }

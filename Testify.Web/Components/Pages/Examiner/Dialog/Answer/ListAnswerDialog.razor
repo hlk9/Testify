@@ -1,4 +1,5 @@
 ﻿@using Testify.DAL.Models
+@using Testify.Web.Utils
 @using Testify.Web.utils
 @inject IDialogService DialogService
 
@@ -29,7 +30,7 @@
                     <MudTd DataLabel="Đúng/Sai">
                         @(context.IsCorrect == true ? "Đúng" : "Sai")
                     </MudTd>
-                    <MudTd DataLabel="Trạng thái">@(context.Status == true ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
+                    <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.statusTrue) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
                     <MudTd DataLabel="Thao tác">
                         <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
 
