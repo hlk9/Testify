@@ -1,5 +1,6 @@
 ﻿@using Testify.DAL.Models
 @using Testify.Web.Components.Pages.Examiner.Component
+@using Testify.Web.Utils
 @using Testify.Web.utils
 
 <MudDialog>
@@ -143,28 +144,31 @@
 
     private async Task Submit()
     {
-        int count = 0;
-        for (int i = 0; i < lstAnswers.Count; i++)
+        if (lstAnswers.Count > 0)
         {
-            if (lstAnswers[i].IsCorrect == true)
+            int count = 0;
+            for (int i = 0; i < lstAnswers.Count; i++)
             {
-                count++;
+                if (lstAnswers[i].IsCorrect == true)
+                {
+                    count++;
+                }
             }
-        }
 
-        if (QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
-        {
-            if(count > 1)
+            if (QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
             {
-                snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                if (count > 1)
+                {
+                    snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                    return;
+                }
+            }
+
+            if (count == 0)
+            {
+                snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
                 return;
             }
-        }
-        
-        if(count == 0)
-        {
-            snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
-            return;
         }
 
         bool allValid = true;
@@ -181,10 +185,10 @@
         {
             if(lstAnswers == null || lstAnswers.Count == 0)
             {
-                question.Status = null;
+                question.Status = Convert.ToByte(StatusType.statusNull);
             } else
             {
-                question.Status = true;
+                question.Status = Convert.ToByte(StatusType.statusTrue);
             }
             question.CreatedDate = DateTime.Now;
             question.QuestionTypeId = QuestionTypeId;
@@ -194,7 +198,7 @@
                 for (int i = 0; i < lstAnswers.Count; i++)
                 {
                     lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
-                    lstAnswers[i].Status = true;
+                    lstAnswers[i].Status = Convert.ToByte(StatusType.statusTrue);
                     var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
                 }
                 MudDialog.Close(DialogResult.Ok(true));

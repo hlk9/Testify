@@ -36,7 +36,7 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<Question> UpdateStatus(int id, string? status)
+        public async Task<Question> UpdateStatus(int id, byte status)
         {
             var updateStatus = await _httpClient.PutAsJsonAsync($"Question/Update-Status?questionId={id}&status={status}", status);
             var reponse = await updateStatus.Content.ReadFromJsonAsync<Question>();
