@@ -1,41 +1,6 @@
 ﻿@page "/"
 
-<style>
-    /* CSS để làm mờ và ẩn thông báo lỗi */
-    @@keyframes fadeIn {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-    }
-
-    @@keyframes fadeOut {
-        0% { opacity: 1; }
-        100% { opacity: 0; }
-    }
-
-    .alert-fade-in {
-        animation: fadeIn 0.5s forwards; /* Hiển thị thông báo */
-    }
-
-    .alert-fade-out {
-        animation: fadeOut 0.5s forwards; /* Ẩn thông báo sau 3s */
-    }
-
-    @@media (max-width: 720px) {
-        .rounded-custom {
-            border-radius: 0px !important;
-        }
-
-        .loginRange {
-            width: 100% !important;
-        }
-    }
-
-    @@media (min-width: 1500px) {
-        .loginRange {
-            width: 70% !important;
-        }
-    }
-</style>
+@using MudBlazor
 
 <MudGrid Spacing="0" Class="m-0 w-100 align-items-center" Justify="Justify.SpaceBetween" Style="background-color:#29A69A; height:100vh">
     <MudItem sm="12" md="12" xs="12" lg="7" Class="d-flex h-100 justify-center align-items-center flex-column rounded-xs-0 pa-3 rounded-custom" Style="background-color: #FFFFFF; border-top-right-radius:50px; border-bottom-right-radius:50px">
@@ -50,13 +15,6 @@
                 </MudItem>
             </MudGrid>
         </MudPaper>
-
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <MudAlert Class="@(showAlert ? "alert-fade-in" : "alert-fade-out")" Severity="Severity.Error" Variant="Variant.Filled">
-                @errorMessage
-            </MudAlert>
-        }
 
         <MudPaper Elevation="0" Class="p-0 p-md-5 loginRange" Style="width:60%" Height="100%">
             <MudText Style="font-size:22px; font-weight:bold" Class="text-center">Đăng nhập bằng tài khoản Testify của bạn</MudText>
@@ -101,8 +59,12 @@
     private string username;
     private string password;
     private string errorMessage;
-    private bool showAlert = false;
+    private bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
     [Inject] NavigationManager Navigation { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
 
     private void NavigateToPasswordRetrieval()
     {
@@ -115,10 +77,6 @@
     {
         NavigationRegister.NavigateTo("/Register");
     }
-
-    bool isShow;
-    InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
     void ButtonTestclick()
     {
@@ -153,21 +111,12 @@
         }
         else
         {
-            errorMessage = "Đăng nhập không thành công. Vui lòng kiểm tra lại tên người dùng và mật khẩu.";
-            showAlert = true; // Hiển thị thông báo lỗi
-            StateHasChanged(); // Trigger re-render to show the alert immediately
-
-            // Wait for 3 seconds and then clear the error message
-            await Task.Delay(3000);
-            showAlert = false;
-            errorMessage = null;
-            StateHasChanged(); // Trigger re-render to hide the alert
+            Snackbar.Add("Đăng nhập không thành công. Vui lòng kiểm tra lại tên người dùng và mật khẩu.", Severity.Warning);
         }
     }
 
     private User AuthenticateUser(string username, string password)
     {
-        // Replace this with actual authentication logic (e.g., database check)
         if (username == "admin@example.com" && password == "admin")
         {
             Navigation.NavigateTo("/admin/home");
