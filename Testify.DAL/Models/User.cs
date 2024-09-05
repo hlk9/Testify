@@ -28,6 +28,5 @@ namespace Testify.DAL.Models
         public virtual ICollection<ClassUser>? ClassUsers { get; set; }
         public virtual ICollection<UserPermission>? UserPermissions { get; set; }
         public virtual ICollection<Submission>? Submissions { get; set; }
-  
     }
 }
