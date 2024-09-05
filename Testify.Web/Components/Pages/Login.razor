@@ -1,4 +1,4 @@
-﻿@page "/Login"
+﻿@page "/"
 
 <style>
     @@media (max-width: 720px) {
@@ -39,8 +39,8 @@
 
 
             <MudText Style="font-size:22px; font-weight:bold" Class="text-center">Đăng nhập bằng tải khoản Testify của bạn</MudText>
-            <MudTextField T="string" Class=" mt-3 mb-3" Placeholder="Email/Số điện thoại" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
-            <MudTextField T="string" Class="mt-3 mb-3" Placeholder="Mật khẩu" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" FullWidth="true"></MudTextField>
+            <MudTextField T="string" @bind-Value="username" Class=" mt-3 mb-3" Placeholder="Email/Số điện thoại" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
+            <MudTextField T="string" @bind-Value="password" Class="mt-3 mb-3" Placeholder="Mật khẩu" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" FullWidth="true"></MudTextField>
             <MudText Class="mt-3 mb-3" Align="Align.End" @onclick="NavigateToPasswordRetrieval">Quên mật khẩu?</MudText>
 
             <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w-100 rounded-4">Tiếp tục</MudButton>
@@ -78,6 +78,8 @@
     </MudItem>
 </MudGrid>
 @code {
+    private string username;
+    private string password;
     [Inject] NavigationManager Navigation { get; set; }
 
     private void NavigateToPasswordRetrieval()
@@ -110,6 +112,49 @@
             PasswordInputIcon = Icons.Material.Filled.Visibility;
             PasswordInput = InputType.Text;
         }
+    }
+
+    private async Task LoginNew()
+    {
+        // Placeholder for authentication logic
+        // Replace this with your actual authentication logic.
+        var user = AuthenticateUser(username, password);
+
+        if (user != null)
+        {
+            if (user.Role == "Admin")
+            {
+                Navigation.NavigateTo("/admin");
+            }
+            else if (user.Role == "User")
+            {
+                Navigation.NavigateTo("/user");
+            }
+        }
+        else
+        {
+            // Show an error message if login fails
+            // You can use MudBlazor's MudAlert or similar component for this
+        }
+    }
+
+    private User AuthenticateUser(string username, string password)
+    {
+        // Replace this with actual authentication logic (e.g., database check)
+        if (username == "admin@example.com" && password == "admin")
+        {
+            return new User { Role = "Admin" };
+        }
+        else if (username == "user@example.com" && password == "user")
+        {
+            return new User { Role = "User" };
+        }
+        return null;
+    }
+
+    private class User
+    {
+        public string Role { get; set; }
     }
 
 }
