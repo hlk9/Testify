@@ -18,4 +18,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Testify.DAL\Testify.DAL.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="wwwroot\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
