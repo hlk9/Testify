@@ -16,7 +16,7 @@ namespace Testify.DAL.Models
         public string? Description { get; set; }
         [ForeignKey("SubjectId")] 
         public int SubjectId  { get; set; }
-        public virtual Subject Subject { get; set; }
+        public virtual Subject? Subject { get; set; }
         public int NumberOfQuestions { get; set; }
         public byte Status { get; set; } = 1;
         public double MaximmumMark { get; set; }
@@ -24,6 +24,6 @@ namespace Testify.DAL.Models
         public int Duration { get; set; }
         [ForeignKey("ScoreMethodId")]
         public int ScoreMethodId { get; set; }
-        public virtual ScoreMethod ScoreMethod { get; set; }
+        public virtual ScoreMethod? ScoreMethod { get; set; }
     }
 }
