@@ -9,7 +9,7 @@
         <MudTextField T="int" @bind-Value="@subject.Id" Disabled Label="Mã môn học" ReadOnly="true" />
         <MudTextField T="string" @bind-Value="@subject.Name" Disabled Label="Tên môn học" ReadOnly="true" />
         <MudTextField T="string" @bind-Value="@subject.Description" Disabled Label="Mô tả" ReadOnly="true" />
-        <MudTextField T="bool?" @bind-Value="@subject.Status" Disabled Label="Trạng thái" ReadOnly="true" />
+        <MudTextField T="byte?" @bind-Value="@subject.Status" Disabled Label="Trạng thái" ReadOnly="true" />
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="Variant.Filled" OnClick="Cancel">Quay lại</MudButton>
