@@ -97,6 +97,14 @@ namespace Testify.DAL.Context
                 new QuestionType { Id = 4, Name = "Nhập đáp án đúng", Description = "Nhập câu trả lời", Status = true }
                 );
 
+            modelBuilder.Entity<Level>()
+                .HasData(
+                new Level { Id = 1, Name = "Admin", Status = true  },
+                new Level { Id = 2, Name = "Examiner", Status = true },
+                new Level { Id = 3, Name = "Teacher", Status = true },
+                new Level { Id = 4, Name = "Student", Status = true }
+                );
+
         }
     }
 }

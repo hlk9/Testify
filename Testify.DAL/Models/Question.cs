@@ -12,7 +12,7 @@ namespace Testify.DAL.Models
         public int Id { get; set; }
         public string Content { get; set; }
         public DateTime CreatedDate { get; set; }
-        public byte Status { get; set; }
+        public byte? Status { get; set; }
         public int SubjectId { get; set; }
         public string DocumentURL { get; set; }
         [ForeignKey("QuestionTypeId")]
