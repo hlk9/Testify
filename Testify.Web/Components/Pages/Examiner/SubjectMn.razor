@@ -1,4 +1,5 @@
 ﻿@page "/Examiner/SubjectManagement"
+@using Testify.DAL.Models
 @layout AdminLayout
 @inject IDialogService DialogService
 <style>
@@ -29,24 +30,7 @@
     </MudGrid>
 
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
-        @* <div class="d-flex mt-2">
-        <div>
-        <img class=" ms-4 mt-4 img-icon-listclass" style="color:#29a69a" src="https://www.svgrepo.com/show/456444/list-clipboard.svg" />
-        </div>
-
-        <div>
-        <MudText Class="fw-bold ps-3 mt-2" Style="font-size:22px; color:#29A69A; padding-top:13px;">Danh sách lớp học</MudText>
-        </div>
-
-
-        <div class="border rounded-pill mb-1 justify-content-end" style=" margin-top:10px;">
-        <MudText Class=" input-search-end">Tìm kiếm theo tên hoặc theo mã   <MudIconButton Class="icon-input-search" Icon="@Icons.Material.Filled.Search"></MudIconButton> </MudText>
-        </div>
-        </div> *@
-        @*     <hr /> *@
-
-
-        <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@subject" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -68,16 +52,29 @@
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Mã môn học">@context.Column1</MudTd>
-                <MudTd DataLabel="Tên môn học">@context.Column2</MudTd>
-                <MudTd DataLabel="Mô tả">@context.Column3</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Column4</MudTd>
-                <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                </MudTd>
+           
+            <RowTemplate>    
+                @if(subject?.Count == 0 || subject == null)
+                {
+                    <h5>Empty</h5>
+                }
+                else
+                {
+                    @foreach(var item in subject)
+                    {
+                        <MudTd DataLabel="Mã môn học">@item.Id</MudTd>
+                        <MudTd DataLabel="Tên môn học">@item.Name</MudTd>
+                        <MudTd DataLabel="Mô tả">@item.Description</MudTd>
+                        <MudTd DataLabel="Trạng thái">@item.Status</MudTd>
+                        <MudTd DataLabel="Thao tác">
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        </MudTd>
+                    }
+           
+                }
+                      
             </RowTemplate>
             <NoRecordsContent>
                 <MudText>No matching records found</MudText>
@@ -98,32 +95,11 @@
 @code {
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
 
-    public List<ChartSeries> Series = new List<ChartSeries>()
+    private List<Subject>? subject;
+
+    protected override async Task OnInitializedAsync()
     {
-        new ChartSeries() { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
-        new ChartSeries() { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
-        new ChartSeries() { Name = "Sweden", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
-    };
-    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
-
-    private int a;
-    public record Model(string Column1, string Column2, string Column3);
-
-    public record ModelTable(string Column1, string Column2, string Column3, string Column4, string Column5);
-
-    private List<Model> _items = new List<Model>();
-
-    private List<ModelTable> itemTable = new List<ModelTable>();
-
-    protected override void OnInitialized()
-    {
-        for (var i = 0; i < 20; i++)
-        {
-
-            _items.Add(new Model($"Value_{i}", $"Value_{i}", $"Value_{i}"));
-            itemTable.Add(new ModelTable($"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}"));
-        }
-
+        subject = await _serSub.GetAllSub();
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };

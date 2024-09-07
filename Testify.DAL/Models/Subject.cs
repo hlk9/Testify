@@ -16,8 +16,8 @@ namespace Testify.DAL.Models
         public string Description { get; set; }
         [ForeignKey("OrganizationId")]
         public int OrganizationId { get; set; }
-        public virtual Organization Organization { get; set; }
-        public bool? Status { get; set; }
+        public virtual Organization? Organization { get; set; }
+        public byte? Status { get; set; }
 
         public virtual ICollection<ExamSchedule>? ExamSchedules { get; set; }
         public virtual ICollection<Exam>? Exams { get; set; }
