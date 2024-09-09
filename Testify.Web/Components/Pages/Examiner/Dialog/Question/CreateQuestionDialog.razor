@@ -14,41 +14,57 @@
                     <MudText Style="font-size: 16px">Câu Hỏi:</MudText>
                 </div>
                 <MudForm Spacing="4" Model="@question" @ref="@form">
-                    <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
-                    <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
-                    <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                        @if (_lstQuestionLevels != null)
-                        {
-                            @foreach (var itemLevel in _lstQuestionLevels)
+                    <div>
+                        <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi"/>
+                        <div style="font-size: 12px; color: red">@validationContent</div>
+                    </div>
+
+                    <div>
+                        <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi"/>
+                        <div style="font-size: 12px; color: red">@validationDocumentURL</div>
+                    </div>
+
+                    <div>
+                        <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @if (_lstQuestionLevels != null)
                             {
-                                <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                                @foreach (var itemLevel in _lstQuestionLevels)
+                                {
+                                    <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                                }
                             }
-                        }
 
-                    </MudSelect>
+                        </MudSelect>
+                        <div style="font-size: 12px; color: red">@validationQuestionLevel</div>
+                    </div>
+                    
+                    <div>
+                        <MudSelect T="int" @bind-Value="QuestionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueQuestionType">
 
-                    <MudSelect T="int" @bind-Value="QuestionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueQuestionType">
-
-                        @if (_lstQuestionTypes != null)
-                        {
-                            @foreach (var itemType in _lstQuestionTypes)
+                            @if (_lstQuestionTypes != null)
                             {
-                                <MudSelectItem Value="itemType.Id">@itemType.Name</MudSelectItem>
+                                @foreach (var itemType in _lstQuestionTypes)
+                                {
+                                    <MudSelectItem Value="itemType.Id">@itemType.Name</MudSelectItem>
+                                }
                             }
-                        }
 
-                    </MudSelect>
+                        </MudSelect>
+                        <div style="font-size: 12px; color: red">@validationQuestionType</div>
+                    </div>
 
-                    <MudSelect T="int" @bind-Value="question.SubjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-
-                        @if (_lstSubjects != null)
-                        {
-                            @foreach (var item in _lstSubjects)
+                    <div>
+                        <MudSelect T="int" @bind-Value="question.SubjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @if (_lstSubjects != null)
                             {
-                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                @foreach (var item in _lstSubjects)
+                                {
+                                    <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                }
                             }
-                        }
-                    </MudSelect>
+                        </MudSelect>
+                        <div style="font-size: 12px; color: red">@validationSubject</div>
+                    </div>
                 </MudForm>
             </MudItem>
 
@@ -81,7 +97,13 @@
     private bool isDisableAddNewAnswer = true;
     private bool chooseAdd = true;
     private List<AnswerForm> answerForms = new List<AnswerForm>();
-    // private bool statusQuestion { get; set; }
+
+    private string validationContent = "";
+    private string validationDocumentURL = "";
+    private string validationQuestionLevel = "";
+    private string validationQuestionType = "";
+    private string validationSubject = "";
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -142,79 +164,121 @@
         await LoadData();
     }
 
+    private bool CheckRequired()
+    {
+        int count = 0;
+        if(string.IsNullOrWhiteSpace(question.Content))
+        {
+            validationContent = "Không được để trống!!";
+            count+= 1;
+        }
+        if (string.IsNullOrWhiteSpace(question.DocumentURL))
+        {
+            validationDocumentURL = "Không được để trống!!";
+            count += 1;
+        }
+        if (question.SubjectId == null || question.SubjectId <= 0)
+        {
+            validationSubject = "Không được để trống!!";
+            count += 1;
+        }
+        if (question.QuestionLevelId == null || question.QuestionLevelId <= 0)
+        {
+            validationQuestionLevel = "Không được để trống!!";
+            count += 1;
+        }
+        if (question.QuestionTypeId == null || question.QuestionTypeId <= 0)
+        {
+            validationQuestionType = "Không được để trống!!";
+            count += 1;
+        }
+
+        if(count > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
     private async Task Submit()
     {
-        if (lstAnswers.Count > 0)
+        var checkRequired = CheckRequired();
+        if(!checkRequired)
         {
-            int count = 0;
-            for (int i = 0; i < lstAnswers.Count; i++)
+            if (lstAnswers.Count > 0)
             {
-                if (lstAnswers[i].IsCorrect == true)
+                int count = 0;
+                for (int i = 0; i < lstAnswers.Count; i++)
                 {
-                    count++;
+                    if (lstAnswers[i].IsCorrect == true)
+                    {
+                        count++;
+                    }
                 }
-            }
 
-            if (QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
-            {
-                if (count > 1)
+                if (QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
                 {
-                    snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                    if (count > 1)
+                    {
+                        snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                        return;
+                    }
+                }
+
+                if (count == 0)
+                {
+                    snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
                     return;
                 }
             }
 
-            if (count == 0)
-            {
-                snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
-                return;
-            }
-        }
+            bool allValid = true;
 
-        bool allValid = true;
-
-        foreach (var form in answerForms)
-        {
-            if (!await form.ValidateAsync())
+            foreach (var form in answerForms)
             {
-                allValid = false;
-            }
-        }
-
-        if(allValid)
-        {
-            if(lstAnswers == null || lstAnswers.Count == 0)
-            {
-                question.Status = Convert.ToByte(StatusType.statusNull);
-            } else
-            {
-                question.Status = Convert.ToByte(StatusType.statusTrue);
-            }
-            question.CreatedDate = DateTime.Now;
-            question.QuestionTypeId = QuestionTypeId;
-            var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
-            if (checkAddNewQuestion != null)
-            {
-                for (int i = 0; i < lstAnswers.Count; i++)
+                if (!await form.ValidateAsync())
                 {
-                    lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
-                    lstAnswers[i].Status = Convert.ToByte(StatusType.statusTrue);
-                    var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
+                    allValid = false;
                 }
-                MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Thêm thành công", Severity.Success);
-                lstAnswers.Clear();
+            }
+
+            if (allValid)
+            {
+                if (lstAnswers == null || lstAnswers.Count == 0)
+                {
+                    question.Status = Convert.ToByte(StatusType.statusNull);
+                }
+                else
+                {
+                    question.Status = Convert.ToByte(StatusType.statusTrue);
+                }
+                question.CreatedDate = DateTime.Now;
+                question.QuestionTypeId = QuestionTypeId;
+                var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
+                if (checkAddNewQuestion != null)
+                {
+                    for (int i = 0; i < lstAnswers.Count; i++)
+                    {
+                        lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
+                        lstAnswers[i].Status = Convert.ToByte(StatusType.statusTrue);
+                        var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
+                    }
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Thêm thành công", Severity.Success);
+                    lstAnswers.Clear();
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Thêm thất bại", Severity.Error);
+                }
             }
             else
             {
-                MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Thêm thất bại", Severity.Error);
+                snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
             }
         }
-        else
-        {
-            snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
-        }
+        
     }
 
     private void Cancel() => MudDialog.Cancel();
