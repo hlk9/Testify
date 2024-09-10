@@ -8,11 +8,11 @@ using Testify.DAL.Models;
 
 namespace Testify.DAL.Context
 {
-    public class TestifyDbContext:DbContext
+    public class TestifyDbContext : DbContext
     {
         public TestifyDbContext()
         {
-            
+
         }
 
         public TestifyDbContext(DbContextOptions options) : base(options)
@@ -43,11 +43,13 @@ namespace Testify.DAL.Context
         public DbSet<ExamDetail> ExamDetails { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
-        public DbSet<OrganizationUser> OrganizationUsers { get; set; } 
+        public DbSet<OrganizationUser> OrganizationUsers { get; set; }
         public DbSet<ScoreMethod> ScoreMethods { get; set; }
         public DbSet<UserExamSchedule> UserExamSchedules { get; set; }
         public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ExamDetailQuestion> ExamDetailQuestions { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<BlackListToken> BlackListTokens { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -90,8 +92,8 @@ namespace Testify.DAL.Context
                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<QuestionType>()
-                .HasData(                
-                new QuestionType { Id = 1,Name="Đúng / Sai",Description="Chọn câu trả lời Đúng hoặc Sai", Status=true},
+                .HasData(
+                new QuestionType { Id = 1, Name = "Đúng / Sai", Description = "Chọn câu trả lời Đúng hoặc Sai", Status = true },
                 new QuestionType { Id = 2, Name = "Chọn đáp án đúng nhất", Description = "Chọn đáp án đúng nhất", Status = true },
                 new QuestionType { Id = 3, Name = "Chọn nhiều đáp án đúng", Description = "Chọn các đáp án đúng", Status = true },
                 new QuestionType { Id = 4, Name = "Nhập đáp án đúng", Description = "Nhập câu trả lời", Status = true }
@@ -99,11 +101,29 @@ namespace Testify.DAL.Context
 
             modelBuilder.Entity<Level>()
                 .HasData(
-                new Level { Id = 1, Name = "Admin", Status = true  },
+                new Level { Id = 1, Name = "Admin", Status = true },
                 new Level { Id = 2, Name = "Examiner", Status = true },
                 new Level { Id = 3, Name = "Teacher", Status = true },
                 new Level { Id = 4, Name = "Student", Status = true }
                 );
+
+            modelBuilder.Entity<Permission>()
+                .HasData(
+                new Permission { Id = 1, Name = "Quản Trị Viên", Description = "Quyền tối cao, cao nhất của tổ chức, có thể thi hành mọi chức năng của hệ thống", Status = true },
+                new Permission { Id = 2, Name = "Xem Giảng viên, Khảo thí và Sinh viên", Description = "Xem giảng viên, khảo thí, sinh viên", Status = true },
+                new Permission { Id = 3, Name = "Chỉnh sửa Giảng viên, Khảo thí và Sinh viên", Description = "Chỉnh sửa giảng viên, khảo thí, sinh viên", Status = true },
+                new Permission { Id = 4, Name = "Chỉnh sửa và Xoá Giảng viên, Khảo thí và Sinh viên", Description = "Chỉnh sửa và Xoá giảng viên, khảo thí, sinh viên", Status = true },
+                new Permission { Id = 5, Name = "Xem bài thi, câu hỏi, đáp án", Description = "Xem bài thi, câu hỏi, đáp án", Status = true },
+                new Permission { Id = 6, Name = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án", Description = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án", Status = true },
+                new Permission { Id = 7, Name = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án", Description = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án", Status = true },
+                new Permission { Id = 8, Name = "Xem lớp, môn", Description = "Xem lớp, môn", Status = true },
+                new Permission { Id = 9, Name = "Chỉnh sửa và Xoá lớp, môn", Description = "Chỉnh sửa và Xoá lớp, môn", Status = true },
+                new Permission { Id = 10, Name = "Xem bài làm đã nộp", Description = "Xem bài làm đã nộp", Status = true },
+                new Permission { Id = 11, Name = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Description = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Status = true }
+
+                );
+
+            
 
         }
     }
