@@ -19,6 +19,7 @@ builder.Services.AddScoped<QuestionTypeService>();
 builder.Services.AddScoped<QuestionLevelService>();
 builder.Services.AddScoped<SubjectService>();
 builder.Services.AddScoped<AnswerService>();
+builder.Services.AddScoped<RoomService>();
 
 builder.Services.AddMudServices(config =>
 {
