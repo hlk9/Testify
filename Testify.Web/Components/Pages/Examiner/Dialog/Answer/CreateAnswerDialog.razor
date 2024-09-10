@@ -10,16 +10,14 @@
     <DialogContent>
         <MudForm Spacing="5"  @ref="form">
             <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue())" Required="true" RequiredError="Chưa chọn câu hỏi">
-                @if(lstQuestion == null ||lstQuestion?.Count == 0)
+                @if (lstQuestion != null)
                 {
-                    <MudSelectItem T="int" Value="-1">Không có câu hỏi nào!</MudSelectItem>
-                }
-                else
-                {
+                    <MudSelectItem Value="-1">Chọn câu hỏi</MudSelectItem>
+
                     foreach (var item in lstQuestion)
                     {
-                        if(item.Status == Convert.ToByte(StatusType.statusNull))
-                        {   
+                        if (item.Status == Convert.ToByte(StatusType.statusNull))
+                        {
                             <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
                         }
                     }
