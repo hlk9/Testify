@@ -19,10 +19,11 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-All-Questions")]
+        [Authorize]
         public async Task<ActionResult<List<Question>>> GetlAllQuestions()
         {
             var lstQuestion = await _repoQuestion.GetAllQuestions();
-            return Ok(lstQuestion);      
+            return Ok(lstQuestion);       
         }
 
         [HttpGet("Get-Question-By-Id")]
