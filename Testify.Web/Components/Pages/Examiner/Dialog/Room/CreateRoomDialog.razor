@@ -1,15 +1,19 @@
-﻿<MudDialog>
+﻿@using Testify.DAL.Models
+<MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
             Thêm mới phòng
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Label="Mã phòng" ReadOnly="true" />
-        <MudTextField T="string" Label="Tên phòng" ReadOnly="true" />
-        <MudTextField T="string" Label="Số lượng" ReadOnly="true" />
-        <MudTextField T="string" Label="Địa chỉ" ReadOnly="true" />
-        <MudTextField T="string" Label="Trạng thái" ReadOnly="true" />
+        <MudForm Model="@room">
+
+        <MudTextField T="int" @bind-Value="@room.Id" Label="Mã phòng"  />
+        <MudTextField T="string" @bind-Value="@room.Name" Label="Tên phòng"  />
+            <MudTextField T="int" @bind-Value="@room.Capacity" Label="Số lượng" />
+            <MudTextField T="string" @bind-Value="@room.Address" Label="Địa chỉ" />
+            <MudTextField T="bool?" @bind-Value="@room.Status" Label="Trạng thái" />
+        </MudForm>
 
     </DialogContent>
     <DialogActions>
@@ -21,7 +25,23 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    private Room room { get; set; } = new();
+
+
+    private async Task Submit()
+    {
+        var check = await _serRoom.CreateRoom(room);
+        if(check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thất bại", Severity.Error);
+        }
+    }
 
     private void Cancel() => MudDialog.Cancel();
 }

@@ -1,15 +1,20 @@
-﻿<MudDialog>
+﻿@using Testify.DAL.Models
+
+<MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
             Chi tiết phòng
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Disabled Label="Mã phòng" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Tên phòng" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Số lượng" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Địa chỉ" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Trạng thái" ReadOnly="true" />
+
+            <MudTextField T="int" @bind-Value="@room.Id" Label="Mã phòng" ReadOnly="true" />
+        <MudTextField T="string" Label="Tên phòng" @bind-Value="@room.Name" ReadOnly="true" />
+        <MudTextField T="int" Label="Số lượng" @bind-Value="@room.Capacity" ReadOnly="true" />
+        <MudTextField T="string" Label="Địa chỉ" @bind-Value="@room.Address" ReadOnly="true" />
+        <MudTextField T="bool?" Label="Trạng thái" @bind-Value="@room.Status" ReadOnly="true" />
+
+        
 
     </DialogContent>
     <DialogActions>
@@ -21,7 +26,16 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    [Parameter]
+
+    public int RoomId { get; set; }
+
+    private Room room { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        room = await _serRoom.GetRoomId(RoomId);
+    }
 
     private void Cancel() => MudDialog.Cancel();
 }
