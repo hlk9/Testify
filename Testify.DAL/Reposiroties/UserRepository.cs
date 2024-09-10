@@ -16,6 +16,30 @@ namespace Testify.DAL.Reposiroties
         {
             _context = new TestifyDbContext();
         }
+
+        public async Task<User> GetByKeyAndPassword(string keyword, string hashPassword)
+        {
+            User avaiableUser = await _context.Users.FirstOrDefaultAsync(x=>x.UserName == keyword || x.Email == keyword || x.PhoneNumber == keyword);
+            if (avaiableUser == null)
+            {
+                return null;
+            }
+            else 
+            {
+                if(avaiableUser.PasswordHash == hashPassword)
+                    return avaiableUser;
+                else
+                {
+                    ///wrong password
+                    avaiableUser.PasswordHash = "-1";
+                    return avaiableUser;
+                }    
+            }    
+           
+           
+               
+        }
+
         public async Task<List<User>> GetAllUsers()
         {
             return await _context.Users.ToListAsync();

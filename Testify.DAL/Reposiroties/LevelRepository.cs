@@ -16,6 +16,9 @@ namespace Testify.DAL.Reposiroties
         {
             _context = new TestifyDbContext();
         }
+
+      
+
         public async Task<List<Level>> GetAllLevels()
         {
             return await _context.Levels.ToListAsync();
