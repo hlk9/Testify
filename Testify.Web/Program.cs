@@ -41,7 +41,7 @@ builder.Services.AddMudServices(config =>
 
 builder.Services.AddScoped(http => new HttpClient
 {
-    BaseAddress = new Uri("http://0.0.0.0:7128")
+    BaseAddress = new Uri("http://localhost:7128")
 });
 
 var app = builder.Build();
