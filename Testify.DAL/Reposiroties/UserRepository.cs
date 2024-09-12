@@ -27,7 +27,10 @@ namespace Testify.DAL.Reposiroties
             else 
             {
                 if(avaiableUser.PasswordHash == hashPassword)
+                {
                     return avaiableUser;
+                }    
+                    
                 else
                 {
                     ///wrong password
@@ -94,6 +97,24 @@ namespace Testify.DAL.Reposiroties
                 _context.Users.Remove(objDeleteUser);
                 await _context.SaveChangesAsync();
                 return objDeleteUser;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<User> FindUserExistByKeyWord(string key)
+        {
+            try
+            {
+                var u = _context.Users.FirstOrDefault(x => x.UserName.Equals(key) || x.Email.Equals(key) || x.PhoneNumber.Equals(key));
+
+                if (u == null)
+                    return null;
+                return u;
+                
+
             }
             catch
             {
