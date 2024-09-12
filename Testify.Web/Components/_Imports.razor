@@ -8,6 +8,7 @@
 @using Microsoft.JSInterop
 @using MudBlazor
 @using MudBlazor.Services
+@using Testify.API.TokenHelper
 @using Testify.Web
 @using Testify.Web.Components
 @using Testify.Web.Components.Layout
@@ -19,5 +20,8 @@
 @inject QuestionLevelService _serQuestionLevel
 @inject SubjectService _serSub
 @inject AnswerService _serAnswer
+@inject RoomService _serRoom
 @inject NavigationManager navigation
 @inject ISnackbar snackbar
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AccessService _serviceAccess

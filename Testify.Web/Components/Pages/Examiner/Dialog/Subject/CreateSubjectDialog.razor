@@ -34,7 +34,13 @@
         var check = await _serSub.CreateSub(subject); 
         if(check == true)
         {
-            navigation.NavigateTo("/Examiner/SubjectManagement");
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thất bại", Severity.Error);
         }
     }
 

@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Localization;
 using MudBlazor;
 using MudBlazor.Services;
@@ -19,6 +20,11 @@ builder.Services.AddScoped<QuestionTypeService>();
 builder.Services.AddScoped<QuestionLevelService>();
 builder.Services.AddScoped<SubjectService>();
 builder.Services.AddScoped<AnswerService>();
+builder.Services.AddScoped<RoomService>();
+builder.Services.AddScoped<AccessService>();
+
+//BlazoredLocalStorage
+builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddMudServices(config =>
 {

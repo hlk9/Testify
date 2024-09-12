@@ -53,7 +53,7 @@
                 </ActivatorContent>
                 <ChildContent>
                     <MudMenuItem>Thông tin cá nhân</MudMenuItem>
-                    <MudMenuItem>Đăng xuất</MudMenuItem>
+                    <MudMenuItem OnClick="Logout">Đăng xuất</MudMenuItem>
 
                 </ChildContent>
             </MudMenu>
@@ -95,6 +95,12 @@
                 PaletteDark = _darkPalette,
                 LayoutProperties = new LayoutProperties()
             };
+    }
+
+    private async void Logout()
+    {
+        await localStorage.RemoveItemAsync("token");
+        navigation.NavigateTo("/");
     }
 
 
