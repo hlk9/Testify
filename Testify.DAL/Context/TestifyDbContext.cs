@@ -22,7 +22,7 @@ namespace Testify.DAL.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=20.5.250.222,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
+            optionsBuilder.UseSqlServer("Data Source=20.70.181.197,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
         }
 
         public DbSet<Answer> Answers { get; set; }
