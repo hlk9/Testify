@@ -1,5 +1,4 @@
 ﻿@page "/"
-
 @using MudBlazor
 
 <MudGrid Spacing="0" Class="m-0 w-100 align-items-center" Justify="Justify.SpaceBetween" Style="background-color:#29A69A; height:100vh">
@@ -22,7 +21,7 @@
             <MudTextField T="string" @bind-Value="password" Class="mt-3 mb-3" Placeholder="Mật khẩu" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" FullWidth="true"></MudTextField>
             <MudText Class="mt-3 mb-3" Align="Align.End" @onclick="NavigateToPasswordRetrieval">Quên mật khẩu?</MudText>
 
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w-100 rounded-4" @onclick="LoginNew">Tiếp tục</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w-100 rounded-4" @onclick="LoginToSystem">Tiếp tục</MudButton>
 
             <MudText Class="text-center mt-4 mb-4">Hoặc</MudText>
 
@@ -65,6 +64,42 @@
 
     [Inject] NavigationManager Navigation { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        CheckToken();
+    }
+
+    private async void CheckToken()
+    {
+
+    }
+
+    private async void LoginToSystem()
+    {
+        var ult = await _serviceAccess.Login(username, password);
+        if (ult != null && ult.IsLoginSucces == true)
+        {
+            Snackbar.Add("Đăng nhập thành công!", Severity.Success);
+            await localStorage.SetItemAsync("token", ult.Token);
+            var token = await localStorage.GetItemAsync<string>("token");
+
+            if (ult.LevelId == 1)
+            {
+                Navigation.NavigateTo("/admin/Home");
+            }
+            else if (ult.LevelId == 2)
+                Navigation.NavigateTo("/Examiner/Home");
+
+
+        }
+        else
+        {
+            Snackbar.Add("Đăng nhập không thành công. Vui lòng kiểm tra lại tên người dùng và mật khẩu.", Severity.Warning);
+        }
+
+    }
 
     private void NavigateToPasswordRetrieval()
     {

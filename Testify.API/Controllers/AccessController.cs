@@ -16,7 +16,7 @@ namespace Testify.API.Controllers
         {
             authHelper = new AuthHelper(configuration);
         }
-      
+
         [HttpGet("Login")]
         public async Task<UserLoginWithToken> LoginReturnToken(string username, string passwordHash)
         {
@@ -25,21 +25,82 @@ namespace Testify.API.Controllers
             User u = await UserRepo.GetByKeyAndPassword(username, passwordHash);
             if (u != null && u.PasswordHash != "-1")
             {
-                uLT.Id = u.Id;
-                uLT.UserName = u.UserName;
-                uLT.FullName = u.FullName;
-                uLT.IsLoginSucces = true; 
-                uLT.LevelId = u.LevelId;
-                 
+                RefreshTokenRepository tokenRepo = new RefreshTokenRepository();
 
-                uLT.Token = authHelper.GenerateJWTToken(u);
-                return uLT;
+                var token = tokenRepo.GetTokenByUserId(u.Id.ToString());
+
+                if (token != null)
+                {
+                    uLT.Token = token.ToString();
+                    uLT.Id = u.Id;
+                    uLT.UserName = u.UserName;
+                    uLT.FullName = u.FullName;
+                    uLT.IsLoginSucces = true;
+                    uLT.LevelId = u.LevelId;
+                    return uLT;
+                }
+                else
+                {
+                    var tokenModel = authHelper.GenerateJWTToken(u);
+                    if (tokenModel != null)
+                    {
+
+                        RefreshToken refreshToken = new RefreshToken();
+                        refreshToken.CreatedAt = tokenModel.RegisterDate;
+                        refreshToken.IsRevoked = false;
+                        refreshToken.UserId = tokenModel.UserId;
+                        refreshToken.ExpiryDate = tokenModel.Expried;
+                        refreshToken.Token = tokenModel.Token;
+
+                        if (tokenRepo.AddToken(refreshToken) == true)
+                        {
+                            uLT.Token = tokenModel.Token;
+                            uLT.Id = u.Id;
+                            uLT.UserName = u.UserName;
+                            uLT.FullName = u.FullName;
+                            uLT.IsLoginSucces = true;
+                            uLT.LevelId = u.LevelId;
+                            return uLT;
+                        }
+
+                    }
+                }
+
+                //uLT.Id = u.Id;
+                //uLT.UserName = u.UserName;
+                //uLT.FullName = u.FullName;
+                //uLT.IsLoginSucces = true; 
+                //uLT.LevelId = u.LevelId;      
+                //uLT.Token = authHelper.GenerateJWTToken(u).Token;
+                //return uLT;
             }
-            uLT.Id = null; 
+            uLT.Id = null;
             uLT.IsLoginSucces = false;
             return uLT;
 
 
+        }
+        //[HttpGet("CheckToken")]
+        //public async Task<UserLoginWithToken> CheckAndGetToken(string token)
+        //{
+
+        //}
+
+
+        [HttpPost("Register")]
+        public async Task<bool> RegisterUser(User usr)
+        {
+            UserRepo = new UserRepository();
+            var user = UserRepo.FindUserExistByKeyWord(usr.Email);
+            if (user != null)
+            {
+                return false;
+            }
+            else
+            {
+
+                return true;
+            }
         }
     }
 }
