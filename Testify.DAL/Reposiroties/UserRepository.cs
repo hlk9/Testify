@@ -26,7 +26,7 @@ namespace Testify.DAL.Reposiroties
             }
             else 
             {
-                if(avaiableUser.PasswordHash == hashPassword)
+                if(avaiableUser.PasswordHash.ToUpper() == hashPassword.ToUpper())
                 {
                     return avaiableUser;
                 }    
