@@ -1,9 +1,12 @@
-﻿@page "/Register"
+﻿@using Newtonsoft.Json
+@using Testify.DAL.Models
+@page "/Register"
 
 <style>
     .fix-layout {
         display: block;
     }
+
     @@media (max-width: 720px) {
         .fix-layout: {
             display: none;
@@ -13,58 +16,61 @@
 
 <MudGrid Class="m-0 w-100 p-0 align-items-center vh-100" Justify="Justify.SpaceBetween" Style="background-color:#ffffff;">
     <MudItem sm=12 md=12 xs=12 lg=7 xl="7" Class="py-3 px-0" Style="background-color: #ffffff; ">
-        
-            <MudGrid>
-                <MudItem xl="1" lg="1" md="1" sm="1" xs="2" Class=""></MudItem>
-                <MudItem xl="2" lg="2" md="3" sm="3" xs="4" Class="">
-                    Logo
-                </MudItem>
-                <MudItem xl="6" lg="6" md="4" sm="4" xs="0" Class=""></MudItem>
-                <MudItem xl="2" lg="2" md="3" sm="3" xs="4" Class="">
-                    <MudButton Color="Color.Primary" Class=" ps-3 pe-3 pt-2 pb-2 w-100" Variant="Variant.Outlined" @onclick="NavigateToLogin">Đăng nhập</MudButton>
-                </MudItem>
-                <MudItem xl="1" lg="1" md="1" sm="1" xs="2" Class=""></MudItem>
-            </MudGrid>
 
-            <MudGrid>
-                <MudItem xl="2" lg="2" md="2" sm="1" xs="1"></MudItem>
-                <MudItem xl="8" lg="8" md="8" sm="10" xs="10">
+        <MudGrid>
+            <MudItem xl="1" lg="1" md="1" sm="1" xs="2" Class=""></MudItem>
+            <MudItem xl="2" lg="2" md="3" sm="3" xs="4" Class="">
+                Logo
+            </MudItem>
+            <MudItem xl="6" lg="6" md="4" sm="4" xs="0" Class=""></MudItem>
+            <MudItem xl="2" lg="2" md="3" sm="3" xs="4" Class="">
+                <MudButton Color="Color.Primary" Class=" ps-3 pe-3 pt-2 pb-2 w-100" Variant="Variant.Outlined" @onclick="NavigateToLogin">Đăng nhập</MudButton>
+            </MudItem>
+            <MudItem xl="1" lg="1" md="1" sm="1" xs="2" Class=""></MudItem>
+        </MudGrid>
+
+        <MudGrid>
+            <MudItem xl="2" lg="2" md="2" sm="1" xs="1"></MudItem>
+            <MudItem xl="8" lg="8" md="8" sm="10" xs="10">
+                <EditForm Model="currentUser">
                     <MudText Style="font-size:22px; font-weight:bold" Class="text-center">Đăng ký tài khoản Testify của bạn</MudText>
+                    @*                    <MudText Style="font-weight: bold; margin-top: 15px">Tên tài khoản</MudText>
+                    <MudTextField T="string" Placeholder="Nhập tên tài khoản, phải là độc nhất" Variant="Variant.Outlined" @bind-Value="currentUser.UserName" FullWidth="true" Class="mb-3"></MudTextField> *@
                     <MudText Style="font-weight: bold; margin-top: 15px">Thông tin cá nhân</MudText>
-                    <MudTextField T="string" Placeholder="Họ tên" Variant="Variant.Outlined" FullWidth="true" Class="mb-3"></MudTextField>
+                    <MudTextField T="string" Placeholder="Họ tên" @bind-Value="currentUser.FullName" Variant="Variant.Outlined" FullWidth="true" Class="mb-3"></MudTextField>
 
                     <MudPaper Class="bg-transparent shadow-none mb-3">
                         <MudGrid>
                             <MudItem xs="12" lg="6" md="6" sm="12">
-                                <MudTextField T="string" Placeholder="Lớp" Variant="Variant.Outlined" Class="w-100" />
+                                <MudTextField T="string" Placeholder="Tên tài khoản, độc nhất" @bind-Value="currentUser.UserName" Variant="Variant.Outlined" Class="w-100" />
                             </MudItem>
                             <MudItem xs="12" lg="6" md="6" sm="12">
-                                <MudTextField T="string" Placeholder="Ngày sinh" Variant="Variant.Outlined" Class="w-100" />
+                                <MudDatePicker Placeholder="Ngày sinh" @bind-Date="dateOfB" Variant="Variant.Outlined" Class="w-100" />
                             </MudItem>
                         </MudGrid>
                     </MudPaper>
                     <MudPaper Class="bg-transparent shadow-none mb-3">
                         <MudGrid>
                             <MudItem xs="12" sm="12" md="12" lg="4" xl="4">
-                                <MudTextField T="string" Placeholder="Tỉnh/ Thành Phố" Variant="Variant.Outlined"
+                                <MudTextField T="string" Placeholder="Tỉnh/ Thành Phố" @bind-Value="userProvice" Variant="Variant.Outlined"
                                               Class="w-100" />
                             </MudItem>
                             <MudItem xs="12" sm="12" md="12" lg="4" xl="4">
-                                <MudTextField T="string" Placeholder="Quận/ Huyện" Variant="Variant.Outlined"
+                                <MudTextField T="string" Placeholder="Quận/ Huyện" @bind-Value="userTown" Variant="Variant.Outlined"
                                               Class="w-100" />
                             </MudItem>
                             <MudItem xs="12" sm="12" md="12" lg="4" xl="4">
-                                <MudTextField T="string" Placeholder="Phường/ Xã" Variant="Variant.Outlined"
+                                <MudTextField T="string" Placeholder="Phường/ Xã" @bind-Value="userCommune" Variant="Variant.Outlined"
                                               Class="w-100" />
                             </MudItem>
                         </MudGrid>
                     </MudPaper>
                     <MudText Class="fw-bold mt-3">Thông tin tài khoản</MudText>
-                    <MudTextField T="string" Class="mb-3" Placeholder="Số điện thoại" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
-                    <MudTextField T="string" Class="mb-3" Placeholder="Email" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
-                    <MudTextField T="string" Class="mb-3" Placeholder="Mật khẩu" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
-                    <MudTextField T="string" Class="mb-3" Placeholder="Xác nhận mật khẩu" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
-                    <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w-100 rounded-4 mt-2" Style="height: 45px">Đăng ký</MudButton>
+                    <MudTextField T="string" Class="mb-3" InputType="InputType.Telephone" Placeholder="Số điện thoại" @bind-Value="currentUser.PhoneNumber" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
+                    <MudTextField T="string" Class="mb-3" InputType="InputType.Email" Placeholder="Email" @bind-Value="currentUser.Email" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
+                    <MudTextField T="string" Class="mb-3" InputType="InputType.Password" Placeholder="Mật khẩu" @bind-Value="firstPass" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
+                    <MudTextField T="string" Class="mb-3" InputType="InputType.Password" Placeholder="Xác nhận mật khẩu" @bind-Value="secondPass" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w-100 rounded-4 mt-2" Style="height: 45px" @onclick="RegisterClick">Đăng ký</MudButton>
                     <MudText Class="text-center mt-2 mb-2">Hoặc</MudText>
                     <MudGrid Spacing="4" Justify="Justify.SpaceBetween">
                         <MudItem xl="6" lg="6" md="6" xs="12" sm="6">
@@ -80,9 +86,10 @@
                             </MudButton>
                         </MudItem>
                     </MudGrid>
-                </MudItem>
-                <MudItem xl="2" lg="2" md="2" sm="1" xs="1"></MudItem>
-            </MudGrid>
+                </EditForm>
+            </MudItem>
+            <MudItem xl="2" lg="2" md="2" sm="1" xs="1"></MudItem>
+        </MudGrid>
     </MudItem>
     <MudItem sm=12 md=12 xs=12 lg=5 xl="5" Class="h-100 w-100 p-0" Style="background-color: #29a69a">
         <div class="fix-layout">
@@ -102,8 +109,45 @@
 @code {
     [Inject] NavigationManager NavigationLogin { get; set; }
 
+    private User currentUser = new User();
+    private string userProvice;
+    private string userTown;
+    private string userCommune;
+    private DateTime? dateOfB;
+    private string firstPass;
+    private string secondPass;
+
     private void NavigateToLogin()
     {
         NavigationLogin.NavigateTo("/Login");
+    }
+
+    private async void RegisterClick()
+    {
+
+        if (string.IsNullOrEmpty(userProvice) || string.IsNullOrEmpty(userTown) || string.IsNullOrEmpty(userCommune) || string.IsNullOrEmpty(firstPass) || string.IsNullOrEmpty(secondPass))
+        {
+            return;
+        }
+        else
+        {
+            if (_serviceAccess.HashPassword(firstPass) == _serviceAccess.HashPassword(secondPass))
+            {
+                string address = userCommune + " |" + userTown + " |" + userProvice;
+                currentUser.PasswordHash = _serviceAccess.HashPassword(firstPass);
+                currentUser.DateOfBirth = DateTime.Now;
+                currentUser.Address = address;
+                currentUser.LevelId = 4;
+                currentUser.AvatarUrl = null;
+                currentUser.LastLogin = null;
+                currentUser.Status = 1;
+                currentUser.Level = null;
+                currentUser.ClassUsers = null;
+                currentUser.UserPermissions = null;
+                currentUser.Submissions = null;
+                await _serviceUser.RegisterStudent(currentUser);
+            }
+        }
+
     }
 }

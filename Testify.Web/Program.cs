@@ -22,6 +22,7 @@ builder.Services.AddScoped<SubjectService>();
 builder.Services.AddScoped<AnswerService>();
 builder.Services.AddScoped<RoomService>();
 builder.Services.AddScoped<AccessService>();
+builder.Services.AddScoped<UserService>();
 
 //BlazoredLocalStorage
 builder.Services.AddBlazoredLocalStorage();
