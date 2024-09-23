@@ -2,8 +2,8 @@
 {
     public enum StatusType : Byte
     {
-        statusTrue = 1,
-        statusFalse = 2,
-        statusNull = 255,
+        isActive = 1,
+        inActive = 2,
+        noAnswer = 255,
     }
 }

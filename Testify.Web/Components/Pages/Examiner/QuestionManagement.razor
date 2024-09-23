@@ -2,6 +2,7 @@
 @using Testify.DAL.Models
 @using Testify.Web.Utils
 @using Testify.Web.utils
+@using Testify.Web.Shared
 @layout AdminLayout
 @inject IDialogService DialogService
 
@@ -70,22 +71,28 @@
     </MudGrid>
 
     <div class="bg-white rounded-3 mb-4" style="width:100%;">
-        <MudTable Items="@_lstQuestions" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        @if(isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudTable Items="@_lstQuestions" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
-            <ToolBarContent>
-                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách câu hỏi</MudText>
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách câu hỏi</MudText>
 
-                    </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </MudItem>
-                </MudGrid>
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
 
-            </ToolBarContent>
-            <HeaderContent>
+                </ToolBarContent>
+                <HeaderContent>
                     <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id câu hỏi</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Tên câu hỏi</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
@@ -95,77 +102,76 @@
                     <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
                     <MudTh></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                @if (context.Status == Convert.ToByte(StatusType.statusTrue) || context.Status == Convert.ToByte(StatusType.statusNull))
-                {
+                </HeaderContent>
+                <RowTemplate>
+                    @if (context.Status == Convert.ToByte(StatusType.isActive) || context.Status == Convert.ToByte(StatusType.noAnswer))
+                    {
 
-                    <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
-                    <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
-                    <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
-                    <MudTd DataLabel="Mức độ">
-                        @if (_lstQuestionLevels != null)
-                        {
-                            foreach (var item in _lstQuestionLevels)
+                        <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
+                        <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
+                        <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
+                        <MudTd DataLabel="Mức độ">
+                            @if (_lstQuestionLevels != null)
                             {
-                                if (item.Id == context.QuestionLevelId)
+                                foreach (var item in _lstQuestionLevels)
                                 {
-                                    @item.Name
-                                    ;
-                                    break;
+                                    if (item.Id == context.QuestionLevelId)
+                                    {
+                                        @item.Name
+                                        ;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                    </MudTd>
-                    <MudTd DataLabel="Loại câu hỏi">
-                        @if (_lstQuestionTypes != null)
-                        {
-                            foreach (var item in _lstQuestionTypes)
+                        </MudTd>
+                        <MudTd DataLabel="Loại câu hỏi">
+                            @if (_lstQuestionTypes != null)
                             {
-                                if (item.Id == context.QuestionTypeId)
+                                foreach (var item in _lstQuestionTypes)
                                 {
-                                    @item.Name
-                                    ;
-                                    break;
+                                    if (item.Id == context.QuestionTypeId)
+                                    {
+                                        @item.Name
+                                        ;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                    </MudTd>
-                    <MudTd DataLabel="Thuộc môn">
-                        @if (_lstSubjects != null)
-                        {
-                            foreach (var item in _lstSubjects)
+                        </MudTd>
+                        <MudTd DataLabel="Thuộc môn">
+                            @if (_lstSubjects != null)
                             {
-                                if (item.Id == context.SubjectId)
+                                foreach (var item in _lstSubjects)
                                 {
-                                    @item.Name;
-                                    break;
+                                    if (item.Id == context.SubjectId)
+                                    {
+                                        @item.Name
+                                        ;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                    </MudTd>
-                    <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.statusTrue) ? "Hoạt Động" : (context.Status == Convert.ToByte(StatusType.statusNull) ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
+                        </MudTd>
+                        <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : (context.Status == Convert.ToByte(StatusType.noAnswer) ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
 
-                    <MudTd DataLabel="Thao tác">
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Updatre, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                    </MudTd>
-                    <MudTd>
-                        <MudButton Disabled="@(context.Status == Convert.ToByte(StatusType.statusNull) ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
-                    </MudTd>
-                }
-                    
-            </RowTemplate>
-            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
+                        <MudTd DataLabel="Thao tác">
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Updatre, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        </MudTd>
+                        <MudTd>
+                            <MudButton Disabled="@(context.Status == Convert.ToByte(StatusType.noAnswer) ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
+                        </MudTd>
+                    }
+
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>No Data</MudText>
+                </NoRecordsContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        }
     </div>
 </div>
 
@@ -175,12 +181,13 @@
     private List<QuestionLevel> _lstQuestionLevels;
     private List<QuestionType> _lstQuestionTypes;
     private bool IsDisableShowAnswer;
+    private bool isLoading { get; set; } = true;
 
     private async Task LoadData()
     {
         _lstQuestions = await _serQuestion.GetAllQuestions();
-        
         StateHasChanged();
+        isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
