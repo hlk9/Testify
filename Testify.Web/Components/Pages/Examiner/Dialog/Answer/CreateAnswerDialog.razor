@@ -1,43 +1,52 @@
 ﻿@using Testify.DAL.Models;
 @using Testify.Web.Components.Pages.Examiner.Component;
-@using Testify.Web.Utils
-@using Testify.Web.utils
+@using Testify.Web.Shared;
+@using Testify.Web.utils;
+@using Testify.Web.Utils;
 
 <MudDialog>
     <TitleContent>
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới đáp án cho câu hỏi</MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Spacing="5"  @ref="form">
-            <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue())" Required="true" RequiredError="Chưa chọn câu hỏi">
-                @if (lstQuestion != null)
-                {
+        @if(isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Spacing="5" @ref="form">
+                <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue())">
+
                     <MudSelectItem Value="-1">Chọn câu hỏi</MudSelectItem>
 
-                    foreach (var item in lstQuestion)
+                    @if(lstQuestion != null)
                     {
-                        if (item.Status == Convert.ToByte(StatusType.statusNull))
+                        foreach (var item in lstQuestion)
                         {
-                            <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
+                            if (item.Status == Convert.ToByte(StatusType.noAnswer))
+                            {
+                                <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
+                            }
                         }
                     }
-                }
-            </MudSelect>
+                </MudSelect>
 
-            <div class="w-100 d-flex justify-content-between align-items-center">
-                <MudText>Thêm đáp án:</MudText>
-                <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNeuAnswer" Disabled="IsDisableNewAnswer" OnClick="AddNewAnswer"></MudIconButton>
-            </div>
+                <div class="w-100 d-flex justify-content-between align-items-center">
+                    <MudText>Thêm đáp án:</MudText>
+                    <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNeuAnswer" Disabled="IsDisableNewAnswer" OnClick="AddNewAnswer"></MudIconButton>
+                </div>
 
-            @if(lstAnswers != null)
-            {
-                @foreach (var item in lstAnswers)
+                @if (lstAnswers != null)
                 {
-                    <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
+                    @foreach (var item in lstAnswers)
+                    {
+                        <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
+                    }
                 }
-            }
 
-        </MudForm>
+            </MudForm>
+        }
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancle</MudButton>
@@ -50,6 +59,7 @@
     private Answer answer { get; set; } = new();
     private List<Question>? lstQuestion;
     private List<QuestionType>? lstQuestionType;
+    private bool isLoading { get; set; } = true;
     private bool IsDisableNewAnswer = true;
     private int ValueQuestionTypeChoice;
     private int questionId = -1;
@@ -59,10 +69,16 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
+    private async Task LoadData()
+    {
+
+        lstQuestion = await _serQuestion.GetAllQuestions();
+        isLoading = false;
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        lstQuestion = await _serQuestion.GetAllQuestions();
-        lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
+        await LoadData();
     }
 
     private async Task ChangeValue()
@@ -147,11 +163,11 @@
 
             for (int i = 0; i < lstAnswers.Count; i++)
             {
-                lstAnswers[i].Status = Convert.ToByte(StatusType.statusTrue);
+                lstAnswers[i].Status = Convert.ToByte(StatusType.isActive);
                 var check = await _serAnswer.Create(lstAnswers[i]);
             }
 
-            var question = await _serQuestion.UpdateStatus(questionId, Convert.ToByte(StatusType.statusTrue));
+            var question = await _serQuestion.UpdateStatus(questionId, Convert.ToByte(StatusType.isActive));
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Thêm thành công", Severity.Success);
         }

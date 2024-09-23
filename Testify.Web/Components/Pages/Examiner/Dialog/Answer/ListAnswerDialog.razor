@@ -1,6 +1,7 @@
 ﻿@using Testify.DAL.Models
 @using Testify.Web.Utils
 @using Testify.Web.utils
+@using Testify.Web.Shared;
 @inject IDialogService DialogService
 
 <MudDialog>
@@ -15,41 +16,45 @@
         
     </TitleContent>
     <DialogContent>
-        <div class="bg-white rounded-3 mb-4" style="width:100%;">
-            <MudTable Items="@lstAnswers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
-                <HeaderContent>
-                    <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id đáp án</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Nội dung đáp án</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Đúng/Sai</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Id đáp án" hidden>@context.Id</MudTd>
-                    <MudTd DataLabel="Nội dung đáp án">@context.Content</MudTd>
-                    <MudTd DataLabel="Đúng/Sai">
-                        @(context.IsCorrect == true ? "Đúng" : "Sai")
-                    </MudTd>
-                    <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.statusTrue) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
-                    <MudTd DataLabel="Thao tác">
-                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
+        @if(isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <div class="bg-white rounded-3 mb-4" style="width:100%;">
+                <MudTable Items="@lstAnswers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
+                    <HeaderContent>
+                        <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id đáp án</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Nội dung đáp án</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Đúng/Sai</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Id đáp án" hidden>@context.Id</MudTd>
+                        <MudTd DataLabel="Nội dung đáp án">@context.Content</MudTd>
+                        <MudTd DataLabel="Đúng/Sai">
+                            @(context.IsCorrect == true ? "Đúng" : "Sai")
+                        </MudTd>
+                        <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
+                        <MudTd DataLabel="Thao tác">
+                            <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
 
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))" Disabled="CheckTypeQuestion"></MudIconButton>
-                    </MudTd>
-                </RowTemplate>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))" Disabled="CheckTypeQuestion"></MudIconButton>
+                        </MudTd>
+                    </RowTemplate>
 
-                <NoRecordsContent>
-                    <MudText>No matching records found</MudText>
-                </NoRecordsContent>
-                <LoadingContent>
-                    <MudText>Loading...</MudText>
-                </LoadingContent>
-                <PagerContent>
-                    <MudTablePager />
-                </PagerContent>
-            </MudTable>
+                    <NoRecordsContent>
+                        <MudText>No Data</MudText>
+                    </NoRecordsContent>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
 
-        </div>
+            </div>
+        }
     </DialogContent>
 </MudDialog>
 
@@ -61,15 +66,15 @@
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
-
+    private bool isLoading { get; set; } = true;
     private int questionTypeId = -1;
     private bool CheckTypeQuestion = false;
 
     private async Task loadData()
     {
         lstAnswers = await _serAnswer.GetAllByQuestionId(questionId);
-
         StateHasChanged();
+        isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
