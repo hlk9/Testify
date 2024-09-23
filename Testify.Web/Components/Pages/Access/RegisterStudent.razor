@@ -33,7 +33,7 @@
             <MudItem xl="2" lg="2" md="2" sm="1" xs="1"></MudItem>
             <MudItem xl="8" lg="8" md="8" sm="10" xs="10">
                 <EditForm Model="currentUser">
-                    <MudText Style="font-size:22px; font-weight:bold" Class="text-center">Đăng ký tài khoản Testify của bạn</MudText>
+                    <MudText Style="font-size:22px; font-weight:bold" Class="text-center">Đăng ký tài khoản Testify dành cho thí sinh</MudText>
                     @*                    <MudText Style="font-weight: bold; margin-top: 15px">Tên tài khoản</MudText>
                     <MudTextField T="string" Placeholder="Nhập tên tài khoản, phải là độc nhất" Variant="Variant.Outlined" @bind-Value="currentUser.UserName" FullWidth="true" Class="mb-3"></MudTextField> *@
                     <MudText Style="font-weight: bold; margin-top: 15px">Thông tin cá nhân</MudText>
@@ -116,6 +116,7 @@
     private DateTime? dateOfB;
     private string firstPass;
     private string secondPass;
+    [Inject] ISnackbar Snackbar { get; set; }
 
     private void NavigateToLogin()
     {
@@ -145,7 +146,13 @@
                 currentUser.ClassUsers = null;
                 currentUser.UserPermissions = null;
                 currentUser.Submissions = null;
-                await _serviceUser.RegisterStudent(currentUser);
+                bool status = await _serviceUser.RegisterStudent(currentUser);
+
+                if (status == true)
+                {
+                    Snackbar.Add("Đăng ký thành công!", Severity.Info);
+                    navigation.NavigateTo("/");
+                }
             }
         }
 
