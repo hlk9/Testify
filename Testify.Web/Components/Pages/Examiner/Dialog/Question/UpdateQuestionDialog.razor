@@ -1,53 +1,45 @@
 ﻿@using Testify.DAL.Models
+@using Testify.Web.Shared;
 
 <MudDialog>
     <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật mức độ câu hỏi</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật câu hỏi</MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Spacing="5" Model="@question" @ref="@form">
-            <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
-            <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
-            <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                @if (_lstQuestionLevels != null)
-                {
-                    @foreach (var itemLevel in _lstQuestionLevels)
+        @if(isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Spacing="5" Model="@question" @ref="@form">
+                <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
+                <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
+                <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (_lstQuestionLevels != null)
                     {
-                        <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                        @foreach (var itemLevel in _lstQuestionLevels)
+                        {
+                            <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                        }
                     }
-                }
 
-            </MudSelect>
+                </MudSelect>
 
-            <MudSelect T="int" @bind-Value="question.QuestionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect T="int" @bind-Value="question.SubjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
 
-                @if (_lstQuestionTypes != null)
-                {
-                    @foreach (var itemType in _lstQuestionTypes)
+                    @if (_lstSubjects != null)
                     {
-                        <MudSelectItem Value="itemType.Id">@itemType.Name</MudSelectItem>
+                        @foreach (var item in _lstSubjects)
+                        {
+                            <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                        }
                     }
-                }
-
-            </MudSelect>
-
-            <MudSelect T="int" @bind-Value="question.SubjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-
-                @if (_lstSubjects != null)
-                {
-                    @foreach (var item in _lstSubjects)
-                    {
-                        <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
-                    }
-                }
 
 
-            </MudSelect>
-            @* <MudRadioGroup @bind-Value="statusQuestion">
-                <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
-                <MudRadio Value="@(false)">Không hoạt động</MudRadio>
-            </MudRadioGroup> *@
-        </MudForm>
+                </MudSelect>
+            </MudForm>
+        }
     </DialogContent>
     <DialogActions>
 
@@ -59,11 +51,8 @@
 @code {
     private Question question { get; set; } = new();
     private List<QuestionLevel> _lstQuestionLevels;
-    private List<QuestionType> _lstQuestionTypes;
     private List<Subject> _lstSubjects;
-
-    // private bool statusQuestion { get; set; }
-
+    private bool isLoading { get; set; } = true;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -72,15 +61,20 @@
 
     MudForm form;
 
-    protected override async Task OnInitializedAsync()
+    private async Task LoadData()
     {
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
-
-        _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
 
         _lstSubjects = await _serSub.GetAllSub();
 
         question = await _serQuestion.GetQuestionById(QuestionId);
+
+        isLoading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
     }
 
     private async Task Submit()

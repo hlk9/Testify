@@ -33,7 +33,7 @@
 
     private async Task Submit()
     {
-        var deleteAnswer = await _serAnswer.UpdateStatus(answerId, Convert.ToByte(StatusType.statusNull));
+        var deleteAnswer = await _serAnswer.UpdateStatus(answerId, Convert.ToByte(StatusType.noAnswer));
 
         if(deleteAnswer != null)
         {
@@ -41,7 +41,7 @@
             var count = 0;
             foreach (var item in lstAnswer)
             {
-                if(item.Status == Convert.ToByte(StatusType.statusTrue))
+                if(item.Status == Convert.ToByte(StatusType.isActive))
                 {
                     count++;
                     break;
@@ -49,7 +49,7 @@
             }
             if(count == 0)
             {
-                await _serQuestion.UpdateStatus(answer.QuestionId, Convert.ToByte(StatusType.statusNull));
+                await _serQuestion.UpdateStatus(answer.QuestionId, Convert.ToByte(StatusType.noAnswer));
             }
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Xóa thành công!!", Severity.Success);
