@@ -72,7 +72,7 @@
     private async Task LoadData()
     {
 
-        lstQuestion = await _serQuestion.GetAllQuestions();
+        lstQuestion = await _serQuestion.GetAllQuestions("");
         isLoading = false;
     }
 
