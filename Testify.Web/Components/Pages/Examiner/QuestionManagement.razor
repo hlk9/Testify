@@ -155,14 +155,13 @@
                         <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : (context.Status == Convert.ToByte(StatusType.noAnswer) ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
 
                         <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Updatre, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                             <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                         </MudTd>
                         <MudTd>
                             <MudButton Disabled="@(context.Status == Convert.ToByte(StatusType.noAnswer) ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
                         </MudTd>
                     }
-
                 </RowTemplate>
                 <NoRecordsContent>
                     <MudText>No Data</MudText>
@@ -252,7 +251,7 @@
             }
 
         }
-        else if (name.Equals(OpenDialogType.Updatre))
+        else if (name.Equals(OpenDialogType.Update))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Question.UpdateQuestionDialog>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;

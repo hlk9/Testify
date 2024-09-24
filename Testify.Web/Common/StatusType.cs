@@ -3,7 +3,7 @@
     public enum StatusType : Byte
     {
         isActive = 1,
-        inActive = 2,
+        unActive = 2,
         noAnswer = 255,
     }
 }

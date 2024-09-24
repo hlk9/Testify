@@ -14,7 +14,7 @@ namespace Testify.Web.Services
 
         public async Task<List<Question>> GetAllQuestions(string textSearch)
         {
-            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?search={textSearch}");
+            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={textSearch}");
             var response = await allQuestion.Content.ReadFromJsonAsync<List<Question>>();
 
             return response;
