@@ -86,8 +86,8 @@
 
                         </MudItem>
                         <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
                         </MudItem>
                     </MudGrid>
 
@@ -182,10 +182,17 @@
     private List<QuestionType> _lstQuestionTypes;
     private bool IsDisableShowAnswer;
     private bool isLoading { get; set; } = true;
+    private string searchValue = "";
 
-    private async Task LoadData()
+    private async Task onChangeSearch()
     {
-        _lstQuestions = await _serQuestion.GetAllQuestions();
+
+        await LoadData(searchValue);
+    }
+
+    private async Task LoadData(string? textSearch)
+    {
+        _lstQuestions = await _serQuestion.GetAllQuestions(textSearch);
         StateHasChanged();
         isLoading = false;
     }
@@ -195,9 +202,7 @@
         _lstSubjects = await _serSub.GetAllSub();
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
-
-
-        await LoadData();
+        await LoadData("");
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
@@ -225,7 +230,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         } 
         else if (name.Equals(OpenDialogType.ShowDialogAddNewAnswer))
@@ -234,7 +239,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
         else if (name.Equals(OpenDialogType.Create))
@@ -243,7 +248,7 @@
             var result = await dialog.Result;
             if(!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
 
         }
@@ -253,7 +258,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
         else
@@ -262,7 +267,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
 
