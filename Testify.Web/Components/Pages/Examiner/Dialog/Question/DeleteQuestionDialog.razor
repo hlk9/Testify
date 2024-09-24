@@ -33,7 +33,7 @@
 
     private async Task Submit()
     {
-        var check = await _serQuestion.UpdateStatus(QuestionId, Convert.ToByte(StatusType.inActive));
+        var check = await _serQuestion.UpdateStatus(QuestionId, Convert.ToByte(StatusType.unActive));
         if (check != null)
         {
             MudDialog.Close(DialogResult.Ok(true));

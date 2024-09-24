@@ -69,7 +69,7 @@
                 </MudTd>
                 <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
+                    <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Update, context.Id))"></MudIconButton>
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                 </MudTd>
             </RowTemplate>
@@ -131,7 +131,7 @@
                 await loadData();
             }
         }
-        else if (name.Equals(OpenDialogType.Updatre))
+        else if (name.Equals(OpenDialogType.Update))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.UpdateAnswerDialog>("Options dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
