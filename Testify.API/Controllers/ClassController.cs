@@ -23,7 +23,7 @@ namespace Testify.API.Controllers
         public List<Class> GetClassByName(string keyword, int organizationId)
         {
             context = new TestifyDbContext();
-            return context.Classes.Where(x => x.Name.Contains(keyword) && x.OrganizationId== organizationId).ToList();
+            return context.Classes.Where(x => x.Name.Contains(keyword)).ToList();
 
         }
 
