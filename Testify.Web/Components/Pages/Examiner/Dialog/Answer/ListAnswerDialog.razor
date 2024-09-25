@@ -95,7 +95,8 @@
     {
         var dialogParametersUpdate = new DialogParameters<Dialog.Answer.UpdateAnswerDialog>
         {
-            {x => x.answerId, id}
+            {x => x.answerId, id},
+            {y => y.questionOfAnswerId, questionId}
         };
         var dialogParametersDelete = new DialogParameters<Dialog.Answer.DeleteAnswerDialog>
         {
