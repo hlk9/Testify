@@ -29,5 +29,12 @@ namespace Testify.API.Controllers
 
 
         }
+
+        [HttpGet("get-all-users")]
+        public async Task<ActionResult<List<Room>>> GetAll()
+        {
+            var lstUser = await userRepos.GetAllUsers();
+            return Ok(lstUser);
+        }
     }
 }
