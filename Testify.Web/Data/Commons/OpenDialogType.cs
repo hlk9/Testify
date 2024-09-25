@@ -1,4 +1,4 @@
-﻿namespace Testify.Web.utils
+﻿namespace Testify.Web.Data.Commons
 {
     public static class OpenDialogType
     {
