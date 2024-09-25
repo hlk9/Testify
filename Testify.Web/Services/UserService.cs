@@ -29,5 +29,11 @@ namespace Testify.Web.Services
 
         }
 
+        public async Task<List<User>> GetUsers()
+        {
+            return await _httpClient.GetFromJsonAsync<List<User>>("User/get-all-users");
+        }
+
+
     }
 }
