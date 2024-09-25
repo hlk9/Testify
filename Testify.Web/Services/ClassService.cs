@@ -16,7 +16,7 @@ namespace Testify.Web.Services
         {
             using (var client = new HttpClient()) { 
             client.BaseAddress = new Uri(baseApiUrl);
-                var response = client.GetStringAsync("Class/Get-Classes?organizationId=1").Result;
+                var response = client.GetStringAsync("Class/Get-Classes").Result;
                 var lst = JsonConvert.DeserializeObject<List<Class>>(response);
                 return lst;
             }

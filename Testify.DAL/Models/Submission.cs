@@ -28,9 +28,9 @@ namespace Testify.DAL.Models
         public int UnAnswered { get; set; }
         public int Answered { get; set; }
         public string Note { get; set; }
-        [ForeignKey("OrganizationId")]
-        public int OrganizationId { get; set; }
-        public virtual Organization Organization { get; set; }
+        //[ForeignKey("OrganizationId")]
+        //public int OrganizationId { get; set; }
+        //public virtual Organization Organization { get; set; }
 
         public bool? Status { get; set; }
 
