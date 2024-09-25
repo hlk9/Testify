@@ -27,7 +27,7 @@ namespace Testify.DAL.Context
 
         public DbSet<Answer> Answers { get; set; }
         public DbSet<AnswerSubmission> AnswerSubmissions { get; set; }
-        public DbSet<Organization> Organizations { get; set; }
+        //public DbSet<Organization> Organizations { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionAnswer> QuestionAnswers { get; set; }
         public DbSet<QuestionLevel> QuestionLevels { get; set; }
@@ -43,7 +43,7 @@ namespace Testify.DAL.Context
         public DbSet<ExamDetail> ExamDetails { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
-        public DbSet<OrganizationUser> OrganizationUsers { get; set; }
+        //public DbSet<OrganizationUser> OrganizationUsers { get; set; }
         public DbSet<ScoreMethod> ScoreMethods { get; set; }
         public DbSet<UserExamSchedule> UserExamSchedules { get; set; }
         public DbSet<ExamSchedule> ExamSchedules { get; set; }
@@ -79,11 +79,6 @@ namespace Testify.DAL.Context
                 .HasForeignKey(s => s.ExamScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Submission>()
-                .HasOne(s => s.Organization)
-                .WithMany()
-                .HasForeignKey(s => s.OrganizationId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Answer>()
                .HasOne(s => s.Question)

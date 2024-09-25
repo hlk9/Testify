@@ -11,11 +11,11 @@ namespace Testify.API.Controllers
     {
         TestifyDbContext context;
         [HttpGet("Get-Classes")]
-        public List<Class> GetAllClassOfOrganization(int organizationId)
+        public List<Class> GetAllClassOfOrganization()
         {
             context = new TestifyDbContext();
-            organizationId = 1;
-            return context.Classes.Where(x => x.OrganizationId == organizationId).ToList();
+         
+            return context.Classes.ToList();
 
         }
 
@@ -63,8 +63,7 @@ namespace Testify.API.Controllers
             var classOrigin = context.Classes.Find(classUpdate.Id);
             if (classOrigin != null)
             {
-                classOrigin.Name = classUpdate.Name;
-                classOrigin.OrganizationId = classUpdate.OrganizationId;
+                classOrigin.Name = classUpdate.Name;               
                 classOrigin.Description = classUpdate.Description;
                 classOrigin.Status = classUpdate.Status;
                 context.SaveChanges();
