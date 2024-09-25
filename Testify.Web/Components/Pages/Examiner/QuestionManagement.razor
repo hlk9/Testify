@@ -196,12 +196,19 @@
         isLoading = false;
     }
 
+    private async Task LoadData()
+    {
+        _lstQuestions = await _serQuestion.GetAllQuestions(null);
+        StateHasChanged();
+        isLoading = false;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         _lstSubjects = await _serSub.GetAllSub();
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
-        await LoadData("");
+        await LoadData();
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
