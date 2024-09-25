@@ -50,10 +50,7 @@ namespace Testify.DAL.Reposiroties
                 
                 updateSubject.Name = sub.Name;
                 updateSubject.Description = sub.Description;
-                updateSubject.Status = sub.Status;
-                updateSubject.OrganizationId = sub.OrganizationId;
-                updateSubject.OrganizationId = sub.OrganizationId;
-
+                updateSubject.Status = sub.Status;           
                 var objSubject = _context.Subjects.Update(updateSubject).Entity;
                 await _context.SaveChangesAsync();
                 return objSubject;

@@ -1,6 +1,5 @@
-﻿@using Testify.DAL.Models
-@using Testify.Web.Utils
-@using Testify.Web.utils
+﻿@using Testify.DAL.Models;
+@using Testify.Web.Data.Commons;
 @using Testify.Web.Shared;
 @inject IDialogService DialogService
 
@@ -39,7 +38,7 @@
                         </MudTd>
                         <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
                         <MudTd DataLabel="Thao tác">
-                            <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Updatre, context.Id))"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Update, context.Id))"></MudIconButton>
 
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))" Disabled="CheckTypeQuestion"></MudIconButton>
                         </MudTd>
@@ -96,14 +95,15 @@
     {
         var dialogParametersUpdate = new DialogParameters<Dialog.Answer.UpdateAnswerDialog>
         {
-            {x => x.answerId, id}
+            {x => x.answerId, id},
+            {y => y.questionOfAnswerId, questionId}
         };
         var dialogParametersDelete = new DialogParameters<Dialog.Answer.DeleteAnswerDialog>
         {
             {x => x.answerId, id}
         };
 
-        if (name.Equals(OpenDialogType.Updatre))
+        if (name.Equals(OpenDialogType.Update))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.UpdateAnswerDialog>("Options dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;

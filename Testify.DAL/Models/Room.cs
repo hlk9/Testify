@@ -16,8 +16,8 @@ namespace Testify.DAL.Models
         public int Capacity { get; set; }
         public string Address { get; set; }
         public bool? Status { get; set; }
-        [ForeignKey("OrganizationId")]
-        public int OrganizationId { get; set; }
-        public virtual Organization? Organization { get; set; }
+        //[ForeignKey("OrganizationId")]
+        //public int OrganizationId { get; set; }
+        //public virtual Organization? Organization { get; set; }
     }
 }

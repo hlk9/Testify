@@ -1,7 +1,6 @@
 ﻿@page "/Examiner/QuestionManagement"
 @using Testify.DAL.Models
-@using Testify.Web.Utils
-@using Testify.Web.utils
+@using Testify.Web.Data.Commons
 @using Testify.Web.Shared
 @layout AdminLayout
 @inject IDialogService DialogService
@@ -86,8 +85,8 @@
 
                         </MudItem>
                         <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
                         </MudItem>
                     </MudGrid>
 
@@ -155,14 +154,13 @@
                         <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : (context.Status == Convert.ToByte(StatusType.noAnswer) ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
 
                         <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Updatre, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                             <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                         </MudTd>
                         <MudTd>
                             <MudButton Disabled="@(context.Status == Convert.ToByte(StatusType.noAnswer) ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
                         </MudTd>
                     }
-
                 </RowTemplate>
                 <NoRecordsContent>
                     <MudText>No Data</MudText>
@@ -182,10 +180,24 @@
     private List<QuestionType> _lstQuestionTypes;
     private bool IsDisableShowAnswer;
     private bool isLoading { get; set; } = true;
+    private string searchValue = "";
+
+    private async Task onChangeSearch()
+    {
+
+        await LoadData(searchValue);
+    }
+
+    private async Task LoadData(string? textSearch)
+    {
+        _lstQuestions = await _serQuestion.GetAllQuestions(textSearch);
+        StateHasChanged();
+        isLoading = false;
+    }
 
     private async Task LoadData()
     {
-        _lstQuestions = await _serQuestion.GetAllQuestions();
+        _lstQuestions = await _serQuestion.GetAllQuestions(null);
         StateHasChanged();
         isLoading = false;
     }
@@ -195,8 +207,6 @@
         _lstSubjects = await _serSub.GetAllSub();
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
-
-
         await LoadData();
     }
 
@@ -225,7 +235,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         } 
         else if (name.Equals(OpenDialogType.ShowDialogAddNewAnswer))
@@ -234,7 +244,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
         else if (name.Equals(OpenDialogType.Create))
@@ -243,17 +253,17 @@
             var result = await dialog.Result;
             if(!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
 
         }
-        else if (name.Equals(OpenDialogType.Updatre))
+        else if (name.Equals(OpenDialogType.Update))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Question.UpdateQuestionDialog>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
         else
@@ -262,7 +272,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
 

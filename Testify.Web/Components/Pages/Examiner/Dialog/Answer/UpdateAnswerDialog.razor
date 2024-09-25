@@ -1,5 +1,5 @@
 ﻿@using Testify.DAL.Models
-@using Testify.Web.utils
+@using Testify.Web.Data.Commons
 
 <MudDialog>
     <TitleContent>
@@ -7,11 +7,11 @@
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="4" Model="@answer" @ref="@form">
-            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" />
-            <MudSelect T="bool" @bind-Value="@valueIsCorrect" Label="Đúng/Sai">
-                <MudSelectItem Value="true">Đúng</MudSelectItem>
-                <MudSelectItem Value="false">Sai</MudSelectItem>
-            </MudSelect>
+            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" ReadOnly=@checkContentAnswer/>
+            <MudRadioGroup T="bool" @bind-Value="@valueIsCorrect">
+                <MudRadio Value="true">Đúng</MudRadio>
+                <MudRadio Value="false">Sai</MudRadio>
+            </MudRadioGroup>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -23,35 +23,84 @@
 
 @code {
     private Answer answer { get; set; } = new();
+    private Question question;
 
     [Parameter]
     public int answerId { get; set; }
 
-    MudForm form;
+    [Parameter]
+    public int questionOfAnswerId { get; set; }
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
+    MudForm form;
+
     private bool valueIsCorrect;
+    private bool checkContentAnswer = false;
 
     protected override async Task OnInitializedAsync()
     {
         answer = await _serAnswer.GetById(answerId);
+        question = await _serQuestion.GetQuestionById(questionOfAnswerId);
         valueIsCorrect = answer.IsCorrect;
+        if (question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
+        {
+            checkContentAnswer = true;
+        }
+    }
+
+    private async Task<bool> CheckIscorrect()
+    {
+        var lstAnswerOfQuestion = await _serAnswer.GetAllByQuestionId(questionOfAnswerId);
+        var lstNoCurrentAnswer = lstAnswerOfQuestion.Where(x => x.Id != answerId).ToList();
+
+        var correct = lstNoCurrentAnswer.Count(x => x.IsCorrect);
+        var isCorrect = lstNoCurrentAnswer.Count(x => !x.IsCorrect);
+
+        if (question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice) || question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
+        {
+            if (valueIsCorrect == true && correct > 0)
+            {
+                snackbar.Add("Chỉ được 1 đáp án đúng", Severity.Warning);
+                return true;
+            }
+            else if (valueIsCorrect == false && isCorrect == lstNoCurrentAnswer.Count)
+            {
+                snackbar.Add("Ít nhất 1 đáp án đúng", Severity.Warning);
+                return true;
+            }
+        }
+        else
+        {
+            if (valueIsCorrect == false && isCorrect == lstNoCurrentAnswer.Count)
+            {
+                snackbar.Add("Ít nhất 1 đáp án đúng", Severity.Warning);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private async Task Submit()
     {
-        var updateAnswer = await _serAnswer.Update(answer);
-        if (updateAnswer != null)
+        var checkIcorrect = await CheckIscorrect();
+
+        if(!checkIcorrect)
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Cập nhật thành công", Severity.Success);
-        }
-        else
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Cập nhật thất bại", Severity.Error);
+            answer.IsCorrect = valueIsCorrect;
+            var updateAnswer = await _serAnswer.Update(answer);
+            if (updateAnswer != null)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Cập nhật thành công", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Cập nhật thất bại", Severity.Error);
+            }
         }
     }
 

@@ -51,8 +51,6 @@ namespace Testify.DAL.Reposiroties
                 updateRoom.Name = r.Name;
                 updateRoom.Status = r.Status;
                 updateRoom.Capacity = r.Capacity;
-                updateRoom.OrganizationId = r.OrganizationId;
-
                 var objRoom = _context.Rooms.Update(updateRoom).Entity;
                 await _context.SaveChangesAsync();
                 return objRoom;
