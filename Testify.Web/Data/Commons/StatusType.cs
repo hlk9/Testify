@@ -1,6 +1,6 @@
-﻿namespace Testify.Web.Utils
+﻿namespace Testify.Web.Data.Commons
 {
-    public enum StatusType : Byte
+    public enum StatusType : byte
     {
         isActive = 1,
         unActive = 2,
