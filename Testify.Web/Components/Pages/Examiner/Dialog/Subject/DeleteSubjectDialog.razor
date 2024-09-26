@@ -21,16 +21,17 @@
     private Subject subject { get; set; }
 
     [Parameter]
-    public int IdSubject { get; set; }
+    public int idSubject { get; set; }
 
-    protected async override void OnInitialized()
+
+    protected async override Task OnInitializedAsync()
     {
-        subject = await _serSub.GetSubId(IdSubject);
+        subject = await _serSub.GetSubId(idSubject);
     }
 
     private async Task Delete()
     {
-        var check = await _serSub.DeleteSub(IdSubject);
+        var check = await _serSub.DeleteSub(idSubject);
         if(check == true)
         {
             MudDialog.Close(DialogResult.Ok(true));

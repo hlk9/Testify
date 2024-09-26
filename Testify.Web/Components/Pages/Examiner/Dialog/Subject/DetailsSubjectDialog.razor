@@ -21,13 +21,13 @@
     private MudDialogInstance MudDialog { get; set; }
 
     [Parameter]
-    public int IdSubject { get; set; }
+    public int idSubject { get; set; }
 
     private Subject subject { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        subject = await _serSub.GetSubId(IdSubject);
+        subject = await _serSub.GetSubId(idSubject);
     }
 
 

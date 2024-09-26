@@ -17,7 +17,7 @@ namespace Testify.Web.Services
 
         public async Task<Subject> GetSubId(int id)
         {
-            return await _httpClient.GetFromJsonAsync<Subject>($"Subject/get-subject-id?id={id}");
+            return await _httpClient.GetFromJsonAsync<Subject>($"Subject/get-subject-by-id?id={id}");
         }
 
         public async Task<bool> CreateSub(Subject subject)
