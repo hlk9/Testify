@@ -239,88 +239,90 @@
         return false;
     }
 
+    private bool CheckAnswerIscorrect()
+    {
+        int count = lstAnswers.Count(x => x.IsCorrect);
+
+        if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+        {
+            if (count > 1)
+            {
+                snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                return true;
+            }
+        }
+
+        if (count == 0)
+        {
+            snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
+            return true;
+        }
+        return false;
+    }
+
     private async Task Submit()
     {
-        if (lstAnswers.Count > 0)
+        var checkIscorrect = CheckAnswerIscorrect();
+
+        if(!checkIscorrect)
         {
-            int count = 0;
-            for (int i = 0; i < lstAnswers.Count; i++)
+            
+            bool allValid = true;
+
+            foreach (var form in answerForms)
             {
-                if (lstAnswers[i].IsCorrect == true)
+                if (!await form.ValidateAsync())
                 {
-                    count++;
+                    allValid = false;
                 }
             }
 
-            if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+            if (allValid)
             {
-                if (count > 1)
+                if (lstAnswers == null || lstAnswers.Count == 0)
                 {
-                    snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
-                    return;
-                }
-            }
-
-            if (count == 0)
-            {
-                snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
-                return;
-            }
-        }
-
-        bool allValid = true;
-
-        foreach (var form in answerForms)
-        {
-            if (!await form.ValidateAsync())
-            {
-                allValid = false;
-            }
-        }
-
-        if (allValid)
-        {
-            if (lstAnswers == null || lstAnswers.Count == 0)
-            {
-                question.Status = Convert.ToByte(StatusType.noAnswer);
-            }
-            else
-            {
-                question.Status = Convert.ToByte(StatusType.isActive);
-            }
-            question.CreatedDate = DateTime.Now;
-            question.QuestionTypeId = questionTypeId;
-            question.QuestionLevelId = questionLevelId;
-            question.SubjectId = subjectId;
-            var checkValidation = ValidationForm();
-
-            if(!checkValidation)
-            {
-                var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
-                if (checkAddNewQuestion != null)
-                {
-                    for (int i = 0; i < lstAnswers.Count; i++)
-                    {
-                        lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
-                        lstAnswers[i].Status = Convert.ToByte(StatusType.isActive);
-                        var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
-                    }
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Thêm thành công", Severity.Success);
-                    lstAnswers.Clear();
+                    question.Status = Convert.ToByte(StatusType.noAnswer);
                 }
                 else
                 {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Thêm thất bại", Severity.Error);
+                    question.Status = Convert.ToByte(StatusType.isActive);
                 }
-            }
+                question.CreatedDate = DateTime.Now;
+                question.QuestionTypeId = questionTypeId;
+                question.QuestionLevelId = questionLevelId;
+                question.SubjectId = subjectId;
 
+                var checkValidation = ValidationForm();
+
+                if(!checkValidation)
+                {
+                    var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
+                    if (checkAddNewQuestion != null)
+                    {
+                        for (int i = 0; i < lstAnswers.Count; i++)
+                        {
+                            lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
+                            lstAnswers[i].Status = Convert.ToByte(StatusType.isActive);
+                            var checkAddNewAnswer = await _serAnswer.Create(lstAnswers[i]);
+                        }
+                        MudDialog.Close(DialogResult.Ok(true));
+                        snackbar.Add("Thêm thành công", Severity.Success);
+                        lstAnswers.Clear();
+                    }
+                    else
+                    {
+                        MudDialog.Close(DialogResult.Ok(true));
+                        snackbar.Add("Thêm thất bại", Severity.Error);
+                    }
+                }
+
+            }
+            else
+            {
+                snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
+            }
         }
-        else
-        {
-            snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
-        }
+
     }
     private void Cancel() => MudDialog.Cancel();
 }
