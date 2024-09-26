@@ -29,6 +29,9 @@
     MudForm form;
     private Subject subject { get; set; } = new();
 
+    [Parameter]
+    public int idSubject { get; set; }
+
     private async Task AddNew()
     {
         var check = await _serSub.CreateSub(subject); 
