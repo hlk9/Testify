@@ -19,7 +19,7 @@ namespace Testify.DAL.Models
         
         public string Code { get; set; }
 
-        public bool? Status { get; set; }
+        public byte? Status { get; set; }
         public DateTime CreateDate { get; set; }
         public Guid CreateBy { get; set; }
         public DateTime UpdateDate { get; set; }

@@ -12,7 +12,7 @@ namespace Testify.DAL.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool? Status { get; set; }
+        public byte? Status { get; set; }
         public virtual ICollection<User>? Users { get; set; }
     }
 }

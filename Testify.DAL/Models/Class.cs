@@ -14,6 +14,7 @@ namespace Testify.DAL.Models
         public string ClassCode { get; set; }
         public string Description { get; set; }
         public int Capacity { get; set; }
+        public Guid TeacherId { get; set; }        
         //[ForeignKey("OrganizationId")]
         //public int OrganizationId { get; set; }
         //public virtual Organization? Organization { get; set; }
@@ -23,6 +24,6 @@ namespace Testify.DAL.Models
 
         public virtual ICollection<ClassUser>? ClassUsers { get; set; }
 
-        public bool? Status { get; set; }
+        public byte? Status { get; set; }
     }
 }
