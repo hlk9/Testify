@@ -19,7 +19,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-All-Questions")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord)
         {
             var lstQuestion = await _repoQuestion.GetAllQuestions(keyWord);
@@ -44,6 +44,13 @@ namespace Testify.API.Controllers
         public async Task<ActionResult<Question>> Update(Question question)
         {
             var updateQuestion = await _repoQuestion.UpdateQuestion(question);
+            return Ok(updateQuestion);
+        }
+
+        [HttpPut("Update-UploadFile-Question")]
+        public async Task<ActionResult<Question>> UpdateUpload(Question question)
+        {
+            var updateQuestion = await _repoQuestion.UpdateDocumentPath(question);
             return Ok(updateQuestion);
         }
 

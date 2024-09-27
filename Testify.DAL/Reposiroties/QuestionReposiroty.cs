@@ -73,6 +73,22 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
+        public async Task<Question> UpdateDocumentPath(Question question)
+        {
+            try
+            {
+                var objUpdateQuestion = await _context.Questions.FindAsync(question.Id);
+                objUpdateQuestion.DocumentPath = question.DocumentPath;
+
+                var updateQuestion = _context.Questions.Update(objUpdateQuestion).Entity;
+                await _context.SaveChangesAsync();
+                return updateQuestion;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public async Task<Question> UpdateStatusQuestion(int  questionId, byte status)
         {

@@ -8,7 +8,7 @@
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án</MudText>
     </TitleContent>
     <DialogContent>
-        @if(isLoading)
+        @if (isLoading)
         {
             <LoadingContext />
         }
@@ -21,11 +21,17 @@
                     </div>
                     <MudForm Spacing="4" Model="@question" @ref="@form">
                         <div>
-                            <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" @bind-Value="question.Content"/>
+                            <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" @bind-Value="question.Content" />
                         </div>
 
-                        <div>
-                            <MudTextField @bind-Value="question.DocumentPath" For="@(() => question.DocumentPath)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <MudTextField @bind-Value="@currentFileImage" Style="padding: 0" T="string" ReadOnly=true />
+                            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Accept=".jpg, .png, .mp3">
+                                <ActivatorContent>
+                                    <MudFab StartIcon="@Icons.Material.Filled.Image"
+                                            Label="Thêm Ảnh" />
+                                </ActivatorContent>
+                            </MudFileUpload>
                         </div>
 
                         <MudSelect T="int" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
@@ -101,14 +107,18 @@
     private List<Subject> _lstSubjects;
     private List<Answer> lstAnswers = new List<Answer>();
     private List<AnswerForm> answerForms = new List<AnswerForm>();
-    private bool isLoading {get; set;} = true;
+    private bool isLoading { get; set; } = true;
     private int indexAnswer = 1;
     private bool isDisableAddNewAnswer = true;
     private bool chooseAdd = true;
-
     private int questionLevelId = -1;
     private int questionTypeId = -1;
     private int subjectId = -1;
+    private string currentFileImage = "";
+    private string newNameFile;
+    private IBrowserFile selectFile;
+
+    private string[] allowFileUpload = { ".jpg", ".png", ".mp3" };
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
@@ -205,17 +215,12 @@
     private bool ValidationForm()
     {
         int count = 0;
-        if(question.Content == null || question.Content.Trim().Length == 0)
+        if (question.Content == null || question.Content.Trim().Length == 0)
         {
             snackbar.Add("Nội dung trống!", Severity.Error);
             count += 1;
         }
-        if (question.DocumentPath == null || question.DocumentPath.Trim().Length == 0)
-        {
-            snackbar.Add("Đường dẫn trống!", Severity.Error);
-            count += 1;
-        }
-        if(question.QuestionLevelId == -1 || question.QuestionLevelId == null)
+        if (question.QuestionLevelId == -1 || question.QuestionLevelId == null)
         {
             snackbar.Add("Chưa chọn cấp độ câu hỏi", Severity.Error);
             count += 1;
@@ -225,13 +230,13 @@
             snackbar.Add("Chưa chọn mức độ câu hỏi", Severity.Error);
             count += 1;
         }
-        if(question.SubjectId == -1 || question.SubjectId == null)
+        if (question.SubjectId == -1 || question.SubjectId == null)
         {
             snackbar.Add("Chưa chọn môn học", Severity.Error);
             count += 1;
         }
 
-        if(count > 0)
+        if (count > 0)
         {
             return true;
         }
@@ -241,64 +246,112 @@
 
     private bool CheckAnswerIscorrect()
     {
-        int count = lstAnswers.Count(x => x.IsCorrect);
-
-        if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+        if (lstAnswers != null && lstAnswers.Count != 0)
         {
-            if (count > 1)
+            int count = lstAnswers.Count(x => x.IsCorrect);
+
+            if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
             {
-                snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                if (count > 1)
+                {
+                    snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                    return true;
+                }
+            }
+
+            if (count == 0)
+            {
+                snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
                 return true;
             }
         }
-
-        if (count == 0)
-        {
-            snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
-            return true;
-        }
         return false;
+    }
+
+    private void UploadFiles(IBrowserFile file)
+    {
+        if (file == null)
+        {
+            return;
+        }
+        var contentAfterDotLast = Path.GetExtension(file.Name);
+
+        if (!allowFileUpload.Contains(contentAfterDotLast))
+        {
+            snackbar.Add("Dạng file không đúng. Chỉ nhận ảnh hoặc nghe!", Severity.Error);
+            return;
+        }
+
+        currentFileImage = file.Name;
+        selectFile = file;
+    }
+
+    private async Task SaveFileUpload()
+    {
+        if (selectFile == null)
+        {
+            return;
+        }
+        else
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/ImageUploads", newNameFile);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await selectFile.OpenReadStream().CopyToAsync(stream);
+            }
+        }
+    }
+
+    private void RenameImage(int questionId)
+    {
+        if (selectFile != null)
+        {
+            var extention = Path.GetExtension(selectFile.Name);
+            newNameFile = $"imageQID{questionId}{extention}";
+        }
     }
 
     private async Task Submit()
     {
         var checkIscorrect = CheckAnswerIscorrect();
+        var checkValidation = ValidationForm();
 
-        if(!checkIscorrect)
+        bool allValid = true;
+
+        foreach (var form in answerForms)
         {
-            
-            bool allValid = true;
-
-            foreach (var form in answerForms)
+            if (!await form.ValidateAsync())
             {
-                if (!await form.ValidateAsync())
-                {
-                    allValid = false;
-                }
+                allValid = false;
             }
+        }
 
-            if (allValid)
+        if (allValid)
+        {
+            if (lstAnswers == null || lstAnswers.Count == 0)
             {
-                if (lstAnswers == null || lstAnswers.Count == 0)
-                {
-                    question.Status = Convert.ToByte(StatusType.noAnswer);
-                }
-                else
-                {
-                    question.Status = Convert.ToByte(StatusType.isActive);
-                }
-                question.CreatedDate = DateTime.Now;
-                question.QuestionTypeId = questionTypeId;
-                question.QuestionLevelId = questionLevelId;
-                question.SubjectId = subjectId;
+                question.Status = Convert.ToByte(StatusType.noAnswer);
+            }
+            else
+            {
+                question.Status = Convert.ToByte(StatusType.isActive);
+            }
+            question.CreatedDate = DateTime.Now;
+            question.QuestionTypeId = questionTypeId;
+            question.QuestionLevelId = questionLevelId;
+            question.SubjectId = subjectId;
 
-                var checkValidation = ValidationForm();
-
-                if(!checkValidation)
+            if (!checkValidation)
+            {
+                if (!checkIscorrect)
                 {
                     var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
                     if (checkAddNewQuestion != null)
                     {
+                        RenameImage(checkAddNewQuestion.Id);
+                        checkAddNewQuestion.DocumentPath = newNameFile;
+                        var checkUploadQuestion = await _serQuestion.UpdateUpload(checkAddNewQuestion);
+                        await SaveFileUpload();
                         for (int i = 0; i < lstAnswers.Count; i++)
                         {
                             lstAnswers[i].QuestionId = checkAddNewQuestion.Id;
@@ -317,12 +370,12 @@
                 }
 
             }
-            else
-            {
-                snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
-            }
-        }
 
+        }
+        else
+        {
+            snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
+        }
     }
     private void Cancel() => MudDialog.Cancel();
 }
