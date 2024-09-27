@@ -59,7 +59,7 @@ namespace Testify.DAL.Reposiroties
                 objUpdateQuestion.CreatedDate = question.CreatedDate;
                 objUpdateQuestion.Status = question.Status;
                 objUpdateQuestion.SubjectId = question.SubjectId;
-                objUpdateQuestion.DocumentURL = question.DocumentURL;
+                objUpdateQuestion.DocumentPath = question.DocumentPath;
                 objUpdateQuestion.QuestionLevelId = question.QuestionLevelId;
                 objUpdateQuestion.QuestionTypeId = question.QuestionTypeId;
 
