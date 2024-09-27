@@ -47,9 +47,9 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Users.ToListAsync();
         }
-        public async Task<User> GetByidUser(int id)
+        public async Task<User> GetByidUser(string id)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users.FindAsync(Guid.Parse(id));
         }
         public async Task<User> AddUser(User user)
         {

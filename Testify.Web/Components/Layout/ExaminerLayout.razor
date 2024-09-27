@@ -1,7 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
-
+@if (isLoading == true)
+{
+    <MudOverlay Visible="isLoading" Style="background-color:white; opacity:1;" LightBackground="true" LockScroll="true" Absolute="true">
+        <MudProgressCircular Color="Color.Success" Size="Size.Large" Indeterminate="true" />
+        <MudText Color="Color.Secondary" Align="Align.Center">Đang xử lý</MudText>
+    </MudOverlay>
+}
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -21,7 +27,7 @@
                 </ActivatorContent>
                 <ChildContent>
                     <MudMenuItem>Thông tin cá nhân</MudMenuItem>
-                    <MudMenuItem>Đăng xuất</MudMenuItem>
+                    <MudMenuItem OnClick="Logout">Đăng xuất</MudMenuItem>
 
                 </ChildContent>
             </MudMenu>
@@ -66,7 +72,52 @@
                 PaletteDark = _darkPalette,
                 LayoutProperties = new LayoutProperties()
             };
+        isLoading = false;
     }
+
+ 
+
+
+    private bool isTokenValid = true;
+    private bool isLoading = true;
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && isLoading == true)
+        {
+            isTokenValid = await CheckingToken();
+            isLoading = false;
+            StateHasChanged();
+            if (isTokenValid == false)
+            {
+                navigation.NavigateTo("/");
+
+            }
+
+        }
+    }
+    private async Task<bool> CheckingToken()
+    {
+        var token = await localStorage.GetItemAsStringAsync("token");
+        if (string.IsNullOrEmpty(token))
+        {
+            return false;
+        }
+        else
+        {
+            var modelLogin = await _serviceAccess.CheckAccessStatusByToken(token);
+            if (modelLogin.IsLoginSucces != true)
+            {
+                return false;
+            }
+            if (modelLogin.IsLoginSucces == true && modelLogin.LevelId != 3 || modelLogin.LevelId!=2)
+            {
+                return false;
+            }
+
+        }
+        return true;
+    }
+
 
     private readonly PaletteLight _lightPalette = new()
         {
@@ -118,5 +169,11 @@
         true => Icons.Material.Rounded.AutoMode,
         false => Icons.Material.Outlined.DarkMode,
     };
+
+    private async void Logout()
+    {
+        await localStorage.RemoveItemAsync("token");
+        navigation.NavigateTo("/");
+    }
 }
 

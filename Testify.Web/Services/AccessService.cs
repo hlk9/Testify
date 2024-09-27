@@ -41,5 +41,18 @@ namespace Testify.Web.Services
 
 
         }
+
+        public  async Task<UserLoginWithToken> CheckAccessStatusByToken(string token)
+        {
+
+            var accessDTO = await _httpClient.GetFromJsonAsync<UserLoginWithToken>($"/Access/CheckToken?token={token}");
+
+            if (accessDTO != null)
+            {                
+                return  accessDTO;
+            }
+            return null;
+            
+        }
     }
 }
