@@ -6,7 +6,7 @@
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật câu hỏi</MudText>
     </TitleContent>
     <DialogContent>
-        @if(isLoading)
+        @if (isLoading)
         {
             <LoadingContext />
         }
@@ -14,7 +14,15 @@
         {
             <MudForm Spacing="5" Model="@question" @ref="@form">
                 <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
-                <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <MudTextField @bind-Value="currentFileImage" Style="padding: 0" T="string" ReadOnly=true />
+                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Accept=".png, .jpg, .mp3">
+                        <ActivatorContent>
+                            <MudFab StartIcon="@Icons.Material.Filled.Image"
+                                    Label="Thêm Ảnh" />
+                        </ActivatorContent>
+                    </MudFileUpload>
+                </div>
                 <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     @if (_lstQuestionLevels != null)
                     {
@@ -55,11 +63,15 @@
     private bool isLoading { get; set; } = true;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
-
     [Parameter]
     public int QuestionId { get; set; }
-
     MudForm form;
+    private IBrowserFile selectFile;
+    private string newNameFile;
+    private string currentFileImage = "";
+
+    private string[] allowFileUpload = { ".jpg", ".png", ".mp3" };
+
 
     private async Task LoadData()
     {
@@ -69,6 +81,8 @@
 
         question = await _serQuestion.GetQuestionById(QuestionId);
 
+        currentFileImage = question.DocumentPath;
+
         isLoading = false;
     }
 
@@ -77,19 +91,86 @@
         await LoadData();
     }
 
-    private async Task Submit()
-     {
-    //     question.Status = statusQuestion;
-        var check = await _serQuestion.UpdateQuestion(question);
-        if (check != null)
+    private bool ValidationForm()
+    {
+        int count = 0;
+        if (question.Content == null || question.Content.Trim().Length == 0)
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Cập nhật thành công", Severity.Success);
+            snackbar.Add("Nội dung trống!", Severity.Error);
+            count += 1;
+        }
+
+        if (count > 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void UploadFiles(IBrowserFile file)
+    {
+        if (file == null)
+        {
+            return;
+        }
+        var contentAfterDotLast = Path.GetExtension(file.Name);
+
+        if (!allowFileUpload.Contains(contentAfterDotLast))
+        {
+            snackbar.Add("Dạng file không đúng. Chỉ nhận ảnh hoặc nghe!", Severity.Error);
+            return;
+        }
+
+        currentFileImage = file.Name;
+        selectFile = file;
+    }
+
+    private async Task SaveFileUpload()
+    {
+        if (selectFile == null)
+        {
+            return;
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Cập nhật thất bại", Severity.Error);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/ImageUploads", newNameFile);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await selectFile.OpenReadStream().CopyToAsync(stream);
+            }
+        }
+    }
+
+    private void RenameImage(int questionId)
+    {
+        if (selectFile != null)
+        {
+            var extention = Path.GetExtension(selectFile.Name);
+            newNameFile = $"imageQID{questionId}{extention}";
+        }
+    }
+
+    private async Task Submit()
+    {
+        var checkValidation = ValidationForm();
+
+        if (!checkValidation)
+        {
+            RenameImage(question.Id);
+            question.DocumentPath = newNameFile;
+            var check = await _serQuestion.UpdateQuestion(question);
+            await SaveFileUpload();
+            if (check != null)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Cập nhật thành công", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Cập nhật thất bại", Severity.Error);
+            }
         }
     }
 
