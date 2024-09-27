@@ -14,7 +14,7 @@
         {
             <MudForm Spacing="5" Model="@question" @ref="@form">
                 <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
-                <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
+                <MudTextField @bind-Value="question.DocumentPath" For="@(() => question.DocumentPath)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
                 <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     @if (_lstQuestionLevels != null)
                     {

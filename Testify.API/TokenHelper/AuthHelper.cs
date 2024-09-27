@@ -48,11 +48,11 @@ namespace Testify.API.TokenHelper
             return tokenUserModel;
         }
 
-        public bool CheckTokenExpried(Guid uid,string token)
+        public bool CheckTokenExpried(string token)
         {
             RefreshTokenRepository repo = new RefreshTokenRepository();
 
-            return repo.CheckTokenExpried(uid, token);
+            return repo.CheckTokenExpried(token);
 
         }
 

@@ -80,11 +80,35 @@ namespace Testify.API.Controllers
 
 
         }
-        //[HttpGet("CheckToken")]
-        //public async Task<UserLoginWithToken> CheckAndGetToken(string token)
-        //{
+        [HttpGet("CheckToken")]
+        public async Task<UserLoginWithToken> CheckAndGetToken(string token)
+        {
+            UserLoginWithToken dataTrans = new UserLoginWithToken();
+            UserRepo = new UserRepository();
+            RefreshTokenRepository tokenRepo = new RefreshTokenRepository();
+            string uId = await tokenRepo.GetUserIdByToken(token);
 
-        //}
+            if (string.IsNullOrEmpty(uId))
+            {
+                dataTrans.IsLoginSucces = false;
+                return dataTrans;
+            }
+
+            var usr = await UserRepo.GetByidUser(uId);
+            if (usr != null)
+            {
+                bool loginSuc = tokenRepo.CheckTokenExpried(token);
+                dataTrans.Token = token;
+                dataTrans.UserName = usr.UserName;
+                dataTrans.LevelId = usr.LevelId;
+                dataTrans.FullName = usr.FullName;
+                dataTrans.Id = usr.Id;
+                dataTrans.IsLoginSucces = loginSuc;
+                return dataTrans;
+            }
+            return null;
+
+        }
 
 
         [HttpPost("Register")]
