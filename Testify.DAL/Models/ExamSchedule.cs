@@ -19,7 +19,7 @@ namespace Testify.DAL.Models
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string? Description { get; set; }
-        public bool? Status { get; set; }
+        public byte? Status { get; set; }
         [ForeignKey("SubjectId")]
         public int? SubjectId { get; set; }
         public virtual Subject? Subject { get; set; }

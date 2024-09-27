@@ -25,6 +25,9 @@
     [Parameter]
     public EventCallback<Answer> OnRemove { get; set; }
 
+    [Parameter]
+    public EventCallback<Answer> OnAnswerChanged { get; set; }
+
     private bool isValid;
     private bool IsDisableRemove;
     MudForm form;
@@ -44,9 +47,6 @@
         answer.QuestionId = questionId;
         checkQuestionType();
     }
-
-    [Parameter]
-    public EventCallback<Answer> OnAnswerChanged { get; set; }
 
     private async void RemoveForm()
     {

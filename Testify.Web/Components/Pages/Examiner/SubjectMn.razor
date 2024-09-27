@@ -1,5 +1,6 @@
 ﻿@page "/Examiner/SubjectManagement"
 @using Testify.DAL.Models
+@using Testify.Web.Data.Commons
 @layout AdminLayout
 @inject IDialogService DialogService
 <style>
@@ -25,7 +26,7 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create ,-1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -54,26 +55,16 @@
             </HeaderContent>
            
             <RowTemplate>    
-                @if(subject?.Count == 0 || subject == null)
-                {
-                    <h5>Empty</h5>
-                }
-                else
-                {
-                    @foreach(var item in subject)
-                    {
-                        <MudTd DataLabel="Mã môn học">@item.Id</MudTd>
-                        <MudTd DataLabel="Tên môn học">@item.Name</MudTd>
-                        <MudTd DataLabel="Mô tả">@item.Description</MudTd>
-                        <MudTd DataLabel="Trạng thái">@item.Status</MudTd>
+
+                <MudTd DataLabel="Mã môn học">@context.Id</MudTd>
+                <MudTd DataLabel="Tên môn học">@context.Name</MudTd>
+                <MudTd DataLabel="Mô tả">@context.Description</MudTd>
+                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
                         <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,Index))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,Index))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,Index))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                         </MudTd>
-                    }
-           
-                }
                       
             </RowTemplate>
             <NoRecordsContent>
@@ -102,26 +93,51 @@
         subject = await _serSub.GetAllSub();
     }
 
+    [Parameter]
+    public int idSubject { get; set; }
+
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
-        if (name.Equals("create"))
+        var dialogParametersUpdate = new DialogParameters<Dialog.Subject.UpdateSubjectDialog>
         {
-            return DialogService.ShowAsync<Dialog.Subject.CreateSubjectDialog>("Options Dialog", options);
+            {x => x.idSubject, id}
+        };
+
+        var dialogParametersDel = new DialogParameters<Dialog.Subject.DeleteSubjectDialog>
+        {
+            {x => x.idSubject, id}
+        };
+
+        var dialogParametersQuestionId = new DialogParameters<Dialog.Subject.DetailsSubjectDialog>
+        {
+            {x => x.idSubject, id}
+        };
+
+
+        if (name.Equals(OpenDialogType.Create))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Subject.CreateSubjectDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+
         }
-        else if (name.Equals("update"))
+        else if (name.Equals(OpenDialogType.Update))
         {
-            return DialogService.ShowAsync<Dialog.Subject.UpdateSubjectDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
+            var result = await dialog.Result;
+
         }
-        else if (name.Equals("details"))
+        else if (name.Equals(OpenDialogType.Detail))
         {
-            return DialogService.ShowAsync<Dialog.Subject.DetailsSubjectDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Account.DetailsAccountManagement>("Options Dialog", dialogParametersQuestionId, options);
+            var result = await dialog.Result;
         }
         else
         {
-            return DialogService.ShowAsync<Dialog.Subject.DeleteSubjectDialog>("Options Dialog", options);
-        }
+            var dialog = await DialogService.ShowAsync<Dialog.Account.DeleteAccountManagement>("Options Dialog", dialogParametersDel, options);
+            var result = await dialog.Result;
 
+        }
     }
 }

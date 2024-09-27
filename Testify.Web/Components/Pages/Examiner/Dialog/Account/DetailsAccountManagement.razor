@@ -1,4 +1,5 @@
-﻿<MudDialog>
+﻿@using Testify.DAL.Models
+<MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Class="mr-3 mb-n1" />
@@ -6,16 +7,20 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Disabled Label="Mã tài khoản" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Họ và tên" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Ngày sinh" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Số điện thoại" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Địa chỉ" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Level" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Tên tài khoản" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Email" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Lần cuối đăng nhập" ReadOnly="true" />
-        <MudTextField T="string" Disabled Label="Trạng thái" ReadOnly="true" />
+        <MudForm Model="@users">
+
+            <MudTextField T="Guid" @bind-Value="@users.Id" Label="Mã tài khoản"  ReadOnly=true/>
+            <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" ReadOnly=true />
+            <MudTextField T="DateTime" @bind-Value="@users.DateOfBirth" Label="Ngày sinh" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" ReadOnly=true />
+            <MudTextField T="int" @bind-Value="@users.LevelId" Label="Level" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@users.Email" Label="Email" ReadOnly=true />
+            <MudTextField T="DateTime?" @bind-Value="@users.LastLogin" Label="Lần cuối đăng nhập" ReadOnly=true />
+            <MudTextField T="byte" @bind-Value="@users.Status" Label="Trạng thái" ReadOnly=true />
+        </MudForm>
+        
 
     </DialogContent>
     <DialogActions>
@@ -27,6 +32,15 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
+    [Parameter]
+    public Guid UserId { get; set; }
+
+    private User users { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await _serLec.GetLecturerById(UserId);
+    }
     private void Submit() => MudDialog.Close(DialogResult.Ok(true));
 
     private void Cancel() => MudDialog.Cancel();

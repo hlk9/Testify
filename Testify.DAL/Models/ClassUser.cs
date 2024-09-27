@@ -18,7 +18,7 @@ namespace Testify.DAL.Models
         [ForeignKey("UserId")]
         public Guid UserId { get; set; }
         public virtual User User { get; set; }
-        public bool? Status { get; set; } = true;
+        public byte? Status { get; set; }
 
     }
 }
