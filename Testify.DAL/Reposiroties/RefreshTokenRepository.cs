@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,13 +17,13 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public string GetUserIdByToken(string token)
+        public async Task<string> GetUserIdByToken(string token)
         {
-            var usr = _context.RefreshTokens.FirstOrDefault(x => x.Token == token);
+            var usr = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token.Equals(token.Replace("\"","")));
 
             if (usr != null)
             {
-                return usr.UserId.ToString();
+                return  usr.UserId.ToString();
             }
             return null;
 
@@ -66,9 +67,9 @@ namespace Testify.DAL.Reposiroties
 
         }
 
-        public bool CheckTokenExpried(Guid uid, string token)
+        public bool CheckTokenExpried(string token)
         {
-            var tok = _context.RefreshTokens.FirstOrDefault(x => x.UserId == uid && x.Token == token && x.ExpiryDate>DateTime.UtcNow);
+            var tok = _context.RefreshTokens.FirstOrDefault(x =>  x.Token == token.Replace("\"","") && x.ExpiryDate>DateTime.UtcNow);
 
             if (tok != null)
                 return true;

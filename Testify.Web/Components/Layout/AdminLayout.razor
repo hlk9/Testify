@@ -1,44 +1,21 @@
 ﻿@inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
+@if (isLoading == true)
+{
+    <MudOverlay Visible="isLoading" Style="background-color:white; opacity:1;" LightBackground="true" LockScroll="true" Absolute="true">
+        <MudProgressCircular Color="Color.Success" Size="Size.Large" Indeterminate="true" />
+        <MudText Color="Color.Secondary"  Align="Align.Center" >Đang xử lý</MudText>
+    </MudOverlay>
+}
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-    @* <MudGrid>
-    <MudItem xs="3">
-    <MudPaper>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="0">
-    <NavAdmin></NavAdmin>
-    </MudDrawer>
-    </MudPaper>
-    </MudItem>
 
-    <MudItem xs="9">
-    <MudMainContent Class="pt-0">
-    <MudAppBar Elevation="1">
-    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-    <MudLink Typo="Typo.h5" Class="ml-3" Color="Color.Primary" Href="/">Testify</MudLink>
-    <MudSpacer />
-    <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-    <MudMenu>
-    <ActivatorContent>
-    <MudAvatar Color="Color.Tertiary">L</MudAvatar>
-    </ActivatorContent>
-    <ChildContent>
-    <MudMenuItem>Thông tin cá nhân</MudMenuItem>
-    <MudMenuItem>Đăng xuất</MudMenuItem>
+   
 
-    </ChildContent>
-    </MudMenu>
-
-    </MudAppBar>
-
-    @Body
-    </MudMainContent>
-    </MudItem>
-    </MudGrid> *@
     <MudDrawer @bind-Open="@_open" ClipMode="_clipMode" Elevation="1" Variant="@DrawerVariant.Responsive">
         <NavAdmin></NavAdmin>
     </MudDrawer>
@@ -85,8 +62,11 @@
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
 
-    protected override void OnInitialized()
+
+
+    protected  override void OnInitialized()
     {
+
         base.OnInitialized();
 
         _theme = new()
@@ -95,7 +75,80 @@
                 PaletteDark = _darkPalette,
                 LayoutProperties = new LayoutProperties()
             };
+
+
+
     }
+
+    private bool isTokenValid = true;
+    private bool isLoading = true;
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && isLoading == true)
+        {
+            isTokenValid =  await CheckingToken();
+            isLoading = false;
+            StateHasChanged();
+            if (isTokenValid == false)
+            {
+                navigation.NavigateTo("/");
+               
+            }
+            
+        }
+    }
+    private async Task<bool> CheckingToken()
+    {
+        var token = await localStorage.GetItemAsStringAsync("token");
+        if (string.IsNullOrEmpty(token))
+        {
+            return false;
+        }
+        else
+        {
+            var modelLogin = await _serviceAccess.CheckAccessStatusByToken(token);
+            if (modelLogin.IsLoginSucces != true)
+            {
+                return false;
+            }
+            if (modelLogin.IsLoginSucces == true && modelLogin.LevelId != 1)
+            {
+                return false;
+            }
+
+        }
+        return true;
+    }
+
+
+    // protected async override void OnAfterRender(bool firstRender)
+    // {
+    //     var token = await localStorage.GetItemAsStringAsync("token");
+    //     if (string.IsNullOrEmpty(token))
+    //     {
+    //         navigation.NavigateTo("/");
+    //     }
+    //     else
+    //     {
+    //         var modelLogin = await _serviceAccess.CheckAccessStatusByToken(token);
+    //         if (modelLogin.IsLoginSucces != true)
+    //         {
+    //             navigation.NavigateTo("/");
+    //         }
+    //         if (modelLogin.IsLoginSucces == true && modelLogin.LevelId != 1)
+    //         {
+    //             navigation.NavigateTo("/");
+    //         }
+
+
+    //     }
+
+
+    // }
+
+
+
+
 
     private async void Logout()
     {
