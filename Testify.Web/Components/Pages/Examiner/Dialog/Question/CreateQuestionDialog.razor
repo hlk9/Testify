@@ -294,7 +294,7 @@
         }
         else
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/ImageUploads", newNameFile);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Uploads", newNameFile);
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await selectFile.OpenReadStream().CopyToAsync(stream);
