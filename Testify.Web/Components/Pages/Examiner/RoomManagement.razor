@@ -55,27 +55,25 @@
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                @if (room?.Count == 0 || room == null)
-                {
-                    <h5>Empty</h5>
-                }
-                else
-                {
-                    @foreach(var item in room )
+                <MudTd DataLabel="Mã phòng">@context.Id</MudTd>
+                <MudTd DataLabel="Tên phòng">@context.Name</MudTd>
+                <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                <MudTd DataLabel="Địa chỉ">@context.Address</MudTd>
+                <MudTd DataLabel="Trạng thái">
+                    @if(context.Status == true)
                     {
-                        <MudTd DataLabel="Mã phòng">@context.Id</MudTd>
-                        <MudTd DataLabel="Tên phòng">@context.Name</MudTd>
-                        <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
-                        <MudTd DataLabel="Địa chỉ">@context.Address</MudTd>
-                        <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
-                        <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                        </MudTd>
-                    } 
-                }
-                
+                        <span>Hoạt động</span>
+                    }
+                    else
+                    {
+                        <span>Không hoạt động</span>
+                    }
+                </MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                </MudTd>
             </RowTemplate>
             <NoRecordsContent>
                 <MudText>No matching records found</MudText>

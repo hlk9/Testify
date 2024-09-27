@@ -33,10 +33,10 @@
 
     private User user { get; set; }
 
-    protected async override Task OnInitializedAsync()
-    {
-        user = await _serLec.GetLecturerById(UserId);
-    }
+    // protected async override Task OnInitializedAsync()
+    // {
+    //     user = await _serLec.GetLecturerById(UserId);
+    // }
 
     private void Submit() => MudDialog.Close(DialogResult.Ok(true));
 
