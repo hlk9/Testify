@@ -24,4 +24,7 @@
   <ItemGroup>
     <None Include="wwwroot\*" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\Uploads\" />
+  </ItemGroup>
 </Project>
