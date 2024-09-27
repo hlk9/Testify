@@ -25,7 +25,7 @@
                         </div>
 
                         <div>
-                            <MudTextField @bind-Value="question.DocumentURL" For="@(() => question.DocumentURL)" Style="padding: 0" T="string" Label="Link Câu Hỏi"/>
+                            <MudTextField @bind-Value="question.DocumentPath" For="@(() => question.DocumentPath)" Style="padding: 0" T="string" Label="Link Câu Hỏi" />
                         </div>
 
                         <MudSelect T="int" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
@@ -210,7 +210,7 @@
             snackbar.Add("Nội dung trống!", Severity.Error);
             count += 1;
         }
-        if(question.DocumentURL == null || question.DocumentURL.Trim().Length == 0)
+        if (question.DocumentPath == null || question.DocumentPath.Trim().Length == 0)
         {
             snackbar.Add("Đường dẫn trống!", Severity.Error);
             count += 1;
