@@ -229,6 +229,12 @@
             {x => x.questionId, id}
         };
 
+        var dialogParametersCreateAnswer = new DialogParameters<Dialog.Answer.CreateAnswerDialog>
+        {
+            {x => x.isQuestionId, true},
+            {y => y.questionIdParams, -1}
+        };
+
         if(name.Equals(OpenDialogType.ShowAnswer))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.ListAnswerDialog>("Options Dialog", dialogParametersQuestionId, options);
@@ -240,7 +246,7 @@
         } 
         else if (name.Equals(OpenDialogType.ShowDialogAddNewAnswer))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", dialogParametersCreateAnswer, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
