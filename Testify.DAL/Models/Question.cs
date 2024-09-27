@@ -14,7 +14,7 @@ namespace Testify.DAL.Models
         public DateTime CreatedDate { get; set; }
         public byte? Status { get; set; }
         public int SubjectId { get; set; }
-        public string DocumentURL { get; set; }
+        public string? DocumentPath { get; set; }
         [ForeignKey("QuestionTypeId")]
         public int QuestionTypeId { get; set; }
          public virtual QuestionType? QuestionType { get; set; }
