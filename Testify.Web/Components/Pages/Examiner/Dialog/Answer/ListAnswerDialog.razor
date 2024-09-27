@@ -10,6 +10,7 @@
                 <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Danh Sách Câu Hỏi</MudText>
             </MudItem>
             <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
+                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Class="button-add-answer-to-question" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
             </MudItem>
         </MudGrid>
         
@@ -31,17 +32,21 @@
                         <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Id đáp án" hidden>@context.Id</MudTd>
-                        <MudTd DataLabel="Nội dung đáp án">@context.Content</MudTd>
-                        <MudTd DataLabel="Đúng/Sai">
-                            @(context.IsCorrect == true ? "Đúng" : "Sai")
-                        </MudTd>
-                        <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
-                        <MudTd DataLabel="Thao tác">
-                            <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Update, context.Id))"></MudIconButton>
+                        @if (context.Status == Convert.ToByte(StatusType.isActive))
+                        {
+                            <MudTd DataLabel="Id đáp án" hidden>@context.Id</MudTd>
+                            <MudTd DataLabel="Nội dung đáp án">@context.Content</MudTd>
+                            <MudTd DataLabel="Đúng/Sai">
+                                @(context.IsCorrect == true ? "Đúng" : "Sai")
+                            </MudTd>
+                            <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
+                            <MudTd DataLabel="Thao tác">
+                                <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Update, context.Id))"></MudIconButton>
 
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))" Disabled="CheckTypeQuestion"></MudIconButton>
-                        </MudTd>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))" Disabled="CheckTypeQuestion"></MudIconButton>
+                            </MudTd>
+                        }
+                        
                     </RowTemplate>
 
                     <NoRecordsContent>
@@ -87,7 +92,7 @@
         await loadData();
     }
 
-    private readonly DialogOptions _MediumWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
     private readonly DialogOptions _SmallWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
@@ -100,7 +105,14 @@
         };
         var dialogParametersDelete = new DialogParameters<Dialog.Answer.DeleteAnswerDialog>
         {
-            {x => x.answerId, id}
+            {x => x.answerId, id},
+            {y => y.QuestionIdOfAnswer, questionId}
+        };
+
+        var dialogParametersCreateAnswer = new DialogParameters<Dialog.Answer.CreateAnswerDialog>
+        {
+            {x => x.isQuestionId, false},
+            {y => y.questionIdParams, questionId}
         };
 
         if (name.Equals(OpenDialogType.Update))
@@ -115,6 +127,15 @@
         else if (name.Equals(OpenDialogType.Delete))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.DeleteAnswerDialog>("Options dialog", dialogParametersDelete, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await loadData();
+            }
+        }
+        else if (name.Equals(OpenDialogType.ShowDialogAddNewAnswer))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", dialogParametersCreateAnswer, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {

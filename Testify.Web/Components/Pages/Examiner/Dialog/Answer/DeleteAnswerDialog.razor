@@ -21,6 +21,9 @@
     [Parameter]
     public int answerId { get; set; }
 
+    [Parameter]
+    public int QuestionIdOfAnswer { get; set; }
+
     MudForm form;
 
     [CascadingParameter]
@@ -31,34 +34,56 @@
         answer = await _serAnswer.GetById(answerId);
     }
 
+    private async Task<bool> checkQuantityAnswer()
+    {
+        var question = await _serQuestion.GetQuestionById(QuestionIdOfAnswer);
+
+        var lstAnswerOfQuestionId = await _serAnswer.GetAllByQuestionId(QuestionIdOfAnswer);
+        var lstNoCurrentAswer = lstAnswerOfQuestionId.Where(x => x.Id != answer.Id && x.Status == Convert.ToByte(StatusType.isActive)).ToList();
+
+        int countCorrect = lstNoCurrentAswer.Count(x => x.IsCorrect);
+        int countIsCorrect = lstNoCurrentAswer.Count(x => !x.IsCorrect);
+
+        if (answer.IsCorrect == true && countCorrect == 0)
+        {
+            snackbar.Add("Không thể xóa đáp án. Phải ít nhất 1 đáp án đúng", Severity.Error);
+            return true;
+        }
+        else if(answer.IsCorrect == false && countIsCorrect == 0 && question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+        {
+            snackbar.Add("Không thể xóa đáp án. Phải ít nhất 1 đáp án sai", Severity.Error);
+            return true;
+        }
+
+        if(lstNoCurrentAswer.Count == 1 && lstNoCurrentAswer != null)
+        {
+            snackbar.Add("Phải có tối thiểu 2 đáp án", Severity.Error);
+            return true;
+        }
+
+        return false;
+    }
+
     private async Task Submit()
     {
-        var deleteAnswer = await _serAnswer.UpdateStatus(answerId, Convert.ToByte(StatusType.noAnswer));
+        var checkAnswer = await checkQuantityAnswer();
 
-        if(deleteAnswer != null)
+        if(!checkAnswer)
         {
-            var lstAnswer = await _serAnswer.GetAllByQuestionId(answer.QuestionId);
-            var count = 0;
-            foreach (var item in lstAnswer)
+            var deleteAnswer = await _serAnswer.UpdateStatus(answerId, Convert.ToByte(StatusType.noAnswer));
+
+            if (deleteAnswer != null)
             {
-                if(item.Status == Convert.ToByte(StatusType.isActive))
-                {
-                    count++;
-                    break;
-                }
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Xóa thành công!!", Severity.Success);
             }
-            if(count == 0)
+            else
             {
-                await _serQuestion.UpdateStatus(answer.QuestionId, Convert.ToByte(StatusType.noAnswer));
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Xóa thất bại!!", Severity.Error);
             }
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thành công!!", Severity.Success);
         }
-        else
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thất bại!!", Severity.Error);
-        }
+        
     }
 
     private void Cancel() => MudDialog.Cancel();

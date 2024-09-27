@@ -246,7 +246,7 @@
 
     private bool CheckAnswerIscorrect()
     {
-        if (lstAnswers != null && lstAnswers.Count != 0)
+        if (lstAnswers != null && lstAnswers.Count > 0)
         {
             int count = lstAnswers.Count(x => x.IsCorrect);
 
@@ -313,18 +313,25 @@
 
     private async Task Submit()
     {
-        var checkIscorrect = CheckAnswerIscorrect();
-        var checkValidation = ValidationForm();
-
         bool allValid = true;
-
+        int countAnswer = 0;
         foreach (var form in answerForms)
         {
             if (!await form.ValidateAsync())
             {
                 allValid = false;
             }
+            countAnswer++;
         }
+
+        if(countAnswer <= 1 && lstAnswers != null && lstAnswers.Count != 0)
+        {
+            snackbar.Add("Phải có tối thiểu 2 đáp án", Severity.Error);
+            return;
+        }
+
+        var checkIscorrect = CheckAnswerIscorrect();
+        var checkValidation = ValidationForm();
 
         if (allValid)
         {
