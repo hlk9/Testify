@@ -7,9 +7,7 @@
     </TitleContent>
     <DialogContent>
         <MudForm Model="@room">
-
-        <MudTextField T="int" @bind-Value="@room.Id" Label="Mã phòng"  />
-        <MudTextField T="string" @bind-Value="@room.Name" Label="Tên phòng"  />
+            <MudTextField T="string" @bind-Value="@room.Name" Label="Tên phòng" />
             <MudTextField T="int" @bind-Value="@room.Capacity" Label="Số lượng" />
             <MudTextField T="string" @bind-Value="@room.Address" Label="Địa chỉ" />
             <MudTextField T="bool?" @bind-Value="@room.Status" Label="Trạng thái" />
@@ -31,7 +29,7 @@
     private async Task Submit()
     {
         var check = await _serRoom.CreateRoom(room);
-        if(check == true)
+        if (check == true)
         {
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Thêm thành công", Severity.Success);

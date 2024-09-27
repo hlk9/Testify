@@ -36,17 +36,17 @@
 
     private async Task Submit()
     {
-        var check = await _serLec.CreateLecturer(users);
-        if(check == true)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thành công", Severity.Success);
-        }
-        else
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thất bại", Severity.Error);
-        }
+        // var check = await _serLec.CreateLecturer(users);
+        // if(check == true)
+        // {
+        //     MudDialog.Close(DialogResult.Ok(true));
+        //     snackbar.Add("Thêm thành công", Severity.Success);
+        // }
+        // else
+        // {
+        //     MudDialog.Close(DialogResult.Ok(true));
+        //     snackbar.Add("Thêm thất bại", Severity.Error);
+        // }
     }
 
     private void Cancel() => MudDialog.Cancel();

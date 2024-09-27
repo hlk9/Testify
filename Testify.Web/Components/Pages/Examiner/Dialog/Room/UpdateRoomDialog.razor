@@ -6,11 +6,11 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Disabled Label="Mã phòng" ReadOnly="true" />
-        <MudTextField T="string" @bind-Value="@room.Name" Label="Tên phòng" ReadOnly="true" />
-        <MudTextField T="int" @bind-Value="@room.Capacity" Label="Số lượng" ReadOnly="true" />
-        <MudTextField T="string" @bind-Value="@room.Address" Label="Địa chỉ" ReadOnly="true" />
-        <MudTextField T="bool?" @bind-Value="@room.Status" Label="Trạng thái" ReadOnly="true" />
+        <MudTextField T="string" Disabled Label="Mã phòng"/>
+        <MudTextField T="string" @bind-Value="@room.Name" Label="Tên phòng" />
+        <MudTextField T="int" @bind-Value="@room.Capacity" Label="Số lượng"/>
+        <MudTextField T="string" @bind-Value="@room.Address" Label="Địa chỉ"/>
+        <MudTextField T="bool?" @bind-Value="@room.Status" Label="Trạng thái"/>
 
     </DialogContent>
     <DialogActions>
