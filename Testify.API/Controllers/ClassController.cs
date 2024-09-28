@@ -2,75 +2,50 @@
 using System.Linq;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
+using Testify.DAL.Reposiroties;
 
 namespace Testify.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Class")]
     public class ClassController : ControllerBase
     {
-        TestifyDbContext context;
+        ClassRepository classRepository;
+        public ClassController()
+        {
+            classRepository = new ClassRepository();
+        }
         [HttpGet("Get-Classes")]
-        public List<Class> GetAllClassOfOrganization()
+        public async Task<ActionResult<List<Room>>> GetAll()
         {
-            context = new TestifyDbContext();
-         
-            return context.Classes.ToList();
-
+            var lstClass = await classRepository.GetAllClass();
+            return Ok(lstClass);
         }
-
-        [HttpGet("Get-Class-ByName")]
-        public List<Class> GetClassByName(string keyword, int organizationId)
+        [HttpGet("get-classes-by-id")]
+        public async Task<ActionResult<Class>> GetByIdRoom(int id)
         {
-            context = new TestifyDbContext();
-            return context.Classes.Where(x => x.Name.Contains(keyword)).ToList();
-
+            var objClasses = await classRepository.GetByIdClass(id);
+            return Ok(objClasses);
         }
-
         [HttpPost("Add-Class")]
-        public bool AddClass(Class cls)
+        public async Task<ActionResult<Class>> CreateClass(Class r)
         {
-            context = new TestifyDbContext();
-            context.Classes.Add(cls);
-            return context.SaveChanges() > 0;
+            var addClass = await classRepository.AddClass(r);
+            return Ok(addClass);
         }
 
         [HttpDelete("Delete-Class")]
-        public bool DeleteClass(int classId)
+        public async Task<ActionResult<Class>> DeleteClass(int id)
         {
-            context = new TestifyDbContext();
-
-
-            try
-            {
-                var cls = context.Classes.FirstOrDefault(x => x.Id == classId);
-                context.Classes.Remove(cls);
-                context.SaveChanges();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-          
-
+            var deleteClass = await classRepository.DeleteClass(id);
+            return Ok(deleteClass);
         }
 
         [HttpPut("Update-Class")]
-        public bool UpdateClass(Class classUpdate)
+        public async Task<ActionResult<Class>> UpdateClass(Class r)
         {
-            context = new TestifyDbContext();
-            var classOrigin = context.Classes.Find(classUpdate.Id);
-            if (classOrigin != null)
-            {
-                classOrigin.Name = classUpdate.Name;               
-                classOrigin.Description = classUpdate.Description;
-                classOrigin.Status = classUpdate.Status;
-                context.SaveChanges();
-                return true;
-            }
-            return false;
+            var updateClass = await classRepository.UpdateClass(r);
+            return Ok(updateClass);
         }
-
     }
 }

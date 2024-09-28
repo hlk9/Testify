@@ -20,7 +20,9 @@ builder.Services.AddScoped<QuestionTypeService>();
 builder.Services.AddScoped<QuestionLevelService>();
 builder.Services.AddScoped<SubjectService>();
 builder.Services.AddScoped<AnswerService>();
+builder.Services.AddScoped<LecturerService>();
 builder.Services.AddScoped<RoomService>();
+builder.Services.AddScoped<ClassService>();
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<UserService>();
 
