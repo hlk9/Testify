@@ -6,11 +6,6 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        @* <MudTextField T="string" Label="Mã lớp học" ReadOnly="true" />
-        <MudTextField T="string" Label="Tên lớp học" ReadOnly="true" />
-        <MudTextField T="string" Label="Số lượng" ReadOnly="true" />
-        <MudTextField T="string" Label="Mô tả" ReadOnly="true" />
-        <MudTextField T="string" Label="Trạng thái" ReadOnly="true" /> *@
         <MudForm Spacing="4" Model="@classes" @ref="@form">
             <div>
                 <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" />
