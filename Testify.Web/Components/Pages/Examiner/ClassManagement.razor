@@ -40,7 +40,7 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -102,9 +102,9 @@
                         </MudTd>
 
                         <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                         </MudTd>
                     }
                 }
@@ -148,23 +148,43 @@
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, string name)
     {
-        if (name.Equals("create"))
+        if (name.Equals(OpenDialogType.Create))
         {
-            return DialogService.ShowAsync<Dialog.Class.CreateClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.CreateClassDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
-        else if (name.Equals("update"))
+        else if (name.Equals(OpenDialogType.Update))
         {
-            return DialogService.ShowAsync<Dialog.Class.UpdateClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.UpdateClassDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
-        else if (name.Equals("details"))
+        else if (name.Equals(OpenDialogType.Detail))
         {
-            return DialogService.ShowAsync<Dialog.Class.DetailsClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.DetailsClassDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
         else
         {
-            return DialogService.ShowAsync<Dialog.Class.DeleteClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.DeleteClassDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
 
     }

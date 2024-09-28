@@ -37,14 +37,12 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<Class>($"Class/get-classes-by-id?id={id}");
         }
 
-        public async Task<bool> CreateClass(Class c)
+        public async Task<Class> CreateClass(Class c)
         {
-            var status = await _httpClient.PostAsJsonAsync<Class>("Room/Add-Class", c);
-            if (status.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            return false;
+            var newClass = await _httpClient.PostAsJsonAsync("Class/Add-Class", c);
+            var reponse = await newClass.Content.ReadFromJsonAsync<Class>();
+            return reponse;
+           
         }
 
         public async Task<bool> UpdateClass(Class c)

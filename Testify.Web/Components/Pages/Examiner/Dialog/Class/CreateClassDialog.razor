@@ -1,4 +1,6 @@
-﻿<MudDialog>
+﻿@using Testify.Web.Data.Commons
+@using Testify.Web.Shared
+<MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Class="mr-3 mb-n1" />
@@ -6,33 +8,40 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Spacing="4" Model="@classes" @ref="@form">
-            <div>
-                <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" />
-            </div>
+        @if(isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Spacing="4" Model="@classes" @ref="@form">
+                <div>
+                    <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" />
+                </div>
 
-            <div>
-                <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" />
-            </div>
+                <div>
+                    <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" />
+                </div>
 
-            <div>
-                <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" />
-            </div>
+                <div>
+                    <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" />
+                </div>
 
-            <MudSelect T="Guid" @bind-Value="teacherId" Label="Giáo viên quản lý" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                @if (teacherId == Guid.Empty)
-                {
-                    <MudSelectItem Value="Guid.Empty">Không có giảng viên nào!</MudSelectItem>
-                }
-                else
-                {
-                    @foreach (var itemLevel in _lstTeacher)
+                <MudSelect T="Guid" @bind-Value="teacherId" Label="Giáo viên quản lý" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (teacherId == Guid.Empty)
                     {
-                        <MudSelectItem Value="@itemLevel.Id">@itemLevel.FullName</MudSelectItem>
+                        <MudSelectItem Value="Guid.Empty">Không có giảng viên nào!</MudSelectItem>
                     }
-                }
-            </MudSelect>
-        </MudForm>
+                    else
+                    {
+                        @foreach (var itemLevel in _lstTeacher)
+                        {
+                            <MudSelectItem Value="@itemLevel.Id">@itemLevel.FullName</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudForm>
+        }
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
@@ -44,7 +53,7 @@
     private Class classes { get; set; } = new();
     private List<User> _lstTeacher;
     private Guid teacherId = Guid.Empty;
-
+    private bool isLoading { get; set; } = true;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -65,9 +74,69 @@
             teacherId = Guid.Empty;
         }
 
+        isLoading = false;
     }
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    private bool ValidateForm()
+    {
+        int count = 0;
+        if (classes.Name == null || classes.Name.Trim().Length == 0)
+        {
+            snackbar.Add("Nội dung trống", Severity.Error);
+            count += 1;
+        }
+        if (classes.Description == null || classes.Description.Trim().Length == 0)
+        {
+            snackbar.Add("Nội dung trống", Severity.Error);
+            count += 1;
+        }
+        if (classes.Capacity < 10)
+        {
+            snackbar.Add("Số lượng tối thiểu 10", Severity.Error);
+            count += 1;
+        }
+        if(teacherId == Guid.Empty || teacherId == null)
+        {
+            snackbar.Add("Chưa chọn giáo viên", Severity.Error);
+            count += 1;
+        }
+        if(count > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public string GenerateRandomString()
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        return new string(Enumerable.Repeat(chars, 6)
+                                    .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    private async Task Submit()
+    {
+        var checkValidation = ValidateForm();
+
+        if (!checkValidation)
+        {
+            classes.Status = Convert.ToByte(StatusType.isActive);
+            classes.TeacherId = teacherId;
+            classes.ClassCode = GenerateRandomString();
+            var checkAddClass = await _serClass.CreateClass(classes);
+            if(checkAddClass != null)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thất bại", Severity.Error);
+            }
+        }
+    }
 
     private void Cancel() => MudDialog.Cancel();
 }
