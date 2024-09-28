@@ -20,6 +20,11 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<User>($"Lecturer/Get-Lecturer-By-Id?id={id}");
         }
 
+        public async Task<List<User>> GetAllTeacher()
+        {
+            return await _httpClient.GetFromJsonAsync<List<User>>("Lecturer/Get-All-Teacher");
+        }
+
         public async Task<bool> CreateLecturer(User user)
         {
             var statusCreate = await _httpClient.PostAsJsonAsync<User>("Lecturer/Create-Lecturer", user);

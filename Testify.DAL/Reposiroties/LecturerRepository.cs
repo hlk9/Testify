@@ -22,6 +22,10 @@ namespace Testify.DAL.Reposiroties
             return await _context.Users.ToListAsync();
         }
 
+        public async Task<List<User>> GetAllTeacher()
+        {
+            return await _context.Users.Where(x => x.LevelId == 3).ToListAsync();
+        }
         public async Task<User> GetLecturerById(Guid id)
         {
             return await _context.Users.FindAsync(id);
