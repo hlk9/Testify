@@ -6,12 +6,38 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Label="Mã lớp học" ReadOnly="true" />
+        @* <MudTextField T="string" Label="Mã lớp học" ReadOnly="true" />
         <MudTextField T="string" Label="Tên lớp học" ReadOnly="true" />
         <MudTextField T="string" Label="Số lượng" ReadOnly="true" />
         <MudTextField T="string" Label="Mô tả" ReadOnly="true" />
-        <MudTextField T="string" Label="Trạng thái" ReadOnly="true" />
-       
+        <MudTextField T="string" Label="Trạng thái" ReadOnly="true" /> *@
+        <MudForm Spacing="4" Model="@classes" @ref="@form">
+            <div>
+                <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" />
+            </div>
+
+            <div>
+                <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" />
+            </div>
+
+            <div>
+                <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" />
+            </div>
+
+            <MudSelect T="Guid" @bind-Value="teacherId" Label="Giáo viên quản lý" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                @if (teacherId == Guid.Empty)
+                {
+                    <MudSelectItem Value="Guid.Empty">Không có giảng viên nào!</MudSelectItem>
+                }
+                else
+                {
+                    @foreach (var itemLevel in _lstTeacher)
+                    {
+                        <MudSelectItem Value="@itemLevel.Id">@itemLevel.FullName</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
@@ -19,8 +45,32 @@
     </DialogActions>
 </MudDialog>
 @code {
+    MudForm form;
+    private Class classes { get; set; } = new();
+    private List<User> _lstTeacher;
+    private Guid teacherId = Guid.Empty;
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Loaddata();
+    }
+
+    private async Task Loaddata()
+    {
+        _lstTeacher = await _serLec.GetAllTeacher();
+        if (_lstTeacher.Any())
+        {
+            teacherId = _lstTeacher[0].Id;
+        }
+        else
+        {
+            teacherId = Guid.Empty;
+        }
+
+    }
 
     private void Submit() => MudDialog.Close(DialogResult.Ok(true));
 
