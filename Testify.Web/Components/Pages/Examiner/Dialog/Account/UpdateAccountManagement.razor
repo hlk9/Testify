@@ -7,16 +7,20 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Disabled Label="Mã tài khoản" ReadOnly="true" />
-        <MudTextField T="string" Label="Họ và tên" ReadOnly="true" />
-        <MudTextField T="string" Label="Ngày sinh" ReadOnly="true" />
-        <MudTextField T="string" Label="Số điện thoại" ReadOnly="true" />
-        <MudTextField T="string" Label="Địa chỉ" ReadOnly="true" />
-        <MudTextField T="string" Label="Level" ReadOnly="true" />
-        <MudTextField T="string" Label="Tên tài khoản" ReadOnly="true" />
-        <MudTextField T="string" Label="Email" ReadOnly="true" />
-        <MudTextField T="string" Label="Lần cuối đăng nhập" ReadOnly="true" />
-        <MudTextField T="string" Label="Trạng thái" ReadOnly="true" />
+        <MudForm Model="@user">
+
+            <MudTextField T="Guid" @bind-Value="@user.Id" Label="Mã tài khoản" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@user.FullName" Label="Họ và tên" />
+            <MudTextField T="DateTime" @bind-Value="@user.DateOfBirth" Label="Ngày sinh" />
+            <MudTextField T="string" @bind-Value="@user.PhoneNumber" Label="Số điện thoại"  />
+            <MudTextField T="string" @bind-Value="@user.Address" Label="Địa chỉ"  />
+            <MudTextField T="int" @bind-Value="@user.LevelId" Label="Level" />
+            <MudTextField T="string" @bind-Value="@user.UserName" Label="Tên tài khoản" />
+            <MudTextField T="string" @bind-Value="@user.Email" Label="Email" />
+            @*             <MudTextField T="DateTime?" @bind-Value="@user.LastLogin" Label="Lần cuối đăng nhập" ReadOnly=true />
+            <MudTextField T="byte" @bind-Value="@user.Status" Label="Trạng thái" ReadOnly=true /> *@
+        </MudForm>
+
 
     </DialogContent>
     <DialogActions>
@@ -29,16 +33,29 @@
     private MudDialogInstance MudDialog { get; set; }
 
     [Parameter]
-    public Guid UserId{ get; set; }
+    public Guid UserId { get; set; }
 
-    private User user { get; set; }
+    private User user { get; set; } = new();
 
-    // protected async override Task OnInitializedAsync()
-    // {
-    //     user = await _serLec.GetLecturerById(UserId);
-    // }
+    protected async override Task OnInitializedAsync()
+    {
+        user = await _serLec.GetLecturerById(UserId);
+    }
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    private async Task Submit()
+    {
+        var check = await _serLec.UpdateLecturer(user);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Sửa thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thất bại", Severity.Error);
+        }
+    }
 
     private void Cancel() => MudDialog.Cancel();
 }

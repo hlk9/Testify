@@ -31,10 +31,32 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("get-all-users")]
-        public async Task<ActionResult<List<Room>>> GetAll()
+        public async Task<ActionResult<List<User>>> GetAll()
         {
             var lstUser = await userRepos.GetAllUsers();
             return Ok(lstUser);
         }
+
+        [HttpPost("create-user")]
+        public async Task<ActionResult<User>> CreateAccount(User user)
+        {
+            var newU = await userRepos.AddUser(user);
+            return Ok(newU);
+        }
+
+        [HttpPut("update-user")]
+        public async Task<ActionResult<User>> UpdateAccount(User user)
+        {
+            var editUser = await userRepos.UpdateUser(user);
+            return Ok(editUser);
+        }
+
+        [HttpDelete("delete-user")]
+        public async Task<ActionResult<User>> DeleteAccount(Guid id)
+        {
+            var deleteU = await userRepos.DeleteUser(id);
+            return Ok(deleteU);
+        }
+
     }
 }
