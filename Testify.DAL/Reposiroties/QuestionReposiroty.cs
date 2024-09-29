@@ -18,17 +18,25 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public async Task<List<Question>> GetAllQuestions(string? textSearch)
+        public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
         {
-            if(string.IsNullOrEmpty(textSearch) || textSearch.Length == 0)
+            if((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == false)
             {
                 return await _context.Questions.ToListAsync();
+            }
+            else if((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == true)
+            {
+                return await _context.Questions.Where(x => x.Status == 1 || x.Status == 255).ToListAsync();
+            }
+            else if((textSearch != null || textSearch != "") && isActive == true)
+            {
+                return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1 || x.Status == 255).ToListAsync();
             }
             else
             {
                 return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
             }
-        }
+        3}
 
         public async Task<Question> GetQuestionById(int id)
         {

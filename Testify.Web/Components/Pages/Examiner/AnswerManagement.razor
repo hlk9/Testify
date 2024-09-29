@@ -101,7 +101,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lstQuestion = await _serQuestion.GetAllQuestions("");
+        lstQuestion = await _serQuestion.GetAllQuestions("", true);
         await loadData();
     }
 

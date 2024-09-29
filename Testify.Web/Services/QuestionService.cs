@@ -12,9 +12,9 @@ namespace Testify.Web.Services
             _httpClient = httpClient;   
         }
 
-        public async Task<List<Question>> GetAllQuestions(string textSearch)
+        public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
         {
-            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={textSearch}");
+            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={textSearch}&isActive={isActive}");
             var response = await allQuestion.Content.ReadFromJsonAsync<List<Question>>();
 
             return response;
