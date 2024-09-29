@@ -17,8 +17,8 @@
             <MudTextField T="int" @bind-Value="@users.LevelId" Label="Level" ReadOnly=true />
             <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" ReadOnly=true />
             <MudTextField T="string" @bind-Value="@users.Email" Label="Email" ReadOnly=true />
-            <MudTextField T="DateTime?" @bind-Value="@users.LastLogin" Label="Lần cuối đăng nhập" ReadOnly=true />
-            <MudTextField T="byte" @bind-Value="@users.Status" Label="Trạng thái" ReadOnly=true />
+@*             <MudTextField T="DateTime?" @bind-Value="@users.LastLogin" Label="Lần cuối đăng nhập" ReadOnly=true />
+            <MudTextField T="byte" @bind-Value="@users.Status" Label="Trạng thái" ReadOnly=true /> *@
         </MudForm>
         
 
@@ -35,13 +35,13 @@
     [Parameter]
     public Guid UserId { get; set; }
 
-    private User users { get; set; }
+    private User users { get; set; } = new();
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     users = await _serLec.GetLecturerById(UserId);
-    // }
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    protected override async Task OnInitializedAsync()
+    {
+        users = await _serLec.GetLecturerById(UserId);
+    }
+
 
     private void Cancel() => MudDialog.Cancel();
 }

@@ -19,7 +19,20 @@
     public Guid UserId { get; set; }
 
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    private async Task Submit()
+    {
+        var check = await _serLec.DeleteLecturer(UserId);
+        if(check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thất bại", Severity.Error);
+        }
+    }
 
     private void Cancel() => MudDialog.Cancel();
 }
