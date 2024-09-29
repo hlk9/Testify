@@ -44,8 +44,9 @@ namespace Testify.DAL.Reposiroties
                 var objUpdateClass = await _context.Classes.FindAsync(classes.Id);
 
                 objUpdateClass.Name = classes.Name;
-                objUpdateClass.ClassCode = classes.ClassCode;
+                objUpdateClass.Capacity = classes.Capacity;
                 objUpdateClass.Description = classes.Description;
+                objUpdateClass.TeacherId = classes.TeacherId;
 
                 var updateClass = _context.Classes.Update(objUpdateClass).Entity;
                 await _context.SaveChangesAsync();
@@ -67,6 +68,22 @@ namespace Testify.DAL.Reposiroties
                 return objDeleteClass;
             }
             catch
+            {
+                return null;
+            }
+        }
+        public async Task<Class> UpdateStatusClass(int classId, byte status)
+        {
+            try
+            {
+                var objUpdateClass = await _context.Classes.FindAsync(classId);
+
+                objUpdateClass.Status = status;
+                var updateClass = _context.Classes.Update(objUpdateClass).Entity;
+                await _context.SaveChangesAsync();
+                return updateClass;
+            }
+            catch (Exception)
             {
                 return null;
             }

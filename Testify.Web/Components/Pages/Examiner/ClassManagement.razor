@@ -40,7 +40,7 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create, -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -91,7 +91,7 @@
                         </MudTd>
                         <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
                         <MudTd DataLabel="Trạng thái">
-                            @if (context.Status == 1)
+                            @if (context.Status == Convert.ToByte(StatusType.isActive))
                             {
                                 <span>Hoạt động</span>
                             }
@@ -102,9 +102,9 @@
                         </MudTd>
 
                         <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                         </MudTd>
                     }
                 }
@@ -130,7 +130,7 @@
     private bool isLoading { get; set; } = true;
     private List<User> _lstUser;
 
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+    private int Index = -1;
 
     private List<Class>? classes { get; set; }
 
@@ -148,8 +148,23 @@
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private async Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
+        var updateParaeters = new DialogParameters<Dialog.Class.UpdateClassDialog>
+        {
+            {x => x.ClassId, id}
+        };
+
+        var dialogParametersDel = new DialogParameters<Dialog.Class.DeleteClassDialog>
+        {
+            {x => x.ClassId, id}
+        };
+
+        var dialogParametersDetail = new DialogParameters<Dialog.Class.DetailsClassDialog>
+        {
+            {x => x.ClassId, id}
+        };
+
         if (name.Equals(OpenDialogType.Create))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Class.CreateClassDialog>("Options Dialog", options);
@@ -161,7 +176,7 @@
         }
         else if (name.Equals(OpenDialogType.Update))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Class.UpdateClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.UpdateClassDialog>("Options Dialog", updateParaeters, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -170,7 +185,7 @@
         }
         else if (name.Equals(OpenDialogType.Detail))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Class.DetailsClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.DetailsClassDialog>("Options Dialog", dialogParametersDetail, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -179,7 +194,7 @@
         }
         else
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Class.DeleteClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.DeleteClassDialog>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {

@@ -42,10 +42,17 @@ namespace Testify.API.Controllers
         }
 
         [HttpPut("Update-Class")]
-        public async Task<ActionResult<Class>> UpdateClass(Class r)
+        public async Task<ActionResult<Class>> UpdateClass(Class c)
         {
-            var updateClass = await classRepository.UpdateClass(r);
+            var updateClass = await classRepository.UpdateClass(c);
             return Ok(updateClass);
+        }
+
+        [HttpPut("Update-Status")]
+        public async Task<ActionResult<Class>> UpdateStatus(int classId, byte status)
+        {
+            var updateStatus = await classRepository.UpdateStatusClass(classId, status);
+            return Ok(updateStatus);
         }
     }
 }

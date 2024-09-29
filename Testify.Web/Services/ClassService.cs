@@ -6,21 +6,6 @@ namespace Testify.Web.Services
 {
     public class ClassService
     {
-        //private readonly string baseApiUrl;
-        //public ClassService(IConfiguration configuration)
-        //{
-        //    baseApiUrl = configuration["AppSettings:APIBaseURL"];
-        //}
-
-        //public async Task <List<Class>>GetAllClass()
-        //{
-        //    using (var client = new HttpClient()) { 
-        //    client.BaseAddress = new Uri(baseApiUrl);
-        //        var response = client.GetStringAsync("Class/Get-Classes").Result;
-        //        var lst = JsonConvert.DeserializeObject<List<Class>>(response);
-        //        return lst;
-        //    }
-        //}
         private readonly HttpClient _httpClient;
         public ClassService(HttpClient httpClient)
         {
@@ -45,14 +30,18 @@ namespace Testify.Web.Services
            
         }
 
-        public async Task<bool> UpdateClass(Class c)
+        public async Task<Class> UpdateClass(Class c)
         {
-            var status = await _httpClient.PutAsJsonAsync<Class>("Class/Update-Class", c);
-            if (status.IsSuccessStatusCode)
-            {
-                return true;
-            }
-            return false;
+            var updateClass = await _httpClient.PutAsJsonAsync("Class/Update-Class", c);
+            var reponse = await updateClass.Content.ReadFromJsonAsync<Class>();
+            return reponse;
+        }
+
+        public async Task<Class> UpdateStatus(int id, byte status)
+        {
+            var updateStatus = await _httpClient.PutAsJsonAsync($"Class/Update-Status?classId={id}&status={status}", status);
+            var reponse = await updateStatus.Content.ReadFromJsonAsync<Class>();
+            return reponse;
         }
 
         public async Task<bool> DeleteClass(int id)
