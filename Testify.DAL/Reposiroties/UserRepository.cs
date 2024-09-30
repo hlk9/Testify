@@ -88,7 +88,7 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
-        public async Task<User> DeleteUser(int id)
+        public async Task<User> DeleteUser(Guid id)
         {
             try
             {

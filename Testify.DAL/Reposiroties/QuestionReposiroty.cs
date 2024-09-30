@@ -36,7 +36,7 @@ namespace Testify.DAL.Reposiroties
             {
                 return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
             }
-        3}
+        }
 
         public async Task<Question> GetQuestionById(int id)
         {
