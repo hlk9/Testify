@@ -1,22 +1,50 @@
-﻿<MudDialog>
+﻿
+
+<MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            Thêm mới lịch thi
-        </MudText>
+        <MudText Typo="Typo.h6">Tạo lịch thi mới</MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Label="Mã lịch thi" ReadOnly="true" />
-        <MudTextField T="string" Label="Mã bài thi" ReadOnly="true" />
-        <MudTextField T="string" Label="Thời gian bắt đầu" ReadOnly="true" />
-        <MudTextField T="string" Label="Thời gian kết thúc" ReadOnly="true" />
-        <MudTextField T="string" Label="Trạng thái" ReadOnly="true" />
+
+        <MudTextField T="string" Label="Tiêu đề lịch thi này"></MudTextField>
+        <MudGrid Class="mt-3 mb-3" Justify="Justify.SpaceBetween" Spacing="4">
+            <MudItem Class="w-100">
+                <MudSelect Class="w-100" FullWidth="true" T="string" Dense="true" Label="Chọn môn của lịch thi" Placeholder="Chọn môn" Variant="Variant.Outlined" AdornmentColor="Color.Primary">
+                    <MudSelectItem Value="@("Pizza")" Disabled="true">Pizza (Disabled)</MudSelectItem>
+                    <MudSelectItem Value="@("Burger")">Burger</MudSelectItem>
+                    <MudSelectItem Value="@("Hotdog")">Hot Dog</MudSelectItem>
+                </MudSelect>
+
+                <MudSelect Class="w-100" FullWidth="true" Dense="true" T="string" Label="Chọn bài thi" Placeholder="Chọn" Variant="Variant.Outlined" AdornmentColor="Color.Primary">
+                    <MudSelectItem Value="@("Pizza")" Disabled="true">Pizza (Disabled)</MudSelectItem>
+                    <MudSelectItem Value="@("Burger")">Burger</MudSelectItem>
+                    <MudSelectItem Value="@("Hotdog")">Hot Dog</MudSelectItem>
+                </MudSelect>
+
+            </MudItem>
+            <MudItem Class="w-50">
+                <MudDatePicker Editable="true" DateFormat="dd/MM/yyyy" Label="Ngày bắt đầu" />
+                <MudTimePicker Editable="true" PickerVariant="PickerVariant.Dialog" Label="Thời gian bắt đầu" />
+            </MudItem>
+
+            <MudItem Class="w-50">
+                <MudDatePicker Editable="true" DateFormat="dd/MM/yyyy" Label="Ngày kết thúc" />
+                <MudTimePicker Editable="true" PickerVariant="PickerVariant.Dialog" Label="Thời gian kết thúc" />
+            </MudItem>
+        </MudGrid>
+
+
+        <MudTextField T="string" Label="Ghi chú"></MudTextField>
+      
 
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">Tạo</MudButton>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
     </DialogActions>
 </MudDialog>
+
+
 @code {
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
