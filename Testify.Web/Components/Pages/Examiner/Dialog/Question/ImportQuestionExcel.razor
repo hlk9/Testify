@@ -1,0 +1,211 @@
+﻿@using OfficeOpenXml;
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án bằng file excel</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
+            <MudTextField T="string" @bind-Value="@nameFileCurrent"></MudTextField>
+            <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadChange">
+                <ActivatorContent>
+                    <MudFab StartIcon="@Icons.Material.Filled.FileUpload"
+                            Label="File Excel" />
+                </ActivatorContent>
+            </MudFileUpload>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="bg-transparent mt-3 d-flex justify-content-between align-items-center">
+            <MudButton Class="bg-info text-white" OnClick="@(() => Submit(false))">Kiểm tra file excel</MudButton>
+            <MudText><span style="color: #29a69a;">Số câu đạt:</span> <span class="fw-bold">@lstQuestionExcelPass.Count</span> / @countQuestion</MudText>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="bg-transparent mt-3">
+            @if (lstQuestionExcelFail != null)
+            {
+                <MudTable Items="@lstQuestionExcelFail" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true">
+                    <RowTemplate>
+                        <MudTd DataLabel="Id câu hỏi" hidden>@context.connectionId</MudTd>
+                        <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
+                        <MudTd DataLabel="Ngày tạo">@context.QuestionLevelId</MudTd>
+                        <MudTd DataLabel="Ngày tạo">@context.QuestionTypeId</MudTd>
+                        <MudTd DataLabel="Ngày tạo">@context.SubjectId</MudTd>
+                    </RowTemplate>
+
+                    <NoRecordsContent>
+                        <MudText>No Data</MudText>
+                    </NoRecordsContent>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+            }
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(() => Submit(true))">Thêm mới</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<QuestionInexcel> lstQuestionExcelPass = new List<QuestionInexcel>();
+    private List<QuestionInexcel> lstQuestionExcelFail = new List<QuestionInexcel>();
+    private List<AnswerInExcel> lstAnswerInExcel = new List<AnswerInExcel>();
+    private string nameFileCurrent;
+    private IBrowserFile selectFileCurrent;
+    private string[] allowFileUpload = { ".xlsx", ".xls" };
+    private int countQuestion = 0;
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private async Task UploadChange(IBrowserFile file)
+    {
+        if (file == null)
+        {
+            return;
+        }
+        var contentAfterDotLast = Path.GetExtension(file.Name);
+
+        if (!allowFileUpload.Contains(contentAfterDotLast))
+        {
+            snackbar.Add("Dạng file không đúng. Chỉ nhận file excel!", Severity.Error);
+            return;
+        }
+
+        nameFileCurrent = file.Name;
+        selectFileCurrent = file;
+    }
+
+    private async Task Submit(bool isSubmit)
+    {
+        if (selectFileCurrent == null)
+        {
+            snackbar.Add("Chưa chọn file import", Severity.Error);
+            return;
+        }
+        using var stream = new MemoryStream();
+        await selectFileCurrent.OpenReadStream().CopyToAsync(stream);
+        stream.Position = 0;
+
+        ExcelPackage package = new ExcelPackage(stream);
+        ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+        ExcelWorksheet worksheetQuestion = package.Workbook.Worksheets[0];
+        ExcelWorksheet worksheetAnswer = package.Workbook.Worksheets[1];
+        int rowCount = worksheetQuestion.Dimension.Rows;
+        int colCount = worksheetQuestion.Dimension.Columns;
+
+        lstQuestionExcelPass = new List<QuestionInexcel>();
+        lstQuestionExcelFail = new List<QuestionInexcel>();
+        lstAnswerInExcel = new List<AnswerInExcel>();
+        countQuestion = 0;
+
+        for (int rowQ = 2; rowQ <= worksheetQuestion.Dimension.Rows; rowQ++)
+        {
+            try
+            {
+                countQuestion++;
+                QuestionInexcel question = new QuestionInexcel();
+                question.connectionId = worksheetQuestion.Cells[rowQ, 1].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 1].Value.ToString()) : -1;
+                question.Content = worksheetQuestion.Cells[rowQ, 2].Value != null ? worksheetQuestion.Cells[rowQ, 2].Value.ToString() : "";
+                question.QuestionLevelId = worksheetQuestion.Cells[rowQ, 3].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 3].Value.ToString()) : -1;
+                question.QuestionTypeId = worksheetQuestion.Cells[rowQ, 4].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 4].Value.ToString()) : -1;
+                question.SubjectId = worksheetQuestion.Cells[rowQ, 5].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 5].Value.ToString()) : -1;
+
+                if (question.Content == "" || question.connectionId == -1 || question.QuestionLevelId == -1 || question.QuestionTypeId == -1 || question.SubjectId == -1)
+                {
+                    lstQuestionExcelFail.Add(question);
+                    continue;
+                }
+
+                List<AnswerInExcel> tempAnswer = new List<AnswerInExcel>();
+                bool isValidAnswer = true;
+                int countAnswer = 0;
+
+                for (int rowA = 2; rowA <= worksheetAnswer.Dimension.Rows; rowA++)
+                {
+                    try
+                    {
+                        if (worksheetQuestion.Cells[rowQ, 1].Value.ToString() == worksheetAnswer.Cells[rowA, 1].Value.ToString())
+                        {
+                            countAnswer++;
+                            if (worksheetAnswer.Cells[rowA, 1].Value == null || worksheetAnswer.Cells[rowA, 2].Value == null || worksheetAnswer.Cells[rowA, 3].Value == null)
+                            {
+                                isValidAnswer = false;
+                                break;
+                            }
+                            AnswerInExcel answer = new AnswerInExcel();
+                            answer.ConnectionId = Convert.ToInt32(worksheetAnswer.Cells[rowA, 1].Value.ToString());
+                            answer.Content = worksheetAnswer.Cells[rowA, 2].Value.ToString();
+                            answer.IsCorrect = worksheetAnswer.Cells[rowA, 3].Value.ToString() == "1" ? true : false;
+                            tempAnswer.Add(answer);
+                        }
+                    }
+                    catch { }
+                }
+
+                if (isValidAnswer && tempAnswer.Count == countAnswer)
+                {  
+                    question.Answers = tempAnswer;
+                    lstQuestionExcelPass.Add(question);
+                }
+                else
+                {
+                    lstQuestionExcelFail.Add(question);
+                }
+            }
+            catch { }
+        }
+
+        if(isSubmit == true)
+        {
+            foreach (var item in lstQuestionExcelPass) 
+            {
+                Question q = new Question();
+                q.Content = item.Content;
+                q.QuestionLevelId = item.QuestionLevelId;
+                q.QuestionTypeId = item.QuestionTypeId;
+                q.SubjectId = item.SubjectId;
+                q.Status = 1;
+                q.CreatedDate = DateTime.Now;
+
+                var addNewQuestion = await _serQuestion.CreateQuestion(q);
+
+                if(addNewQuestion != null)
+                {
+                    foreach (var a in item.Answers)
+                    {
+                        Answer ans = new Answer();
+                        ans.QuestionId = addNewQuestion.Id;
+                        ans.Content = a.Content;
+                        ans.IsCorrect = a.IsCorrect;
+                        ans.Status = 1;
+                        await _serAnswer.Create(ans);
+                    }
+                }
+            }
+
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm câu hỏi thành công", Severity.Success);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private class QuestionInexcel()
+    {
+        public int connectionId { get; set; }
+        public string Content { get; set; }
+        public int QuestionLevelId { get; set; }
+        public int QuestionTypeId { get; set; }
+        public int SubjectId { get; set; }
+        public List<AnswerInExcel> Answers { get; set; }
+    }
+
+    private class AnswerInExcel()
+    {
+        public int ConnectionId { get; set; }
+        public string Content { get; set; }
+        public bool IsCorrect { get; set; }
+    }
+}
