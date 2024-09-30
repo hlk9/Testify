@@ -17,19 +17,20 @@
 
         <MudPaper Elevation="0" Class="bg-transparent mt-3 d-flex justify-content-between align-items-center">
             <MudButton Class="bg-info text-white" OnClick="@(() => Submit(false))">Kiểm tra file excel</MudButton>
-            <MudText><span style="color: #29a69a;">Số câu đạt:</span> <span class="fw-bold">@lstQuestionExcelPass.Count</span> / @countQuestion</MudText>
+            <MudText><span style="color: #29a69a;">Số câu đạt:</span> <span class="fw-bold">@_lstQuestionExcelPass?.Count</span> / @countQuestion</MudText>
         </MudPaper>
 
         <MudPaper Elevation="0" Class="bg-transparent mt-3">
-            @if (lstQuestionExcelFail != null)
+            @if (_lstQuestionExcelFail != null)
             {
-                <MudTable Items="@lstQuestionExcelFail" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true">
+                <MudTable Items="@_lstQuestionExcelFail" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true">
                     <RowTemplate>
                         <MudTd DataLabel="Id câu hỏi" hidden>@context.connectionId</MudTd>
                         <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
-                        <MudTd DataLabel="Ngày tạo">@context.QuestionLevelId</MudTd>
-                        <MudTd DataLabel="Ngày tạo">@context.QuestionTypeId</MudTd>
-                        <MudTd DataLabel="Ngày tạo">@context.SubjectId</MudTd>
+                        <MudTd DataLabel="Mã mức độ câu hỏi">@context.QuestionLevelId</MudTd>
+                        <MudTd DataLabel="Mã loại câu hỏi">@context.QuestionTypeId</MudTd>
+                        <MudTd DataLabel="Mã môn">@context.SubjectId</MudTd>
+                        <MudTd DataLabel="Loại lỗi" Style="color: red">@context.ErorrMessage</MudTd>
                     </RowTemplate>
 
                     <NoRecordsContent>
@@ -49,15 +50,31 @@
 </MudDialog>
 
 @code {
-    private List<QuestionInexcel> lstQuestionExcelPass = new List<QuestionInexcel>();
-    private List<QuestionInexcel> lstQuestionExcelFail = new List<QuestionInexcel>();
-    private List<AnswerInExcel> lstAnswerInExcel = new List<AnswerInExcel>();
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Inject]
+    private IDialogService _mudDialogServices { get; set; }
+
+    private List<QuestionInexcel>? _lstQuestionExcelPass;
+    private List<QuestionInexcel>? _lstQuestionExcelFail;
+    private List<AnswerInExcel>? lstAnswerInExcel;
+
+    private List<Subject> _lstSubJect = new List<Subject>();
+    private List<QuestionLevel> _lstQuestionLevel = new List<QuestionLevel>();
+    private List<QuestionType> _lstQuestionType = new List<QuestionType>();
+
     private string nameFileCurrent;
     private IBrowserFile selectFileCurrent;
     private string[] allowFileUpload = { ".xlsx", ".xls" };
     private int countQuestion = 0;
-    [CascadingParameter]
-    private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lstSubJect = await _serSub.GetAllSub();
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
+    }
 
     private async Task UploadChange(IBrowserFile file)
     {
@@ -95,8 +112,8 @@
         int rowCount = worksheetQuestion.Dimension.Rows;
         int colCount = worksheetQuestion.Dimension.Columns;
 
-        lstQuestionExcelPass = new List<QuestionInexcel>();
-        lstQuestionExcelFail = new List<QuestionInexcel>();
+        _lstQuestionExcelPass = new List<QuestionInexcel>();
+        _lstQuestionExcelFail = new List<QuestionInexcel>();
         lstAnswerInExcel = new List<AnswerInExcel>();
         countQuestion = 0;
 
@@ -114,7 +131,26 @@
 
                 if (question.Content == "" || question.connectionId == -1 || question.QuestionLevelId == -1 || question.QuestionTypeId == -1 || question.SubjectId == -1)
                 {
-                    lstQuestionExcelFail.Add(question);
+                    question.ErorrMessage = "Có dữ liệu bị trống. Kiểm tra lại";
+                    _lstQuestionExcelFail.Add(question);
+                    continue;
+                }
+                else if (_lstSubJect.FirstOrDefault(x => x.Id == question.SubjectId) == null)
+                {
+                    question.ErorrMessage = "Mã môn không có trong dữ liệu";
+                    _lstQuestionExcelFail.Add(question);
+                    continue;
+                }
+                else if (_lstQuestionLevel.FirstOrDefault(x => x.Id == question.QuestionLevelId) == null)
+                {
+                    question.ErorrMessage = "Mã mức độ câu hỏi không có trong dữ liệu";
+                    _lstQuestionExcelFail.Add(question);
+                    continue;
+                }
+                else if (_lstQuestionType.FirstOrDefault(x => x.Id == question.QuestionTypeId) == null)
+                {
+                    question.ErorrMessage = "Mã loại câu hỏi không có trong dữ liệu";
+                    _lstQuestionExcelFail.Add(question);
                     continue;
                 }
 
@@ -145,48 +181,60 @@
                 }
 
                 if (isValidAnswer && tempAnswer.Count == countAnswer)
-                {  
+                {
                     question.Answers = tempAnswer;
-                    lstQuestionExcelPass.Add(question);
+                    _lstQuestionExcelPass.Add(question);
                 }
                 else
                 {
-                    lstQuestionExcelFail.Add(question);
+                    question.ErorrMessage = "Câu hỏi có đáp án không hợp lệ (rỗng hoặc sai thông tin nhập vào)";
+                    _lstQuestionExcelFail.Add(question);
                 }
             }
             catch { }
         }
 
-        if(isSubmit == true)
+        if (isSubmit == true)
         {
-            foreach (var item in lstQuestionExcelPass) 
+            var confirm = await _mudDialogServices.ShowMessageBox
+            (
+                "Thông báo",
+                $"Bạn chắc chắn muốn thêm {_lstQuestionExcelPass.Count} / {countQuestion} đạt?",
+                "Xác nhận",
+                cancelText: "Cancel"
+            );
+
+            if (confirm == true)
             {
-                Question q = new Question();
-                q.Content = item.Content;
-                q.QuestionLevelId = item.QuestionLevelId;
-                q.QuestionTypeId = item.QuestionTypeId;
-                q.SubjectId = item.SubjectId;
-                q.Status = 1;
-                q.CreatedDate = DateTime.Now;
-
-                var addNewQuestion = await _serQuestion.CreateQuestion(q);
-
-                if(addNewQuestion != null)
+                foreach (var item in _lstQuestionExcelPass)
                 {
-                    foreach (var a in item.Answers)
+                    Question q = new Question();
+                    q.Content = item.Content;
+                    q.QuestionLevelId = item.QuestionLevelId;
+                    q.QuestionTypeId = item.QuestionTypeId;
+                    q.SubjectId = item.SubjectId;
+                    q.Status = 1;
+                    q.CreatedDate = DateTime.Now;
+
+                    var addNewQuestion = await _serQuestion.CreateQuestion(q);
+
+                    if (addNewQuestion != null)
                     {
-                        Answer ans = new Answer();
-                        ans.QuestionId = addNewQuestion.Id;
-                        ans.Content = a.Content;
-                        ans.IsCorrect = a.IsCorrect;
-                        ans.Status = 1;
-                        await _serAnswer.Create(ans);
+                        foreach (var a in item.Answers)
+                        {
+                            Answer ans = new Answer();
+                            ans.QuestionId = addNewQuestion.Id;
+                            ans.Content = a.Content;
+                            ans.IsCorrect = a.IsCorrect;
+                            ans.Status = 1;
+                            await _serAnswer.Create(ans);
+                        }
                     }
                 }
-            }
 
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm câu hỏi thành công", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm câu hỏi thành công", Severity.Success);
+            }
         }
     }
 
@@ -199,6 +247,7 @@
         public int QuestionLevelId { get; set; }
         public int QuestionTypeId { get; set; }
         public int SubjectId { get; set; }
+        public string? ErorrMessage { get; set; }
         public List<AnswerInExcel> Answers { get; set; }
     }
 
