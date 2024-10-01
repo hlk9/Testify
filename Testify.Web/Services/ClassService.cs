@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -12,9 +13,11 @@ namespace Testify.Web.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<Class>> GetAllClass()
+        public async Task<List<ClassWithUser>> GetAllClass(string? textSearch, bool isActive)
         {
-            return await _httpClient.GetFromJsonAsync<List<Class>>("Class/Get-Classes");
+            var allClass = await _httpClient.GetAsync($"Class/Get-Classes?KeyWord={textSearch}&isActive{isActive}");
+            var response = await allClass.Content.ReadFromJsonAsync<List<ClassWithUser>>();
+            return response;
         }
 
         public async Task<Class> GetClassId(int id)

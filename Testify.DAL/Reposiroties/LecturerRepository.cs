@@ -30,7 +30,6 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Users.FindAsync(id);
         }
-
         public async Task<User> CreateLecturer(User user)
         {
             try
