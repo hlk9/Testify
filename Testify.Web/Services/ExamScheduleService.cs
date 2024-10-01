@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using Testify.API.DTOs;
+using Testify.DAL.Models;
 
 namespace Testify.Web.Services
 {
@@ -79,6 +80,12 @@ namespace Testify.Web.Services
             else { return false; }
            
 
+        }
+
+        public async Task<List<ExamScheduleDto>> GetInforBasic()
+        {
+            var lst = await _httpClient.GetFromJsonAsync<List<ExamScheduleDto>>("ExamSchedule/Get-InfoBasic");
+            return lst;
         }
 
     }
