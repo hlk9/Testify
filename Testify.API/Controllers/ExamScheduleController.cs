@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Testify.API.DTOs;
 using Testify.API.TokenHelper;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
@@ -41,10 +42,10 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Active")]
-        public List<ExamSchedule> GetScheduleActive()
+        public async Task<List<ExamSchedule>> GetScheduleActive()
         {
 
-            return repos.GetSchedulesActive();
+            return await repos.GetSchedulesActive();
         }
 
 
@@ -54,6 +55,27 @@ namespace Testify.API.Controllers
 
             return repos.GetScheduleCurrent();
         }
+
+        [HttpGet("Get-InfoBasic")]
+        public async Task<List<ExamScheduleDto>> GetInfoBasic()
+        {
+            List<ExamScheduleDto> listResult= new List<ExamScheduleDto>();
+            SubjectRepository subjectRepository = new SubjectRepository();
+            
+            var lstSchedule = await repos.GetSchedulesActive();
+            var lstSubject = await subjectRepository.GetAllSubject();
+            //var lstExam = 
+
+          foreach ( var item in lstSchedule )
+            {
+
+                listResult.Add(new ExamScheduleDto { Id = item.Id,Description = item.Description , EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x=>x.Id == item.SubjectId).Name, Title = item.Title});
+
+            }  
+           return listResult;
+
+        }
+
 
         [HttpPut("Update")]
         public bool UpdateSchedule(ExamSchedule schedule)

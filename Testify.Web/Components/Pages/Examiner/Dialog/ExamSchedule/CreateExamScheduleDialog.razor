@@ -80,6 +80,7 @@
             if(stats ==true)
             {
                 Snackbar.Add("Tạo lịch thi mới thành công", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
                 StateHasChanged();
             }
             else

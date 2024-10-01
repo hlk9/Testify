@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,9 +17,9 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public List<ExamSchedule> GetSchedulesActive()
+        public async Task<List<ExamSchedule>> GetSchedulesActive()
         {
-                return _context.ExamSchedules.Where(x=>x.Status==1).ToList();
+                return await _context.ExamSchedules.Where(x=>x.Status==1).ToListAsync();
         }
         public List<ExamSchedule> GetScheduleFuture()
         {
