@@ -24,7 +24,7 @@ namespace Testify.DAL.Models
         public int? SubjectId { get; set; }
         public virtual Subject? Subject { get; set; }
         [ForeignKey("RoomId")]
-        public int RoomId { get; set; }
+        public int? RoomId { get; set; }
         public virtual Room? Room { get; set; }
 
     }

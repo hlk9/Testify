@@ -10,7 +10,22 @@ using Testify.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(
+
+    config =>
+    {
+        config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+
+        config.SnackbarConfiguration.PreventDuplicates = false;
+        config.SnackbarConfiguration.NewestOnTop = false;
+        config.SnackbarConfiguration.ShowCloseIcon = true;
+        config.SnackbarConfiguration.VisibleStateDuration = 10000;
+        config.SnackbarConfiguration.HideTransitionDuration = 500;
+        config.SnackbarConfiguration.ShowTransitionDuration = 500;
+        config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+    }
+
+    );
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -26,6 +41,7 @@ builder.Services.AddScoped<RoomService>();
 builder.Services.AddScoped<ClassService>();
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ExamScheduleService>();
 
 
 
@@ -52,7 +68,7 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {
-    options.Level = System.IO.Compression.CompressionLevel.Optimal;
+    options.Level = System.IO.Compression.CompressionLevel.Fastest;
 });
 
 
@@ -66,7 +82,7 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.PreventDuplicates = false;
     config.SnackbarConfiguration.NewestOnTop = false;
     config.SnackbarConfiguration.ShowCloseIcon = true;
-    config.SnackbarConfiguration.VisibleStateDuration = 10000;
+    config.SnackbarConfiguration.VisibleStateDuration = 3000;
     config.SnackbarConfiguration.HideTransitionDuration = 500;
     config.SnackbarConfiguration.ShowTransitionDuration = 500;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
