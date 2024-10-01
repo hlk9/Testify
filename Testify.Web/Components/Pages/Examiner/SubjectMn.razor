@@ -57,19 +57,21 @@
                     <MudTh><MudTableSortLabel SortLabel="Tên môn học" T="string">Tên môn học</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Mô tả</MudTableSortLabel></MudTh>
                     @* <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh> *@
-                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                    <MudTh Style="text-align:center"><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
                 </HeaderContent>
 
                 <RowTemplate>
 
                     <MudTd DataLabel="Mã môn học">@context.Id</MudTd>
                     <MudTd DataLabel="Tên môn học">@context.Name</MudTd>
-                    <MudTd DataLabel="Mô tả">@context.Description</MudTd>
+                    <MudTd  DataLabel="Mô tả">@context.Description</MudTd>
                     @*  <MudTd DataLabel="Trạng thái">@context.Status</MudTd> *@
-                    <MudTd DataLabel="Thao tác">
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    <MudTd Style="text-align:center" DataLabel="Thao tác">
+                       <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
+                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                      
+
                     </MudTd>
 
                 </RowTemplate>

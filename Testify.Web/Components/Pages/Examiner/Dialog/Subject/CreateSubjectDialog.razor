@@ -8,7 +8,7 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Model="@subject" @ref="@form" >
+        <MudForm Spacing="3" Model="@subject" @ref="@form" >
 
             <MudTextField @bind-Value="@subject.Id" For="@(()=> subject.Id)" T="int" Label="Mã môn học"  />
             <MudTextField @bind-Value="@subject.Name" For="@(()=> subject.Name)" T="string" Label="Tên môn học"  />
