@@ -6,9 +6,12 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="int" @bind-Value="@subject.Id" Disabled Label="Mã môn học"  />
-        <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" />
-        <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả"  />
+        <MudForm Spacing="3">
+            <MudTextField T="int" @bind-Value="@subject.Id" Disabled Label="Mã môn học" />
+            <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" />
+            <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" />
+        </MudForm>
+        
       @*   <MudTextField T="byte?" @bind-Value="@subject.Status" Label="Trạng thái"  /> *@
     </DialogContent>
     <DialogActions>

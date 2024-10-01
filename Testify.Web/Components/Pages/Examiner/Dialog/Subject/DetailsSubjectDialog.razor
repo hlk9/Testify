@@ -5,10 +5,13 @@
             Chi tiết môn học
         </MudText>
     </TitleContent>
-    <DialogContent>
-        <MudTextField T="int" @bind-Value="@subject.Id"  Label="Mã môn học" ReadOnly="true" />
-        <MudTextField T="string" @bind-Value="@subject.Name"  Label="Tên môn học" ReadOnly="true" />
-        <MudTextField T="string" @bind-Value="@subject.Description"  Label="Mô tả" ReadOnly="true" />
+    <DialogContent >
+        <MudForm Spacing="3">
+            <MudTextField T="int" @bind-Value="@subject.Id" Label="Mã môn học" ReadOnly="true" />
+            <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" ReadOnly="true" />
+            <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" ReadOnly="true" />
+        </MudForm>
+       
        @*  <MudTextField T="byte?" @bind-Value="@subject.Status"  Label="Trạng thái" ReadOnly="true" /> *@
     </DialogContent>
     <DialogActions>
