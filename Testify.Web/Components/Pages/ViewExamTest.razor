@@ -1,0 +1,118 @@
+﻿@page "/ViewExam"
+
+<MudPaper Elevation="0" Class="exam_main">
+    <MudPaper Elevation="0" Class="exam_container">
+        <MudPaper Elevation="0" Class="left_panel">
+            <MudPaper Elevation="0" Class="left_panel_header">
+                <MudText Class="text-white">Thời gian còn lại: ...</MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Class="text-white" OnClick="OpenRightContent"></MudIconButton>
+            </MudPaper>
+            <MudPaper Elevation="0" Class="left_panel_content hidden-scroll">
+                <MudPaper Elevation="0" Class="left_panel_content_child">
+                    <MudPaper Elevation="0">
+                        dffdf
+                    </MudPaper>
+                </MudPaper>
+            </MudPaper>
+        </MudPaper>
+        <MudPaper Elevation="0" Class="right_panel_pc">
+            <MudPaper Class="right_panel_header">
+                <MudText Class="text-white">Thí Sinh: <span class="fw-bold">Nguyễn Văn Thị Lò A</span></MudText>
+                <MudText Class="text-white">Thời gian còn lại: <span class="fw-bold">59:03</span></MudText>
+            </MudPaper>
+            <MudPaper Elevation="0" Class="right_panel_content">
+                <MudText Class="text-center w-100 fw-bold fs-4">Cuối kì I</MudText>
+
+                <MudPaper Elevation="0" Class="mt-4 w-100">
+                    <MudPaper Class="right_panel_list_answer" Elevation="0">
+                        <MudButton Class="btn_answer">1</MudButton>
+                        <MudButton Class="btn_answer">2</MudButton>
+                        <MudButton Class="btn_answer">3</MudButton>
+                        <MudButton Class="btn_answer">4</MudButton>
+                        <MudButton Class="btn_answer">5</MudButton>
+                        <MudButton Class="btn_answer">6</MudButton>
+                        <MudButton Class="btn_answer">7</MudButton>
+                        <MudButton Class="btn_answer">8</MudButton>
+                        <MudButton Class="btn_answer">9</MudButton>
+                        <MudButton Class="btn_answer">10</MudButton>
+                        <MudButton Class="btn_answer">11</MudButton>
+                    </MudPaper>
+                </MudPaper>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Class="btn_submit">
+                <MudGrid>
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                        <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a">Rời khỏi</MudButton>
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                        <MudButton Class="w-100 text-white" Style="background-color: #29a69a">Nộp bài</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="@isOpenClassMobile">
+            <MudPaper Elevation="0" Class="check bg-transparent rounded-0">
+                <MudButton Class="bg_black_close rounded-0" OnClick="CloseMobile"></MudButton>
+                <MudPaper Elevation="0" Class="right_panel_content_mobile">
+                    <MudPaper Class="right_panel_header">
+                        <MudText Class="text-white">Thí Sinh: <span class="fw-bold">Nguyễn Văn Thị Lò A</span></MudText>
+                        <MudIconButton Icon="@Icons.Material.Filled.Close" Class="text-white" OnClick="CloseMobile"></MudIconButton>
+                    </MudPaper>
+                    <MudPaper Elevation="0" Class="right_content">
+                        <MudText Class="text-center w-100 fw-bold fs-4">Cuối kì I</MudText>
+
+                        <MudPaper Elevation="0" Class="mt-4 w-100">
+                            <MudPaper Class="right_panel_list_answer" Elevation="0">
+                                <MudButton Class="btn_answer">1</MudButton>
+                                <MudButton Class="btn_answer">2</MudButton>
+                                <MudButton Class="btn_answer">3</MudButton>
+                                <MudButton Class="btn_answer">4</MudButton>
+                                <MudButton Class="btn_answer">5</MudButton>
+                                <MudButton Class="btn_answer">6</MudButton>
+                                <MudButton Class="btn_answer">7</MudButton>
+                                <MudButton Class="btn_answer">8</MudButton>
+                                <MudButton Class="btn_answer">9</MudButton>
+                                <MudButton Class="btn_answer">10</MudButton>
+                                <MudButton Class="btn_answer">11</MudButton>
+                            </MudPaper>
+                        </MudPaper>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Class="btn_submit">
+                        <MudGrid>
+                            <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                                <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a">Rời khỏi</MudButton>
+                            </MudItem>
+                            <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                                <MudButton Class="w-100 text-white" Style="background-color: #29a69a">Nộp bài</MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudPaper>
+            </MudPaper>
+        </MudPaper>
+    </MudPaper>
+</MudPaper>
+
+@code {
+    private string isOpenClassMobile = "right_panel_mobile";
+
+    private void OpenRightContent()
+    {
+        if (isOpenClassMobile == "right_panel_mobile")
+        {
+            isOpenClassMobile = "right_panel_mobile d-block";
+        }
+        else
+        {
+            isOpenClassMobile = "right_panel_mobile";
+        }
+    }
+
+    private void CloseMobile()
+    {
+        isOpenClassMobile = "right_panel_mobile";
+    }
+}
