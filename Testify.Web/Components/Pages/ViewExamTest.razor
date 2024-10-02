@@ -8,11 +8,30 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Class="text-white" OnClick="OpenRightContent"></MudIconButton>
             </MudPaper>
             <MudPaper Elevation="0" Class="left_panel_content hidden-scroll">
-                <MudPaper Elevation="0" Class="left_panel_content_child">
-                    <MudPaper Elevation="0">
-                        dffdf
+                @for (int i = 0; i < 10; i++)
+                {
+                    <MudPaper Elevation="0" Class="w-100 mb-3">
+                        <MudPaper Elevation="0" Class="bg-transparent w-100" Style="border: 1px solid #c6c6c6; padding: 10px; border-radius: unset">
+                            <MudText Class="fw-bold fs-5">@i. Con người đi bằng mấy chân?</MudText>
+                            <MudGrid Class="mt-1">
+                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">A. 4 chân</MudItem>
+                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">B. 3 chân</MudItem>
+                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">C. 2 chân</MudItem>
+                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">D. 1 chân</MudItem>
+                            </MudGrid>
+                        </MudPaper>
+
+                        <MudPaper Elevation="0" Style="background-color: #29a69a; display: flex; justify-content: left; align-items: center; gap: 15px; padding: 10px 20px; border-radius: unset">
+                            <MudText Class="fw-bold text-white">Đáp án: </MudText>
+                            <MudPaper Elevation="0" Class="bg-transparent d-flex justify-content-start align-items-center gap-3">
+                                <MudButton Class="btn btn-light rounded rounded-circle">A</MudButton>
+                                <MudButton Class="btn btn-light rounded rounded-circle">B</MudButton>
+                                <MudButton Class="btn btn-light rounded rounded-circle">C</MudButton>
+                                <MudButton Class="btn btn-light rounded rounded-circle">D</MudButton>
+                            </MudPaper>
+                        </MudPaper>
                     </MudPaper>
-                </MudPaper>
+                }
             </MudPaper>
         </MudPaper>
         <MudPaper Elevation="0" Class="right_panel_pc">
