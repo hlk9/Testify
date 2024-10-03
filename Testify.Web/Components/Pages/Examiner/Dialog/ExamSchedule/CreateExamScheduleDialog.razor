@@ -117,7 +117,7 @@
     private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
     {
         // In real life use an asynchronous function for fetching data from an api.
-        listSubject = await subjectService.GetAllSub();
+        listSubject = await subjectService.GetAllSub(null,true);
 
 
         if (string.IsNullOrEmpty(value))
@@ -126,12 +126,6 @@
         return listSubject.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
-
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
 
     private async void SubmitValid()
     {
