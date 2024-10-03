@@ -66,7 +66,7 @@
                 <MudTd DataLabel="Thao tác">
                     <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                     <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -94,7 +94,7 @@
         new ChartSeries() { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
         new ChartSeries() { Name = "Sweden", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
     };
-    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };   
+    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
 
     private List<ExamScheduleDto> listSchedule = new List<ExamScheduleDto>();
 
@@ -105,6 +105,24 @@
 
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+
+
+
+    private async Task ShowDeleteDialog(DialogOptions options, int Id)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id }
+        };
+       var dialog= await DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result==null||!result.Canceled)
+        {
+            listSchedule = await scheduleService.GetInforBasic();
+        }
+    }
+
 
     private async Task OpenDialogAsync(DialogOptions options, string name)
     {
@@ -120,15 +138,15 @@
         }
         else if (name.Equals("update"))
         {
-             DialogService.ShowAsync<Dialog.ExamSchedule.UpdateExamScheduleDialog>("Options Dialog", options);
+            DialogService.ShowAsync<Dialog.ExamSchedule.UpdateExamScheduleDialog>("Options Dialog", options);
         }
         else if (name.Equals("details"))
         {
-             DialogService.ShowAsync<Dialog.ExamSchedule.DetailsExamSchedule>("Options Dialog", options);
+            DialogService.ShowAsync<Dialog.ExamSchedule.DetailsExamSchedule>("Options Dialog", options);
         }
         else
         {
-             DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", options);
+            DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", options);
         }
         StateHasChanged();
 

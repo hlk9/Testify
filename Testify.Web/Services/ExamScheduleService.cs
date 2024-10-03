@@ -78,7 +78,7 @@ namespace Testify.Web.Services
 
             }
             else { return false; }
-           
+
 
         }
 
@@ -86,6 +86,12 @@ namespace Testify.Web.Services
         {
             var lst = await _httpClient.GetFromJsonAsync<List<ExamScheduleDto>>("ExamSchedule/Get-InfoBasic");
             return lst;
+        }
+
+        public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end)
+        {
+            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-InTime");
+            return schedule;
         }
 
     }

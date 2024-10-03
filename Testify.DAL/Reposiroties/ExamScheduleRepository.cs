@@ -19,11 +19,11 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<ExamSchedule>> GetSchedulesActive()
         {
-                return await _context.ExamSchedules.Where(x=>x.Status==1).ToListAsync();
+            return await _context.ExamSchedules.Where(x => x.Status == 1).ToListAsync();
         }
         public List<ExamSchedule> GetScheduleFuture()
         {
-            return _context.ExamSchedules.Where(x => x.Status == 1 && x.StartTime>DateTime.Now).ToList();
+            return _context.ExamSchedules.Where(x => x.Status == 1 && x.StartTime > DateTime.Now).ToList();
         }
 
         public List<ExamSchedule> GetSchedulePast()
@@ -33,7 +33,7 @@ namespace Testify.DAL.Reposiroties
 
         public List<ExamSchedule> GetScheduleCurrent()
         {
-            return _context.ExamSchedules.Where(x => x.Status == 1 && x.EndTime > DateTime.Now && x.StartTime>=DateTime.Now).ToList();
+            return _context.ExamSchedules.Where(x => x.Status == 1 && x.EndTime > DateTime.Now && x.StartTime >= DateTime.Now).ToList();
         }
 
         public async Task<bool> AddSchedule(ExamSchedule schedule)
@@ -42,10 +42,10 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 await _context.ExamSchedules.AddAsync(schedule);
-                await _context.SaveChangesAsync();               
+                await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return false;
             }
@@ -70,14 +70,14 @@ namespace Testify.DAL.Reposiroties
                     updateOjb.Exams = schedule.Exams;
                     updateOjb.ExamId = schedule.Id;
                     updateOjb.SubjectId = schedule.SubjectId;
-                    
+
                     _context.ExamSchedules.Update(updateOjb);
                     _context.SaveChangesAsync();
                     return true;
                 }
                 return false;
-               
-               
+
+
             }
             catch (Exception ex)
             {
@@ -109,6 +109,11 @@ namespace Testify.DAL.Reposiroties
             {
                 return false;
             }
+        }
+
+        public async Task<ExamSchedule> CheckIsContaintInTime(DateTime startDate, DateTime endDate)
+        {
+            return await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime || x.StartTime >= startDate && x.EndTime <= endDate || x.StartTime >= startDate && endDate <= x.EndTime || startDate <= x.StartTime && endDate >= x.EndTime);
         }
 
 

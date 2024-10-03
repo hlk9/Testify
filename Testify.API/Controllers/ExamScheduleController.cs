@@ -89,6 +89,12 @@ namespace Testify.API.Controllers
         {
             return repos.DeleteSchedule(id);
         }
+
+        [HttpGet("Get-InTime")]
+        public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end)
+        {
+            return await repos.CheckIsContaintInTime(start, end);
+        }
     }
 
 
