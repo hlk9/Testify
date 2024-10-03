@@ -15,6 +15,11 @@ namespace Testify.API.Controllers
         {
             _respon = new ExamReponsitory();
         }
+        [HttpGet("Get-Active")]
+        public async Task<List<Exam>> GetAllActicve()
+        {
+            return await _respon.GetAllActicve();
+        }
 
         [HttpGet("Get-Exams")]
         public async Task<ActionResult<List<ExamWhitExamDetail>>> GetAll(string? keyword, bool isActive)

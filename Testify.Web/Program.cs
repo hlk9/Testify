@@ -42,6 +42,7 @@ builder.Services.AddScoped<ClassService>();
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ExamScheduleService>();
+builder.Services.AddScoped<ExamService>();
 
 
 

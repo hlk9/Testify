@@ -1,4 +1,6 @@
 ﻿@inject ExamScheduleService scheduleService
+@inject ExamService examService
+@inject SubjectService subjectService
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">Tạo lịch thi mới</MudText>
@@ -9,17 +11,24 @@
             <MudTextField T="string" @bind-Value="@currentSchedule.Title" For="@(() => currentSchedule.Title)" Label="Tiêu đề lịch thi này"></MudTextField>
             <MudGrid Class="mt-3 mb-3" Justify="Justify.SpaceBetween" Spacing="4">
                 <MudItem Class="w-100">
-                    <MudSelect Class="w-100" FullWidth="true" @bind-Value="@currentSubjectId" T="int?" Dense="true" Label="Chọn môn của lịch thi" Placeholder="Chọn môn" Variant="Variant.Outlined" AdornmentColor="Color.Primary">
-                        <MudSelectItem T="int?" Value="1" Disabled="true">Pizza (Disabled)</MudSelectItem>
-                        <MudSelectItem T="int?" Value="2">Burger</MudSelectItem>
-                        <MudSelectItem T="int?" Value="3">Hot Dog</MudSelectItem>
-                    </MudSelect>
 
-                    <MudSelect Class="w-100" FullWidth="true" Dense="true" @bind-Value="@currentExamId" T="int?" Label="Chọn bài thi" Placeholder="Chọn" Variant="Variant.Outlined" AdornmentColor="Color.Primary">
-                        <MudSelectItem T="int?" Value="1" Disabled="true">Pizza (Disabled)</MudSelectItem>
-                        <MudSelectItem T="int?" Value="2">Burger</MudSelectItem>
-                        <MudSelectItem T="int?" Value="3">Hot Dog</MudSelectItem>
-                    </MudSelect>
+                    <MudAutocomplete T="Subject"
+                                     @bind-Value="subjectCurrent"
+                                     SearchFunc="@SearchSubject"
+                                     Variant="Variant.Outlined"
+                                     Label="Môn"
+                                     Placeholder="Chọn môn"
+                                     Clearable="true"
+                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
+
+                    <MudAutocomplete T="Exam"
+                                     @bind-Value="examCurrent"
+                                     SearchFunc="@SearchExam"
+                                     Variant="Variant.Outlined"
+                                     Label="Bài thi"
+                                     Placeholder="Chọn bài thi"
+                                     Clearable="true"
+                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
 
                 </MudItem>
                 <MudItem Class="w-50">
@@ -45,39 +54,116 @@
     </DialogActions>
 </MudDialog>
 
-
 @code {
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
     private ExamSchedule currentSchedule = new ExamSchedule();
-    private int? currentSubjectId;
-    private int? currentExamId;
     private DateTime? startDate;
     private DateTime? endDate;
     private TimeSpan? startTime;
     private TimeSpan? endTime;
+    private List<Exam> listExam;
+    private List<Subject> listSubject;
+    private Exam examCurrent;
+    private Subject subjectCurrent;
+
+    private string[] _states =
+       {
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+        "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
+        "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+        "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+        "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
+        "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
+        "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+        "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    };
+
+
+    private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        listExam = await examService.GetAllActive();
+        List<string> lstString = new List<string>();
+
+        foreach (var item in listExam)
+        {
+            lstString.Add(item.Name);
+        }
+
+        if (string.IsNullOrEmpty(value))
+            return lstString;
+
+        return lstString.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+
+    private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        listExam = await examService.GetAllActive();
+
+
+        if (string.IsNullOrEmpty(value))
+            return listExam;
+
+        return listExam.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+
+    private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        listSubject = await subjectService.GetAllSub(null,true);
+
+
+        if (string.IsNullOrEmpty(value))
+            return listSubject;
+
+        return listSubject.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
 
 
     private async void SubmitValid()
     {
-        currentExamId = 2;
-        currentSubjectId = 1;
-        if (currentExamId == null || currentSubjectId == null || startDate == null || startTime == null || endDate == null || endTime == null)
+        DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
+        DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
+        if (subjectCurrent == null || startDate == null || startTime == null || endDate == null || endTime == null || examCurrent == null)
         {
             Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
             return;
         }
         else
         {
+
+            if (startDate.Value.Date.Add(startTime.Value)>endDate.Value.Date.Add(endTime.Value))
+            {
+                Snackbar.Add("Thất bại, Thời gian không hợp lệ", Severity.Error);
+                return;
+            }
+            else
+            {
+                var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime);
+
+                if(ojb!=null)
+                {
+                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi "+ojb.Title+" Hãy kiểm tra lại", Severity.Error);
+                    return;
+                }
+
+            }
+
             currentSchedule.RoomId = null;
-            currentSchedule.SubjectId = currentSubjectId;
-            currentSchedule.ExamId = (int)currentExamId;
+            currentSchedule.SubjectId = subjectCurrent.Id;
+            currentSchedule.ExamId = examCurrent.Id;
             currentSchedule.StartTime = startDate.Value.Date.Add(startTime.Value);
             currentSchedule.EndTime = endDate.Value.Date.Add(endTime.Value);
             currentSchedule.Status = 1;
             bool stats = await scheduleService.Create(currentSchedule);
-            if(stats ==true)
+            if (stats == true)
             {
                 Snackbar.Add("Tạo lịch thi mới thành công", Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
@@ -86,14 +172,13 @@
             else
             {
                 Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
-            }              
-            
-            
+            }
+
 
         }
     }
 
-  
+
 
     private void Cancel() => MudDialog.Cancel();
 }
