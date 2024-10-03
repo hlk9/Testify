@@ -77,7 +77,7 @@
     {
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
 
-        _lstSubjects = await _serSub.GetAllSub();
+        _lstSubjects = await _serSub.GetAllSub(null, true);
 
         question = await _serQuestion.GetQuestionById(QuestionId);
 

@@ -173,7 +173,7 @@
 
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
 
-        _lstSubjects = await _serSub.GetAllSub();
+        _lstSubjects = await _serSub.GetAllSub(null, true);
 
         if (_lstQuestionLevels.Any())
         {
