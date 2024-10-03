@@ -186,6 +186,7 @@
 
     private async Task LoadData(string? textSearch)
     {
+
         _lstQuestions = await _serQuestion.GetAllQuestions(textSearch, true);
         StateHasChanged();
         isLoading = false;
@@ -193,7 +194,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _lstSubjects = await _serSub.GetAllSub();
+        _lstSubjects = await _serSub.GetAllSub(null, true);
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
         await LoadData("");

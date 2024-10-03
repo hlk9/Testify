@@ -16,9 +16,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("get-all-subject")]
-        public async Task<ActionResult<List<Subject>>> GetAll() 
+        public async Task<ActionResult<List<Subject>>> GetAll(string? keyWord, bool isActive) 
         {
-        var lstSubject = await _repo.GetAllSubject();
+        var lstSubject = await _repo.GetAllSubject(keyWord, isActive);
             return Ok(lstSubject);
         }
 

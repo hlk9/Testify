@@ -63,7 +63,7 @@ namespace Testify.API.Controllers
             SubjectRepository subjectRepository = new SubjectRepository();
             
             var lstSchedule = await repos.GetSchedulesActive();
-            var lstSubject = await subjectRepository.GetAllSubject();
+            var lstSubject = await subjectRepository.GetAllSubject(null, true);
             //var lstExam = 
 
           foreach ( var item in lstSchedule )
