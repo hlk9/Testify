@@ -5,32 +5,48 @@
             Chi tiết môn học
         </MudText>
     </TitleContent>
-    <DialogContent >
-        <MudForm Spacing="3">
-            <MudTextField T="int" @bind-Value="@subject.Id" Label="Mã môn học" ReadOnly="true" />
-            <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" ReadOnly="true" />
-            <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" ReadOnly="true" />
-        </MudForm>
-       
-       @*  <MudTextField T="byte?" @bind-Value="@subject.Status"  Label="Trạng thái" ReadOnly="true" /> *@
+    <DialogContent>
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Model="@subject" @ref="@form" Spacing="3">
+                <MudTextField T="int" @bind-Value="@subject.Id" Label="Mã môn học" ReadOnly="true" />
+                <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" ReadOnly="true" />
+                <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" ReadOnly="true" />
+            </MudForm>
+
+            @*  <MudTextField T="byte?" @bind-Value="@subject.Status"  Label="Trạng thái" ReadOnly="true" /> *@
+        }
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="Variant.Filled" OnClick="Cancel">Quay lại</MudButton>
-       
+
     </DialogActions>
 </MudDialog>
 @code {
-    [CascadingParameter]
-    private MudDialogInstance MudDialog { get; set; }
 
+    MudForm form;
+    [CascadingParameter]
+
+    private MudDialogInstance MudDialog { get; set; }
+    private bool isLoading { get; set; } = true;
     [Parameter]
     public int idSubject { get; set; }
 
     private Subject subject { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
+    private async Task Loaddata()
     {
         subject = await _serSub.GetSubId(idSubject);
+        isLoading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Loaddata();
     }
 
 
