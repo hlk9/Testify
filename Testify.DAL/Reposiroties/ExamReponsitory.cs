@@ -176,5 +176,10 @@ namespace Testify.DAL.Reposiroties
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Exam>> GetAllActicve()
+        {
+            return _context.Exams.Where(x=>x.Status == 1).ToList();
+        }
     }
 }
