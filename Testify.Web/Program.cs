@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using MudBlazor;
 using MudBlazor.Services;
 using System.Globalization;
+using Testify.DAL.Models;
 using Testify.Web.Components;
 using Testify.Web.Services;
 
@@ -42,6 +43,9 @@ builder.Services.AddScoped<ClassService>();
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ExamScheduleService>();
+builder.Services.AddScoped<ExamService>();
+builder.Services.AddScoped<ExamDetailService>();
+builder.Services.AddScoped<ExamDetailQuestionService>();
 
 
 

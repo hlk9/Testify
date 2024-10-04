@@ -1,4 +1,5 @@
 ﻿@page "/ViewExam"
+@using Testify.DAL.ViewModels
 
 <MudPaper Elevation="0" Class="exam_main">
     <MudPaper Elevation="0" Class="exam_container">
@@ -8,29 +9,44 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Class="text-white" OnClick="OpenRightContent"></MudIconButton>
             </MudPaper>
             <MudPaper Elevation="0" Class="left_panel_content hidden-scroll">
-                @for (int i = 0; i < 10; i++)
+                @if (_lstQuestionWithAnswers != null)
                 {
-                    <MudPaper Elevation="0" Class="w-100 mb-3">
-                        <MudPaper Elevation="0" Class="bg-transparent w-100" Style="border: 1px solid #c6c6c6; padding: 10px; border-radius: unset">
-                            <MudText Class="fw-bold fs-5">@i. Con người đi bằng mấy chân?</MudText>
-                            <MudGrid Class="mt-1">
-                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">A. 4 chân</MudItem>
-                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">B. 3 chân</MudItem>
-                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">C. 2 chân</MudItem>
-                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12">D. 1 chân</MudItem>
-                            </MudGrid>
-                        </MudPaper>
+                    foreach (var q in _lstQuestionWithAnswers)
+                    {
+                        stt = 1;
+                        <MudPaper Elevation="0" Class="w-100 mb-5">
+                            <MudPaper Elevation="4" Class="bg-transparent w-100" Style="border-radius: 30px 30px 15px 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                                <MudText Class="fw-bold fs-5 text-white py-4 px-4" Style="background-color: #29a69a; border-radius: 30px 30px 0px 0px"><b>Câu @(stt++):</b> @q.Content</MudText>
+                                <MudGrid Class="pb-4 m-0 w-100" Style="border-radius: 0px 0px 15px 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
+                                    @for (int i = 0; i < q.Answers.Count; i++)
+                                    {
+                                        var answer = q.Answers[i];
+                                        bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == q.Id && x.AnswerId == answer.Id);
+                                        char letter = (char)('A' + i);
 
-                        <MudPaper Elevation="0" Style="background-color: #29a69a; display: flex; justify-content: left; align-items: center; gap: 15px; padding: 10px 20px; border-radius: unset; flex-wrap: wrap">
-                            <MudText Class="fw-bold text-white">Đáp án: </MudText>
-                            <MudPaper Elevation="0" Class="bg-transparent d-flex justify-content-start align-items-center gap-3">
-                                <MudButton Class="btn btn-light rounded rounded-pill">A</MudButton>
-                                <MudButton Class="btn btn-light rounded rounded-pill">B</MudButton>
-                                <MudButton Class="btn btn-light rounded rounded-pill">C</MudButton>
-                                <MudButton Class="btn btn-light rounded rounded-pill">D</MudButton>
+                                        <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                            @if (isSelect)
+                                            {
+                                                <MudButton Class="py-3 text-start w-100 text-truncate text-wrap h-100"
+                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid #29a69a; background-color: #29a69a; color: #fff"
+                                                           OnClick="@(() => SelectAnswer(q.Id, answer.Id))">
+                                                    <MudText><b>@letter.</b> @answer.Content</MudText>
+                                                </MudButton>
+                                            }
+                                            else
+                                            {
+                                                <MudButton Class="py-3 text-start w-100 text-truncate text-wrap h-100"
+                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                           OnClick="@(() => SelectAnswer(q.Id, answer.Id))">
+                                                    <MudText><b>@letter.</b> @answer.Content</MudText>
+                                                </MudButton>
+                                            }
+                                        </MudItem>
+                                    }
+                                </MudGrid>
                             </MudPaper>
                         </MudPaper>
-                    </MudPaper>
+                    }
                 }
             </MudPaper>
         </MudPaper>
@@ -44,17 +60,19 @@
 
                 <MudPaper Elevation="0" Class="mt-4 w-100">
                     <MudPaper Class="right_panel_list_answer" Elevation="0">
-                        <MudButton Class="btn_answer">1</MudButton>
-                        <MudButton Class="btn_answer">2</MudButton>
-                        <MudButton Class="btn_answer">3</MudButton>
-                        <MudButton Class="btn_answer">4</MudButton>
-                        <MudButton Class="btn_answer">5</MudButton>
-                        <MudButton Class="btn_answer">6</MudButton>
-                        <MudButton Class="btn_answer">7</MudButton>
-                        <MudButton Class="btn_answer">8</MudButton>
-                        <MudButton Class="btn_answer">9</MudButton>
-                        <MudButton Class="btn_answer">10</MudButton>
-                        <MudButton Class="btn_answer">11</MudButton>
+                        @foreach (var a in _lstQuestionWithAnswers)
+                        {
+                            sttList = 1;
+                            bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == a.Id);
+                            if (isSelect)
+                            {
+                                <MudButton Class="btn_answer" Style="background-color: #29a69a; color: #fff">@(sttList++)</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton Class="btn_answer">@(sttList++)</MudButton>
+                            }
+                        }
                     </MudPaper>
                 </MudPaper>
             </MudPaper>
@@ -84,17 +102,19 @@
 
                         <MudPaper Elevation="0" Class="mt-4 w-100">
                             <MudPaper Class="right_panel_list_answer" Elevation="0">
-                                <MudButton Class="btn_answer">1</MudButton>
-                                <MudButton Class="btn_answer">2</MudButton>
-                                <MudButton Class="btn_answer">3</MudButton>
-                                <MudButton Class="btn_answer">4</MudButton>
-                                <MudButton Class="btn_answer">5</MudButton>
-                                <MudButton Class="btn_answer">6</MudButton>
-                                <MudButton Class="btn_answer">7</MudButton>
-                                <MudButton Class="btn_answer">8</MudButton>
-                                <MudButton Class="btn_answer">9</MudButton>
-                                <MudButton Class="btn_answer">10</MudButton>
-                                <MudButton Class="btn_answer">11</MudButton>
+                                @foreach (var a in _lstQuestionWithAnswers)
+                                {
+                                    sttList = 1;
+                                    bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == a.Id);
+                                    if (isSelect)
+                                    {
+                                        <MudButton Class="btn_answer" Style="background-color: #29a69a; color: #fff">@(sttList++)</MudButton>
+                                    }
+                                    else
+                                    {
+                                        <MudButton Class="btn_answer">@(sttList++)</MudButton>
+                                    }
+                                }
                             </MudPaper>
                         </MudPaper>
                     </MudPaper>
@@ -115,7 +135,63 @@
     </MudPaper>
 </MudPaper>
 
+
 @code {
+    private List<ExamDetail> _lstexamDetails;
+    private List<ExamDetailQuestion> _lstexamDetailsQuestion;
+    private List<QuestionWithAnswer> _lstQuestionWithAnswers = new List<QuestionWithAnswer>();
+    private List<QuestionAndAnswerChoosen> _lstQAndASelect = new List<QuestionAndAnswerChoosen>();
+    private bool isLoading = true;
+    private int idExam = 2;
+    private int idExamDetail = -1;
+    private int stt;
+    private int sttList;
+
+    private async Task LoadExam()
+    {
+        _lstexamDetails = await _serExamDetail.GetExamDetailByExamId(idExam);
+        Random rad = new Random();
+        var indexExamdetail = rad.Next(_lstexamDetails.Count);
+        idExamDetail = _lstexamDetails[indexExamdetail].Id;
+        _lstexamDetailsQuestion = await _serExamDetailQuestion.GetAllByExamDetailId(idExamDetail);
+        foreach (var item in _lstexamDetailsQuestion)
+        {
+            Question question = await _serQuestion.GetQuestionById(item.QuestionId);
+
+            QuestionWithAnswer questionWithAnswer = new QuestionWithAnswer()
+                {
+                    Id = question.Id,
+                    Content = question.Content,
+                    Answers = await _serAnswer.GetAllByQuestionId(item.QuestionId)
+                };
+
+            _lstQuestionWithAnswers.Add(questionWithAnswer);
+        }
+
+        isLoading = false;
+    }
+
+    private async Task SelectAnswer(int questionId, int answerIdChoose)
+    {
+        if (questionId != null)
+        {
+            var objQuestionAndAnswer = _lstQAndASelect.FirstOrDefault(x => x.QuestionId == questionId);
+            if (objQuestionAndAnswer != null)
+            {
+                objQuestionAndAnswer.AnswerId = answerIdChoose;
+            }
+            else
+            {
+                _lstQAndASelect.Add(new QuestionAndAnswerChoosen { QuestionId = questionId, AnswerId = answerIdChoose });
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExam();
+    }
+
     private string isOpenClassMobile = "right_panel_mobile";
 
     private void OpenRightContent()
