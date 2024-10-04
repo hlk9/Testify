@@ -181,5 +181,10 @@ namespace Testify.DAL.Reposiroties
         {
             return _context.Exams.Where(x=>x.Status == 1).ToList();
         }
+
+        public async Task<List<Exam>> GetAllActicveOfSubject(int subjectId)
+        {
+            return _context.Exams.Where(x => x.Status == 1&&x.SubjectId==subjectId).ToList();
+        }
     }
 }

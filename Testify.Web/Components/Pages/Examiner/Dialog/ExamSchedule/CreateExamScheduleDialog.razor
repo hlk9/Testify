@@ -139,6 +139,13 @@
         else
         {
 
+            if(startDateTime<DateTime.Now.AddMinutes(10))
+            {
+                Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);
+                return;
+            }
+
+
             if (startDate.Value.Date.Add(startTime.Value)>endDate.Value.Date.Add(endTime.Value))
             {
                 Snackbar.Add("Thất bại, Thời gian không hợp lệ", Severity.Error);
@@ -150,7 +157,7 @@
 
                 if(ojb!=null)
                 {
-                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi "+ojb.Title+" Hãy kiểm tra lại", Severity.Error);
+                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi "+ojb.Title+", hãy kiểm tra lại", Severity.Error);
                     return;
                 }
 
