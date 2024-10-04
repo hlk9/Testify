@@ -17,6 +17,13 @@ namespace Testify.Web.Services
             return reponse;
         }
 
+        public async Task<List<Exam>> GetAllActive()
+        {
+            var allExam = await _httpClient.GetAsync($"Exam/Get-Active");
+            var reponse = await allExam.Content.ReadFromJsonAsync<List<Exam>>();
+            return reponse;
+        }
+
         public async Task<Exam> GetExamId(int id)
         {
             return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id={id}");
