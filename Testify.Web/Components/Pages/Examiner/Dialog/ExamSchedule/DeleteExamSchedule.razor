@@ -21,12 +21,20 @@
     [Parameter]
     public int Id { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
-    private async void DeleteExcute()
+    private async Task DeleteExcute()
     {
-         await scheduleService.Delete(Id);
-        Snackbar.Add("Xoá thành công "+Id, Severity.Info);
+        bool stats =  await scheduleService.Delete(Id);
+        if(stats)
+        {
+            Snackbar.Add("Xoá thành công!", Severity.Info);
+            MudDialog.Close(DialogResult.Ok(true));
 
-        MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add("Xoá thất bại", Severity.Error);
+        }
+
     }
 
     private void Submit() => MudDialog.Close(DialogResult.Ok(true));

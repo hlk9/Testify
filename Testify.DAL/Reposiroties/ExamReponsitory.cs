@@ -43,7 +43,8 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<Exam> GetByIdExam(int id)
         {
-            return await _context.Exams.FindAsync(id);
+            var a = await _context.Exams.FindAsync(id);
+            return a;
         }
 
         public async Task<List<ExamWhitExamDetail>> GetAllExamWhitExamDetail(string? textSearch, bool isActive)

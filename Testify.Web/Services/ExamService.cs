@@ -26,7 +26,8 @@ namespace Testify.Web.Services
 
         public async Task<Exam> GetExamId(int id)
         {
-            return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id={id}");
+            var a = await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
+            return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
         }
 
         public async Task<Exam> CreateExam(Exam e)
@@ -54,7 +55,7 @@ namespace Testify.Web.Services
         }
         public async Task<List<Exam>> GetListOfSubject(int id)
         {
-            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamBySubject");
+            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamBySubject?id="+id);
             return lst;
         }
 

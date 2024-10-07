@@ -44,7 +44,7 @@ namespace Testify.Web.Services
 
         public async Task<bool> Update(ExamSchedule schedule)
         {
-            var lst = await _httpClient.PutAsJsonAsync("ExamSchedule/Get-Current", schedule);
+            var lst = await _httpClient.PutAsJsonAsync("ExamSchedule/Update", schedule);
 
             if (lst.IsSuccessStatusCode)
             {
@@ -57,7 +57,7 @@ namespace Testify.Web.Services
 
         public async Task<bool> Delete(int id)
         {
-            var lst = await _httpClient.DeleteAsync($"ExamSchedule/Get-Current?id={id}");
+            var lst = await _httpClient.DeleteAsync($"ExamSchedule/Delete?id={id}");
 
             if (lst.IsSuccessStatusCode)
             {
@@ -91,6 +91,12 @@ namespace Testify.Web.Services
         public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end)
         {
             var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-InTime");
+            return schedule;
+        }
+
+        public async Task<ExamSchedule> GetById(int id)
+        {
+            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-ById?id="+id);
             return schedule;
         }
 
