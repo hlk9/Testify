@@ -1,0 +1,38 @@
+﻿<MudDialog>
+    <TitleContent>
+        Xóa tài khoản
+    </TitleContent>
+    <DialogContent>
+        <MudText>Bạn có muốn xóa không?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="@Color.Error" Variant="Variant.Filled" OnClick="Submit">Xóa</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid UserId { get; set; }
+
+
+    private async Task Submit()
+    {
+        var check = await _serLec.DeleteLecturer(UserId);
+        if(check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

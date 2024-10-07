@@ -1,0 +1,51 @@
+﻿@using Testify.DAL.Models;
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới loại câu hỏi</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Spacing="5" Model="@questionType" @ref="@form">
+            <MudTextField @bind-Value="questionType.Name" For="@(() => questionType.Name)" Style="padding: 0" T="string" Label="Tên Loại Câu Hỏi" />
+            <MudTextField @bind-Value="questionType.Description" For="@(() => questionType.Description)" Style="padding: 0" T="string" Label="Mô Tả" />
+            <MudRadioGroup @bind-Value="StatusQuestionType">
+                <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
+                <MudRadio Value="@(false)">Không hoạt động</MudRadio>
+            </MudRadioGroup>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Thêm mới</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    MudForm form;
+
+    private QuestionType questionType { get; set; } = new();
+
+    private bool StatusQuestionType { get; set; } = true;
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private async void Submit()
+    {
+        questionType.Status = StatusQuestionType;
+        var check = await _serQuestionType.CreateQuestionType(questionType);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

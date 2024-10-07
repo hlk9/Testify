@@ -8,5 +8,27 @@
 @using Microsoft.JSInterop
 @using MudBlazor
 @using MudBlazor.Services
+@using Testify.API.TokenHelper
 @using Testify.Web
 @using Testify.Web.Components
+@using Testify.Web.Components.Layout
+@using Heron.MudCalendar
+@using Testify.Web.Services
+@using Testify.DAL.Models
+@using Microsoft.AspNetCore.Authentication;
+@inject QuestionService _serQuestion
+@inject QuestionTypeService _serQuestionType
+@inject QuestionLevelService _serQuestionLevel
+@inject SubjectService _serSub
+@inject AnswerService _serAnswer
+@inject RoomService _serRoom
+@inject LecturerService _serLec
+@inject ClassService _serClass
+@inject ExamService _serExam
+@inject ExamDetailService _serExamDetail
+@inject ExamDetailQuestionService _serExamDetailQuestion
+@inject NavigationManager navigation
+@inject ISnackbar snackbar
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AccessService _serviceAccess
+@inject UserService _serviceUser

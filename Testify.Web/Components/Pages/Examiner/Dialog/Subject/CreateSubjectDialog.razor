@@ -1,0 +1,67 @@
+﻿@using Testify.DAL.Models
+
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Thêm mới môn học
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (isLoading)
+        {
+            <Testify.Web.Shared.LoadingContext />
+        }
+        else
+        {
+            <MudForm Spacing="3" Model="@subject" @ref="@form">
+
+                <MudTextField @bind-Value="@subject.Id" For="@(()=> subject.Id)" T="int" Label="Mã môn học" />
+                <MudTextField @bind-Value="@subject.Name" For="@(()=> subject.Name)" T="string" Label="Tên môn học" />
+                <MudTextField @bind-Value="@subject.Description" For="@(()=> subject.Description)" T="string" Label="Mô tả" />
+                <MudTextField @bind-Value="@subject.Status" For="@(()=> subject.Status)" T="byte?" Label="Trạng thái" />
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" OnClick=" Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddNew">Tạo</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    private bool isLoading { get; set; } = true;
+    MudForm form;
+    private Subject subject { get; set; } = new();
+
+    [Parameter]
+    public int idSubject { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        isLoading = false;
+    }
+
+    private async Task AddNew()
+    {
+        var check = await _serSub.CreateSub(subject);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

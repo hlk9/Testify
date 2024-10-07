@@ -1,0 +1,90 @@
+﻿@using Testify.DAL.Models
+@using Testify.Web.Data.Commons
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa đáp án</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Bạn chắc chắn muốn xóa đáp án <span style="font-weight: bold">@answer?.Content</span> không?</MudText>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="Submit">Xóa</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private Answer answer { get; set; } = new();
+
+    [Parameter]
+    public int answerId { get; set; }
+
+    [Parameter]
+    public int QuestionIdOfAnswer { get; set; }
+
+    MudForm form;
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        answer = await _serAnswer.GetById(answerId);
+    }
+
+    private async Task<bool> checkQuantityAnswer()
+    {
+        var question = await _serQuestion.GetQuestionById(QuestionIdOfAnswer);
+
+        var lstAnswerOfQuestionId = await _serAnswer.GetAllByQuestionId(QuestionIdOfAnswer);
+        var lstNoCurrentAswer = lstAnswerOfQuestionId.Where(x => x.Id != answer.Id && x.Status == Convert.ToByte(StatusType.isActive)).ToList();
+
+        int countCorrect = lstNoCurrentAswer.Count(x => x.IsCorrect);
+        int countIsCorrect = lstNoCurrentAswer.Count(x => !x.IsCorrect);
+
+        if (answer.IsCorrect == true && countCorrect == 0)
+        {
+            snackbar.Add("Không thể xóa đáp án. Phải ít nhất 1 đáp án đúng", Severity.Error);
+            return true;
+        }
+        else if(answer.IsCorrect == false && countIsCorrect == 0 && question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+        {
+            snackbar.Add("Không thể xóa đáp án. Phải ít nhất 1 đáp án sai", Severity.Error);
+            return true;
+        }
+
+        if(lstNoCurrentAswer.Count == 1 && lstNoCurrentAswer != null)
+        {
+            snackbar.Add("Phải có tối thiểu 2 đáp án", Severity.Error);
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task Submit()
+    {
+        var checkAnswer = await checkQuantityAnswer();
+
+        if(!checkAnswer)
+        {
+            var deleteAnswer = await _serAnswer.UpdateStatus(answerId, Convert.ToByte(StatusType.noAnswer));
+
+            if (deleteAnswer != null)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Xóa thành công!!", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Xóa thất bại!!", Severity.Error);
+            }
+        }
+        
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

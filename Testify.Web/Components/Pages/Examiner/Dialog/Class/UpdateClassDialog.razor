@@ -1,0 +1,136 @@
+﻿@using Testify.Web.Data.Commons
+@using Testify.Web.Shared
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Class="mr-3 mb-n1" />
+            Sửa lớp học
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if(isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Spacing="4" Model="@classes" @ref="@form">
+                <div>
+                    <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" />
+                </div>
+
+                <div>
+                    <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" />
+                </div>
+
+                <div>
+                    <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" />
+                </div>
+
+                <MudSelect T="Guid" @bind-Value="teacherId" Label="Giáo viên quản lý" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (teacherId == Guid.Empty)
+                    {
+                        <MudSelectItem Value="Guid.Empty">Không có giảng viên nào!</MudSelectItem>
+                    }
+                    else
+                    {
+                        @foreach (var itemLevel in _lstTeacher)
+                        {
+                            <MudSelectItem Value="@itemLevel.Id">@itemLevel.FullName</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Warning" Variant="@Variant.Filled" OnClick="Submit">Sửa</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    MudForm form;
+    private Class classes { get; set; } = new();
+    private List<User> _lstTeacher;
+    private Guid teacherId = Guid.Empty;
+    [Parameter]
+    public int ClassId { get; set; }
+    private bool isLoading { get; set; } = true;
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Loaddata();
+    }
+
+    private async Task Loaddata()
+    {
+        classes = await _serClass.GetClassId(ClassId);
+        
+        _lstTeacher = await _serLec.GetAllTeacher();
+        if (classes.TeacherId != null)
+        {
+            teacherId = classes.TeacherId;
+        }
+        else
+        {
+            teacherId = Guid.Empty;
+        }
+
+        isLoading = false;
+    }
+
+    private bool ValidateForm()
+    {
+        int count = 0;
+        if (classes.Name == null || classes.Name.Trim().Length == 0)
+        {
+            snackbar.Add("Nội dung trống", Severity.Error);
+            count += 1;
+        }
+        if (classes.Description == null || classes.Description.Trim().Length == 0)
+        {
+            snackbar.Add("Nội dung trống", Severity.Error);
+            count += 1;
+        }
+        if (classes.Capacity < 10)
+        {
+            snackbar.Add("Số lượng tối thiểu 10", Severity.Error);
+            count += 1;
+        }
+        if (teacherId == Guid.Empty || teacherId == null)
+        {
+            snackbar.Add("Chưa chọn giáo viên", Severity.Error);
+            count += 1;
+        }
+        if (count > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private async Task Submit()
+    {
+        var checkValidation = ValidateForm();
+
+        if (!checkValidation)
+        {
+            classes.TeacherId = teacherId;
+            var checkAddClass = await _serClass.UpdateClass(classes);
+            if (checkAddClass != null)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Sửa thành công", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Sửa thất bại", Severity.Error);
+            }
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

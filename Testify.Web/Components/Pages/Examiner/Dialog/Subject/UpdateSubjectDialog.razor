@@ -1,0 +1,66 @@
+﻿@using Testify.DAL.Models
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Sửa môn học
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Model="@subject" @ref="@form" Spacing="3">
+                <MudTextField T="int" @bind-Value="@subject.Id" Disabled Label="Mã môn học" />
+                <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" />
+                <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" />
+            </MudForm>
+
+            @*   <MudTextField T="byte?" @bind-Value="@subject.Status" Label="Trạng thái"  /> *@
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="Variant.Filled" OnClick="Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="Submit">Sửa</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    MudForm form;
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public int idSubject { get; set; }
+    private bool isLoading { get; set; } = true;
+    private Subject subject { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Loaddata();
+    }
+
+
+    private async Task Loaddata()
+    {
+        subject = await _serSub.GetSubId(idSubject);
+        isLoading = false;
+    }
+    private async Task Submit()
+    {
+        var check = await _serSub.UpdateSub(subject);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Sửa thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Sửa thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

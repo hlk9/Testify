@@ -1,0 +1,144 @@
+﻿@page "/Examiner/AnswerManagement"
+@using Testify.DAL.Models;
+@using Testify.Web.Data.Commons;
+@layout Layout.AdminLayout
+@inject IDialogService DialogService
+
+<style>
+    .input-search-end {
+        color: #8e8e8e;
+        padding-left: 15px;
+    }
+
+    .add-button-end {
+        background-color: #29A69A;
+        color: white;
+        width: 100%;
+    }
+
+        .add-button-end:hover {
+            background-color: white;
+            color: #29a69a;
+        }
+
+    .icon-input-search {
+        padding-left: 100px;
+    }
+</style>
+
+<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-63px)); background-color:#fafafa">
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">ĐÁP ÁN</MudText>
+    </MudPaper>
+    <MudGrid Style="padding:20px 0 ">
+        <MudItem xl="9" lg="8" md="7" sm="6" xs="12">
+
+        </MudItem>
+        <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
+            <MudButton Class="add-button-end" OnClick="@(() => OpenDialogAsync(_MediumWidth, OpenDialogType.Create, -1))" Variant="Variant.Filled">Thêm đáp án cho câu hỏi đã có</MudButton>
+        </MudItem> 
+    </MudGrid>
+
+    <div class="mb-3">
+        <MudSelect @bind-Value="@questionId" T="int" Label="Lưa chọn câu hỏi" SelectedValuesChanged="@(() => reloadAnswers())" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            @if (lstQuestion != null)
+            {
+                foreach (var item in lstQuestion)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
+                }
+            }
+        </MudSelect>
+    </div>
+
+    <div class="bg-white rounded-3 mb-4" style="width:100%;">
+        <MudTable Items="@lstAnswers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+            <HeaderContent>
+                <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id đáp án</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Nội dung đáp án</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Đúng/Sai</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id đáp án" hidden>@context.Id</MudTd>
+                <MudTd DataLabel="Nội dung đáp án">@context.Content</MudTd>
+                <MudTd DataLabel="Đúng/Sai">
+                    @(context.IsCorrect == true ? "Đúng" : "Sai")
+                </MudTd>
+                <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : "Vô hiệu hóa")</MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Update, context.Id))"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                </MudTd>
+            </RowTemplate>
+
+            <NoRecordsContent>
+                <MudText>No matching records found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+
+    </div>
+</div>
+
+
+@code {
+    private List<Answer> lstAnswers;
+    private List<Question> lstQuestion;
+    private int questionId;
+
+    private async Task loadData()
+    {
+        lstAnswers = await _serAnswer.GetAllByQuestionId(questionId);
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        lstQuestion = await _serQuestion.GetAllQuestions("", true);
+        await loadData();
+    }
+
+    private async Task reloadAnswers()
+    {
+        await loadData();
+    }
+
+    private readonly DialogOptions _MediumWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+    private readonly DialogOptions _SmallWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
+    {
+        var dialogParametersUpdate = new DialogParameters<Dialog.Answer.UpdateAnswerDialog>
+        {
+            {x => x.answerId, id}
+        };
+
+        if(name.Equals(OpenDialogType.Create))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", options);
+            var result = await dialog.Result;
+            if(!result.Canceled)
+            {
+                await loadData();
+            }
+        }
+        else if (name.Equals(OpenDialogType.Update))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.UpdateAnswerDialog>("Options dialog", dialogParametersUpdate, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await loadData();
+            }
+        }
+
+    }
+}

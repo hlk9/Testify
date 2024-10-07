@@ -1,0 +1,164 @@
+﻿ @page "/Examiner/AccountManagement" 
+@using Testify.DAL.Models
+@using Testify.Web.Data.Commons
+@layout AdminLayout
+@inject IDialogService DialogService
+<style>
+
+    .add-button-end {
+        background-color: #29A69A;
+        color: white;
+        width: 100%;
+    }
+
+        .add-button-end:hover {
+            background-color: white;
+            color: #29a69a;
+        }
+
+</style>
+<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TÀI KHOẢN</MudText>
+    </MudPaper>
+    <MudGrid Style="padding:20px 0 ">
+        <MudItem xl="3" lg="3" md="3" sm="3" xs="12">
+            <MudSelect Dense="true" T="int" Label="Danh sách tài khoản" Variant="Variant.Outlined">
+@*                 <MudSelectItem Value="1">Admin</MudSelectItem>
+                <MudSelectItem Value="2">Khảo thí</MudSelectItem>
+                <MudSelectItem Value="3">Giáo viên</MudSelectItem>
+                <MudSelectItem Value="4">Sinh viên</MudSelectItem> *@
+
+            </MudSelect>
+        </MudItem >
+        <MudItem xl="7" lg="6" md="6" sm="6">
+
+        </MudItem>
+        <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+        </MudItem>
+    </MudGrid>
+
+    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+
+        <MudTable Items="@_lstUser" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+
+            <ToolBarContent>
+                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách tài khoản</MudText>
+
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string">Họ và tên</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Ngày sinh" T="DateOnly">Ngày sinh</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Họ và tên">@context.FullName</MudTd>
+                <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
+                <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
+                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
+
+                <MudTd Style="marign:3px" DataLabel="Thao tác">
+                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
+                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+
+                </MudTd>
+            </RowTemplate>
+
+            <NoRecordsContent>
+                <MudText>No matching records found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+
+    </div>
+
+
+
+</div>
+@code {
+    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+
+    private List<User>? _lstUser { get; set; }
+
+    private Level level { get; set; }
+
+    [Parameter]
+    public Guid idUser { get; set; }
+
+    private User user { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lstUser = await _serLec.GetAllLecturer();
+
+    }
+
+
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    private async Task OpenDialogAsync(DialogOptions options, string name, Guid id)
+    {
+
+        var dialogParametersUpdate = new DialogParameters<Dialog.Account.UpdateAccountManagement>
+        {
+            {x => x.UserId, id}
+        };
+
+        var dialogParametersDel = new DialogParameters<Dialog.Account.DeleteAccountManagement>
+        {
+            {x => x.UserId, id}
+        };
+
+        var dialogParametersUserId = new DialogParameters<Dialog.Account.DetailsAccountManagement>
+        {
+            {x => x.UserId, id}
+        };
+
+
+        if (name.Equals(OpenDialogType.Create))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Account.CreateAccountDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+
+        }
+        else if (name.Equals(OpenDialogType.Update))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
+            var result = await dialog.Result;
+
+        }
+        else if (name.Equals(OpenDialogType.Detail))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Account.DetailsAccountManagement>("Options Dialog", dialogParametersUserId, options);
+            var result = await dialog.Result;
+        }
+        else
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Account.DeleteAccountManagement>("Options Dialog", dialogParametersDel, options);
+            var result = await dialog.Result;
+         
+        }
+    }
+}
+
+        

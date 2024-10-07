@@ -1,0 +1,285 @@
+﻿@page "/Examiner/QuestionManagement"
+@using Testify.DAL.Models
+@using Testify.Web.Data.Commons
+@using Testify.Web.Shared
+@layout AdminLayout
+@inject IDialogService DialogService
+
+<style>
+    .input-search-end {
+        color: #8e8e8e;
+        padding-left: 15px;
+    }
+
+    .button-add-new-hover {
+        background-color: #29A69A;
+        color: white;
+        width: 100%;
+    }
+
+        .button-add-new-hover:hover {
+            background-color: white;
+            color: #29a69a;
+        }
+
+    .icon-input-search {
+        padding-left: 100px;
+    }
+
+    .button-add-answer-to-question {
+        background-color: gold;
+        color: #fff;
+        width: 100%;
+    }
+
+        .button-add-answer-to-question:hover {
+            background-color: transparent;
+            color: gold;
+        }
+
+    .button-import {
+        background-color: red;
+        color: #fff;
+        width: 100%;
+    }
+
+        .button-import:hover {
+            background-color: transparent;
+            color: red;
+            width: 100%;
+        }
+</style>
+
+<div style="font-family:Roboto; padding:30px; background-color:#fafafa">
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI VÀ ĐÁP ÁN</MudText>
+    </MudPaper>
+    <MudGrid Style="padding:20px 0 ">
+        <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
+            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Export</MudButton>
+        </MudItem>
+        <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
+            <MudButton Class="button-import" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ImportExcel, -1))">Import</MudButton>
+        </MudItem>
+        <MudItem xl="3" lg="3" md="4" sm="12" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Class="button-add-answer-to-question" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
+        </MudItem>
+        <MudItem xl="3" lg="3" md="4" sm="12" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.Create, -1))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
+        </MudItem>
+    </MudGrid>
+
+    <div class="bg-white rounded-3 mb-4" style="width:100%;">
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudTable Items="@_lstQuestions" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách câu hỏi</MudText>
+
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id câu hỏi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Tên câu hỏi" T="string">Tên câu hỏi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Mức độ" T="string">Mức độ</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Loại câu hỏi" T="string">Loại câu hỏi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thuộc môn" T="string">Thuộc môn</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Id câu hỏi" hidden>@context.Id</MudTd>
+                    <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
+                    <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
+                    <MudTd DataLabel="Mức độ">
+                        @if (_lstQuestionLevels != null)
+                        {
+                            foreach (var item in _lstQuestionLevels)
+                            {
+                                if (item.Id == context.QuestionLevelId)
+                                {
+                                    @item.Name
+                                    ;
+                                    break;
+                                }
+                            }
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Loại câu hỏi">
+                        @if (_lstQuestionTypes != null)
+                        {
+                            foreach (var item in _lstQuestionTypes)
+                            {
+                                if (item.Id == context.QuestionTypeId)
+                                {
+                                    @item.Name
+                                    ;
+                                    break;
+                                }
+                            }
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Thuộc môn">
+                        @if (_lstSubjects != null)
+                        {
+                            foreach (var item in _lstSubjects)
+                            {
+                                if (item.Id == context.SubjectId)
+                                {
+                                    @item.Name
+                                    ;
+                                    break;
+                                }
+                            }
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : (context.Status == Convert.ToByte(StatusType.noAnswer) ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
+
+                    <MudTd DataLabel="Thao tác">
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTd>
+                    <MudTd>
+                        <MudButton Disabled="@(context.Status == Convert.ToByte(StatusType.noAnswer) ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>No Data</MudText>
+                </NoRecordsContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Question> _lstQuestions = new List<Question>();
+    private List<Subject> _lstSubjects;
+    private List<QuestionLevel> _lstQuestionLevels;
+    private List<QuestionType> _lstQuestionTypes;
+    private bool IsDisableShowAnswer;
+    private bool isLoading { get; set; } = true;
+    private string searchValue = "";
+
+    private async Task onChangeSearch()
+    {
+
+        await LoadData(searchValue);
+    }
+
+    private async Task LoadData(string? textSearch)
+    {
+
+        _lstQuestions = await _serQuestion.GetAllQuestions(textSearch, true);
+        StateHasChanged();
+        isLoading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lstSubjects = await _serSub.GetAllSub(null, true);
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
+        await LoadData("");
+    }
+
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
+    {
+        var dialogParametersUpdate = new DialogParameters<Dialog.Question.UpdateQuestionDialog>
+        {
+            {x => x.QuestionId, id}
+        };
+
+        var dialogParametersDel = new DialogParameters<Dialog.Question.DeleteQuestionDialog>
+        {
+            {x => x.QuestionId, id}
+        };
+
+        var dialogParametersQuestionId = new DialogParameters<Dialog.Answer.ListAnswerDialog>
+        {
+            {x => x.questionId, id}
+        };
+
+        var dialogParametersCreateAnswer = new DialogParameters<Dialog.Answer.CreateAnswerDialog>
+        {
+            {x => x.isQuestionId, true},
+            {y => y.questionIdParams, -1}
+        };
+
+        if (name.Equals(OpenDialogType.ShowAnswer))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.ListAnswerDialog>("Options Dialog", dialogParametersQuestionId, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+        else if (name.Equals(OpenDialogType.ShowDialogAddNewAnswer))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", dialogParametersCreateAnswer, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+        else if (name.Equals(OpenDialogType.Create))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Question.CreateQuestionDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+
+        }
+        else if (name.Equals(OpenDialogType.Update))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Question.UpdateQuestionDialog>("Options Dialog", dialogParametersUpdate, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+        else if(name.Equals(OpenDialogType.ImportExcel)) 
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Question.ImportQuestionExcel>("Options Dialog", options);
+            var result = await dialog.Result;
+            if(!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+        else
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Question.DeleteQuestionDialog>("Options Dialog", dialogParametersDel, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+
+    }
+}

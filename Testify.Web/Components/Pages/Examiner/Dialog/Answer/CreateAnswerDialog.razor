@@ -1,0 +1,190 @@
+﻿@using Testify.DAL.Models;
+@using Testify.Web.Components.Pages.Examiner.Component;
+@using Testify.Web.Shared;
+@using Testify.Web.Data.Commons;
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới đáp án cho câu hỏi</MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Spacing="5" @ref="form">
+                @if(isQuestionId)
+                {
+                    <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue())">
+
+                        <MudSelectItem Value="-1">Chọn câu hỏi</MudSelectItem>
+
+                        @if (lstQuestion != null)
+                        {
+                            foreach (var item in lstQuestion)
+                            {
+                                if (item.Status == Convert.ToByte(StatusType.noAnswer))
+                                {
+                                    <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
+                                }
+                            }
+                        }
+                    </MudSelect>
+                }
+
+                <div class="w-100 d-flex justify-content-between align-items-center">
+                    <MudText>Thêm đáp án:</MudText>
+                    <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNeuAnswer" Disabled=@(isQuestionId == true ? IsDisableNewAnswer : false) OnClick="AddNewAnswer"></MudIconButton>
+                </div>
+
+                @if (lstAnswers != null)
+                {
+                    @foreach (var item in lstAnswers)
+                    {
+                        <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
+                    }
+                }
+
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancle</MudButton>
+        <MudButton Style="color: gold" OnClick="Submit">Thêm mới</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    MudForm form;
+    private Answer answer { get; set; } = new();
+    private List<Question>? lstQuestion;
+    private List<QuestionType>? lstQuestionType;
+    private bool isLoading { get; set; } = true;
+    private bool IsDisableNewAnswer = true;
+    private int ValueQuestionTypeChoice;
+    private int questionId;
+    private int questionTypeId;
+    private List<Answer> lstAnswers = new List<Answer>();
+    private List<AnswerForm> answerForms = new List<AnswerForm>();
+    [Parameter]
+    public bool isQuestionId { get; set; }
+
+    [Parameter]
+    public int questionIdParams { get; set; }
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private async Task LoadData()
+    {
+
+        lstQuestion = await _serQuestion.GetAllQuestions("", true);
+        questionId = questionIdParams;
+        isLoading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task ChangeValue()
+    {
+        if (lstAnswers.Count > 0 || lstAnswers != null)
+        {
+            var objQuestion = await _serQuestion.GetQuestionById(questionId);
+            questionTypeId = objQuestion.QuestionTypeId;
+            IsDisableNewAnswer = false;
+        }
+    }
+
+    private async Task AddNewAnswer()
+    {
+        if (lstAnswers.Count == 0 || await answerForms.Last().ValidateAsync())
+        {
+            var newAnswer = new Answer();
+            lstAnswers.Add(newAnswer);
+            answerForms.Add(new AnswerForm { answer = newAnswer });
+        }
+    }
+
+    private void RemoveAnswerForm(Answer answerToRemove)
+    {
+        var index = lstAnswers.IndexOf(answerToRemove);
+        if (index >= 0)
+        {
+            lstAnswers.RemoveAt(index);
+            answerForms.RemoveAt(index);
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (questionId == -1)
+        {
+            snackbar.Add("Chưa chọn câu hỏi", Severity.Warning);
+            return;
+        }
+        else if (answerForms.Count == 0 || answerForms == null)
+        {
+            snackbar.Add("Chưa nhập đáp án", Severity.Warning);
+            return;
+        }
+
+        int count = 0;
+        for (int i = 0; i < lstAnswers.Count; i++)
+        {
+            if (lstAnswers[i].IsCorrect == true)
+            {
+                count++;
+            }
+        }
+
+        if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
+        {
+            if (count > 1)
+            {
+                snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                return;
+            }
+        }
+
+        if (count == 0)
+        {
+            snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
+            return;
+        }
+
+        bool allValid = true;
+
+        foreach (var form in answerForms)
+        {
+            if (!await form.ValidateAsync())
+            {
+                allValid = false;
+            }
+        }
+
+        if (allValid)
+        {
+
+            for (int i = 0; i < lstAnswers.Count; i++)
+            {
+                lstAnswers[i].Status = Convert.ToByte(StatusType.isActive);
+                var check = await _serAnswer.Create(lstAnswers[i]);
+            }
+
+            var question = await _serQuestion.UpdateStatus(questionId, Convert.ToByte(StatusType.isActive));
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

@@ -4,10 +4,32 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
 
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageReference Include="EPPlus" Version="7.3.2" />
+    <PackageReference Include="Heron.MudCalendar" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.2.0" />
     <PackageReference Include="MudBlazor" Version="7.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Testify.API\Testify.API.csproj" />
+    <ProjectReference Include="..\Testify.DAL\Testify.DAL.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\Uploads\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Components\Pages\Examiner\Dialog\Question\ImportQuestionExcel.razor" />
   </ItemGroup>
 </Project>

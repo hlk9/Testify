@@ -1,0 +1,61 @@
+﻿@using Testify.DAL.Models
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Class="mr-3 mb-n1" />
+            Sửa tài khoản
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Spacing="3" Model="@user">
+
+            <MudTextField T="Guid" @bind-Value="@user.Id" Label="Mã tài khoản" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@user.FullName" Label="Họ và tên" />
+            <MudTextField T="DateTime" @bind-Value="@user.DateOfBirth" Label="Ngày sinh" />
+            <MudTextField T="string" @bind-Value="@user.PhoneNumber" Label="Số điện thoại"  />
+            <MudTextField T="string" @bind-Value="@user.Address" Label="Địa chỉ"  />
+            <MudTextField T="int" @bind-Value="@user.LevelId" Label="Level" />
+            <MudTextField T="string" @bind-Value="@user.UserName" Label="Tên tài khoản" />
+            <MudTextField T="string" @bind-Value="@user.Email" Label="Email" />
+            @*             <MudTextField T="DateTime?" @bind-Value="@user.LastLogin" Label="Lần cuối đăng nhập" ReadOnly=true />
+            <MudTextField T="byte" @bind-Value="@user.Status" Label="Trạng thái" ReadOnly=true /> *@
+        </MudForm>
+
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Warning" Variant="@Variant.Filled" OnClick="Submit">Sửa</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid UserId { get; set; }
+
+    private User user { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        user = await _serLec.GetLecturerById(UserId);
+    }
+
+    private async Task Submit()
+    {
+        var check = await _serLec.UpdateLecturer(user);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Sửa thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

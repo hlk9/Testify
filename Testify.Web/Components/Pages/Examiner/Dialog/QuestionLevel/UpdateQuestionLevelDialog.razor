@@ -1,0 +1,70 @@
+﻿@using Testify.DAL.Models;
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Cập nhật mức độ câu hỏi</MudText>
+    </TitleContent>
+    <DialogContent>
+         @if (questionLevel == null)
+        {
+            <MudText>Loading...</MudText>
+        }
+        else
+        {
+        <MudForm Spacing="5" Model="@questionLevel" @ref="@form">
+            <MudTextField @bind-Value="questionLevel.Name" For="@(() => questionLevel.Name)" Style="padding: 0" T="string" Label="Tên Mức Độ Câu Hỏi" />
+            <MudTextField @bind-Value="questionLevel.Description" For="@(() => questionLevel.Description)" Style="padding: 0" T="string" Label="Mô Tả" />
+            <MudRadioGroup @bind-Value="StatusQuestionLevel">
+                <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
+                <MudRadio Value="@(false)">Không hoạt động</MudRadio>
+            </MudRadioGroup>
+        </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Submit">Cập nhật</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    MudForm form;
+
+    private QuestionLevel questionLevel { get; set; } = new();
+
+    private bool StatusQuestionLevel { get; set; }
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public int QuestionLevelId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (QuestionLevelId != null)
+        {
+            questionLevel = await _serQuestionLevel.GetQuestionLevelById(QuestionLevelId);
+            StatusQuestionLevel = questionLevel.Status.Value;
+        }
+    }
+
+    private async void Submit()
+    {
+        questionLevel.Status = StatusQuestionLevel;
+        var check = await _serQuestionLevel.UpdateQuestionLevel(questionLevel);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Cập nhật thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Cập nhật thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

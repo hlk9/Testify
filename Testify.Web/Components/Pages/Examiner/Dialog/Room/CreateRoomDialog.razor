@@ -1,0 +1,45 @@
+﻿@using Testify.DAL.Models
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Thêm mới phòng
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Model="@room">
+            <MudTextField T="string" @bind-Value="@room.Name" Label="Tên phòng" />
+            <MudTextField T="int" @bind-Value="@room.Capacity" Label="Số lượng" />
+            <MudTextField T="string" @bind-Value="@room.Address" Label="Địa chỉ" />
+            <MudTextField T="bool?" @bind-Value="@room.Status" Label="Trạng thái" />
+        </MudForm>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">Tạo</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private Room room { get; set; } = new();
+
+
+    private async Task Submit()
+    {
+        var check = await _serRoom.CreateRoom(room);
+        if (check == true)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Thêm thất bại", Severity.Error);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
