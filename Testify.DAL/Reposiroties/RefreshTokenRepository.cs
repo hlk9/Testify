@@ -69,6 +69,8 @@ namespace Testify.DAL.Reposiroties
 
         public bool CheckTokenExpried(string token)
         {
+            string a = token.Replace("\"", "");
+            var token1 = _context.RefreshTokens.FirstOrDefault(x => x.Token == token.Replace("\"", ""));
             var tok = _context.RefreshTokens.FirstOrDefault(x =>  x.Token == token.Replace("\"","") && x.ExpiryDate>DateTime.UtcNow);
 
             if (tok != null)

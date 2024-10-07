@@ -1,4 +1,7 @@
-﻿<MudDialog>
+﻿@inject ExamScheduleService scheduleService
+@inject ExamService examService
+@inject SubjectService subjectService
+<MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
 
@@ -6,21 +9,173 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField T="string" Disabled Label="Mã lịch thi" ReadOnly="true" />
-        <MudTextField T="string" Label="Mã bài thi" ReadOnly="true" />
-        <MudTextField T="string" Label="Thời gian bắt đầu" ReadOnly="true" />
-        <MudTextField T="string" Label="Thời gian kết thúc" ReadOnly="true" />
-        <MudTextField T="string"  Label="Trạng thái" ReadOnly="true" />
+        <EditForm Model="@currentSchedule" OnInvalidSubmit="SubmitValid">
+            <DataAnnotationsValidator />
+            <MudTextField T="string" @bind-Value="@currentSchedule.Title" For="@(() => currentSchedule.Title)" Label="Tiêu đề lịch thi này"></MudTextField>
+            <MudGrid Class="mt-3 mb-3" Justify="Justify.SpaceBetween" Spacing="4">
+                <MudItem Class="w-100">
+
+                    <MudAutocomplete T="Subject"
+                                     @bind-Value="subjectCurrent"
+                                     Variant="Variant.Outlined"
+                                     SearchFunc="SearchSubject"
+                                     Label="Môn"
+                                     Placeholder="Chọn môn"
+                                     Clearable="true"
+                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                     OnFocus="SubjectChanged" />
+
+                    <MudAutocomplete T="Exam"
+                                     @bind-Value="examCurrent"
+                                     Variant="Variant.Outlined"
+                                     SearchFunc="SearchExam"
+                                     Label="Bài thi"
+                                     Placeholder="Chọn bài thi"
+                                     Clearable="true"
+                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                     ResetValueOnEmptyText="true" />
+
+                </MudItem>
+                <MudItem Class="w-50">
+                    <MudDatePicker Editable="true" @bind-Date="@startDate" DateFormat="dd/MM/yyyy" Label="Ngày bắt đầu" />
+                    <MudTimePicker Editable="true" @bind-Time="@startTime" PickerVariant="PickerVariant.Dialog" Label="Thời gian bắt đầu" />
+                </MudItem>
+
+                <MudItem Class="w-50">
+                    <MudDatePicker Editable="true" @bind-Date="@endDate" DateFormat="dd/MM/yyyy" Label="Ngày kết thúc" />
+                    <MudTimePicker Editable="true" @bind-Time="@endTime" PickerVariant="PickerVariant.Dialog" Label="Thời gian kết thúc" />
+                </MudItem>
+            </MudGrid>
+
+
+            <MudTextField T="string" @bind-Value="@currentSchedule.Description" For="@(() => currentSchedule.Description)" Label="Ghi chú"></MudTextField>
+        </EditForm>
 
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick=" Cancel">Quay lại</MudButton>
-        <MudButton Color="@Color.Warning" OnClick="Submit">Sửa</MudButton>
+        <MudButton Color="@Color.Warning" OnClick="SubmitValid">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
+    [Parameter]
+    public int Id { get; set; }
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    private ExamSchedule currentSchedule = new ExamSchedule();
+    private DateTime? startDate;
+    private DateTime? endDate;
+    private TimeSpan? startTime;
+    private TimeSpan? endTime;
+    private List<Exam> listExam;
+    private List<Subject> listSubject;
+    private Exam examCurrent;
+    private Subject subjectCurrent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentSchedule = await scheduleService.GetById(Id);
+        examCurrent = await examService.GetExamId(currentSchedule.ExamId);
+        subjectCurrent = await subjectService.GetSubId((int)currentSchedule.SubjectId);
+        startDate = currentSchedule.StartTime.Date;
+        endDate = currentSchedule.EndTime.Date;
+        startTime = currentSchedule.StartTime.TimeOfDay;
+        endTime = currentSchedule.EndTime.TimeOfDay;
+        listSubject = await subjectService.GetAllSub(null, true);
+        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+    }
+    private async Task SubmitValid()
+    {
+        DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
+        DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
+        if (subjectCurrent == null || startDate == null || startTime == null || endDate == null || endTime == null || examCurrent == null || currentSchedule.Title=="")
+        {
+            Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
+            return;
+        }
+        else
+        {
+
+            if (startDateTime < DateTime.Now.AddMinutes(10))
+            {
+                Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);
+                return;
+            }
+
+
+            if (startDate.Value.Date.Add(startTime.Value) > endDate.Value.Date.Add(endTime.Value))
+            {
+                Snackbar.Add("Thất bại, Thời gian không hợp lệ", Severity.Error);
+                return;
+            }
+            else
+            {
+                var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime);
+
+                if (ojb != null&&ojb.Id==currentSchedule.Id)
+                {
+                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
+                    return;
+                }
+
+            }
+
+            currentSchedule.RoomId = null;
+            currentSchedule.SubjectId = subjectCurrent.Id;
+            currentSchedule.ExamId = examCurrent.Id;
+            currentSchedule.StartTime = startDate.Value.Date.Add(startTime.Value);
+            currentSchedule.EndTime = endDate.Value.Date.Add(endTime.Value);
+            currentSchedule.Status = 1;
+            bool stats = await scheduleService.Update(currentSchedule);
+            if (stats == true)
+            {
+                Snackbar.Add("Cập nhật thành công", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+                StateHasChanged();
+            }
+            else
+            {
+                Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
+            }
+
+
+        }
+    }
+
+    private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
+    {
+
+        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+
+
+        if (string.IsNullOrEmpty(value))
+            return listExam;
+
+        return listExam.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+
+    private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
+    {
+
+        listSubject = await subjectService.GetAllSub(null, true);
+
+
+        if (string.IsNullOrEmpty(value))
+            return listSubject;
+
+        return listSubject.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    private async Task SubjectChanged()
+    {
+        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        examCurrent = null;
+        StateHasChanged();
+
+    }
+
 
     private void Submit() => MudDialog.Close(DialogResult.Ok(true));
 

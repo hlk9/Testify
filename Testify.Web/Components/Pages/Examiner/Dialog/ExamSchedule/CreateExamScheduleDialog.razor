@@ -19,7 +19,8 @@
                                      Label="Môn"
                                      Placeholder="Chọn môn"
                                      Clearable="true"
-                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
+                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                     OnFocus="SubjectChanged" />
 
                     <MudAutocomplete T="Exam"
                                      @bind-Value="examCurrent"
@@ -28,7 +29,10 @@
                                      Label="Bài thi"
                                      Placeholder="Chọn bài thi"
                                      Clearable="true"
-                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")" />
+                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                     OnFocus="ExamChanged"
+                                     ResetValueOnEmptyText="true"
+                                    />
 
                 </MudItem>
                 <MudItem Class="w-50">
@@ -68,6 +72,7 @@
     private Exam examCurrent;
     private Subject subjectCurrent;
 
+
     private string[] _states =
        {
         "Alabama", "Alaska", "Arizona", "Arkansas", "California",
@@ -82,29 +87,24 @@
         "Washington", "West Virginia", "Wisconsin", "Wyoming"
     };
 
-
-    private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
+    private async Task SubjectChanged()
     {
-        // In real life use an asynchronous function for fetching data from an api.
-        listExam = await examService.GetAllActive();
-        List<string> lstString = new List<string>();
+        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        examCurrent = null;
+        StateHasChanged();
 
-        foreach (var item in listExam)
-        {
-            lstString.Add(item.Name);
-        }
-
-        if (string.IsNullOrEmpty(value))
-            return lstString;
-
-        return lstString.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
+    private void ExamChanged()
+    {
+        listExam = null;
+        examCurrent = null;
+    }
 
     private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
     {
-        // In real life use an asynchronous function for fetching data from an api.
-        listExam = await examService.GetAllActive();
+      
+        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
 
 
         if (string.IsNullOrEmpty(value))
@@ -116,8 +116,8 @@
 
     private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
     {
-        // In real life use an asynchronous function for fetching data from an api.
-        listSubject = await subjectService.GetAllSub(null,true);
+      
+        listSubject = await subjectService.GetAllSub(null, true);
 
 
         if (string.IsNullOrEmpty(value))
@@ -139,7 +139,14 @@
         else
         {
 
-            if (startDate.Value.Date.Add(startTime.Value)>endDate.Value.Date.Add(endTime.Value))
+            if (startDateTime < DateTime.Now.AddMinutes(10))
+            {
+                Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);
+                return;
+            }
+
+
+            if (startDate.Value.Date.Add(startTime.Value) > endDate.Value.Date.Add(endTime.Value))
             {
                 Snackbar.Add("Thất bại, Thời gian không hợp lệ", Severity.Error);
                 return;
@@ -148,9 +155,9 @@
             {
                 var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime);
 
-                if(ojb!=null)
+                if (ojb != null)
                 {
-                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi "+ojb.Title+" Hãy kiểm tra lại", Severity.Error);
+                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
                     return;
                 }
 

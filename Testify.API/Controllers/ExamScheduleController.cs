@@ -95,6 +95,12 @@ namespace Testify.API.Controllers
         {
             return await repos.CheckIsContaintInTime(start, end);
         }
+
+        [HttpGet("Get-ById")]
+        public async Task<ExamSchedule> GetById(int id)
+        {
+            return await repos.GetById(id);
+        }
     }
 
 
