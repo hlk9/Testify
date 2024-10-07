@@ -64,9 +64,18 @@
                 <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
                 <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    <MudTooltip Text="Sửa">
+                        <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Chi tiết">
+                        <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Xoá">
+
+                        <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTooltip>
+
+
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -115,9 +124,9 @@
         {
               { "Id", Id }
         };
-        var dialog= await DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", parameters, options);
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", parameters, options);
         var result = await dialog.Result;
-        if (result==null||!result.Canceled)
+        if (result == null || !result.Canceled)
         {
             listSchedule = await scheduleService.GetInforBasic();
         }
