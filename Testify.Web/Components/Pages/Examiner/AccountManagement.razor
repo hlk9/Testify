@@ -95,7 +95,8 @@
 </div>
 @code {
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
-
+    private string searchValue = "";
+    private bool isLoading { get; set; } = true;
     private List<User>? _lstUser { get; set; }
 
     private Level level { get; set; }
@@ -105,12 +106,16 @@
 
     private User user { get; set; }
 
-
+    private async Task LoadData()
+    {
+        _lstUser = await _serLec.GetAllLecturer();
+        isLoading = false;
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        _lstUser = await _serLec.GetAllLecturer();
 
+        await LoadData();
     }
 
 
@@ -139,23 +144,39 @@
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.CreateAccountDialog>("Options Dialog", options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
 
         }
         else if (name.Equals(OpenDialogType.Update))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
 
         }
         else if (name.Equals(OpenDialogType.Detail))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.DetailsAccountManagement>("Options Dialog", dialogParametersUserId, options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
         else
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.DeleteAccountManagement>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
          
         }
     }
