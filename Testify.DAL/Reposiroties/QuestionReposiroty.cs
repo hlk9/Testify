@@ -6,16 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.DAL.Reposiroties
 {
     public class QuestionReposiroty
     {
         TestifyDbContext _context;
+        ExamDetailQuestionRepository _repoExamDetailQuestion;
 
         public QuestionReposiroty()
         {
             _context = new TestifyDbContext();
+            _repoExamDetailQuestion = new ExamDetailQuestionRepository();
         }
 
         public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
@@ -130,6 +133,32 @@ namespace Testify.DAL.Reposiroties
             {
                 return null;
             }
+        }
+
+        public async Task<AnswerAndQuestion> GetQuestionWithTrueAnswer(int questionId, int examDetailId)
+        {
+            var answerIsTrue = await (from q in _context.Questions.Where(x => x.Status == 1)
+                                      join a in _context.Answers
+                                      on q.Id equals a.QuestionId
+                                      where q.Id == questionId
+                                      && a.IsCorrect == true
+                                      select a
+                                      ).ToListAsync();
+
+            var question = await GetQuestionById(questionId);
+            var lstexamDetailQuestion = await _repoExamDetailQuestion.GetAllByExamDetailId(examDetailId);
+            var pointOfQuestion = lstexamDetailQuestion.FirstOrDefault(x => x.QuestionId == questionId).Point;
+
+            AnswerAndQuestion QnA = new AnswerAndQuestion()
+            {
+                QuestionId = question.Id,
+                ContentQuestion = question.Content,
+                QuestionTypeId = question.QuestionTypeId,
+                LstAnswer = answerIsTrue,
+                PointOfQuestion = pointOfQuestion
+            };
+
+            return QnA;
         }
     }
 }

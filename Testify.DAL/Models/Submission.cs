@@ -14,13 +14,13 @@ namespace Testify.DAL.Models
         public int Id { get; set; }
         [ForeignKey("UserId")]
         public Guid UserId { get; set; }
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
         [ForeignKey(nameof(ExamDetailId))]
         public int ExamDetailId { get; set; }
-        public virtual ExamDetail ExamDetail { get; set; }
+        public virtual ExamDetail? ExamDetail { get; set; }
         [ForeignKey("ExamScheduleId")]
         public int ExamScheduleId { get; set; }
-        public virtual ExamSchedule ExamSchedule { get; set; }
+        public virtual ExamSchedule? ExamSchedule { get; set; }
         public DateTime SubmitTime { get; set; }
         public TimeSpan TimeTaken { get; set; }
         public double TotalMark { get; set; }
