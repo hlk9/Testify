@@ -1,59 +1,5 @@
-﻿@page "/"
+﻿@page "/Login"
 @using MudBlazor
-
-@* <MudGrid Spacing="0" Class="m-0 w-100 align-items-center" Justify="Justify.SpaceBetween" Style="background-color:#29A69A; height:100vh">
-    <MudItem sm="12" md="12" xs="12" lg="7" Class="d-flex h-100 justify-center align-items-center flex-column rounded-xs-0 pa-3 rounded-custom" Style="background-color: #FFFFFF; border-top-right-radius:50px; border-bottom-right-radius:50px">
-
-        <MudPaper Class="w-100 p-5 m-3" Elevation="0">
-            <MudGrid Justify="Justify.SpaceBetween" Spacing="12">
-                <MudItem lg="6" Class="d-flex justify-start">
-                    Logo
-                </MudItem>
-                <MudItem lg="6" Class="d-flex justify-end">
-                    <MudButton Color="Color.Primary" Class="ps-3 pe-3 pt-2 pb-2" Variant="Variant.Outlined" @onclick="NavigateToRegister">Đăng ký</MudButton>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-
-        <MudPaper Elevation="0" Class="p-0 p-md-5 loginRange" Style="width:60%" Height="100%">
-            <MudText Style="font-size:22px; font-weight:bold" Class="text-center">Đăng nhập bằng tài khoản Testify của bạn</MudText>
-            <MudTextField T="string" @bind-Value="username" Class="mt-3 mb-3" Placeholder="Email/Số điện thoại" Variant="Variant.Outlined" FullWidth="true"></MudTextField>
-            <MudTextField T="string" @bind-Value="password" Class="mt-3 mb-3" Placeholder="Mật khẩu" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" FullWidth="true"></MudTextField>
-            <MudText Class="mt-3 mb-3" Align="Align.End" @onclick="NavigateToPasswordRetrieval">Quên mật khẩu?</MudText>
-
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w-100 rounded-4" @onclick="LoginToSystem">Tiếp tục</MudButton>
-
-            <MudText Class="text-center mt-4 mb-4">Hoặc</MudText>
-
-            <MudGrid Spacing="4" Justify="Justify.SpaceBetween">
-                <MudItem lg="6" Class="d-flex justify-center">
-                    <MudButton Class="d-flex p-2" Variant="Variant.Outlined" Style="border: 1px solid #DDDDDD">
-                        <img class="w-6 h-6" src="https://www.svgrepo.com/show/448224/facebook.svg" width="10%">
-                        <span style="text-transform:none" class="m-2">Facebook</span>
-                    </MudButton>
-                </MudItem>
-                <MudItem lg="6" Class="d-flex justify-center">
-                    <MudButton Class="d-flex p-2" Variant="Variant.Outlined" Style="border: 1px solid #DDDDDD">
-                        <img class="w-6 h-6" src="https://www.svgrepo.com/show/475656/google-color.svg" width="10%">
-                        <span style="text-transform:none" class="m-2">Google</span>
-                    </MudButton>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-    </MudItem>
-
-    <MudItem Class="p-0 pe-5 d-none d-md-none d-lg-block" Style="margin-right:4%">
-        <svg width="496" height="555" viewBox="0 0 496 555" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <rect width="496" height="555" fill="url(#pattern0_130_221)" />
-            <defs>
-                <pattern id="pattern0_130_221" patternContentUnits="objectBoundingBox" width="1" height="1">
-                    <use xlink:href="#image0_130_221" transform="matrix(0.00178746 0 0 0.00159744 -0.0594758 0)" />
-                </pattern>
-            </defs>
-        </svg>
-    </MudItem>
-</MudGrid> *@
-
 <MudContainer MaxWidth="MaxWidth.Large" Class="d-flex justify-content-center align-items-center" Style="min-height: 100vh">
     <MudGrid Class="m-0 p-0 w-100" Style="min-height: 700px">
         <MudItem xl="1" lg="1" md="1" Class="d-none d-lg-block p-0"></MudItem>
@@ -454,11 +400,11 @@
     }
     protected override void OnAfterRender(bool firstRender)
     {
-       if(firstRender)
+        if(firstRender)
             CheckToken();
     }
 
-    private async void CheckToken()
+    private async Task CheckToken()
     {
         var token = await localStorage.GetItemAsync<string>("token");
         if (!string.IsNullOrEmpty(token))
@@ -466,6 +412,7 @@
             var currentUser = await _serviceAccess.CheckAccessStatusByToken(token);
             if (currentUser.IsLoginSucces == true && currentUser.Id != null)
             {
+                await ProtectedSessionStore.SetAsync("userLogin", currentUser.Id);
                 if (currentUser.LevelId == 1)
                 {
                     Navigation.NavigateTo("/Admin/Home");
@@ -483,7 +430,10 @@
         var ult = await _serviceAccess.Login(username, password);
         if (ult != null && ult.IsLoginSucces == true)
         {
+            await ProtectedSessionStore.SetAsync("userLogin", ult.Id);
             Snackbar.Add("Đăng nhập thành công!", Severity.Success);
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            Snackbar.Add(a.Value, Severity.Success);
             await localStorage.SetItemAsync("token", ult.Token);
             var token = await localStorage.GetItemAsync<string>("token");
 

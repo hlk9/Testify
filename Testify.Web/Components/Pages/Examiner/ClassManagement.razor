@@ -1,5 +1,6 @@
 @page "/Examiner/ClassManagement"
 @layout AdminLayout
+@using Testify.DAL.ViewModels
 @using Testify.Web.Data.Commons
 @using Testify.Web.Shared
 @inject IDialogService DialogService
@@ -40,12 +41,12 @@
 
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create, -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
-        <MudTable Items="@classes" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@classWithUsers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
                     <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
@@ -53,8 +54,8 @@
 
                     </MudItem>
                     <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
                     </MudItem>
                 </MudGrid>
             </ToolBarContent>
@@ -91,7 +92,7 @@
                         </MudTd>
                         <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
                         <MudTd DataLabel="Trạng thái">
-                            @if (context.Status == 1)
+                            @if (context.Status == Convert.ToByte(StatusType.isActive))
                             {
                                 <span>Hoạt động</span>
                             }
@@ -102,9 +103,9 @@
                         </MudTd>
 
                         <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                         </MudTd>
                     }
                 }
@@ -129,61 +130,80 @@
 @code {
     private bool isLoading { get; set; } = true;
     private List<User> _lstUser;
+    private int Index = -1;
+    private List<ClassWithUser>? classWithUsers { get; set; } = new List<ClassWithUser>();
+    private string searchValue = "";
 
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
+    private async Task onChangeSearch()
+    {
+        await LoadData(searchValue);
+    }
 
-    private List<Class>? classes { get; set; }
-
-    private async Task LoadData()
+    private async Task LoadData(string? textSearch)
     {
         _lstUser = await _serLec.GetAllTeacher();
-        classes = await _serClass.GetAllClass();
+        classWithUsers = await _serClass.GetAllClass(textSearch, true);
         isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData("");
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private async Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
+        var updateParaeters = new DialogParameters<Dialog.Class.UpdateClassDialog>
+        {
+            {x => x.ClassId, id}
+        };
+
+        var dialogParametersDel = new DialogParameters<Dialog.Class.DeleteClassDialog>
+        {
+            {x => x.ClassId, id}
+        };
+
+        var dialogParametersDetail = new DialogParameters<Dialog.Class.DetailsClassDialog>
+        {
+            {x => x.ClassId, id}
+        };
+
         if (name.Equals(OpenDialogType.Create))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Class.CreateClassDialog>("Options Dialog", options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
         else if (name.Equals(OpenDialogType.Update))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Class.UpdateClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.UpdateClassDialog>("Options Dialog", updateParaeters, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
         else if (name.Equals(OpenDialogType.Detail))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Class.DetailsClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.DetailsClassDialog>("Options Dialog", dialogParametersDetail, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
         else
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Class.DeleteClassDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Class.DeleteClassDialog>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await LoadData();
+                await LoadData("");
             }
         }
 

@@ -7,11 +7,11 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Model="@user">
+        <MudForm Spacing="3" Model="@user">
 
             <MudTextField T="Guid" @bind-Value="@user.Id" Label="Mã tài khoản" ReadOnly=true />
             <MudTextField T="string" @bind-Value="@user.FullName" Label="Họ và tên" />
-            <MudTextField T="DateTime" @bind-Value="@user.DateOfBirth" Label="Ngày sinh" />
+            <MudDatePicker @bind-Value="@user.DateOfBirth" Label="Ngày sinh" />
             <MudTextField T="string" @bind-Value="@user.PhoneNumber" Label="Số điện thoại"  />
             <MudTextField T="string" @bind-Value="@user.Address" Label="Địa chỉ"  />
             <MudTextField T="int" @bind-Value="@user.LevelId" Label="Level" />

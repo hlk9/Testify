@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -14,6 +15,33 @@ builder.Services.AddSwaggerGen();
 
 var jwtSecretKey = builder.Configuration["ApplicationSettings:JWT_Secret"]; // Get the secret key from appsettings.json
 var key = Encoding.UTF8.GetBytes(jwtSecretKey);
+
+
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true; // Compress responses even over HTTPS
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+    {
+        "application/json",      // For JSON responses
+        "application/xml",       // For XML responses
+        "text/plain",            // If you're returning plain text
+        "text/html",             // For any HTML content
+        "application/javascript",
+        // Add any other MIME types if needed
+    });
+});
+
+// Optionally configure Brotli and Gzip compression providers
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = System.IO.Compression.CompressionLevel.Fastest; // Change to Fastest if you want faster compression with lower ratio
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = System.IO.Compression.CompressionLevel.Optimal; // Use Optimal or Fastest based on your needs
+});
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -34,7 +62,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
-
+app.UseResponseCompression();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

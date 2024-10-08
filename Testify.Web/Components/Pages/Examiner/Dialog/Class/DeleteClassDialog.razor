@@ -1,21 +1,48 @@
-﻿<MudDialog>
+﻿@using Testify.DAL.Models;
+@using Testify.Web.Data.Commons
+<MudDialog>
     <TitleContent>
-        Xóa lớp học
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Vô hiệu hoá lớp</MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Bạn có muốn xóa không?</MudText>
+        <MudText>Bạn chắc chắn muốn vô hiệu hóa lớp <MudText Style="font-weight: bold">@classes?.Status</MudText> không?</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="@Color.Error" Variant="Variant.Filled" OnClick="Submit">Xóa</MudButton>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="Submit">Xóa</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
+    private Class classes { get; set; }
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    [Parameter]
+    public int ClassId { get; set; }
+
+    MudForm form;
+
+    protected override async Task OnInitializedAsync()
+    {
+        classes = await _serClass.GetClassId(ClassId);
+    }
+
+    private async Task Submit()
+    {
+        var check = await _serClass.UpdateStatus(ClassId, Convert.ToByte(StatusType.unActive));
+        if(check != null)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Vô hiệu hoá thành công", Severity.Success);
+        }
+        else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Vô hiệu hoá thất bại", Severity.Error);
+        }
+    }
 
     private void Cancel() => MudDialog.Cancel();
 }

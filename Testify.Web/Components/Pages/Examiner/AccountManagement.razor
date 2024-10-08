@@ -57,38 +57,23 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Mã tài khoản" T="string">Mã tài khoản</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string">Họ và tên</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Ngày sinh" T="DateOnly">Ngày sinh</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Địa chỉ" T="string">Địa chỉ</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Level" T="string">Level</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Tên tài khoản" T="string">Tên tài khoản</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Email" T="string">Email</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="PasswordHash" T="string">PasswordHash</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Ảnh đại diện" T="string">Ảnh đại diện</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Lần cuối đăng nhập" T="string">Lần cuối đăng nhập</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Mã tài khoản">@context.Id</MudTd>
                 <MudTd DataLabel="Họ và tên">@context.FullName</MudTd>
                 <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
                 <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
-                <MudTd DataLabel="Địa chỉ">@context.Address</MudTd>
-                <MudTd DataLabel="Level">@context.LevelId</MudTd>
-                <MudTd DataLabel="Tên tài khoản">@context.UserName</MudTd>
-                <MudTd DataLabel="Email">@context.Email</MudTd>
-                <MudTd DataLabel="PasswordHash">@context.PasswordHash</MudTd>
-                <MudTd DataLabel="Ảnh đại diện">@context.AvatarUrl</MudTd>
-                <MudTd DataLabel="Lần cuối đăng nhập">@context.LastLogin</MudTd>
                 <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
 
-                <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                <MudTd Style="marign:3px" DataLabel="Thao tác">
+                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
+                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
+                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+
                 </MudTd>
             </RowTemplate>
 
@@ -110,7 +95,8 @@
 </div>
 @code {
     private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
-
+    private string searchValue = "";
+    private bool isLoading { get; set; } = true;
     private List<User>? _lstUser { get; set; }
 
     private Level level { get; set; }
@@ -120,12 +106,16 @@
 
     private User user { get; set; }
 
-
+    private async Task LoadData()
+    {
+        _lstUser = await _serLec.GetAllLecturer();
+        isLoading = false;
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        _lstUser = await _serLec.GetAllLecturer();
 
+        await LoadData();
     }
 
 
@@ -154,23 +144,39 @@
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.CreateAccountDialog>("Options Dialog", options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
 
         }
         else if (name.Equals(OpenDialogType.Update))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
 
         }
         else if (name.Equals(OpenDialogType.Detail))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.DetailsAccountManagement>("Options Dialog", dialogParametersUserId, options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
         }
         else
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.DeleteAccountManagement>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData();
+            }
          
         }
     }

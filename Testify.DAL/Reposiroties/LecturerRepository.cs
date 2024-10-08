@@ -19,7 +19,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<User>> GetAllLecturer()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.Where(x => x.LevelId == 3).ToListAsync();
         }
 
         public async Task<List<User>> GetAllTeacher()
@@ -30,11 +30,11 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Users.FindAsync(id);
         }
-
         public async Task<User> CreateLecturer(User user)
         {
             try
             {
+                user.LevelId = 3;
                 var addLecturer = _context.Users.Add(user).Entity;
                 await _context.SaveChangesAsync();
                 return addLecturer;
@@ -62,7 +62,7 @@ namespace Testify.DAL.Reposiroties
                 updateLecturer.LastLogin = user.LastLogin;
                 updateLecturer.Email = user.Email;
                 updateLecturer.Status = user.Status;
-                updateLecturer.LevelId = user.LevelId;
+                updateLecturer.LevelId = 3;
                 //updateCandidate.Level = user.Level;
 
 

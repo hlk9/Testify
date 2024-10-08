@@ -23,7 +23,8 @@ namespace Testify.DAL.Models
         public double PassMark { get; set; }
         public int Duration { get; set; }
         [ForeignKey("ScoreMethodId")]
-        public int ScoreMethodId { get; set; }
+        public int? ScoreMethodId { get; set; }
         public virtual ScoreMethod? ScoreMethod { get; set; }
+        public ICollection<ExamDetail>? ExamDetails { get; set; }
     }
 }

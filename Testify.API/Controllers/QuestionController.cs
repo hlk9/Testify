@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 
 namespace Testify.API.Controllers
@@ -66,6 +67,13 @@ namespace Testify.API.Controllers
         {
             var deleteQuestion = await _repoQuestion.DeleteQuestion(id);
             return Ok(deleteQuestion);
+        }
+
+        [HttpGet("Get-AnswerIsTrue-Point-Question")]
+        public async Task<ActionResult<AnswerAndQuestion>> GetQuestionWithTrueAnswer(int questionId, int examDetailId)
+        {
+            var obj = await _repoQuestion.GetQuestionWithTrueAnswer(questionId, examDetailId);
+            return Ok(obj);
         }
     }
 }

@@ -10,9 +10,12 @@ namespace Testify.Web.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<Subject>> GetAllSub()
+        public async Task<List<Subject>> GetAllSub(string? textSearch, bool isActive)
         {
-            return await _httpClient.GetFromJsonAsync<List<Subject>>("Subject/get-all-subject");
+            var allSubject = await _httpClient.GetAsync($"Subject/get-all-subject?keyWord={textSearch}&isActive={isActive}");
+            var response = await allSubject.Content.ReadFromJsonAsync<List<Subject>>();
+
+            return response;
         }
 
         public async Task<Subject> GetSubId(int id)

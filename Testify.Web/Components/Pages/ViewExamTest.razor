@@ -1,0 +1,450 @@
+﻿@page "/ViewExam"
+@using Testify.DAL.ViewModels
+@using Testify.Web.Data.Commons
+
+@* <MudPaper Elevation="0" Class="exam_main">
+    <MudPaper Elevation="0" Class="exam_container">
+        <MudPaper Elevation="0" Class="left_panel">
+            <MudPaper Elevation="0" Class="left_panel_header">
+                <MudText Class="text-white">Thời gian còn lại: ...</MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Class="text-white" OnClick="OpenRightContent"></MudIconButton>
+            </MudPaper>
+            <MudPaper Elevation="0" Class="left_panel_content hidden-scroll">
+                @if (_lstQuestionWithAnswers != null)
+                {
+                    foreach (var q in _lstQuestionWithAnswers)
+                    {
+                        stt = 1;
+                        <MudPaper Elevation="0" Class="w-100 mb-5">
+                            <MudPaper Elevation="4" Class="bg-transparent w-100" Style="border-radius: 30px 30px 15px 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                                <MudText Class="fw-bold fs-5 text-white py-4 px-4" Style="background-color: #29a69a; border-radius: 30px 30px 0px 0px"><b>Câu @(stt++):</b> @q.Content</MudText>
+                                <MudGrid Class="pb-4 m-0 w-100" Style="border-radius: 0px 0px 15px 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
+                                    @for (int i = 0; i < q.Answers.Count; i++)
+                                    {
+                                        var answer = q.Answers[i];
+                                        bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == q.Id && x.Answers.Any(a => a.Id == answer.Id));
+                                        string contentAnswer = (char)('A' + 1) + $". {@answer.Content}";
+
+                                        @if (q.QuestionType == Convert.ToInt32(listQuestionTypes.SingleChoice) || q.QuestionType == Convert.ToInt32(listQuestionTypes.YesNo))
+                                        {
+                                            if (isSelect)
+                                            {
+                                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                    <MudButton Class="py-3 text-start w-100 text-truncate text-wrap h-100"
+                                                               Style="border-radius: 10px; border: 1px solid #29a69a; background-color: #29a69a; color: #fff"
+                                                               OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                        <MudText>@contentAnswer</MudText>
+                                                    </MudButton>
+                                                </MudItem>
+                                            }
+                                            else
+                                            {
+                                                <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                    <MudButton Class="py-3 text-start w-100 text-truncate text-wrap h-100"
+                                                               Style="border-radius: 10px; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                               OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                        <MudText>@contentAnswer</MudText>
+                                                    </MudButton>
+                                                </MudItem>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                <MudCheckBox T="int" Label="@contentAnswer" Class="py-1 text-start w-100 text-truncate text-wrap h-100"
+                                                             Style="border-radius: 10px; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                             ValueChanged="@(() => IsSelectAnswerMulti(q.Id, answer.Id))" />
+                                            </MudItem>
+                                        }
+
+                                    }
+                                </MudGrid>
+                            </MudPaper>
+                        </MudPaper>
+                    }
+                }
+            </MudPaper>
+        </MudPaper>
+        <MudPaper Elevation="0" Class="right_panel_pc">
+            <MudPaper Class="right_panel_header">
+                <MudText Class="text-white">Thí Sinh: <span class="fw-bold">Nguyễn Văn Thị Lò A</span></MudText>
+                <MudText Class="text-white">Thời gian còn lại: <span class="fw-bold">59:03</span></MudText>
+            </MudPaper>
+            <MudPaper Elevation="0" Class="right_panel_content">
+                <MudText Class="text-center w-100 fw-bold fs-4">Cuối kì I</MudText>
+
+                <MudPaper Elevation="0" Class="mt-4 w-100">
+                    <MudPaper Class="right_panel_list_answer" Elevation="0">
+                        @foreach (var a in _lstQuestionWithAnswers)
+                        {
+                            sttList = 1;
+                            bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == a.Id);
+                            if (isSelect)
+                            {
+                                <MudButton Class="btn_answer" Style="background-color: #29a69a; color: #fff">@(sttList++)</MudButton>
+                            }
+                            else
+                            {
+                                <MudButton Class="btn_answer">@(sttList++)</MudButton>
+                            }
+                        }
+                    </MudPaper>
+                </MudPaper>
+            </MudPaper>
+
+            <MudPaper Elevation="0" Class="btn_submit">
+                <MudGrid>
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                        <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a">Rời khỏi</MudButton>
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                        <MudButton Class="w-100 text-white" Style="background-color: #29a69a">Nộp bài</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="@isOpenClassMobile">
+            <MudPaper Elevation="0" Class="check bg-transparent rounded-0">
+                <MudButton Class="bg_black_close rounded-0" OnClick="CloseMobile"></MudButton>
+                <MudPaper Elevation="0" Class="right_panel_content_mobile">
+                    <MudPaper Class="right_panel_header">
+                        <MudText Class="text-white">Thí Sinh: <span class="fw-bold">Nguyễn Văn Thị Lò A</span></MudText>
+                        <MudIconButton Icon="@Icons.Material.Filled.Close" Class="text-white" OnClick="CloseMobile"></MudIconButton>
+                    </MudPaper>
+                    <MudPaper Elevation="0" Class="right_content">
+                        <MudText Class="text-center w-100 fw-bold fs-4">Cuối kì I</MudText>
+
+                        <MudPaper Elevation="0" Class="mt-4 w-100">
+                            <MudPaper Class="right_panel_list_answer" Elevation="0">
+                                @foreach (var a in _lstQuestionWithAnswers)
+                                {
+                                    sttList = 1;
+                                    bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == a.Id);
+                                    if (isSelect)
+                                    {
+                                        <MudButton Class="btn_answer" Style="background-color: #29a69a; color: #fff">@(sttList++)</MudButton>
+                                    }
+                                    else
+                                    {
+                                        <MudButton Class="btn_answer">@(sttList++)</MudButton>
+                                    }
+                                }
+                            </MudPaper>
+                        </MudPaper>
+                    </MudPaper>
+
+                    <MudPaper Elevation="0" Class="btn_submit">
+                        <MudGrid>
+                            <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                                <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a">Rời khỏi</MudButton>
+                            </MudItem>
+                            <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                                <MudButton Class="w-100 text-white" Style="background-color: #29a69a">Nộp bài</MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                </MudPaper>
+            </MudPaper>
+        </MudPaper>
+    </MudPaper>
+</MudPaper> *@
+
+@if(isLoading)
+{
+    <Testify.Web.Shared.LoadingContext />
+}
+else
+{
+    <MudDrawer @bind-Open="@_open" Width="30%" ClipMode="DrawerClipMode.Never" Elevation="3" Anchor="Anchor.End" Variant="@DrawerVariant.Responsive">
+        <MudDrawerHeader Class="align-items-center">
+            <MudText Class="fs-6">Thí sinh: <b>Nguyễn Văn Thị Lò A</b></MudText>
+        </MudDrawerHeader>
+        <MudPaper Elevation="0" Class="w-100 pt-5 px-4 h-100">
+            <MudText Class="fs-5 fw-bold text-center text-uppercase">@exam.Name</MudText>
+            <MudPaper Elevation="0" Class="w-100 d-flex justify-content-center gap-3 flex-wrap py-5 hidden-scroll" Style="min-height: 400px; max-height: 400px; overflow: scroll">
+                @foreach (var a in _lstQuestionWithAnswers)
+                {
+                    sttList = 1;
+                    bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == a.Id);
+                    if (isSelect)
+                    {
+                        <MudButton Style="background-color: #29a69a; color: #fff; width: 50px; height: 50px;">@(sttList++)</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Style="color: #000; width: 50px; height: 50px; border: 1px solid rgba(0, 0, 0, 0.2)">@(sttList++)</MudButton>
+                    }
+                }
+            </MudPaper>
+            <MudPaper Elevation="0" Class="position-absolute">
+                <MudGrid>
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                        <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a">Rời khỏi</MudButton>
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                        <MudButton Class="w-100 text-white" Style="background-color: #29a69a">Nộp bài</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudPaper>
+    </MudDrawer>
+    <MudMainContent>
+        <MudAppBar Elevation="2">
+            <MudText>Thời gian còn lại: <b>@timeRemaining</b></MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Class="d-lg-none d-block" Edge="Edge.End" OnClick="@ToggleDrawer" />
+        </MudAppBar>
+        <MudPaper Elevation="0" Class="p-4">
+            @if (_lstQuestionWithAnswers != null)
+            {
+                foreach (var q in _lstQuestionWithAnswers)
+                {
+                    stt = 1;
+                    <MudPaper Elevation="0" Class="w-100 mb-5">
+                        <MudPaper Elevation="4" Class="bg-transparent w-100">
+                            <MudText Class="fw-bold text-white p-4 rounded-top rounded-3" Style="background-color: #29a69a;"><b>Câu @(stt++):</b> @q.Content</MudText>
+                            <MudGrid Class="pb-4 m-0 w-100">
+                                @for (int i = 0; i < q.Answers.Count; i++)
+                                {
+                                    var answer = q.Answers[i];
+                                    string contentAnswer = (char)('A' + i) + $". {answer.Content}";
+                                    bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == q.Id && x.Answers.Any(y => y.Id == answer.Id));
+                                    @if (q.QuestionType == Convert.ToInt32(listQuestionTypes.SingleChoice) || q.QuestionType == Convert.ToInt32(listQuestionTypes.YesNo))
+                                    {
+                                        if (isSelect)
+                                        {
+                                            <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                <MudButton Class="py-3 w-100 text-truncate text-wrap h-100"
+                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2); background-color: rgba(0, 0, 0, 0.2)"
+                                                           OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                    <MudText Class="text-start w-100">@contentAnswer</MudText>
+                                                </MudButton>
+                                            </MudItem>
+                                        }
+                                        else
+                                        {
+                                            <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                <MudButton Class="py-3 w-100 text-truncate text-wrap h-100"
+                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                           OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                    <MudText Class="text-start w-100">@contentAnswer</MudText>
+                                                </MudButton>
+                                            </MudItem>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                            <MudCheckBox T="int" Label="@contentAnswer" Class="py-1 text-start w-100 text-truncate text-wrap h-100"
+                                                         Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                         ValueChanged="@(() => IsSelectAnswerMulti(q.Id, answer.Id))" />
+                                        </MudItem>
+                                    }
+                                }
+                            </MudGrid>
+                        </MudPaper>
+                    </MudPaper>
+                }
+            }
+        </MudPaper>
+    </MudMainContent>
+}
+
+@code {
+    [Inject]
+    private IDialogService _mudDialogServices { get; set; }
+
+    private Exam exam { get; set; } = new();
+    private List<ExamDetail> _lstexamDetails;
+    private List<ExamDetailQuestion> _lstexamDetailsQuestion;
+    private List<QuestionWithAnswer> _lstQuestionWithAnswers = new List<QuestionWithAnswer>();
+    private List<QuestionAndAnswerChoosen> _lstQAndASelect = new List<QuestionAndAnswerChoosen>();
+    private int countdownTime;
+    private int timeDoExam = 0;
+    private string timeRemaining = "";
+    private bool isLoading;
+    private int idExam = 2;
+    private int idExamDetail;
+    private int stt;
+    private int sttList;
+    private System.Timers.Timer timer;
+    private bool _open = true;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+
+    private async Task LoadExam()
+    {
+        _lstexamDetails = await _serExamDetail.GetExamDetailByExamId(idExam);
+        Random rad = new Random();
+        var indexExamdetail = rad.Next(_lstexamDetails.Count);
+        idExamDetail = _lstexamDetails[indexExamdetail].Id;
+        _lstexamDetailsQuestion = await _serExamDetailQuestion.GetAllByExamDetailId(idExamDetail);
+        foreach (var item in _lstexamDetailsQuestion)
+        {
+            Question question = await _serQuestion.GetQuestionById(item.QuestionId);
+
+            QuestionWithAnswer questionWithAnswer = new QuestionWithAnswer()
+                {
+                    Id = question.Id,
+                    Content = question.Content,
+                    QuestionType = question.QuestionTypeId,
+                    Answers = await _serAnswer.GetAllByQuestionId(item.QuestionId)
+                };
+
+            _lstQuestionWithAnswers.Add(questionWithAnswer);
+        }
+
+        isLoading = false;
+    }
+
+    private async Task IsSelectAnswerSingle(int questionId, int answerId)
+    {
+        List<Answer> lstAnswers = new List<Answer>();
+        var objanswer = await _serAnswer.GetById(answerId);
+        lstAnswers.Add(objanswer);
+        var objQuestionAndAnswer = _lstQAndASelect.FirstOrDefault(x => x.QuestionId == questionId);
+        if (objQuestionAndAnswer != null)
+        {
+            objQuestionAndAnswer.Answers = lstAnswers;
+        }
+        else
+        {
+            _lstQAndASelect.Add(new QuestionAndAnswerChoosen { QuestionId = questionId, Answers = lstAnswers });
+        }
+    }
+
+    private async Task IsSelectAnswerMulti(int questionId, int answerId)
+    {
+        List<Answer> lstAnswers = new List<Answer>();
+        var objanswer = await _serAnswer.GetById(answerId);
+        lstAnswers.Add(objanswer);
+        var objQuestionAndAnswer = _lstQAndASelect.FirstOrDefault(x => x.QuestionId == questionId);
+        if (objQuestionAndAnswer != null)
+        {
+            if (objQuestionAndAnswer.Answers.Any(x => x.Id == answerId) && objQuestionAndAnswer.Answers.Count > 1)
+            {
+                objQuestionAndAnswer.Answers.RemoveAll(x => x.Id == answerId);
+            }
+            else if (objQuestionAndAnswer.Answers.Any(x => x.Id == answerId) && objQuestionAndAnswer.Answers.Count == 1)
+            {
+                _lstQAndASelect.RemoveAll(x => x.QuestionId == questionId);
+            }
+            else
+            {
+                objQuestionAndAnswer.Answers.Add(objanswer);
+            }
+        }
+        else
+        {
+            _lstQAndASelect.Add(new QuestionAndAnswerChoosen { QuestionId = questionId, Answers = lstAnswers });
+        }
+    }
+
+    private async Task ScoreExam()
+    {
+        Submission submission = new Submission();
+        double score = exam.MaximmumMark;
+        bool isPassed = false;
+        int unAswered = exam.NumberOfQuestions - _lstQAndASelect.Count();
+        int answered = _lstQAndASelect.Count();
+
+        foreach (var q in _lstQAndASelect)
+        {
+            AnswerAndQuestion QnA = await _serQuestion.GetTrueAnswerOfQuesiton(q.QuestionId, idExamDetail);
+
+            if (q.Answers.Count() == 1)
+            {
+                foreach (var a in q.Answers)
+                {
+                    if (a.IsCorrect == false)
+                    {
+                        score -= QnA.PointOfQuestion;
+                    }
+                }
+            }
+            else
+            {
+                bool allAnswerTrue = (q.Answers.Where(x => x.IsCorrect == true).Count() == QnA.LstAnswer.Count());
+                if (!allAnswerTrue)
+                {
+                    score -= QnA.PointOfQuestion;
+                }
+            }
+        }
+
+        if (score >= exam.PassMark)
+        {
+            isPassed = true;
+        }
+        else
+        {
+            isPassed = false;
+        }
+
+        var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+
+        submission.UserId = Guid.Parse(userId.Value);
+        submission.ExamDetailId = idExamDetail;
+        submission.ExamScheduleId = 6;
+        submission.SubmitTime = DateTime.Now;
+        submission.TimeTaken = TimeSpan.FromSeconds(timeDoExam);
+        submission.TotalMark = score;
+        submission.IsPassed = isPassed;
+        submission.UnAnswered = unAswered;
+        submission.Answered = answered;
+        submission.Note = "Đạt";
+        submission.Status = true;
+
+        var objSub = await _serSubmission.CreateSubmission(submission);
+        if (objSub != null)
+        {
+            AnswerSubmission AnS = new AnswerSubmission();
+
+            foreach (var item in _lstQAndASelect)
+            {
+                AnS.SubmissionId = objSub.Id;
+                AnS.QuestionId = item.QuestionId;
+                foreach (var a in item.Answers)
+                {
+                    AnS.AnswerId = a.Id;
+                    await _serAnS.CreateAnswerSubmission(AnS);
+                }
+            }
+            snackbar.Add("Nộp bài thành công", Severity.Success);
+        }
+        else
+        {
+            snackbar.Add("Nộp bài thất bại", Severity.Error);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        exam = await _serExam.GetExamId(idExam);
+        await LoadExam();
+    }
+
+    private string isOpenClassMobile = "right_panel_mobile";
+
+    private void OpenRightContent()
+    {
+        if (isOpenClassMobile == "right_panel_mobile")
+        {
+            isOpenClassMobile = "right_panel_mobile d-block";
+        }
+        else
+        {
+            isOpenClassMobile = "right_panel_mobile";
+        }
+    }
+
+    private void CloseMobile()
+    {
+        isOpenClassMobile = "right_panel_mobile";
+    }
+}

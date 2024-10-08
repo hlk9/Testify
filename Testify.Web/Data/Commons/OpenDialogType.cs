@@ -8,5 +8,6 @@
         public static string Delete = "Delete";
         public static string ShowAnswer = "ShowAnswer";
         public static string ShowDialogAddNewAnswer = "ShowDialogAddNewAnswer";
+        public static string ImportExcel = "Import";
     }
 }

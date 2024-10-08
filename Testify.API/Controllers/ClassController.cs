@@ -3,6 +3,7 @@ using System.Linq;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -16,9 +17,9 @@ namespace Testify.API.Controllers
             classRepository = new ClassRepository();
         }
         [HttpGet("Get-Classes")]
-        public async Task<ActionResult<List<Room>>> GetAll()
+        public async Task<ActionResult<List<ClassWithUser>>> GetAll(string? keyword, bool isActive)
         {
-            var lstClass = await classRepository.GetAllClass();
+            var lstClass = await classRepository.GetClassWithUser(keyword, isActive);
             return Ok(lstClass);
         }
         [HttpGet("get-classes-by-id")]
@@ -42,10 +43,17 @@ namespace Testify.API.Controllers
         }
 
         [HttpPut("Update-Class")]
-        public async Task<ActionResult<Class>> UpdateClass(Class r)
+        public async Task<ActionResult<Class>> UpdateClass(Class c)
         {
-            var updateClass = await classRepository.UpdateClass(r);
+            var updateClass = await classRepository.UpdateClass(c);
             return Ok(updateClass);
+        }
+
+        [HttpPut("Update-Status")]
+        public async Task<ActionResult<Class>> UpdateStatus(int classId, byte status)
+        {
+            var updateStatus = await classRepository.UpdateStatusClass(classId, status);
+            return Ok(updateStatus);
         }
     }
 }

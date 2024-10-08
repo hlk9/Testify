@@ -1,6 +1,8 @@
 ﻿@page "/Examiner/ExamScheduleManagement"
+@using Testify.API.DTOs
 @layout AdminLayout
 @inject IDialogService DialogService
+@inject ExamScheduleService scheduleService
 <style>
     .add-button-end {
         background-color: #29A69A;
@@ -30,7 +32,7 @@
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
 
 
-        <MudTable Items="@itemTable" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@listSchedule" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -46,23 +48,34 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Mã lịch thi" T="string">Mã lịch thi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Mã bài thi" T="string">Mã bài thi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên lịch thi" T="string">Mã lịch thi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Bài thi" T="string">Mã bài thi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Mã bài thi</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thời gian bắt đầu" T="string">Thời gian bắt đầu</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thời gian kết thúc" T="string">Thời gian kết thúc</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Mã lịch thi">@context.Column1</MudTd>
-                <MudTd DataLabel="Mã bài thi">@context.Column2</MudTd>
-                <MudTd DataLabel="Thời gian bắt đầu">@context.Column3</MudTd>
-                <MudTd DataLabel="Thời gian kết thúc">@context.Column4</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Column5</MudTd>
+                <MudTd DataLabel="Tên lịch thi">@context.Title</MudTd>
+                <MudTd DataLabel="Bài thi">@context.ExamName</MudTd>
+                <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                <MudTd DataLabel="Thời gian bắt đầu">@context.StartTime</MudTd>
+                <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
+                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update"))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"details"))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,""))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    <MudTooltip Text="Sửa">
+                        <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Chi tiết">
+                        <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Xoá">
+
+                        <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTooltip>
+
+
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -92,46 +105,89 @@
     };
     public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
 
-    private int a;
-    public record Model(string Column1, string Column2, string Column3);
+    private List<ExamScheduleDto> listSchedule = new List<ExamScheduleDto>();
 
-    public record ModelTable(string Column1, string Column2, string Column3, string Column4, string Column5);
-
-    private List<Model> _items = new List<Model>();
-
-    private List<ModelTable> itemTable = new List<ModelTable>();
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        for (var i = 0; i < 20; i++)
-        {
-
-            _items.Add(new Model($"Value_{i}", $"Value_{i}", $"Value_{i}"));
-            itemTable.Add(new ModelTable($"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}", $"Value_{i}"));
-        }
-
+        listSchedule = await scheduleService.GetInforBasic();
     }
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
 
-    private Task OpenDialogAsync(DialogOptions options, string name)
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+
+
+
+    private async Task ShowDeleteDialog(DialogOptions options, int Id)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id }
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || !result.Canceled)
+        {
+            listSchedule = await scheduleService.GetInforBasic();
+        }
+    }
+
+    private async Task OpenDetailAsync(DialogOptions options, int Id)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id }
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.DetailsExamSchedule>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || !result.Canceled)
+        {
+            listSchedule = await scheduleService.GetInforBasic();
+        }
+    }
+
+    private async Task ShowUpdateDialog(DialogOptions options, int Id)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id }
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.UpdateExamScheduleDialog>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || !result.Canceled)
+        {
+            listSchedule = await scheduleService.GetInforBasic();
+        }
+    }
+
+
+
+
+    private async Task OpenDialogAsync(DialogOptions options, string name)
     {
         if (name.Equals("create"))
         {
-            return DialogService.ShowAsync<Dialog.ExamSchedule.CreateExamScheduleDialog>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.CreateExamScheduleDialog>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                listSchedule = await scheduleService.GetInforBasic();
+            }
+
         }
         else if (name.Equals("update"))
         {
-            return DialogService.ShowAsync<Dialog.ExamSchedule.UpdateExamScheduleDialog>("Options Dialog", options);
+            DialogService.ShowAsync<Dialog.ExamSchedule.UpdateExamScheduleDialog>("Options Dialog", options);
         }
         else if (name.Equals("details"))
         {
-            return DialogService.ShowAsync<Dialog.ExamSchedule.DetailsExamSchedule>("Options Dialog", options);
+            DialogService.ShowAsync<Dialog.ExamSchedule.DetailsExamSchedule>("Options Dialog", options);
         }
         else
         {
-            return DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", options);
+            DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", options);
         }
+        StateHasChanged();
 
     }
 }

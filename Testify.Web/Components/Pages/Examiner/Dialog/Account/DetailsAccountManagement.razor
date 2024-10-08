@@ -7,7 +7,7 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Model="@users">
+        <MudForm Spacing="3" Model="@users">
 
             <MudTextField T="Guid" @bind-Value="@users.Id" Label="Mã tài khoản"  ReadOnly=true/>
             <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" ReadOnly=true />

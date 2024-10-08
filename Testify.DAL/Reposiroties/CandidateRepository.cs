@@ -19,7 +19,9 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<User>> GetAllCandidate()
         {
-            return await _context.Users.ToListAsync();
+            //return await _context.Users.ToListAsync();
+            return await _context.Users.Where(x => x.LevelId == 4).ToListAsync();
+            
         }
 
         public async Task<User> GetCandidateById(Guid id)
@@ -31,6 +33,8 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
+                // gán luôn LevelId = 4 để khi thêm mặc định lv = 4 => là thí sinh
+                user.LevelId = 4;
                 var addCandidate = _context.Users.Add(user).Entity;
                 await _context.SaveChangesAsync();
                 return addCandidate;
@@ -57,7 +61,7 @@ namespace Testify.DAL.Reposiroties
                 updateCandidate.LastLogin = user.LastLogin;
                 updateCandidate.Email = user.Email;
                 updateCandidate.Status = user.Status;
-                updateCandidate.LevelId = user.LevelId;
+                updateCandidate.LevelId = 4;
                 //updateCandidate.Level = user.Level;
                
 
