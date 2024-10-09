@@ -1,0 +1,116 @@
+﻿@using OfficeOpenXml
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới tài khoản bằng file excel</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
+            <MudTextField T="string" @bind-Value="@nameFileCurrent"></MudTextField>
+            <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadChange">
+                <ActivatorContent>
+                    <MudFab StartIcon="@Icons.Material.Filled.FileUpload"
+                            Label="File Excel" />
+                </ActivatorContent>
+            </MudFileUpload>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="bg-transparent mt-3 d-flex justify-content-between align-items-center">
+            <MudButton Class="bg-info text-white"   OnClick="@(() => Submit(false))" >Kiểm tra file excel</MudButton>
+        </MudPaper>
+
+        <MudPaper Elevation="0" Class="bg-transparent mt-3">
+             @if (_lstAccountFromExcel != null)
+            {
+                <MudTable Items="@_lstAccountFromExcel" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true">
+                    <RowTemplate>
+                        <MudTd DataLabel="Họ và tên" hidden>@context.FullName</MudTd>
+                        <MudTd DataLabel="Tên tài khoản">@context.UserName</MudTd>
+                        <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
+                        <MudTd DataLabel="Địa chỉ">@context.Address</MudTd>
+                        <MudTd DataLabel="Email">@context.Email</MudTd>
+                        <MudTd DataLabel="Mật khẩu">@context.PasswordHash</MudTd>
+                        <MudTd DataLabel="Chức vụ">@context.LevelId</MudTd>
+                    </RowTemplate>
+
+                    <NoRecordsContent>
+                        <MudText>No Data</MudText>
+                    </NoRecordsContent>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+            } 
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary"@*  OnClick="@(() => Submit(true))" *@>Thêm mới</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    private void Cancel() => MudDialog.Cancel();
+
+    private string[] allowFileUpload = { ".xlsx", ".xls" };
+    private string nameFileCurrent;
+    private IBrowserFile selectFileCurrent;
+    private int countAccount = 0;
+    private List<AccountExcel>? _lstAccountFromExcel;
+
+    private async Task UploadChange(IBrowserFile file)
+    {
+        if (file == null)
+        {
+            return;
+        }
+        var contentAfterDotLast = Path.GetExtension(file.Name);
+
+        if (!allowFileUpload.Contains(contentAfterDotLast))
+        {
+            snackbar.Add("Dạng file không đúng. Chỉ nhận file excel!", Severity.Error);
+            return;
+        }
+
+        nameFileCurrent = file.Name;
+        selectFileCurrent = file;
+    }
+
+    private async Task Submit(bool isSubmit)
+    {
+        if(selectFileCurrent == null)
+        {
+            snackbar.Add("Chưa có file nào được chọn", Severity.Error);
+            return;
+
+            using var stream = new MemoryStream();
+            await selectFileCurrent.OpenReadStream().CopyToAsync(stream);
+            stream.Position = 0;
+
+            ExcelPackage package = new ExcelPackage(stream);
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            ExcelWorksheet worksheetQuestion = package.Workbook.Worksheets[0];
+            ExcelWorksheet worksheetAnswer = package.Workbook.Worksheets[1];
+            int rowCount = worksheetQuestion.Dimension.Rows;
+            int colCount = worksheetQuestion.Dimension.Columns;
+
+            _lstAccountFromExcel = new List<AccountExcel>();
+            countAccount = 0;
+        }
+    }
+
+    private class AccountExcel()
+    {
+        public string FullName { get; set; }
+        public string UserName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+        public string Email { get; set; }
+        public string PasswordHash { get; set; }
+        public int LevelId { get; set; }
+
+
+    }
+}
