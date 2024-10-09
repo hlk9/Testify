@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,29 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public async Task<List<User>> GetAllLecturer()
+        public async Task<List<User>> GetAllLecturer(string? textSearch , bool isActive)
         {
-            return await _context.Users.Where(x => x.LevelId == 3).ToListAsync();
+            //return await _context.Users.ToListAsync();
+            if((string.IsNullOrEmpty(textSearch)|| textSearch.Length == 0) && isActive == false)
+            {
+                return await _context.Users.ToListAsync();
+            }
+            else if ((string.IsNullOrEmpty(textSearch)|| textSearch.Length == 0) && isActive == true)
+            {
+                return await _context.Users.Where(x=> x.Status==1).ToListAsync();
+            }
+            else if ((textSearch != null || textSearch != "") && isActive == true)
+            {
+                return await _context.Users.Where(x=>x.UserName.ToLower().Contains(textSearch.Trim().ToLower())
+                || x.FullName.ToLower().Contains(textSearch.Trim().ToLower())
+                || x.PhoneNumber.ToLower().Contains(textSearch.Trim().ToLower())
+                || x.Email.ToLower().Contains(textSearch.Trim().ToLower()) 
+                || x.Address.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1).ToListAsync();
+            }
+            else
+            {
+                return await _context.Users.Where(x => x.FullName.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+            }
         }
 
         public async Task<List<User>> GetAllTeacher()

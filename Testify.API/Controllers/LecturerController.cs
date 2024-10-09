@@ -16,9 +16,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-All-Lecturer")]
-        public async Task<ActionResult<List<User>>> GetlAllLecturer()
+        public async Task<ActionResult<List<User>>> GetlAllLecturer(string? keyWord, bool isActive)
         {
-            var lstLecturer = await _repo.GetAllLecturer();
+            var lstLecturer = await _repo.GetAllLecturer(keyWord,isActive);
             return Ok(lstLecturer);
         }
         [HttpGet("Get-Lecturer-By-Id")]

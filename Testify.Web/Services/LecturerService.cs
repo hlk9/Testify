@@ -10,9 +10,12 @@ namespace Testify.Web.Services
                 _httpClient = httpClien;
         }
 
-        public async Task<List<User>> GetAllLecturer()
+        public async Task<List<User>> GetAllLecturer(string? textSearch, bool isActive)
         {
-            return await _httpClient.GetFromJsonAsync<List<User>>("Lecturer/Get-All-Lecturer");
+            var allUsers = await _httpClient.GetAsync($"Lecturer/Get-All-Lecturer?keyWord={textSearch}&isActive={isActive}");
+            var response = await allUsers.Content.ReadFromJsonAsync<List<User>>();
+
+            return response;
         }
 
         public async Task<User> GetLecturerById(Guid id)
