@@ -45,11 +45,11 @@ else
                 }
             </MudPaper>
             <MudPaper Elevation="0" Class="position-absolute bottom-0 start-0 end-0">
-                <MudGrid>
-                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
-                        <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a">Rời khỏi</MudButton>
+                <MudGrid Class="p-0 m-0 w-100">
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12" Class="px-2 py-lg-3 py-0">
+                        <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a" OnClick="Cancle">Rời khỏi</MudButton>
                     </MudItem>
-                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12">
+                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12" Class="px-2 py-lg-3 py-2">
                         <MudButton Class="w-100 text-white" Style="background-color: #29a69a" OnClick="OnSubmit">Nộp bài</MudButton>
                     </MudItem>
                 </MudGrid>
@@ -136,29 +136,60 @@ else
     private int stt;
     private int sttList;
     private bool _open = true;
+    private System.Timers.Timer timer;
 
     private void ToggleDrawer()
     {
         _open = !_open;
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        CheckInput();
+        isLoading = true;
+        exam = await _serExam.GetExamId(idExam);
+        await LoadExam();
+    }
+
+    private void CheckInput()
+    {
+        if (idExam == null || idExam <= 0)
+        {
+            snackbar.Add("Không có bài thi nào!", Severity.Warning);
+            navigation.NavigateTo("/Admin/Home");
+            return;
+        }
+    }
+
     private async Task LoadExam()
     {
         _lstexamDetails = await _serExamDetail.GetExamDetailByExamId(idExam);
+        if (_lstexamDetails == null || _lstexamDetails.Count == 0)
+        {
+            snackbar.Add("Lỗi bài thi", Severity.Warning);
+            navigation.NavigateTo("/Admin/Home");
+            return;
+        }
         Random rad = new Random();
         var indexExamdetail = rad.Next(_lstexamDetails.Count);
         idExamDetail = _lstexamDetails[indexExamdetail].Id;
+        if (idExamDetail == null || idExamDetail <= 0)
+        {
+            snackbar.Add("Có lỗi", Severity.Warning);
+            navigation.NavigateTo("/Admin/Home");
+            return;
+        }
         _lstexamDetailsQuestion = await _serExamDetailQuestion.GetAllByExamDetailId(idExamDetail);
         foreach (var item in _lstexamDetailsQuestion)
         {
             Question question = await _serQuestion.GetQuestionById(item.QuestionId);
-
+            List<Answer> shuffledAnswer = (await _serAnswer.GetAllByQuestionId(item.QuestionId)).OrderBy(x => rad.Next()).ToList();
             QuestionWithAnswer questionWithAnswer = new QuestionWithAnswer()
                 {
                     Id = question.Id,
                     Content = question.Content,
                     QuestionType = question.QuestionTypeId,
-                    Answers = await _serAnswer.GetAllByQuestionId(item.QuestionId)
+                    Answers = shuffledAnswer
                 };
 
             _lstQuestionWithAnswers.Add(questionWithAnswer);
@@ -213,34 +244,35 @@ else
     private async Task ScoreExam()
     {
         Submission submission = new Submission();
-        double score = exam.MaximmumMark;
+        double score = 0;
         bool isPassed = false;
-        int unAswered = exam.NumberOfQuestions - _lstQAndASelect.Count();
-        int answered = _lstQAndASelect.Count();
-
+        int answered = 0;
         foreach (var q in _lstQAndASelect)
         {
+            answered++;
             AnswerAndQuestion QnA = await _serQuestion.GetTrueAnswerOfQuesiton(q.QuestionId, idExamDetail);
 
             if (q.Answers.Count() == 1)
             {
                 foreach (var a in q.Answers)
                 {
-                    if (a.IsCorrect == false)
+                    if (a.IsCorrect == true)
                     {
-                        score -= QnA.PointOfQuestion;
+                        score += QnA.PointOfQuestion;
                     }
                 }
             }
             else
             {
-                bool allAnswerTrue = (q.Answers.Where(x => x.IsCorrect == true).Count() == QnA.LstAnswer.Count());
-                if (!allAnswerTrue)
+                bool allAnswerTrue = (q.Answers.Where(x => x.IsCorrect == true).Count() == QnA.LstAnswer.Count() && q.Answers.Count() == QnA.LstAnswer.Count());
+                if (allAnswerTrue)
                 {
-                    score -= QnA.PointOfQuestion;
+                    score += QnA.PointOfQuestion;
                 }
             }
         }
+
+        int unAswered = exam.NumberOfQuestions - answered;
 
         if (score >= exam.PassMark)
         {
@@ -258,11 +290,11 @@ else
         submission.ExamScheduleId = 1;
         submission.SubmitTime = DateTime.Now;
         submission.TimeTaken = TimeSpan.FromSeconds(timeDoExam);
-        submission.TotalMark = score;
+        submission.TotalMark = Math.Round(score, 2);
         submission.IsPassed = isPassed;
         submission.UnAnswered = unAswered;
         submission.Answered = answered;
-        submission.Note = "Đạt";
+        submission.Note = isPassed == true ? "Đạt" : "Không đạt";
         submission.Status = true;
 
         var objSub = await _serSubmission.CreateSubmission(submission);
@@ -290,25 +322,26 @@ else
 
     private async Task OnSubmit()
     {
+        DialogOptions backdropClick = new() { BackdropClick = false };
+
         var confirm = await _mudDialogServices.ShowMessageBox
-        (
-            "Thông báo",
-            "Bạn chắc chắn muốn nộp bài thi?",
-            "Xác nhận",
-            cancelText: "Cancel"
-        );
+            (
+                "Thông báo",
+                "Bạn chắc chắn muốn nộp bài thi?",
+                "Xác nhận",
+                null,
+                cancelText: "Cancel",
+                backdropClick
+
+            );
 
         if (confirm == true)
         {
             await ScoreExam();
-            snackbar.Add("Hi");
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task Cancle()
     {
-        isLoading = true;
-        exam = await _serExam.GetExamId(idExam);
-        await LoadExam();
     }
 }
