@@ -130,7 +130,7 @@ else
     private int timeDoExam = 0;
     private string timeRemaining = "";
     private System.Timers.Timer timer;
-    private int countdownTime = 60;
+    private int countdownTime;
     private bool isLoading;
     private int idExam = 1;
     private int idExamDetail;
@@ -146,10 +146,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         CheckInput();
-        StartCountdown();
         isLoading = true;
         exam = await _serExam.GetExamId(idExam);
+        countdownTime = exam.Duration * 60;
         await LoadExam();
+        StartCountdown();
     }
 
     private void CheckInput()
@@ -353,6 +354,7 @@ else
     private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
     {
         countdownTime--;
+        timeDoExam++;
         var ts = TimeSpan.FromSeconds(countdownTime);
         timeRemaining = $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
         if (countdownTime <= 0)
