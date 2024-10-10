@@ -351,18 +351,31 @@ else
         timer.Enabled = true;
     }
 
+    private void FormatTime()
+    {
+        TimeSpan ts = TimeSpan.FromSeconds(countdownTime);
+
+        if(ts.TotalMinutes <= 60)
+        {
+            timeRemaining = $"{ts.Minutes:D2}:{ts.Seconds:D2}";
+        }
+        else
+        {
+            timeRemaining = $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+        }
+    }
+
     private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
     {
         countdownTime--;
         timeDoExam++;
-        var ts = TimeSpan.FromSeconds(countdownTime);
-        timeRemaining = $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+
         if (countdownTime <= 0)
         {
             timer.Stop();
-            timeRemaining = "00:00:00";
         }
 
+        FormatTime();
         InvokeAsync(StateHasChanged); 
     }
 
