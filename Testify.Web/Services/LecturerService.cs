@@ -1,4 +1,5 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -14,6 +15,14 @@ namespace Testify.Web.Services
         {
             var allUsers = await _httpClient.GetAsync($"Lecturer/Get-All-Lecturer?keyWord={textSearch}&isActive={isActive}");
             var response = await allUsers.Content.ReadFromJsonAsync<List<User>>();
+
+            return response;
+        }
+
+        public async Task<List<ScoreStatistics>> GetScore(int idSub, int idExam)
+        {
+            var allScore = await _httpClient.GetAsync($"Lecturer/Get-score?idsub={idSub}?idexam={idExam}");
+            var response = await allScore.Content.ReadFromJsonAsync<List<ScoreStatistics>>();
 
             return response;
         }
