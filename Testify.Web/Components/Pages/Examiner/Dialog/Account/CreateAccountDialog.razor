@@ -24,7 +24,7 @@
             <MudTextField T="string" @bind-Value="@users.Email" Label="Email"  />
             <MudTextField T="string" @bind-Value="@users.PasswordHash" Label="PasswordHash"  />
 @*             <MudTextField T="DateTime?" @bind-Value="@users.LastLogin" Label="Lần cuối đăng nhập" /> *@
-            <MudTextField T="byte" @bind-Value="@users.Status" Label="Trạng thái" />
+            @* <MudTextField T="byte" @bind-Value="@users.Status" Label="Trạng thái" /> *@
         </MudForm>
 
     </DialogContent>
@@ -36,24 +36,73 @@
 @code {
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
-
+    [Parameter]
+    public Guid UserId { get; set; }
     private User users { get; set; } = new();
 
-
-
-    private async Task Submit()
+    private bool ValidateForm()
     {
-        var check = await _serLec.CreateLecturer(users);
-        if(check == true)
+        int count = 0;
+        if(users.FullName == null || users.FullName.Trim().Length == 0)
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thành công", Severity.Success);
+            snackbar.Add("Họ và tên không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if (users.UserName == null || users.UserName.Trim().Length == 0)
+        {
+            snackbar.Add("Họ và tên không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if(users.DateOfBirth == null)
+        {
+            snackbar.Add("Ngày sinh không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if(users.Address == null || users.Address.Trim().Length == 0)
+        {
+            snackbar.Add("Địa chỉ không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if(users.Email ==null|| users.Email.Trim().Length == 0)
+        {
+            snackbar.Add("Email không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if(users.PasswordHash == null)
+        {
+            snackbar.Add("Mật khẩu không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if(count > 0)
+        {
+            return true;
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thất bại", Severity.Error);
+            return false;
         }
+    }
+
+    private async Task Submit()
+    {
+        var checkValidation = ValidateForm();
+        if (!checkValidation)
+        {
+            users.Status = 1;
+            
+            var check = await _serLec.CreateLecturer(users);
+            if (check == true)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thất bại", Severity.Error);
+            }
+        }
+       
     }
 
     private void Cancel() => MudDialog.Cancel();

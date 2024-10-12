@@ -16,10 +16,10 @@
         {
             <MudForm Spacing="3" Model="@subject" @ref="@form">
 
-                <MudTextField @bind-Value="@subject.Id" For="@(()=> subject.Id)" T="int" Label="Mã môn học" />
+                @* <MudTextField @bind-Value="@subject.Id" For="@(()=> subject.Id)" T="int" Label="Mã môn học" /> *@
                 <MudTextField @bind-Value="@subject.Name" For="@(()=> subject.Name)" T="string" Label="Tên môn học" />
                 <MudTextField @bind-Value="@subject.Description" For="@(()=> subject.Description)" T="string" Label="Mô tả" />
-                <MudTextField @bind-Value="@subject.Status" For="@(()=> subject.Status)" T="byte?" Label="Trạng thái" />
+               @*  <MudTextField @bind-Value="@subject.Status" For="@(()=> subject.Status)" T="byte?" Label="Trạng thái" /> *@
             </MudForm>
         }
     </DialogContent>
@@ -50,16 +50,42 @@
 
     private async Task AddNew()
     {
-        var check = await _serSub.CreateSub(subject);
-        if (check == true)
+        var checkValidation = ValidateForm();
+        if(!checkValidation)
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thành công", Severity.Success);
+            subject.Status = 1;
+            var check = await _serSub.CreateSub(subject);
+            if (check == true)
+            {
+
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thành công", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm thất bại", Severity.Error);
+            }
+        }
+        
+    }
+
+    private bool ValidateForm()
+    {
+        int count = 0;
+        if (subject.Name == null || subject.Name.Trim().Length == 0)
+        {
+            snackbar.Add("Tên không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if (count > 0)
+        {
+
+            return true;
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thất bại", Severity.Error);
+            return false;
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -58,6 +59,14 @@ namespace Testify.Web.Services
             var deleteQuestion = await _httpClient.DeleteAsync($"Question/Delete-Question?id={id}");
             var reponse = await deleteQuestion.Content.ReadFromJsonAsync<Question>();
             return reponse;
+        }
+
+        public async Task<AnswerAndQuestion> GetTrueAnswerOfQuesiton(int questionId, int examdetailId)
+        {
+            var obj = await _httpClient.GetAsync($"Question/Get-AnswerIsTrue-Point-Question?questionId={questionId}&examDetailId={examdetailId}");
+            var response = await obj.Content.ReadFromJsonAsync<AnswerAndQuestion>();
+
+            return response;
         }
     }
 }
