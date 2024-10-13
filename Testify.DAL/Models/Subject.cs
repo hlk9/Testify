@@ -13,7 +13,7 @@ namespace Testify.DAL.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; } 
-        public string Description { get; set; }
+        public string? Description { get; set; }
         //[ForeignKey("OrganizationId")]
         //public int OrganizationId { get; set; }
         //public virtual Organization? Organization { get; set; }
