@@ -101,7 +101,7 @@
                                     <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
                                         <MudCheckBox T="bool" Label="@contentAnswer" @bind-Value="@isSelect" Class="py-1 text-start w-100 text-truncate text-wrap h-100"
                                                      Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
-                                                      onclick="@(() => IsSelectAnswerMulti(q.Id, answer.Id))" ></MudCheckBox>
+                                                     onclick="@(() => IsSelectAnswerMulti(q.Id, answer.Id))"></MudCheckBox>
                                     </MudItem>
                                 }
                             }
@@ -139,23 +139,14 @@
         _open = !_open;
     }
 
-    // protected override async Task OnInitializedAsync()
-    //
-    //     CheckInput();
-    //     isLoading = true;
-    //     exam = await _serExam.GetExamId(idExam);
-    //     countdownTime = exam.Duration * 60;
-    //     await LoadExam();
-    //     StartCountdown();
-    // }
-
     protected override async Task OnInitializedAsync()
     {
         CheckInput();
         isLoading = true;
         exam = await _serExam.GetExamId(idExam);
-        countdownTime = exam.Duration * 60;
-        StartCountdown();
+        // countdownTime = exam.Duration * 60;
+
+        // StartCountdown();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -163,6 +154,7 @@
         if (firstRender)
         {
             await LoadExam();
+            StartCountdown();
         }
     }
 
@@ -180,7 +172,7 @@
     {
         Random rad = new Random();
         var idExamDetailLocalStorage = await localStorage.GetItemAsync<string>("IdExamDetail");
-        
+
         snackbar.Add(idExamDetailLocalStorage == null ? "chưa có" : idExamDetailLocalStorage);
         if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null)
         {
@@ -207,7 +199,7 @@
 
                 _lstQuestionWithAnswers.Add(questionWithAnswer);
             }
-            _lstQAndASelect = lstQAndASelect;
+              _lstQAndASelect = lstQAndASelect;
             return;
         }
 
@@ -244,7 +236,7 @@
         }
         await localStorage.SetItemAsync("IdExam", idExam);
         await localStorage.SetItemAsync("IdExamDetail", idExamDetail);
-
+        await localStorage.SetItemAsync("_lstQAndASelect", _lstQAndASelect);
     }
 
     private async Task IsSelectAnswerSingle(int questionId, int answerId)
@@ -397,12 +389,22 @@
         }
     }
 
-    private void StartCountdown()
+    private async void StartCountdown()
     {
+        var storedTime = await localStorage.GetItemAsync<string>("countdownTime");
+        if (storedTime != null && storedTime != "0")
+        {
+            countdownTime = Convert.ToInt32(storedTime);
+        }
+        else
+        {
+            countdownTime = exam.Duration * 60;
+        }
         timer = new System.Timers.Timer(1000);
         timer.Elapsed += OnTimedEvent;
-        timer.AutoReset = true;
-        timer.Enabled = true;
+        timer.Start();
+        // timer.AutoReset = true;
+        // timer.Enabled = true;
     }
 
     private void FormatTime()
@@ -421,23 +423,46 @@
 
     private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
     {
-        countdownTime--;
-        timeDoExam++;
-
-        if (countdownTime <= 0)
+        if (countdownTime > 0)
         {
-            timer.Stop();
-        }
+            countdownTime--;
+            timeDoExam++;
 
-        FormatTime();
-        InvokeAsync(StateHasChanged);
+            localStorage.SetItemAsync("countdownTime", countdownTime);
+
+            if (countdownTime <= 0)
+            {
+                timer.Stop();
+            }
+
+            FormatTime();
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task Cancle()
     {
-        await localStorage.RemoveItemAsync("IdExam");
-        await localStorage.RemoveItemAsync("IdExamDetail");
-        await localStorage.RemoveItemAsync("_lstQAndASelect");
-        navigation.NavigateTo("/Admin/Home");
+        DialogOptions backdropClick = new() { BackdropClick = false };
+
+        var confirm = await _mudDialogServices.ShowMessageBox
+            (
+                "Thông báo",
+                "Bạn chắc chắn muốn cút khỏi đây?",
+                "Xác nhận",
+                null,
+                cancelText: "Cancel",
+                backdropClick
+
+            );
+
+        if (confirm == true)
+        {
+            await localStorage.RemoveItemAsync("IdExam");
+            await localStorage.RemoveItemAsync("IdExamDetail");
+            await localStorage.RemoveItemAsync("_lstQAndASelect");
+            timer.Stop();
+            localStorage.RemoveItemAsync("countdownTime");
+            navigation.NavigateTo("/Admin/Home");
+        }
     }
 }
