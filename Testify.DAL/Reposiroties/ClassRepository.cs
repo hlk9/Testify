@@ -71,6 +71,12 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Classes.FindAsync(id);
         }
+
+        public async Task<Class> GetClassByCode(string ClassCode)
+        {
+            return await _context.Classes.FirstOrDefaultAsync(x => x.ClassCode.ToLower().Equals(ClassCode.ToLower()));
+        }
+
         public async Task<Class> AddClass(Class classes) 
         {
             try

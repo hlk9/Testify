@@ -48,6 +48,7 @@ builder.Services.AddScoped<ExamDetailService>();
 builder.Services.AddScoped<ExamDetailQuestionService>();
 builder.Services.AddScoped<SubmissionServices>();
 builder.Services.AddScoped<AnswerSubmissionServices>();
+builder.Services.AddScoped<ClassUserServices>();
 
 // Add response compression services
 builder.Services.AddResponseCompression(options =>

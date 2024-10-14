@@ -28,6 +28,14 @@ namespace Testify.API.Controllers
             var objClasses = await classRepository.GetByIdClass(id);
             return Ok(objClasses);
         }
+
+        [HttpGet("Get-Class-By-ClassCode")]
+        public async Task<ActionResult<Class>> GetClassByCode(string ClassCode)
+        {
+            var obj = await classRepository.GetClassByCode(ClassCode);
+            return Ok(obj);
+        }
+
         [HttpPost("Add-Class")]
         public async Task<ActionResult<Class>> CreateClass(Class r)
         {
