@@ -1,8 +1,16 @@
 ﻿@using OfficeOpenXml;
+@inject IJSRuntime jsruntime;
 
 <MudDialog>
     <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án bằng file excel</MudText>
+        <MudGrid Class="align-items-center">
+            <MudItem xs="12" sm="6" md="10">
+                <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase; width: 100%">Tạo mới câu hỏi và đáp án bằng file excel</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="2">
+                <MudButton Class="w-100 bg-success text-white" OnClick="ExportTemPlateQuestion">Tải file mẫu</MudButton>
+            </MudItem>
+        </MudGrid>
     </TitleContent>
     <DialogContent>
         <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
@@ -238,7 +246,24 @@
         }
     }
 
-    private void Cancel() => MudDialog.Cancel();
+    private async Task ExportTemPlateQuestion()
+    {
+        var response = await _serQuestion.ExportExcelQuestion();
+
+        if(response.IsSuccessStatusCode)
+        {
+            var fileContent = await response.Content.ReadAsByteArrayAsync();
+            var fileName = "Template_Question_LVT.xlsx";
+
+            // Tạo một URL Blob từ nội dung của file Excel
+            var fileUrl = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{Convert.ToBase64String(fileContent)}";
+
+            // Sử dụng JavaScript để tạo link tải file
+            await jsruntime.InvokeVoidAsync("downloadFile", fileUrl, fileName);
+        }
+    }
+
+    private void Cancel() => MudDialog.Close(DialogResult.Ok(true));
 
     private class QuestionInexcel()
     {
@@ -258,3 +283,14 @@
         public bool IsCorrect { get; set; }
     }
 }
+
+<script>
+    window.downloadFile = function (url, fileName) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>

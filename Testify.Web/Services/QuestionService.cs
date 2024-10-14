@@ -26,6 +26,11 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<Question>($"Question/Get-Question-By-Id?id={id}");
         }
 
+        public async Task<HttpResponseMessage> ExportExcelQuestion()
+        {
+            return await _httpClient.GetAsync("Question/Export-Excel-Demo-Question");
+        }
+
         public async Task<Question> CreateQuestion(Question question)
         {
             var newQuestion = await _httpClient.PostAsJsonAsync("Question/Create-Question", question);
