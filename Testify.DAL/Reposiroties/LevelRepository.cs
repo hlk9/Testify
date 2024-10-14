@@ -72,5 +72,10 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
+
+        public async Task<List<Level>> GetAllLevelId(int id)
+        {
+            return await _context.Levels.Where(x => x.Id == id).ToListAsync();
+        }
     }
 }
