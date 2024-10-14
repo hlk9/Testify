@@ -1,0 +1,131 @@
+﻿@page "/Class"
+@using Testify.DAL.ViewModels
+@layout StudentLayout
+@inject IDialogService DialogService
+
+<style>
+    .hidden-scroll {
+        overflow-y: scroll;
+        scrollbar-width: none;
+    }
+
+        .hidden-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+</style>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-3">
+    <MudGrid Class="p-0 m-0 w-100">
+        <MudItem md="2" xs="6" Class="px-3 pe-sm-3">
+            <MudBadge Class="w-100" Content="@classParticipated" Overlap="true" Color="Color.Tertiary" Bordered="true">
+                <MudButton Color="Color.Tertiary" Variant="Variant.Outlined" Class="w-100" OnClick="@(()=> ChangeStatusClass(1))">Tổng số lớp</MudButton>
+            </MudBadge>
+        </MudItem>
+        <MudItem md="2" xs="6" Class="px-3 ps-sm-3">
+            <MudBadge Class="w-100" Content="@classIsWaiting" Overlap="true" Color="Color.Tertiary" Bordered="true">
+                <MudButton Color="Color.Tertiary" Variant="Variant.Outlined" Class="w-100" OnClick="@(() => ChangeStatusClass(2))">Lớp đang chờ</MudButton>
+            </MudBadge>
+        </MudItem>
+    </MudGrid>
+
+    <MudPaper Elevation="0" Class="w-100 mt-4">
+        <MudGrid Class="p-0 m-0 w-100 align-items-center">
+            <MudItem lg="10" md="9" sm="8" xs="12" Class="ps-0 pe-0 pe-md-3">
+                <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Variant="Variant.Outlined" @bind-Value="@Search"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" TextChanged="ChangeSearch" Immediate=true></MudTextField>
+            </MudItem>
+            <MudItem lg="2" md="3" sm="4" xs="12" Class="ps-0 ps-md-3">
+                <MudButton Class="w-100 h-100 py-3" StartIcon="@Icons.Material.Filled.Add" Style="width: 100%; background-color: #1ec8a5; color: #ffffff" OnClick="@(() => OpenDialogAsync(_maxWidth))">Thêm Lớp Học</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudPaper Elevation=0 Class="w-100 mt-5 hidden-scroll" Style="min-width: 100%; max-height: 600px; overflow: auto">
+        <MudPaper Elevation="0" Style="max-width: 100%; min-width: 900px; padding: 15px 8px; font-weight: bold; border-bottom: 1px solid rgba(0, 0, 0, 0.2); display: flex; justify-content: left; overflow: auto; position: sticky; top: 0">
+            <MudPaper Elevation="0" Width="373px">Tên Lớp</MudPaper>
+            <MudPaper Elevation="0" Width="185px">Mã Lớp</MudPaper>
+            <MudPaper Elevation="0" Width="371px">Giáo Viên Quản Lý</MudPaper>
+            <MudPaper Elevation="0" Width="185px">Môn</MudPaper>
+            <MudPaper Elevation="0" Width="464px">Mô tả</MudPaper>
+            <MudPaper Elevation="0" Width="278px">Thao Tác</MudPaper>
+        </MudPaper>
+
+        @if(_lstCwU.Count != 0)
+        {
+            foreach (var item in _lstCwU)
+            {
+                <MudPaper Elevation="2" Style="max-width: 100%; min-width: 900px; padding: 24px 8px; margin-bottom: 20px; display: flex; justify-content: left; overflow: auto">
+                    <MudPaper Elevation="0" Width="373px" Style="text-transform:full-width">@item.Name</MudPaper>
+                    <MudPaper Elevation="0" Width="185px">@item.ClassCode</MudPaper>
+                    <MudPaper Elevation="0" Width="371px">@item.TeacherName</MudPaper>
+                    <MudPaper Elevation="0" Width="185px">@item.SubjectName</MudPaper>
+                    <MudPaper Elevation="0" Width="464px">@item.Description</MudPaper>
+                    <MudPaper Elevation="0" Width="278px">Không có</MudPaper>
+                </MudPaper>
+            }
+        }
+        else
+        {
+            <MudText Class="w-100 py-4 text-center">No Data.</MudText>
+        }
+
+
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private List<ClassWithClassUser> _lstCwU = new List<ClassWithClassUser>();
+    private int classIsWaiting = 0;
+    private int classParticipated = 0;
+    private string Search;
+    private byte Status = 1;
+
+    protected async override Task OnInitializedAsync()
+    {
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            var lstIsWaiting = await _serClassUser.GetAllClassUser(2);
+            var lstIsParticipated = await _serClassUser.GetAllClassUser(1);
+            classIsWaiting = lstIsWaiting.Count;
+            classParticipated = lstIsParticipated.Count;
+            await LoadData(Search);
+        }
+    }
+
+    private async Task LoadData(string search)
+    {
+        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        _lstCwU = await _serClassUser.GetAll(a.Value, search, Status);
+        StateHasChanged();
+    }
+
+    private async Task ChangeSearch()
+    {
+        await LoadData(Search);
+    }
+
+    private async Task ChangeStatusClass(byte status)
+    {
+        Status = status;
+        await LoadData(Search);
+        StateHasChanged();
+    }
+
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+    private async Task OpenDialogAsync(DialogOptions options)
+    {
+        var dialog = await DialogService.ShowAsync<Dialog.Class.AddNewClass>("Options Dialog", options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData(Search);
+        }
+    }
+}
