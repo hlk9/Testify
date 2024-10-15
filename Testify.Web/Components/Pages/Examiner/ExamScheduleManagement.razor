@@ -64,6 +64,11 @@
                 <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
                 <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
                 <MudTd DataLabel="Thao tác">
+
+                    <MudTooltip Text="Xếp lịch">
+                        <MudIconButton OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
+                    </MudTooltip>
+
                     <MudTooltip Text="Sửa">
                         <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                     </MudTooltip>
@@ -71,7 +76,6 @@
                         <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xoá">
-
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
 
@@ -114,8 +118,24 @@
 
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    private readonly DialogOptions _maxWidthLager = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
 
 
+
+
+    private async Task ShowDistributeDialog(DialogOptions options, int Id)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id }
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.DistributeSchedule>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || !result.Canceled)
+        {
+            listSchedule = await scheduleService.GetInforBasic();
+        }
+    }
 
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
