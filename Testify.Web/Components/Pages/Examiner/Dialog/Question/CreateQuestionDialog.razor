@@ -197,7 +197,7 @@
 
         if (_lstSubjects.Any())
         {
-            subjectId = _lstQuestionLevels[0].Id;
+            subjectId = _lstSubjects[0].Id;
         }
         else
         {
@@ -218,11 +218,6 @@
         if (question.Content == null || question.Content.Trim().Length == 0)
         {
             snackbar.Add("Nội dung trống!", Severity.Error);
-            count += 1;
-        }
-        if (question.QuestionLevelId == -1 || question.QuestionLevelId == null)
-        {
-            snackbar.Add("Chưa chọn cấp độ câu hỏi", Severity.Error);
             count += 1;
         }
         if (question.QuestionTypeId == -1 || question.QuestionTypeId == null)
@@ -263,6 +258,18 @@
             {
                 snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
                 return true;
+            }
+
+            for (int i = 0; i < lstAnswers.Count; i++)
+            {
+                for (int j = i + 1; j < lstAnswers.Count; j++)
+                {
+                    if (lstAnswers[i].Content.ToLower().Trim() == lstAnswers[j].Content.ToLower().Trim())
+                    {
+                        snackbar.Add("Có đáp án trùng nhau!", Severity.Warning);
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -345,7 +352,7 @@
             }
             question.CreatedDate = DateTime.Now;
             question.QuestionTypeId = questionTypeId;
-            question.QuestionLevelId = questionLevelId;
+            question.QuestionLevelId = questionLevelId == -1 ? null : questionLevelId;
             question.SubjectId = subjectId;
 
             if (!checkValidation)

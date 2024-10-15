@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
-
 
 namespace Testify.API.Controllers
 {
@@ -198,7 +198,7 @@ namespace Testify.API.Controllers
                 for (int i = 0; i < lstQuestionLevel.Count; i++)
                 {
                     worksheetQ.Cells[i + 3, 6].Value = lstQuestionLevel[i].Id;
-                    worksheetQ.Cells[i + 3, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; 
+                    worksheetQ.Cells[i + 3, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     worksheetQ.Cells[i + 3, 6].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     worksheetQ.Cells[i + 3, 7].Value = lstQuestionLevel[i].Name;
                     worksheetQ.Cells[i + 3, 7].Style.WrapText = true;
@@ -305,6 +305,146 @@ namespace Testify.API.Controllers
             var excelByBytes = package.GetAsByteArray();
 
             return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Template_Question_LVT.xlsx");
+        }
+
+        [HttpPost("Import-Excel-Question")]
+        public async Task<ActionResult<List<QuestionInExcel>>> UploadFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Chưa chọn file import");
+            }
+
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            stream.Position = 0;
+
+            var result = await ProcessExcelFile(stream);
+            return Ok(result.Value);
+        }
+
+        private async Task<ActionResult<List<QuestionInExcel>>> ProcessExcelFile(Stream stream)
+        {
+            var lstQuestionTemp = new List<QuestionInExcel>();
+
+            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
+            var lstQuestionType = await _repoQuestionType.GetAllTypes();
+            var lstQuestion = await _repoQuestion.GetAllQuestions("", true);
+
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            var package = new ExcelPackage(stream);
+
+            var worksheetsQ = package.Workbook.Worksheets[0];
+            var worksheetsA = package.Workbook.Worksheets[1];
+
+            for (   int rowQ = 2; rowQ <= worksheetsQ.Dimension.Rows; rowQ++)
+            {
+                if (worksheetsQ.Cells[rowQ, 1].Value == null &&
+                    worksheetsQ.Cells[rowQ, 2].Value == null &&
+                    worksheetsQ.Cells[rowQ, 3].Value == null &&
+                    worksheetsQ.Cells[rowQ, 4].Value == null)
+                {
+                    continue;
+                }
+
+                QuestionInExcel question = new QuestionInExcel();
+                question.connectionId = worksheetsQ.Cells[rowQ, 1].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 1].Value.ToString()) : -1;
+                question.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString() != null ? worksheetsQ.Cells[rowQ, 2].Value.ToString() : "";
+                question.QuestionLevelId = worksheetsQ.Cells[rowQ, 3].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString()) : -1;
+                question.QuestionTypeId = worksheetsQ.Cells[rowQ, 4].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString()) : -1;
+
+                if (question.QuestionTypeId == -1 || question.connectionId == -1 || question.Content == "")
+                {
+                    question.ErorrMessage = "Có trường dữ liệu trống!";
+                    question.PassFail = false;
+                    lstQuestionTemp.Add(question);
+                    continue;
+                }
+                else if (!lstQuestionType.Any(x => x.Id == question.QuestionTypeId))
+                {
+                    question.ErorrMessage = "Không có loại câu hỏi này";
+                    question.PassFail = false;
+                    lstQuestionTemp.Add(question);
+                    continue;
+                }
+                else if (lstQuestion.Any(x => x.Content.Trim().ToLower() == question.Content.Trim().ToLower()))
+                {
+                    question.ErorrMessage = "Đã tồn tại câu hỏi này";
+                    question.PassFail = false;
+                    lstQuestionTemp.Add(question);
+                    continue;
+                }
+
+                List<AnswerInExcel> lstAnswer = new List<AnswerInExcel>();
+                bool isValid = true;
+                int countAnswer = 0;
+
+                for (int rowA = 2; rowA <= worksheetsA.Dimension.Rows; rowA++)
+                {
+                    if (worksheetsQ.Cells[rowQ, 1].Value.ToString() == worksheetsA.Cells[rowA, 1].Value.ToString())
+                    {
+                        countAnswer++;
+                        if (worksheetsA.Cells[rowA, 1].Value == null || worksheetsA.Cells[rowA, 2].Value == null || worksheetsA.Cells[rowA, 3].Value == null || worksheetsA.Cells[rowA, 2].Value.ToString().Trim() == "")
+                        {
+                            isValid = false;
+                            break;
+                        }
+                        AnswerInExcel answer = new AnswerInExcel();
+                        answer.ConnectionId = Convert.ToInt32(worksheetsA.Cells[rowA, 1].Value.ToString());
+                        answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString();
+                        answer.IsCorrect = worksheetsA.Cells[rowA, 3].Value.ToString().Trim() == "1" ? true : false;
+                        lstAnswer.Add(answer);
+                    }
+                }
+
+                if (isValid && lstAnswer.Count == countAnswer)
+                {
+                    int countAnswerCorrect = lstAnswer.Count(x => x.IsCorrect);
+
+                    if (countAnswerCorrect <= 0)
+                    {
+                        question.ErorrMessage = "Câu hỏi không có đáp án đúng!";
+                        question.PassFail = false;
+                        lstQuestionTemp.Add(question);
+                        continue;
+                    }
+                    else if ((question.QuestionTypeId == 2 || question.QuestionTypeId == 3) && lstAnswer.Count < 2)
+                    {
+                        question.ErorrMessage = "Câu hỏi tối thiểu có 2 đáp án";
+                        question.PassFail = false;
+                        lstQuestionTemp.Add(question);
+                        continue;
+                    }
+                    else if (question.QuestionTypeId == 1 && lstAnswer.Count != 2)
+                    {
+                        question.ErorrMessage = "Câu hỏi loại đúng sai bắt buộc chỉ 2 đáp án";
+                        question.PassFail = false;
+                        lstQuestionTemp.Add(question);
+                        continue;
+                    }
+                    else if ((question.QuestionTypeId == 1 || question.QuestionTypeId == 2) && countAnswerCorrect > 1)
+                    {
+                        question.ErorrMessage = "Câu hỏi chỉ được 1 đáp án đúng do loại câu hỏi là chọn 1 đáp án hoặc đúng/sai";
+                        question.PassFail = false;
+                        lstQuestionTemp.Add(question);
+                        continue;
+                    }
+
+                    question.Answers = lstAnswer;
+                    question.PassFail = true;
+                    lstQuestionTemp.Add(question);
+                }
+                else
+                {
+                    question.ErorrMessage = "Câu hỏi có đáp án không hợp lệ (rỗng hoặc sai thông tin nhập vào)";
+                    question.PassFail = false;
+                    lstQuestionTemp.Add(question);
+                }
+            }
+
+
+
+            return lstQuestionTemp;
         }
     }
 }

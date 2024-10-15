@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
 
@@ -10,7 +11,7 @@ namespace Testify.Web.Services
 
         public QuestionService(HttpClient httpClient)
         {
-            _httpClient = httpClient;   
+            _httpClient = httpClient;
         }
 
         public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
@@ -29,6 +30,22 @@ namespace Testify.Web.Services
         public async Task<HttpResponseMessage> ExportExcelQuestion()
         {
             return await _httpClient.GetAsync("Question/Export-Excel-Demo-Question");
+        }
+
+        public async Task<List<QuestionInExcel>> ImportExcelQuestion(IBrowserFile file)
+        {
+            using var content = new MultipartFormDataContent();
+
+            using var stream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(stream);
+            stream.Position = 0;
+
+            content.Add(new StreamContent(stream), "file", file.Name);
+
+            var allQuestion = await _httpClient.PostAsync("Question/Import-Excel-Question", content);
+            var response = await allQuestion.Content.ReadFromJsonAsync<List<QuestionInExcel>>();
+
+            return response;
         }
 
         public async Task<Question> CreateQuestion(Question question)
