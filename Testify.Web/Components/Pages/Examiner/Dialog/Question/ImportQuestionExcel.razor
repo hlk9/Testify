@@ -2,7 +2,7 @@
 @using Testify.DAL.ViewModels
 @inject IJSRuntime jsruntime;
 
-@if(isLoading)
+@if (isLoading)
 {
     <Testify.Web.Shared.LoadingContext />
 }
@@ -104,7 +104,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         _lstSubject = await _serSub.GetAllSub("", true);
-        if(_lstSubject.Any())
+        if (_lstSubject.Any())
         {
             subjectId = _lstSubject[0].Id;
         }
@@ -153,12 +153,15 @@ else
                 {
                     _lstQuestionExcelFail.Add(item);
                 }
-                else if(item.PassFail == true)
+                else if (item.PassFail == true)
                 {
                     countQuestionPass++;
+                    item.SubjectId = subjectId;
                     _lstQuestionExcelPass.Add(item);
                 }
             }
+
+
         }
 
 
@@ -268,37 +271,17 @@ else
 
             if (confirm == true)
             {
-                foreach (var item in _lstQuestionExcelPass)
+                var isSuccessCreate = await _serQuestion.CreateQuestionInExcelImport(_lstQuestionExcelPass);
+                if (isSuccessCreate.IsSuccessStatusCode)
                 {
-                    Question q = new Question();
-                    q.Content = item.Content;
-                    if(item.QuestionLevelId >= 0)
-                    {
-                        q.QuestionLevelId = item.QuestionLevelId;
-                    }
-                    q.QuestionTypeId = item.QuestionTypeId;
-                    q.SubjectId = subjectId;
-                    q.Status = 1;
-                    q.CreatedDate = DateTime.Now;
-
-                    var addNewQuestion = await _serQuestion.CreateQuestion(q);
-
-                    if (addNewQuestion != null)
-                    {
-                        foreach (var a in item.Answers)
-                        {
-                            Answer ans = new Answer();
-                            ans.QuestionId = addNewQuestion.Id;
-                            ans.Content = a.Content;
-                            ans.IsCorrect = a.IsCorrect;
-                            ans.Status = 1;
-                            await _serAnswer.Create(ans);
-                        }
-                    }
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Thêm câu hỏi thành công", Severity.Success);
                 }
-
-                MudDialog.Close(DialogResult.Ok(true));
-                snackbar.Add("Thêm câu hỏi thành công", Severity.Success);
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Thêm câu hỏi thất bại", Severity.Error);
+                }
             }
         }
     }
@@ -307,7 +290,7 @@ else
     {
         var response = await _serQuestion.ExportExcelQuestion();
 
-        if(response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
             var fileContent = await response.Content.ReadAsByteArrayAsync();
             var fileName = "Template_Question_LVT.xlsx";

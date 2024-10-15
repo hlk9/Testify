@@ -15,12 +15,14 @@ namespace Testify.API.Controllers
         QuestionReposiroty _repoQuestion;
         QuestionLevelReposiroty _repoQuestionLevel;
         QuestionTypeReposiroty _repoQuestionType;
+        AnswerReposiroty _repoAnswer;
 
         public QuestionController()
         {
             _repoQuestion = new QuestionReposiroty();
             _repoQuestionLevel = new QuestionLevelReposiroty();
             _repoQuestionType = new QuestionTypeReposiroty();
+            _repoAnswer = new AnswerReposiroty();
         }
 
         [HttpGet("Get-All-Questions")]
@@ -445,6 +447,45 @@ namespace Testify.API.Controllers
 
 
             return lstQuestionTemp;
+        }
+
+        [HttpPost("Create-Question-In-Import-Excel")]
+        public async Task<ActionResult> CreateInImportExcel(List<QuestionInExcel> lstQuestion)
+        {
+            if(lstQuestion.Count > 0 && lstQuestion != null)
+            {
+                foreach(var item in lstQuestion)
+                {
+                    Question q = new Question();
+                    q.Content = item.Content;
+                    q.QuestionLevelId = item.QuestionLevelId != -1 ? item.QuestionLevelId : null;
+                    q.QuestionTypeId = item.QuestionTypeId;
+                    q.SubjectId = item.SubjectId;
+                    q.Status = 1;
+                    q.CreatedDate = DateTime.Now;
+
+                    var objQ = await _repoQuestion.CreateQuestion(q);
+
+                    if(objQ != null)
+                    {
+                        foreach (var a in item.Answers)
+                        {
+                            Answer ans = new Answer();
+                            ans.QuestionId = objQ.Id;
+                            ans.Content = a.Content;
+                            ans.IsCorrect = a.IsCorrect;
+                            ans.Status = 1;
+                            var objA = await _repoAnswer.CreateAnswer(ans);
+                        }
+                    }
+                }
+
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }
