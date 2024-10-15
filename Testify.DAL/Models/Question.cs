@@ -19,7 +19,7 @@ namespace Testify.DAL.Models
         public int QuestionTypeId { get; set; }
          public virtual QuestionType? QuestionType { get; set; }
         [ForeignKey("QuestionLevelId")]
-        public int QuestionLevelId { get; set; }
+        public int? QuestionLevelId { get; set; }
         public virtual QuestionLevel? QuestionLevel { get; set; }
 
         public virtual ICollection<QuestionAnswer>? QuestionAnswers { get; set; }
