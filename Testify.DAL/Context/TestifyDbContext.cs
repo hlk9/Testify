@@ -50,6 +50,7 @@ namespace Testify.DAL.Context
         public DbSet<ExamDetailQuestion> ExamDetailQuestions { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<BlackListToken> BlackListTokens { get; set; }
+        public DbSet<ClassExamSchedule> ClassExamSchedules { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
