@@ -117,9 +117,9 @@ namespace Testify.Web.Services
 
         }
 
-        public async Task<ExamSchedule> GetById(int id)
+        public async Task<ExamSchedule> GetById(int? id)
         {
-            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-ById?id="+id);
+            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-ById?id="+id.ToString());
             return schedule;
         }
 
