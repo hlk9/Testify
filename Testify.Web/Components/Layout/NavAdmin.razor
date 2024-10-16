@@ -17,6 +17,9 @@
         <MudNavLink Href="/Examiner/StaffManagement" Icon="@Icons.Material.Filled.PeopleOutline">Nhân Viên</MudNavLink>
         <MudNavLink Href="/Student/StudentManagement" Icon="@Icons.Material.Filled.People">Học Sinh/Sinh Viên</MudNavLink>
         <MudNavLink Href="/Admin/Report" Icon="@Icons.Material.Filled.Equalizer">Báo Cáo Admin</MudNavLink>
-        <MudNavLink Href="/Examiner/QuestionManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Câu Hỏi Và Đáp Án</MudNavLink>
+        <MudNavGroup Title="Quản lý câu hỏi" Icon="@Icons.Material.Filled.QuestionAnswer" Expanded="true">
+            <MudNavLink Href="/Examiner/QuestionManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Câu Hỏi Và Đáp Án</MudNavLink>
+            <MudNavLink Href="/Examiner/QuestionLevelManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Mức độ câu hỏi</MudNavLink>
+        </MudNavGroup>
     </MudNavMenu>
 </MudPaper> 
