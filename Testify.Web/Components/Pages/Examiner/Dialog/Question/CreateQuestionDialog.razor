@@ -102,9 +102,10 @@
 
 @code {
     private Question question { get; set; } = new();
-    private List<QuestionLevel> _lstQuestionLevels;
-    private List<QuestionType> _lstQuestionTypes;
+    private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
+    private List<QuestionType> _lstQuestionTypes = new List<QuestionType>();
     private List<Subject> _lstSubjects;
+    private List<Question> _lstQuestion = new List<Question>();
     private List<Answer> lstAnswers = new List<Answer>();
     private List<AnswerForm> answerForms = new List<AnswerForm>();
     private bool isLoading { get; set; } = true;
@@ -175,6 +176,8 @@
 
         _lstSubjects = await _serSub.GetAllSub(null, true);
 
+        _lstQuestion = await _serQuestion.GetAllQuestions("", true);
+
         if (_lstQuestionLevels.Any())
         {
             questionLevelId = _lstQuestionLevels[0].Id;
@@ -228,6 +231,12 @@
         if (question.SubjectId == -1 || question.SubjectId == null)
         {
             snackbar.Add("Chưa chọn môn học", Severity.Error);
+            count += 1;
+        }
+
+        if(_lstQuestion.Any(x => x.Content.Trim().ToLower() == question.Content.Trim().ToLower() && x.SubjectId == question.SubjectId))
+        {
+            snackbar.Add("Câu hỏi đã tồn tại trong môn này", Severity.Error);
             count += 1;
         }
 
