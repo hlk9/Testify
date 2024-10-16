@@ -19,7 +19,8 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> GetById(int id)
         {
-            return await _context.ExamSchedules.FindAsync(id);
+              var a=  await _context.ExamSchedules.FindAsync(id);
+            return a;
         }
 
         public async Task<List<ExamSchedule>> GetSchedulesActive()
