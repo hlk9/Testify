@@ -59,9 +59,8 @@ else
                         <RowTemplate>
                             <MudTd DataLabel="Id câu hỏi" hidden>@context.connectionId</MudTd>
                             <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
-                            <MudTd DataLabel="Mã mức độ câu hỏi">@context.QuestionLevelId</MudTd>
+                            <MudTd DataLabel="Mã mức độ câu hỏi">@(context.QuestionLevelId == -1 ? "Không có" : context.QuestionLevelId)</MudTd>
                             <MudTd DataLabel="Mã loại câu hỏi">@context.QuestionTypeId</MudTd>
-                            <MudTd DataLabel="Mã môn">@context.SubjectId</MudTd>
                             <MudTd DataLabel="Loại lỗi" Style="color: red">@context.ErorrMessage</MudTd>
                         </RowTemplate>
 
@@ -92,6 +91,7 @@ else
     private List<QuestionInExcel>? _lstQuestionExcelPass;
     private List<QuestionInExcel>? _lstQuestionExcelFail;
     private List<Subject> _lstSubject = new List<Subject>();
+    private List<Question> _LstQuestion = new List<Question>();
 
     private int subjectId = -1;
     private string nameFileCurrent;
@@ -103,6 +103,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        _LstQuestion = await _serQuestion.GetAllQuestions("", true);
         _lstSubject = await _serSub.GetAllSub("", true);
         if (_lstSubject.Any())
         {
@@ -148,6 +149,13 @@ else
         {
             foreach (var item in lstQuestionChecked)
             {
+                item.SubjectId = subjectId;
+                if (_LstQuestion.Any(x => x.Content.Trim().ToLower() == item.Content.Trim().ToLower() && x.SubjectId == item.SubjectId)) 
+                {
+                    item.ErorrMessage = "Câu này đã tồn tại trong môn được chọn!";
+                    item.PassFail = false;
+                }
+
                 countQuestion++;
                 if (item.PassFail == false)
                 {
@@ -156,7 +164,6 @@ else
                 else if (item.PassFail == true)
                 {
                     countQuestionPass++;
-                    item.SubjectId = subjectId;
                     _lstQuestionExcelPass.Add(item);
                 }
             }
@@ -164,104 +171,11 @@ else
 
         }
 
-
-
-        // using var stream = new MemoryStream();
-        // await selectFileCurrent.OpenReadStream().CopyToAsync(stream);
-        // stream.Position = 0;
-
-        // ExcelPackage package = new ExcelPackage(stream);
-        // ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-        // ExcelWorksheet worksheetQuestion = package.Workbook.Worksheets[0];
-        // ExcelWorksheet worksheetAnswer = package.Workbook.Worksheets[1];
-        // int rowCount = worksheetQuestion.Dimension.Rows;
-        // int colCount = worksheetQuestion.Dimension.Columns;
-
-        // _lstQuestionExcelPass = new List<QuestionInexcel>();
-        // _lstQuestionExcelFail = new List<QuestionInexcel>();
-        // lstAnswerInExcel = new List<AnswerInExcel>();
-        // countQuestion = 0;
-
-        // for (int rowQ = 2; rowQ <= worksheetQuestion.Dimension.Rows; rowQ++)
-        // {
-        //     try
-        //     {
-        //         countQuestion++;
-        //         QuestionInexcel question = new QuestionInexcel();
-        //         question.connectionId = worksheetQuestion.Cells[rowQ, 1].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 1].Value.ToString()) : -1;
-        //         question.Content = worksheetQuestion.Cells[rowQ, 2].Value != null ? worksheetQuestion.Cells[rowQ, 2].Value.ToString() : "";
-        //         question.QuestionLevelId = worksheetQuestion.Cells[rowQ, 3].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 3].Value.ToString()) : -1;
-        //         question.QuestionTypeId = worksheetQuestion.Cells[rowQ, 4].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 4].Value.ToString()) : -1;
-        //         question.SubjectId = worksheetQuestion.Cells[rowQ, 5].Value != null ? Convert.ToInt32(worksheetQuestion.Cells[rowQ, 5].Value.ToString()) : -1;
-
-        //         if (question.Content == "" || question.connectionId == -1 || question.QuestionLevelId == -1 || question.QuestionTypeId == -1 || question.SubjectId == -1)
-        //         {
-        //             question.ErorrMessage = "Có dữ liệu bị trống. Kiểm tra lại";
-        //             _lstQuestionExcelFail.Add(question);
-        //             continue;
-        //         }
-        //         else if (_lstSubJect.FirstOrDefault(x => x.Id == question.SubjectId) == null)
-        //         {
-        //             question.ErorrMessage = "Mã môn không có trong dữ liệu";
-        //             _lstQuestionExcelFail.Add(question);
-        //             continue;
-        //         }
-        //         else if (_lstQuestionLevel.FirstOrDefault(x => x.Id == question.QuestionLevelId) == null)
-        //         {
-        //             question.ErorrMessage = "Mã mức độ câu hỏi không có trong dữ liệu";
-        //             _lstQuestionExcelFail.Add(question);
-        //             continue;
-        //         }
-        //         else if (_lstQuestionType.FirstOrDefault(x => x.Id == question.QuestionTypeId) == null)
-        //         {
-        //             question.ErorrMessage = "Mã loại câu hỏi không có trong dữ liệu";
-        //             _lstQuestionExcelFail.Add(question);
-        //             continue;
-        //         }
-
-        //         List<AnswerInExcel> tempAnswer = new List<AnswerInExcel>();
-        //         bool isValidAnswer = true;
-        //         int countAnswer = 0;
-
-        //         for (int rowA = 2; rowA <= worksheetAnswer.Dimension.Rows; rowA++)
-        //         {
-        //             try
-        //             {
-        //                 if (worksheetQuestion.Cells[rowQ, 1].Value.ToString() == worksheetAnswer.Cells[rowA, 1].Value.ToString())
-        //                 {
-        //                     countAnswer++;
-        //                     if (worksheetAnswer.Cells[rowA, 1].Value == null || worksheetAnswer.Cells[rowA, 2].Value == null || worksheetAnswer.Cells[rowA, 3].Value == null)
-        //                     {
-        //                         isValidAnswer = false;
-        //                         break;
-        //                     }
-        //                     AnswerInExcel answer = new AnswerInExcel();
-        //                     answer.ConnectionId = Convert.ToInt32(worksheetAnswer.Cells[rowA, 1].Value.ToString());
-        //                     answer.Content = worksheetAnswer.Cells[rowA, 2].Value.ToString();
-        //                     answer.IsCorrect = worksheetAnswer.Cells[rowA, 3].Value.ToString() == "1" ? true : false;
-        //                     tempAnswer.Add(answer);
-        //                 }
-        //             }
-        //             catch { }
-        //         }
-
-        //         if (isValidAnswer && tempAnswer.Count == countAnswer)
-        //         {
-        //             question.Answers = tempAnswer;
-        //             _lstQuestionExcelPass.Add(question);
-        //         }
-        //         else
-        //         {
-        //             question.ErorrMessage = "Câu hỏi có đáp án không hợp lệ (rỗng hoặc sai thông tin nhập vào)";
-        //             _lstQuestionExcelFail.Add(question);
-        //         }
-        //     }
-        //     catch { }
-        // }
-
         if (isSubmit == true)
         {
-            var confirm = await _mudDialogServices.ShowMessageBox
+            if(_lstQuestionExcelPass.Count > 0 || _lstQuestionExcelPass != null)
+            {
+                var confirm = await _mudDialogServices.ShowMessageBox
             (
                 "Thông báo",
                 $"Bạn chắc chắn muốn thêm {countQuestionPass} / {countQuestion} đạt?",
@@ -269,19 +183,24 @@ else
                 cancelText: "Cancel"
             );
 
-            if (confirm == true)
+                if (confirm == true)
+                {
+                    var isSuccessCreate = await _serQuestion.CreateQuestionInExcelImport(_lstQuestionExcelPass);
+                    if (isSuccessCreate.IsSuccessStatusCode)
+                    {
+                        MudDialog.Close(DialogResult.Ok(true));
+                        snackbar.Add("Thêm câu hỏi thành công", Severity.Success);
+                    }
+                    else
+                    {
+                        MudDialog.Close(DialogResult.Ok(true));
+                        snackbar.Add("Thêm câu hỏi thất bại", Severity.Error);
+                    }
+                }
+            }
+            else
             {
-                var isSuccessCreate = await _serQuestion.CreateQuestionInExcelImport(_lstQuestionExcelPass);
-                if (isSuccessCreate.IsSuccessStatusCode)
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Thêm câu hỏi thành công", Severity.Success);
-                }
-                else
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Thêm câu hỏi thất bại", Severity.Error);
-                }
+                snackbar.Add("Không có câu hỏi nào để import", Severity.Warning);
             }
         }
     }

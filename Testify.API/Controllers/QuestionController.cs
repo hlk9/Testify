@@ -362,6 +362,13 @@ namespace Testify.API.Controllers
                     lstQuestionTemp.Add(question);
                     continue;
                 }
+                else if(question.QuestionLevelId != -1 && !lstQuestionLevel.Any(x => x.Id == question.QuestionLevelId))
+                {
+                    question.ErorrMessage = "Không có mức độ câu hỏi này";
+                    question.PassFail = false;
+                    lstQuestionTemp.Add(question);
+                    continue;
+                }
                 else if (!lstQuestionType.Any(x => x.Id == question.QuestionTypeId))
                 {
                     question.ErorrMessage = "Không có loại câu hỏi này";
@@ -369,13 +376,13 @@ namespace Testify.API.Controllers
                     lstQuestionTemp.Add(question);
                     continue;
                 }
-                else if (lstQuestion.Any(x => x.Content.Trim().ToLower() == question.Content.Trim().ToLower()))
-                {
-                    question.ErorrMessage = "Đã tồn tại câu hỏi này";
-                    question.PassFail = false;
-                    lstQuestionTemp.Add(question);
-                    continue;
-                }
+                //else if (lstQuestion.Any(x => x.Content.Trim().ToLower() == question.Content.Trim().ToLower()))
+                //{
+                //    question.ErorrMessage = "Đã tồn tại câu hỏi này";
+                //    question.PassFail = false;
+                //    lstQuestionTemp.Add(question);
+                //    continue;
+                //}
 
                 List<AnswerInExcel> lstAnswer = new List<AnswerInExcel>();
                 bool isValid = true;
