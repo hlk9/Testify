@@ -1,6 +1,7 @@
 ﻿@page "/Admin/Home"
 @layout AdminLayout
 
+@using Testify.DAL.ViewModels
 @using Testify.Web.Components.Pages.Examiner.Component
 
 <div style="padding:20px; background-color: #fafafa; height: 100%">
@@ -104,19 +105,35 @@
 
             <MudPaper Style="padding: 15px; margin-top: 2rem">
                 <MudGrid Style="align-items: center">
-                    <MudItem xl="5" lg="5" md="4" sm="3" xs="12">
+                    <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
                         <MudText Style="font-size: 16px; font-weight: bold">Phổ điểm</MudText>
                     </MudItem>
-                    <MudItem xl="3" lg="3" md="3" sm="3" xs="12" Style="padding-top:30px; margin:0;">
-                       <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate=true></MudTextField>
+
+                    <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
+                        <MudAutocomplete T="Subject"
+                                         @bind-Value="subjectId"
+                                         SearchFunc="@SearchSubject"
+                                         Variant="Variant.Outlined"
+                                         Label="Môn"
+                                         Placeholder="Chọn môn"
+                                         Clearable="true"
+                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                         OnFocus="SubjectChanged" />
+
+                        
                     </MudItem>
-                    <MudItem xl="4" lg="4" md="5" sm="6" xs="12">
-                        <MudSelect Margin="Margin.Dense" T="int" @bind-Value="@select" Label="Kì thi cuối kì 1" Variant="Variant.Outlined" SelectedValuesChanged="changeValue">
-                            <MudSelectItem Value="1">Bài 1</MudSelectItem>
-                            <MudSelectItem Value="2">Bài 2</MudSelectItem>
-                            <MudSelectItem Value="3">Bài 3</MudSelectItem>
-                        </MudSelect>
+
+                    <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
+                        <MudAutocomplete T="Exam"
+                                         @bind-Value="examId"
+                                         SearchFunc="@SearchExam"
+                                         Variant="Variant.Outlined"
+                                         Label="Bài thi"
+                                         Placeholder="Chọn bài thi"
+                                         Clearable="true"
+                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                         OnFocus="ExamChanged"
+                                         ResetValueOnEmptyText="true" />
                     </MudItem>
                 </MudGrid>
                 <MudGrid Style="margin-top: 2rem; align-items: center">
@@ -126,11 +143,11 @@
                     }
                     else
                     {
-                        <MudItem xl="9" lg="8" md="12" sm="12" xs="12">
+
+                        <MudItem xl="7" lg="7" md="12" sm="12" xs="12">
                             <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" ChartOptions="@ChartOption" XAxisLabels="@_arrScore" Width="100%" Height="450px" @bind-SelectedIndex="indexChooseBar"></MudChart>
                         </MudItem>
-
-                        <MudItem xl="3" lg="4" md="12" sm="12" xs="12">
+                        <MudItem xl="5" lg="5" md="12" sm="12" xs="12">
                             <MudChart ChartType="ChartType.Donut" Width="400px" Height="400px" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts" @bind-SelectedIndex="indexChooseDonut">
                                 <CustomGraphics>
                                     <text class="donut-inner-text" x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">@(indexChooseDonut == 0 ? "Đạt" : "Trượt")</text>
@@ -149,65 +166,54 @@
 
             <MudPaper Style="padding: 15px; margin-top: 2rem">
                 <MudGrid Style="align-items: center">
-                    <MudItem xl="5" lg="5" md="4" sm="3" xs="12">
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
                         <MudText Style="font-size: 16px; font-weight: bold">Phổ điểm</MudText>
                     </MudItem>
-                    <MudItem xl="3" lg="3" md="3" sm="3" xs="12" Style="padding-top:30px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate=true></MudTextField>
-                    </MudItem>
-                    <MudItem xl="4" lg="4" md="5" sm="10" xs="12">
-                        <MudSelect Margin="Margin.Dense" T="int" @bind-Value="@select" Label="Kì thi cuối kì 1" Variant="Variant.Outlined" SelectedValuesChanged="changeValue">
-                            <MudSelectItem Value="1">Bài 1</MudSelectItem>
-                            <MudSelectItem Value="2">Bài 2</MudSelectItem>
-                            <MudSelectItem Value="3">Bài 3</MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                </MudGrid>
-                <MudGrid Style="margin-top: 2rem; align-items: center">
-                    @if (isLoading)
-                    {
-                        <Testify.Web.Shared.LoadingContext />
-                    }
-                    else
-                    {
-                        <MudItem xl="9" lg="8" md="12" sm="12" xs="12">
-                            <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" ChartOptions="@ChartOption" XAxisLabels="@_arrScore" Width="100%" Height="450px" @bind-SelectedIndex="indexChooseBar"></MudChart>
-                        </MudItem>
-
-                        <MudItem xl="3" lg="4" md="12" sm="12" xs="12">
-                            <MudChart ChartType="ChartType.Donut" Width="400px" Height="400px" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts" @bind-SelectedIndex="indexChooseDonut">
-                                <CustomGraphics>
-                                    <text class="donut-inner-text" x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">@(indexChooseDonut == 0 ? "Đạt" : "Trượt")</text>
-                                    <text class="donut-inner-text" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">@Math.Round(_lstDataDonutCharts[indexChooseDonut], 2)%</text>
-                                </CustomGraphics>
-                            </MudChart>
-
-                        </MudItem>
-                    }
-                </MudGrid>
-            </MudPaper>
-        </MudCarouselItem>
 
 
-        <MudCarouselItem Transition="transition">
 
-            <MudPaper Style="padding: 15px; margin-top: 2rem">
-                <MudGrid Style="align-items: center">
-                    <MudItem xl="5" lg="5" md="4" sm="3" xs="12">
-                        <MudText Style="font-size: 16px; font-weight: bold">Phổ điểm</MudText>
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
+                        <MudAutocomplete T="Subject"
+                                         @bind-Value="subjectId"
+                                         SearchFunc="@SearchSubject"
+                                         Variant="Variant.Outlined"
+                                         Label="Môn"
+                                         Placeholder="Chọn môn"
+                                         Clearable="true"
+                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                         OnFocus="SubjectChanged" />
+
+
                     </MudItem>
-                    <MudItem xl="3" lg="3" md="3" sm="3" xs="12" Style="padding-top:30px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Immediate=true></MudTextField>
+
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
+                        <MudAutocomplete T="ClassWithUser"
+                                         @bind-Value="classId"
+                                         SearchFunc="@SearchClass"
+                                         Variant="Variant.Outlined"
+                                         Label="Lớp"
+                                         Placeholder="Chọn lớp"
+                                         Clearable="true"
+                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                         OnFocus="SubjectChanged" />
+
+
                     </MudItem>
-                    <MudItem xl="4" lg="4" md="5" sm="10" xs="12">
-                        <MudSelect Margin="Margin.Dense" T="int" @bind-Value="@select" Label="Kì thi cuối kì 1" Variant="Variant.Outlined" SelectedValuesChanged="changeValue">
-                            <MudSelectItem Value="1">Bài 1</MudSelectItem>
-                            <MudSelectItem Value="2">Bài 2</MudSelectItem>
-                            <MudSelectItem Value="3">Bài 3</MudSelectItem>
-                        </MudSelect>
+
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
+                        <MudAutocomplete T="Exam"
+                                         @bind-Value="examId"
+                                         SearchFunc="@SearchExam"
+                                         Variant="Variant.Outlined"
+                                         Label="Bài thi"
+                                         Placeholder="Chọn bài thi"
+                                         Clearable="true"
+                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                         OnFocus="ExamChanged"
+                                         ResetValueOnEmptyText="true" />
                     </MudItem>
+
+                   
                 </MudGrid>
                 <MudGrid Style="margin-top: 2rem; align-items: center">
                     @if (isLoading)
@@ -234,56 +240,6 @@
             </MudPaper>
         </MudCarouselItem>
     </MudCarousel>
-
-
-    <MudGrid Style="margin-top: 2rem">
-        <MudItem xl="6" lg="12" md="12" sm="12" xs="12">
-            <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
-                <ToolBarContent>
-                    <MudText Style="font-size: 16px; font-weight: bold">Giảng viên</MudText>
-                    <MudSpacer />
-                    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Họ tên</MudTh>
-                    <MudTh>Ngày sinh</MudTh>
-                    <MudTh>Số điện thoại</MudTh>
-                    <MudTh>Quyền</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Họ tên">@context.name</MudTd>
-                    <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
-                    <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
-                    <MudTd DataLabel="Quyền">@context.role</MudTd>
-                </RowTemplate>
-            </MudTable>
-        </MudItem>
-
-        <MudItem xl="6" lg="12" md="12" sm="12" xs="12">
-            <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
-                <ToolBarContent>
-                    <MudText Style="font-size: 16px; font-weight: bold">Lớp học</MudText>
-                    <MudSpacer />
-                    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh>Họ tên</MudTh>
-                    <MudTh>Ngày sinh</MudTh>
-                    <MudTh>Số điện thoại</MudTh>
-                    <MudTh>Lớp</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Họ tên">@context.name</MudTd>
-                    <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
-                    <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
-                    <MudTd DataLabel="Lớp">@context.role</MudTd>
-                </RowTemplate>
-            </MudTable>
-
-        </MudItem>
-    </MudGrid>
 
     <MudGrid Style="margin-top: 2rem">
         <MudItem xl="12" lg="12" md="12" sm="12" xs="12">
@@ -312,13 +268,25 @@
 </div>
 
 @code {
+
+    private List<User> _lstUser { get; set; }
+    private List<Subject> _lstSubject;
+    private List<Exam> _lstExam;
+    private List<ClassWithUser> _lstClass;
+    private Subject subjectId;
+    private Exam examId;
+    private ClassWithUser classId;
+
+
     private class SinhVien
     {
         public string HoTen { get; set; }
         public double Diem { get; set; }
     }
 
+
     private List<SinhVien> _lstSV = new List<SinhVien>();
+
 
     private Random random = new Random();
     private void GenerateRandomStudents(int numberOfStudents)
@@ -338,6 +306,9 @@
     private Transition transition = Transition.Slide;
     private bool bullets = false;
     private bool enableSwipeGesture = true;
+
+
+
     private string[] _arrScore;
     private List<double> _lstDataBarCharts = new List<double>();
     private List<double> _lstDataDonutCharts = new List<double>();
@@ -345,6 +316,7 @@
     public List<ChartSeries> Series;
     public ChartOptions ChartOption { get; set; } = new ChartOptions();
 
+    private double overall;
     private int select = -1;
     private bool isLoading = true;
     private int totalStudent = 0;
@@ -425,6 +397,31 @@
 
     protected override async Task OnInitializedAsync()
     {
+
+
+        _lstSubject = await _serSub.GetAllSub("", true);
+        _lstClass = await _serClass.GetAllClass("", true);
+
+        if (_lstClass.Any())
+        {
+            classId = _lstClass[0];
+          
+            subjectId = _lstSubject[0];
+            _lstExam = await _serExam.GetListOfSubject(subjectId.Id);
+            examId = _lstExam[0];
+        }
+        // if(_lstSubject.Any())
+        // {
+
+        //     subjectId = _lstSubject[0];
+        //     _lstExam = await _serExam.GetListOfSubject(subjectId.Id);
+        //     examId = _lstExam[0];
+        // }
+
+        
+
+
+        // _lstUser = await _serLec.GetScore();
         totalStudent = _lstSV.Count();
         GenerateRandomStudents(1000);
         for (int i = 0; i < 20; i++)
@@ -433,5 +430,61 @@
         }
 
         await LoadDataChart();
+    }
+
+
+    Margin _margin;
+    bool _placeholder;
+    bool _clearable = true;
+
+    private string[] _states =
+    {
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+        "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
+        "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
+        "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
+        "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
+        "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
+        "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+        "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming"
+    };
+
+    private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+            return _lstExam;
+
+        return _lstExam.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    
+    private async Task<IEnumerable<ClassWithUser>> SearchClass(string value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+            return _lstClass;
+
+        return _lstClass.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
+    {
+        if (string.IsNullOrEmpty(value))
+            return _lstSubject;
+
+        return _lstSubject.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5, token);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return _states;
+
+        return _states.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 }

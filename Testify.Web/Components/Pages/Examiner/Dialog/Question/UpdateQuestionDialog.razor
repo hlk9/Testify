@@ -23,28 +23,22 @@
                         </ActivatorContent>
                     </MudFileUpload>
                 </div>
-                <MudSelect T="int" @bind-Value="question.QuestionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @if (_lstQuestionLevels != null)
+                <MudSelect T="int?" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if(questionLevelId == -1)
                     {
-                        @foreach (var itemLevel in _lstQuestionLevels)
-                        {
-                            <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
-                        }
+                        <MudSelectItem Value="@questionLevelId">Không có</MudSelectItem>
                     }
-
+                    @foreach (var itemLevel in _lstQuestionLevels)
+                    {
+                        <MudSelectItem Value="itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                    }
                 </MudSelect>
 
                 <MudSelect T="int" @bind-Value="question.SubjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-
-                    @if (_lstSubjects != null)
+                    @foreach (var item in _lstSubjects)
                     {
-                        @foreach (var item in _lstSubjects)
-                        {
-                            <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
-                        }
+                        <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
                     }
-
-
                 </MudSelect>
             </MudForm>
         }
@@ -58,14 +52,15 @@
 
 @code {
     private Question question { get; set; } = new();
-    private List<QuestionLevel> _lstQuestionLevels;
-    private List<Subject> _lstSubjects;
+    private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
+    private List<Subject> _lstSubjects = new List<Subject>();
     private bool isLoading { get; set; } = true;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Parameter]
     public int QuestionId { get; set; }
     MudForm form;
+    private int? questionLevelId;
     private IBrowserFile selectFile;
     private string newNameFile;
     private string currentFileImage = "";
@@ -80,6 +75,8 @@
         _lstSubjects = await _serSub.GetAllSub(null, true);
 
         question = await _serQuestion.GetQuestionById(QuestionId);
+
+        questionLevelId = question.QuestionLevelId != null ? question.QuestionLevelId : -1;
 
         currentFileImage = question.DocumentPath;
 
@@ -159,6 +156,7 @@
         {
             RenameImage(question.Id);
             question.DocumentPath = newNameFile;
+            question.QuestionLevelId = questionLevelId == -1 ? null : questionLevelId;
             var check = await _serQuestion.UpdateQuestion(question);
             await SaveFileUpload();
             if (check != null)
