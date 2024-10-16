@@ -22,6 +22,14 @@ namespace Testify.API.Controllers
             var lstClass = await classRepository.GetClassWithUser(keyword, isActive);
             return Ok(lstClass);
         }
+
+        [HttpGet("Get-Classes-BySubjectId")]
+        public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId)
+        {
+            var lstClass = await classRepository.GetClassWithSubjectId(subjectId);
+            return Ok(lstClass);
+        }
+
         [HttpGet("get-classes-by-id")]
         public async Task<ActionResult<Class>> GetByIdRoom(int id)
         {
