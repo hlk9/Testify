@@ -23,10 +23,10 @@ namespace Testify.API.Controllers
             return Ok(lstClass);
         }
 
-        [HttpGet("Get-Classes-BySubjectId")]
+        [HttpGet("Get-Classes-BySubjectIdExcludeInSchedule")]
         public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId)
         {
-            var lstClass = await classRepository.GetClassWithSubjectId(subjectId);
+            var lstClass = await classRepository.GetClassWithSubjectIdExcludeInSchedule(subjectId);
             return Ok(lstClass);
         }
 

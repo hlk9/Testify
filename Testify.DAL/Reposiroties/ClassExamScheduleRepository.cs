@@ -18,29 +18,72 @@ namespace Testify.DAL.Reposiroties
         }
         public List<ClassWithUser> GetClassInSchedule(int scheduleId)
         {
-            var data =  (from c in _context.Classes
-                             join u in _context.Users
-                             on c.TeacherId equals u.Id into classUser
-                             from cu in classUser.DefaultIfEmpty()
-                             join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
-                             from cs in classSubject.DefaultIfEmpty()
-                            from schedule in _context.ClassExamSchedules
-                            where(schedule.Id== scheduleId && c.Status==1)
-                             select new ClassWithUser
-                             {
-                                 Id = c.Id,
-                                 Name = c.Name,
-                                 ClassCode = c.ClassCode,
-                                 Description = c.Description,
-                                 Capacity = c.Capacity,
-                                 TeacherId = c.TeacherId,
-                                 FullName = cu.FullName,
-                                 SubjectId = c.SubjectId,
-                                 SubjectName = cs.Name,
-                                 Status = c.Status
-                             }).ToList(); // Await the result here
+            var data = (from c in _context.Classes
+                        join u in _context.Users
+                        on c.TeacherId equals u.Id into classUser
+                        from cu in classUser.DefaultIfEmpty()
+                        join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
+                        from cs in classSubject.DefaultIfEmpty()
+                        join ces in _context.ClassExamSchedules
+                        on c.Id equals ces.ClassId
+                        where (cs.Status == 1 && ces.ExamScheduleId == scheduleId)
+                        select new ClassWithUser
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            ClassCode = c.ClassCode,
+                            Description = c.Description,
+                            Capacity = c.Capacity,
+                            TeacherId = c.TeacherId,
+                            FullName = cu.FullName,
+                            SubjectId = c.SubjectId,
+                            SubjectName = cs.Name,
+                            Status = c.Status
+                        }).ToList();
 
             return data;
+        }
+
+        public bool AddListClassToSchedule(List<ClassWithUser> data, int scheduleId)
+        {
+            try
+            {
+                foreach (var c in data)
+                {
+                    _context.ClassExamSchedules.Add(new ClassExamSchedule { ClassId = c.Id, ExamScheduleId = scheduleId });
+
+                }
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool RemoveListClassToSchedule(List<ClassWithUser> data, int scheduleId)
+        {
+            try
+            {
+                foreach (var c in data)
+                {
+
+                    var a = _context.ClassExamSchedules.Find(c.Id);
+
+                    if (a != null)
+                    {
+                        _context.ClassExamSchedules.Remove(a);
+                    }
+
+                }
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -20,6 +20,18 @@ namespace Testify.API.Controllers
         {
             return repos.GetClassInSchedule(scheduleId);
         }
-               
+
+        [HttpPost("Add-ListClassToSchedule")]
+        public bool AddListClassToSchedule(List<ClassWithUser> data, int scheduleId)
+        {
+            return repos.AddListClassToSchedule(data,scheduleId);
+        }
+
+        [HttpPost("Remove-ListClassToSchedule")]
+        public bool RemoveListClassToSchedule(List<ClassWithUser> data, int scheduleId)
+        {
+            return repos.RemoveListClassToSchedule(data, scheduleId);
+        }
+
     }
 }

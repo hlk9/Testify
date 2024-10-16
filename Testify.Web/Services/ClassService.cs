@@ -64,7 +64,7 @@ namespace Testify.Web.Services
 
         public async Task<List<ClassWithUser>> GetClassBySubjectId(int? subjectId)
         {
-            var listClass = await _httpClient.GetFromJsonAsync<List<ClassWithUser>>($"Class/Get-Classes-BySubjectId?subjectId=" + subjectId);
+            var listClass = await _httpClient.GetFromJsonAsync<List<ClassWithUser>>($"Class/Get-Classes-BySubjectIdExcludeInSchedule?subjectId=" + subjectId);
             return listClass;
         }
     }

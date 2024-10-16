@@ -16,6 +16,23 @@ namespace Testify.Web.Services
         {
             return await _httpClient.GetFromJsonAsync<List<ClassWithUser>>("ClassExamSchedule/Get-Class-ByScheduleId?scheduleId=" +scheduleId);
         }
+
+        public async Task<bool> AddListClassToSchedule(List<ClassWithUser> data, int scheduleId)
+        {
+            var a = await _httpClient.PostAsJsonAsync("ClassExamSchedule/Add-ListClassToSchedule?scheduleId="+scheduleId,data);
+            if(a.IsSuccessStatusCode)
+                return true;
+            return false;
+        }
+
+        public async Task<bool> RemoveListClassToSchedule(List<ClassWithUser> data, int scheduleId)
+        {
+            var a = await _httpClient.PostAsJsonAsync("ClassExamSchedule/Remove-ListClassToSchedule?scheduleId=" + scheduleId, data);
+            if (a.IsSuccessStatusCode)
+                return true;
+            return false;
+        }
+
     }
     
 }
