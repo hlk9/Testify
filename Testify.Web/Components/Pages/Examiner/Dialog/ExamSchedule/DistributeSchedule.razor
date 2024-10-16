@@ -1,0 +1,128 @@
+﻿@using Testify.DAL.ViewModels
+@inject ExamScheduleService scheduleService
+@inject ClassExamScheduleService classExamScheduleService
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Xếp lịch thi: @titleSchedule
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+
+        @if (listClass == null)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+        }
+        else
+        {
+
+        <MudGrid>
+            <MudItem xs="6">
+                <MudPaper Class="d-flex align-items-center align-center justify-center mud-width-full py-8">@titleSchedule</MudPaper>
+            </MudItem>
+            <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                     <MudTooltip Text="Loại bỏ lớp đã được chọn ra khỏi lịch thi này">
+                    <MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Clear" Label="Loại bỏ" />
+                    </MudTooltip>
+                </MudItem>
+                <MudItem xs="6" Class="d-flex justify-content-end">
+                    <MudTooltip Text="Gửi email thông báo tới các thí sinh được xếp lịch thi này">
+                        <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Mail" Label="Gửi Email" Class="me-2" />
+                    </MudTooltip>
+                    <MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" Label="Lưu lại" />
+                </MudItem>
+
+               
+            </MudItem>
+            <MudItem xs="6">
+                <MudItem xs="12" md="12" lg="12">
+                    <MudTable Items="@listClass" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true">
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6">Danh sách lớp</MudText>
+                            <MudSpacer />
+
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Tên Lớp</MudTh>
+                            <MudTh>Mã lớp</MudTh>
+                            <MudTh>Số lượng</MudTh>
+                            <MudTh>Môn</MudTh>
+                            <MudTh>Phụ trách</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Tên Lớp">@context.Name</MudTd>
+                            <MudTd DataLabel="Mã lớp">@context.ClassCode</MudTd>
+                            <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                            <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                            <MudTd DataLabel="Phụ trách">@context.ClassCode</MudTd>
+                        </RowTemplate>
+                        @*  <PagerContent>
+                        <MudTablePager />
+                        </PagerContent> *@
+                    </MudTable>
+                </MudItem>
+            </MudItem>
+            <MudItem xs="6">
+                <MudItem xs="12" md="12" lg="12">
+                        <MudTable Items="@listClassInSchedule" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" Striped="true">
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6" Color="Color.Success">Lớp đã xếp hiện tại</MudText>
+                            <MudSpacer />
+
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Tên Lớp</MudTh>
+                            <MudTh>Mã lớp</MudTh>
+                            <MudTh>Số lượng</MudTh>
+                            <MudTh>Môn</MudTh>
+                            <MudTh>Phụ trách</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Tên Lớp">@context.Name</MudTd>
+                            <MudTd DataLabel="Mã lớp">@context.ClassCode</MudTd>
+                            <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                            <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                            <MudTd DataLabel="Phụ trách">@context.ClassCode</MudTd>
+                        </RowTemplate>
+                        @*    <PagerContent>
+                        <MudTablePager />
+                        </PagerContent> *@
+                    </MudTable>
+                </MudItem>
+            </MudItem>
+        </MudGrid>
+        }
+
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string titleSchedule { get; set; }
+    public ExamSchedule currentSchedule { get; set; } = new ExamSchedule();
+    public List<ClassWithUser> listClass { get; set; }
+    public List<ClassWithUser> listClassInSchedule { get; set; }
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentSchedule = await scheduleService.GetById(Id);
+        listClass = await _serClass.GetClassBySubjectId(currentSchedule.SubjectId);
+        listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);
+    }
+
+
+}
