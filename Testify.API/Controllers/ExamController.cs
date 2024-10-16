@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.WebSockets;
+using Testify.API.DTOs;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -74,5 +76,36 @@ namespace Testify.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("Get-InfoBasic")]
+        public async Task<List<ExamWhitQusetion>> GetInfoBasic()
+        {
+            List<ExamWhitQusetion> listResult = new List<ExamWhitQusetion>();
+            SubjectRepository subjectRepository = new SubjectRepository();
+
+            var lstExam = await _respon.GetAllActicve();
+            var lstSub = await subjectRepository.GetAllSubject(null, true);
+
+            foreach (var item in lstExam) 
+            {
+                listResult.Add(new ExamWhitQusetion
+                {
+                    Id = item.Id,
+                    Description = item.Description,
+                    ExamName = item.Name,
+                    Status = item.Status,
+                    SubjectId = item.SubjectId,
+                    SubjectName = lstSub.FirstOrDefault(x=> x.Id == item.SubjectId).Name,
+                    Duration = item.Duration,
+                    NumberOfQuestion = item.NumberOfQuestions
+
+                });
+            }
+            return listResult;
+
+        }
+
+
+
     }
 }
