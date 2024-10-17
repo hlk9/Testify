@@ -19,7 +19,8 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> GetById(int id)
         {
-            return await _context.ExamSchedules.FindAsync(id);
+              var a=  await _context.ExamSchedules.FindAsync(id);
+            return a;
         }
 
         public async Task<List<ExamSchedule>> GetSchedulesActive()
@@ -118,7 +119,14 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> CheckIsContaintInTime(DateTime startDate, DateTime endDate)
         {
-            return await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 || startDate <= x.StartTime && endDate >= x.EndTime && x.Status!=255);
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255);
+
+            if(ojb!= null)
+            {
+                return ojb;
+            }
+
+            return null;
         }
 
 

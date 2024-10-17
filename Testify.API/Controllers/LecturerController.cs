@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -20,6 +22,13 @@ namespace Testify.API.Controllers
         {
             var lstLecturer = await _repo.GetAllLecturer(keyWord,isActive);
             return Ok(lstLecturer);
+        }
+
+        [HttpGet("Get-score")]
+        public async Task<ActionResult<List<ScoreStatistics>>> GetAllScore( int idsub, int idexam)
+        {
+            var lstScore = await _repo.GetScore(idsub,idexam);
+            return Ok(lstScore);
         }
         [HttpGet("Get-Lecturer-By-Id")]
         public async Task<ActionResult<User>> GetLecturerById(Guid id)

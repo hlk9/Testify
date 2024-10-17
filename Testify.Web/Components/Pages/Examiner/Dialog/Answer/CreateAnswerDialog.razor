@@ -61,13 +61,16 @@
     private Answer answer { get; set; } = new();
     private List<Question>? lstQuestion;
     private List<QuestionType>? lstQuestionType;
+    private List<Answer> lstAnswers = new List<Answer>();
+    private List<AnswerForm> answerForms = new List<AnswerForm>();
+    private List<Answer> lstAnswered = new List<Answer>();
+
     private bool isLoading { get; set; } = true;
     private bool IsDisableNewAnswer = true;
     private int ValueQuestionTypeChoice;
     private int questionId;
     private int questionTypeId;
-    private List<Answer> lstAnswers = new List<Answer>();
-    private List<AnswerForm> answerForms = new List<AnswerForm>();
+
     [Parameter]
     public bool isQuestionId { get; set; }
 
@@ -79,9 +82,15 @@
 
     private async Task LoadData()
     {
-
         lstQuestion = await _serQuestion.GetAllQuestions("", true);
         questionId = questionIdParams;
+
+        if(isQuestionId == false)
+        {
+            var objQuestion = await _serQuestion.GetQuestionById(questionId);
+            questionTypeId = objQuestion.QuestionTypeId;
+            lstAnswered = await _serAnswer.GetAllByQuestionId(questionId);
+        }
         isLoading = false;
     }
 
@@ -133,6 +142,33 @@
             return;
         }
 
+        if(lstAnswered.Count != 0 && isQuestionId == false)
+        {
+            foreach (var item in lstAnswered)
+            {
+                if (lstAnswers.Any(x => x.Content.Trim().ToLower() == item.Content.Trim().ToLower()))
+                {
+                    snackbar.Add("Có đáp án trùng nhau!", Severity.Warning);
+                    return;
+                }
+            }
+        }
+
+        if(isQuestionId == true && lstAnswers.Count != 0)
+        {
+            for (int i = 0; i < lstAnswers.Count; i++)
+            {
+                for (int j = i + 1; j < lstAnswers.Count ; j++)
+                {
+                    if(lstAnswers[i].Content.ToLower().Trim() == lstAnswers[j].Content.ToLower().Trim())
+                    {
+                        snackbar.Add("Có đáp án trùng nhau!", Severity.Warning);
+                        return;
+                    }
+                }
+            }
+        }
+
         int count = 0;
         for (int i = 0; i < lstAnswers.Count; i++)
         {
@@ -144,16 +180,32 @@
 
         if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
         {
-            if (count > 1)
+            if(isQuestionId == false && lstAnswered.Count != 0)
+            {
+                int countCorrect = lstAnswered.Count(x => x.IsCorrect);
+                if(countCorrect >= 1 && count >= 1)
+                {
+                    snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                    return;
+                }
+            }
+
+            if (count > 1 && isQuestionId == true)
             {
                 snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
                 return;
             }
         }
 
-        if (count == 0)
+        if (count == 0 && isQuestionId == true)
         {
             snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
+            return;
+        }
+
+        if (lstAnswers != null && lstAnswers.Count < 2 && isQuestionId == true)
+        {
+            snackbar.Add("Phải có tối thiểu 2 đáp án", Severity.Error);
             return;
         }
 

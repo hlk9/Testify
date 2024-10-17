@@ -1,0 +1,207 @@
+﻿@using Testify.DAL.ViewModels
+@inject ExamScheduleService scheduleService
+@inject ClassExamScheduleService classExamScheduleService
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Xếp lịch thi: @titleSchedule
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+
+        @if (listClass == null)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+        }
+        else
+        {
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                        <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                            <MudTooltip Text="Xếp lịch thi vào các lớp đã chọn">
+                                <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowRightAlt" Label="Xếp lớp" OnClick="AddClassToRight" />
+                            </MudTooltip>
+                        </MudItem>
+                        <MudItem xs="6" Class="d-flex justify-content-end">
+                        </MudItem>
+                    </MudItem>
+                </MudItem>
+                <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                    <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                        <MudTooltip Text="Loại bỏ lớp đã được chọn ra khỏi lịch thi này">
+                            <MudFab Color="Color.Warning" StartIcon="@Icons.Material.Filled.Clear" Label="Loại bỏ" OnClick="RemoveFromSchedule" />
+                        </MudTooltip>
+                    </MudItem>
+                    <MudItem xs="6" Class="d-flex justify-content-end">
+                        <MudTooltip Text="Gửi email thông báo tới các thí sinh được xếp lịch thi này">
+                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Mail" Label="Gửi Email" />
+                        </MudTooltip>                     
+                    </MudItem>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudItem xs="12" md="12" lg="12">
+                        <MudTable Items="@listClass" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listClassSelected">
+                            <ToolBarContent>
+                                <MudText Typo="Typo.h6">Danh sách lớp</MudText>
+                                <MudSpacer />
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh>Tên Lớp</MudTh>
+                                <MudTh>Mã lớp</MudTh>
+                                <MudTh>Số lượng</MudTh>
+                                <MudTh>Môn</MudTh>
+                                <MudTh>Phụ trách</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Tên Lớp">@context.Name</MudTd>
+                                <MudTd DataLabel="Mã lớp">@context.ClassCode</MudTd>
+                                <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                                <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                                <MudTd DataLabel="Phụ trách">@context.FullName</MudTd>
+                            </RowTemplate>
+                            @*  <PagerContent>
+                        <MudTablePager />
+                        </PagerContent> *@
+                        </MudTable>
+                    </MudItem>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudItem xs="12" md="12" lg="12">
+                        <MudTable Items="@listClassInSchedule" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listClassSelectedInSchedule" Striped="true">
+                            <ToolBarContent>
+                                <MudText Typo="Typo.h6" Color="Color.Success">Lớp đã xếp hiện tại</MudText>
+                                <MudSpacer />
+
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh>Tên Lớp</MudTh>
+                                <MudTh>Mã lớp</MudTh>
+                                <MudTh>Số lượng</MudTh>
+                                <MudTh>Môn</MudTh>
+                                <MudTh>Phụ trách</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Tên Lớp">@context.Name</MudTd>
+                                <MudTd DataLabel="Mã lớp">@context.ClassCode</MudTd>
+                                <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                                <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                                <MudTd DataLabel="Phụ trách">@context.FullName</MudTd>
+                            </RowTemplate>
+                            @*    <PagerContent>
+                        <MudTablePager />
+                        </PagerContent> *@
+                        </MudTable>
+                    </MudItem>
+                </MudItem>
+            </MudGrid>
+        }
+
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string titleSchedule { get; set; }
+    public ExamSchedule currentSchedule { get; set; } = new ExamSchedule();
+    public List<ClassWithUser> listClass { get; set; }
+    public HashSet<ClassWithUser> listClassSelected { get; set; }
+
+    public HashSet<ClassWithUser> listClassSelectedInSchedule { get; set; }
+
+    public List<ClassWithUser> listClassInSchedule { get; set; }
+
+    public List<ClassWithUser> newClassToAdd { get; set; } = new List<ClassWithUser>();
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await  ReloadData();
+    }
+
+    private async Task ReloadData()
+    {
+        currentSchedule = await scheduleService.GetById(Id);
+        listClass = await _serClass.GetClassBySubjectId(currentSchedule.SubjectId);
+        listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);        
+    }
+
+
+    private async Task AddClassToRight()
+    {
+        if (listClassSelected == null || listClassSelected.Count == 0)
+        {
+            Snackbar.Add("Bạn chưa chọn lớp nào", Severity.Warning);
+        }
+        else
+        {
+            foreach (var item in listClassSelected)
+            {
+                listClass.Remove(item);              
+                newClassToAdd.Add(item);
+            }
+
+            var stats = await classExamScheduleService.AddListClassToSchedule(newClassToAdd, currentSchedule.Id);
+            if (stats)
+            {
+                Snackbar.Add("Thêm " + newClassToAdd.Count + " lớp thành công", Severity.Info);
+                newClassToAdd.Clear();
+
+            }
+            else
+                Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
+
+            await ReloadData();
+        }
+    }
+
+    private async Task RemoveFromSchedule()
+    {
+        if (listClassSelectedInSchedule == null || listClassSelectedInSchedule.Count == 0)
+        {
+            Snackbar.Add("Bạn chưa chọn lớp nào", Severity.Warning);
+        }
+        else
+        {
+            foreach (var item in listClassSelectedInSchedule)
+            {               
+                try
+                {
+                    var stats =  await classExamScheduleService.RemoveListClassToSchedule(listClassSelectedInSchedule.ToList(), currentSchedule.Id);
+                    if (stats)
+                    {
+                        Snackbar.Add("Xoá " + listClassSelectedInSchedule.Count + " lớp thành công", Severity.Info);
+                        listClassSelectedInSchedule.Clear();
+
+                    }
+                    else
+                        Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
+
+                    await ReloadData();
+
+                }
+                catch
+                {
+                    
+                }
+            }
+
+            Snackbar.Add("Rút " + listClassSelectedInSchedule.Count + " lớp thành công", Severity.Info);
+        }
+    }
+
+
+}

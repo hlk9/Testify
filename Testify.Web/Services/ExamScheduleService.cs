@@ -1,4 +1,7 @@
-﻿using Testify.API.DTOs;
+﻿using Newtonsoft.Json;
+using System.Net;
+using Testify.API;
+using Testify.API.DTOs;
 using Testify.DAL.Models;
 
 namespace Testify.Web.Services
@@ -90,13 +93,33 @@ namespace Testify.Web.Services
 
         public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end)
         {
-            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-InTime");
-            return schedule;
+            var startStr = Uri.EscapeDataString(start.ToString("MM/dd/yyyy HH:mm:ss"));
+            var endStr = Uri.EscapeDataString(end.ToString("MM/dd/yyyy HH:mm:ss"));
+
+            var response = await _httpClient.GetAsync($"ExamSchedule/Get-InTime?start={startStr}&end={endStr}");
+
+            if (response.StatusCode == HttpStatusCode.NoContent) // 204 No Content
+            {
+              
+                return null; 
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+               
+                    var schedule = JsonConvert.DeserializeObject<ExamSchedule>(content);
+                    return schedule;
+                
+            }    
+        
+
+
         }
 
-        public async Task<ExamSchedule> GetById(int id)
+        public async Task<ExamSchedule> GetById(int? id)
         {
-            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-ById?id="+id);
+            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-ById?id="+id.ToString());
             return schedule;
         }
 
