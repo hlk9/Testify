@@ -108,33 +108,6 @@
                     <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
                         <MudText Style="font-size: 16px; font-weight: bold">Phổ điểm</MudText>
                     </MudItem>
-
-                    <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
-                        <MudAutocomplete T="Subject"
-                                         @bind-Value="subjectId"
-                                         SearchFunc="@SearchSubject"
-                                         Variant="Variant.Outlined"
-                                         Label="Môn"
-                                         Placeholder="Chọn môn"
-                                         Clearable="true"
-                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                         OnFocus="SubjectChanged" />
-
-                        
-                    </MudItem>
-
-                    <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
-                        <MudAutocomplete T="Exam"
-                                         @bind-Value="examId"
-                                         SearchFunc="@SearchExam"
-                                         Variant="Variant.Outlined"
-                                         Label="Bài thi"
-                                         Placeholder="Chọn bài thi"
-                                         Clearable="true"
-                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                         OnFocus="ExamChanged"
-                                         ResetValueOnEmptyText="true" />
-                    </MudItem>
                 </MudGrid>
                 <MudGrid Style="margin-top: 2rem; align-items: center">
                     @if (isLoading)
@@ -163,57 +136,39 @@
 
 
         <MudCarouselItem Transition="transition">
-
             <MudPaper Style="padding: 15px; margin-top: 2rem">
                 <MudGrid Style="align-items: center">
                     <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
                         <MudText Style="font-size: 16px; font-weight: bold">Phổ điểm</MudText>
                     </MudItem>
-
-
-
                     <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
-                        <MudAutocomplete T="Subject"
-                                         @bind-Value="subjectId"
-                                         SearchFunc="@SearchSubject"
-                                         Variant="Variant.Outlined"
-                                         Label="Môn"
-                                         Placeholder="Chọn môn"
-                                         Clearable="true"
-                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                         OnFocus="SubjectChanged" />
 
+                        <MudSelect T="int" @bind-Value="subjectId" Variant="Variant.Outlined" SelectedValuesChanged="ChangeValueSubject">
+                            @foreach (var item in _lstSubject)
+                            {
+                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
+                        @if (_lstExam.Count == 0)
+                        {
+                            <MudSelect T="string" Variant="Variant.Outlined" Text="Không có bài thi nào">                
+                                
+                            </MudSelect>
+                        }
+                        else
+                        {
+                            <MudSelect T="int" @bind-Value="examId" Variant="Variant.Outlined" SelectedValuesChanged="ChangeValueExam">
+                                @foreach (var item in _lstExam)
+                                {
+                                    <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
 
                     </MudItem>
 
-                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
-                        <MudAutocomplete T="ClassWithUser"
-                                         @bind-Value="classId"
-                                         SearchFunc="@SearchClass"
-                                         Variant="Variant.Outlined"
-                                         Label="Lớp"
-                                         Placeholder="Chọn lớp"
-                                         Clearable="true"
-                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                         OnFocus="SubjectChanged" />
-
-
-                    </MudItem>
-
-                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
-                        <MudAutocomplete T="Exam"
-                                         @bind-Value="examId"
-                                         SearchFunc="@SearchExam"
-                                         Variant="Variant.Outlined"
-                                         Label="Bài thi"
-                                         Placeholder="Chọn bài thi"
-                                         Clearable="true"
-                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                         OnFocus="ExamChanged"
-                                         ResetValueOnEmptyText="true" />
-                    </MudItem>
-
-                   
                 </MudGrid>
                 <MudGrid Style="margin-top: 2rem; align-items: center">
                     @if (isLoading)
@@ -222,19 +177,26 @@
                     }
                     else
                     {
-                        <MudItem xl="9" lg="8" md="12" sm="12" xs="12">
-                            <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" ChartOptions="@ChartOption" XAxisLabels="@_arrScore" Width="100%" Height="450px" @bind-SelectedIndex="indexChooseBar"></MudChart>
-                        </MudItem>
+                        if (isError)
+                        {
+                            <MudText Class="py-5">Con c</MudText>
+                        }
+                        else
+                        {
+                            <MudItem xl="9" lg="8" md="12" sm="12" xs="12">
+                                <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" ChartOptions="@ChartOption" XAxisLabels="@_arrScore" Width="100%" Height="450px" @bind-SelectedIndex="indexChooseBar"></MudChart>
+                            </MudItem>
 
-                        <MudItem xl="3" lg="4" md="12" sm="12" xs="12">
-                            <MudChart ChartType="ChartType.Donut" Width="400px" Height="400px" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts" @bind-SelectedIndex="indexChooseDonut">
-                                <CustomGraphics>
-                                    <text class="donut-inner-text" x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">@(indexChooseDonut == 0 ? "Đạt" : "Trượt")</text>
-                                    <text class="donut-inner-text" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">@Math.Round(_lstDataDonutCharts[indexChooseDonut], 2)%</text>
-                                </CustomGraphics>
-                            </MudChart>
+                            <MudItem xl="3" lg="4" md="12" sm="12" xs="12">
+                                <MudChart ChartType="ChartType.Donut" Width="400px" Height="400px" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts" @bind-SelectedIndex="indexChooseDonut">
+                                    <CustomGraphics>
+                                        <text class="donut-inner-text" x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">@(indexChooseDonut == 0 ? "Đạt" : "Trượt")</text>
+                                        <text class="donut-inner-text" x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="2">@Math.Round(_lstDataDonutCharts[indexChooseDonut], 2)%</text>
+                                    </CustomGraphics>
+                                </MudChart>
 
-                        </MudItem>
+                            </MudItem>
+                        }
                     }
                 </MudGrid>
             </MudPaper>
@@ -243,7 +205,7 @@
 
     <MudGrid Style="margin-top: 2rem">
         <MudItem xl="12" lg="12" md="12" sm="12" xs="12">
-            <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
+            <MudTable Items="_lstUser" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
                 <ToolBarContent>
                     <MudText Style="font-size: 16px; font-weight: bold">Lớp học</MudText>
                     <MudSpacer />
@@ -257,10 +219,11 @@
                     <MudTh>Lớp</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Họ tên">@context.name</MudTd>
-                    <MudTd DataLabel="Ngày sinh">@context.dob</MudTd>
-                    <MudTd DataLabel="Số điện thoại">@context.phoneNumber</MudTd>
-                    <MudTd DataLabel="Lớp">@context.role</MudTd>
+                    <MudTd DataLabel="Họ tên">@context.FullName</MudTd>
+                    <MudTd DataLabel="Họ tên">@context.Address</MudTd>
+                    <MudTd DataLabel="Họ tên">@context.Email</MudTd>
+                    <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
+                    <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
                 </RowTemplate>
             </MudTable>
         </MudItem>
@@ -270,37 +233,19 @@
 @code {
 
     private List<User> _lstUser { get; set; }
-    private List<Subject> _lstSubject;
-    private List<Exam> _lstExam;
+    private List<Subject> _lstSubject = new List<Subject>();
+    private List<Exam> _lstExam = new List<Exam>();
     private List<ClassWithUser> _lstClass;
-    private Subject subjectId;
-    private Exam examId;
+    private int subjectId;
+    private int examId;
     private ClassWithUser classId;
+    private bool isError = false;
+    private List<ScoreStatistics> _lstScore = new List<ScoreStatistics>();
+    private string text;
 
+    private List<User> _lstSV = new List<User>();
 
-    private class SinhVien
-    {
-        public string HoTen { get; set; }
-        public double Diem { get; set; }
-    }
-
-
-    private List<SinhVien> _lstSV = new List<SinhVien>();
-
-
-    private Random random = new Random();
-    private void GenerateRandomStudents(int numberOfStudents)
-    {
-        for (int i = 1; i <= numberOfStudents; i++)
-        {
-            var student = new SinhVien
-                {
-                    HoTen = $"Sinh Vien {i}",
-                    Diem = random.Next(0, 11)
-                };
-            _lstSV.Add(student);
-        }
-    }
+    //Carousel
     private bool autocycle = false;
     private bool arrows = true;
     private Transition transition = Transition.Slide;
@@ -313,10 +258,11 @@
     private List<double> _lstDataBarCharts = new List<double>();
     private List<double> _lstDataDonutCharts = new List<double>();
     private string[] LabelDonutCharts = { "Phần trăm đạt", "Phần trăm trượt" };
+
+
     public List<ChartSeries> Series;
     public ChartOptions ChartOption { get; set; } = new ChartOptions();
 
-    private double overall;
     private int select = -1;
     private bool isLoading = true;
     private int totalStudent = 0;
@@ -329,12 +275,14 @@
         _lstDataBarCharts.Clear();
         _lstDataDonutCharts.Clear();
 
-        _arrScore = _lstSV.Select(x => x.Diem.ToString()).OrderBy(x => x).Distinct().ToArray();
+        _arrScore = _lstScore.Select(x => x.Score.ToString()).OrderBy(x => x).Distinct().ToArray();
 
-        double isPass = _lstSV.Count(x => x.Diem >= 5);
-        double isFail = _lstSV.Count(x => x.Diem < 5);
-        double percenIsPass = (isPass / _lstSV.Count) * 100;
-        double percenIsFail = ((_lstSV.Count - isPass) / _lstSV.Count) * 100;
+
+        double isPass = _lstScore.Count(x => x.Score >= 5);
+        double isFail = _lstScore.Count(x => x.Score < 5);
+        double percenIsPass = (isPass / _lstScore.Count) * 100;
+        double percenIsFail = ((_lstScore.Count - isPass) / _lstScore.Count) * 100;
+
 
         _lstDataDonutCharts.Add(percenIsPass);
         _lstDataDonutCharts.Add(percenIsFail);
@@ -342,9 +290,9 @@
         foreach (var score in _arrScore)
         {
             int count = 0;
-            foreach (var item in _lstSV)
+            foreach (var item in _lstScore)
             {
-                if (score == item.Diem.ToString())
+                if (score == item.Score.ToString())
                 {
                     count++;
                 }
@@ -366,90 +314,73 @@
         isLoading = false;
     }
 
-    private async Task changeValue()
+    private async Task ChangeValueSubject()
     {
-        if (select == 1)
+        _lstExam = await _serExam.GetListOfSubject(subjectId);
+        if (_lstExam != null && _lstExam.Count > 0)
         {
-            _lstSV.Clear();
-            isLoading = true;
-            GenerateRandomStudents(1264);
+            examId = _lstExam[0].Id;
+            _lstScore = await _serLec.GetScore(subjectId, examId);
             await LoadDataChart();
-        }
-        else if (select == 2)
-        {
-            _lstSV.Clear();
-            isLoading = true;
-            GenerateRandomStudents(15432);
-            await LoadDataChart();
+            isError = false;
         }
         else
         {
-            _lstSV.Clear();
-            isLoading = true;
-            GenerateRandomStudents(5000);
-            await LoadDataChart();
+            isError = true;
+        }      
+    }
+
+    private async Task ChangeValueExam()
+    {
+        _lstScore = await _serLec.GetScore(subjectId, examId);
+        await LoadDataChart();
+
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            return;
         }
     }
 
-    public record items(string name, DateTime dob, string phoneNumber, string role);
-
-    public List<items> lst = new List<items>();
 
     protected override async Task OnInitializedAsync()
     {
 
-
+        _lstSV = await _serLec.GetAllStudent();
         _lstSubject = await _serSub.GetAllSub("", true);
         _lstClass = await _serClass.GetAllClass("", true);
-
-        if (_lstClass.Any())
+        _lstUser = await _serLec.GetAllTeacher();
+        if (_lstSubject.Any())
         {
+
             classId = _lstClass[0];
-          
-            subjectId = _lstSubject[0];
-            _lstExam = await _serExam.GetListOfSubject(subjectId.Id);
-            examId = _lstExam[0];
+            subjectId = _lstSubject[1].Id;
+            _lstExam = await _serExam.GetListOfSubject(subjectId);
+            if(_lstExam != null && _lstExam.Count > 0)
+            {
+                examId = _lstExam[0].Id;
+                _lstScore = await _serLec.GetScore(subjectId, examId);
+            }
+            else
+            {
+                isError = true;
+            }
+
         }
-        // if(_lstSubject.Any())
-        // {
-
-        //     subjectId = _lstSubject[0];
-        //     _lstExam = await _serExam.GetListOfSubject(subjectId.Id);
-        //     examId = _lstExam[0];
-        // }
-
-        
 
 
-        // _lstUser = await _serLec.GetScore();
         totalStudent = _lstSV.Count();
-        GenerateRandomStudents(1000);
-        for (int i = 0; i < 20; i++)
-        {
-            lst.Add(new items($"value{i}", DateTime.Now, $"value{i}", $"value{i}"));
-        }
 
         await LoadDataChart();
     }
 
-
     Margin _margin;
     bool _placeholder;
     bool _clearable = true;
-
-    private string[] _states =
-    {
-        "Alabama", "Alaska", "Arizona", "Arkansas", "California",
-        "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
-        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas",
-        "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts",
-        "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana",
-        "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
-        "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
-        "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
-        "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
-        "Washington", "West Virginia", "Wisconsin", "Wyoming"
-    };
 
     private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
     {
@@ -459,7 +390,7 @@
         return _lstExam.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    
+
     private async Task<IEnumerable<ClassWithUser>> SearchClass(string value, CancellationToken token)
     {
         if (string.IsNullOrEmpty(value))
@@ -476,15 +407,7 @@
         return _lstSubject.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
-    {
-        // In real life use an asynchronous function for fetching data from an api.
-        await Task.Delay(5, token);
 
-        // if text is null or empty, show complete list
-        if (string.IsNullOrEmpty(value))
-            return _states;
 
-        return _states.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
-    }
+
 }
