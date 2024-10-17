@@ -1,0 +1,67 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Class="fw-bold fs-4 mb-3">Tham gia lớp học mới</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Nhập mã lớp học:</MudText>
+        <MudTextField T="string" @bind-Value="@classCode" Placeholder="Mã lớp học"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Tham gia</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private string classCode = "";
+
+    private async Task Submit()
+    {
+        var userIdStore = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        Guid userId = Guid.Parse(userIdStore.Value);
+        if (string.IsNullOrEmpty(classCode) || classCode == "")
+        {
+            snackbar.Add("Bạn chưa nhập mã lớp!", Severity.Warning);
+            return;
+        }
+
+        var objClass = await _serClass.GetClassByCode(classCode);
+        var lstClassUser = await _serClassUser.GetAllClassUser(10);
+        if (lstClassUser.FirstOrDefault(x => x.ClassId == objClass.Id) != null)
+        {
+            snackbar.Add("Đã tham gia hoặc đang chờ phê duyệt lớp học này!", Severity.Warning);
+            return;
+        }
+
+        if (objClass != null)
+        {
+            ClassUser clu = new ClassUser()
+            {
+                ClassId = objClass.Id,
+                UserId = userId,
+                Status = 2
+            };
+
+            var objClu = await _serClassUser.CreateClassUser(clu);
+            if(objClu != null)
+            {
+                snackbar.Add("Tham gia thành công. Đợi phê duyệt!", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                snackbar.Add("Tham gia thất bại", Severity.Error);
+            }
+        }
+        else
+        {
+            snackbar.Add("Mã lớp học không tôn tại!", Severity.Warning);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
+
