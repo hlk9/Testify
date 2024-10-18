@@ -25,6 +25,11 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<Class>($"Class/get-classes-by-id?id={id}");
         }
 
+        public async Task<Class> GetClassByCode(string classCode)
+        {
+            return await _httpClient.GetFromJsonAsync<Class>($"Class/Get-Class-By-ClassCode?ClassCode={classCode}");
+        }
+
         public async Task<Class> CreateClass(Class c)
         {
             var newClass = await _httpClient.PostAsJsonAsync("Class/Add-Class", c);
@@ -55,6 +60,12 @@ namespace Testify.Web.Services
                 return true;
             }
             return false;
+        }
+
+        public async Task<List<ClassWithUser>> GetClassBySubjectId(int? subjectId)
+        {
+            var listClass = await _httpClient.GetFromJsonAsync<List<ClassWithUser>>($"Class/Get-Classes-BySubjectIdExcludeInSchedule?subjectId=" + subjectId);
+            return listClass;
         }
     }
 }

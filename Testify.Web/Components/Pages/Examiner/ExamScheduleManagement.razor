@@ -48,9 +48,9 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Tên lịch thi" T="string">Mã lịch thi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Bài thi" T="string">Mã bài thi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Mã bài thi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Tên lịch thi" T="string">Tên lịch thi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Bài thi" T="string">Bài thi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thời gian bắt đầu" T="string">Thời gian bắt đầu</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thời gian kết thúc" T="string">Thời gian kết thúc</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
@@ -64,9 +64,22 @@
                 <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
                 <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
                 <MudTd DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+
+                    <MudTooltip Text="Xếp lịch">
+                        <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
+                    </MudTooltip>
+
+                    <MudTooltip Text="Sửa">
+                        <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Chi tiết">
+                        <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Xoá">
+                        <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTooltip>
+
+
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -105,8 +118,25 @@
 
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    private readonly DialogOptions _maxWidthLager = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
 
 
+
+
+    private async Task ShowDistributeDialog(DialogOptions options, int Id,string title)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id },
+                {"titleSchedule",title }
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.DistributeSchedule>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || !result.Canceled)
+        {
+            listSchedule = await scheduleService.GetInforBasic();
+        }
+    }
 
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
@@ -114,10 +144,11 @@
         var parameters = new DialogParameters
         {
               { "Id", Id }
+          
         };
-        var dialog= await DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", parameters, options);
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", parameters, options);
         var result = await dialog.Result;
-        if (result==null||!result.Canceled)
+        if (result == null || !result.Canceled)
         {
             listSchedule = await scheduleService.GetInforBasic();
         }

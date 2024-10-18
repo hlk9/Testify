@@ -14,10 +14,6 @@
         <MudForm Spacing="5" Model="@questionLevel" @ref="@form">
             <MudTextField @bind-Value="questionLevel.Name" For="@(() => questionLevel.Name)" Style="padding: 0" T="string" Label="Tên Mức Độ Câu Hỏi" />
             <MudTextField @bind-Value="questionLevel.Description" For="@(() => questionLevel.Description)" Style="padding: 0" T="string" Label="Mô Tả" />
-            <MudRadioGroup @bind-Value="StatusQuestionLevel">
-                <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
-                <MudRadio Value="@(false)">Không hoạt động</MudRadio>
-            </MudRadioGroup>
         </MudForm>
         }
     </DialogContent>
@@ -41,8 +37,11 @@
     [Parameter]
     public int QuestionLevelId { get; set; }
 
+    private List<QuestionLevel> _lstQuestionLevel = new List<QuestionLevel>();
+
     protected override async Task OnInitializedAsync()
     {
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
         if (QuestionLevelId != null)
         {
             questionLevel = await _serQuestionLevel.GetQuestionLevelById(QuestionLevelId);
@@ -52,6 +51,17 @@
 
     private async void Submit()
     {
+        if (questionLevel.Name.Trim() == "" || questionLevel.Name == null)
+        {
+            snackbar.Add("Tên không được để trống", Severity.Warning);
+            return;
+        }
+        else if (_lstQuestionLevel.Any(x => x.Name.Trim().ToLower() == questionLevel.Name.Trim().ToLower()))
+        {
+            snackbar.Add("Đã tồn tại mức độ này", Severity.Warning);
+            return;
+        }
+
         questionLevel.Status = StatusQuestionLevel;
         var check = await _serQuestionLevel.UpdateQuestionLevel(questionLevel);
         if (check == true)

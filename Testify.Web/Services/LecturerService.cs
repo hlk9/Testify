@@ -1,4 +1,5 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -10,9 +11,20 @@ namespace Testify.Web.Services
                 _httpClient = httpClien;
         }
 
-        public async Task<List<User>> GetAllLecturer()
+        public async Task<List<User>> GetAllLecturer(string? textSearch, bool isActive)
         {
-            return await _httpClient.GetFromJsonAsync<List<User>>("Lecturer/Get-All-Lecturer");
+            var allUsers = await _httpClient.GetAsync($"Lecturer/Get-All-Lecturer?keyWord={textSearch}&isActive={isActive}");
+            var response = await allUsers.Content.ReadFromJsonAsync<List<User>>();
+
+            return response;
+        }
+
+        public async Task<List<ScoreStatistics>> GetScore(int idSub, int idExam)
+        {
+            var allScore = await _httpClient.GetAsync($"Lecturer/Get-score?idsub={idSub}&idexam={idExam}");
+            var response = await allScore.Content.ReadFromJsonAsync<List<ScoreStatistics>>();
+
+            return response;
         }
 
         public async Task<User> GetLecturerById(Guid id)
@@ -23,6 +35,11 @@ namespace Testify.Web.Services
         public async Task<List<User>> GetAllTeacher()
         {
             return await _httpClient.GetFromJsonAsync<List<User>>("Lecturer/Get-All-Teacher");
+        }
+
+        public async Task<List<User>> GetAllStudent()
+        {
+            return await _httpClient.GetFromJsonAsync<List<User>>("Lecturer/Get-all-student");
         }
 
         public async Task<bool> CreateLecturer(User user)

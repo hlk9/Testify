@@ -22,12 +22,28 @@ namespace Testify.API.Controllers
             var lstClass = await classRepository.GetClassWithUser(keyword, isActive);
             return Ok(lstClass);
         }
+
+        [HttpGet("Get-Classes-BySubjectIdExcludeInSchedule")]
+        public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId)
+        {
+            var lstClass = await classRepository.GetClassWithSubjectIdExcludeInSchedule(subjectId);
+            return Ok(lstClass);
+        }
+
         [HttpGet("get-classes-by-id")]
         public async Task<ActionResult<Class>> GetByIdRoom(int id)
         {
             var objClasses = await classRepository.GetByIdClass(id);
             return Ok(objClasses);
         }
+
+        [HttpGet("Get-Class-By-ClassCode")]
+        public async Task<ActionResult<Class>> GetClassByCode(string ClassCode)
+        {
+            var obj = await classRepository.GetClassByCode(ClassCode);
+            return Ok(obj);
+        }
+
         [HttpPost("Add-Class")]
         public async Task<ActionResult<Class>> CreateClass(Class r)
         {

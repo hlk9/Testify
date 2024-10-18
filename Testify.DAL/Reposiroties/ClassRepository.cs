@@ -67,10 +67,73 @@ namespace Testify.DAL.Reposiroties
 
             return data;
         }
+
+        public async Task<List<ClassWithUser>> GetClassWithSubjectId(int idSubject)
+        {
+           
+            var data = await (from c in _context.Classes
+                              join u in _context.Users
+                              on c.TeacherId equals u.Id into classUser
+                              from cu in classUser.DefaultIfEmpty()
+                              join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
+                              from cs in classSubject.DefaultIfEmpty()
+                              where (c.SubjectId==idSubject && c.Status==1) 
+                              select new ClassWithUser
+                              {
+                                  Id = c.Id,
+                                  Name = c.Name,
+                                  ClassCode = c.ClassCode,
+                                  Description = c.Description,
+                                  Capacity = c.Capacity,
+                                  TeacherId = c.TeacherId,
+                                  FullName = cu.FullName,
+                                  SubjectId = c.SubjectId,
+                                  SubjectName = cs.Name,
+                                  Status = c.Status
+                              }).ToListAsync(); // Await the result here
+
+            return data;
+        }
+
+
+        public async Task<List<ClassWithUser>> GetClassWithSubjectIdExcludeInSchedule(int idSubject)
+        {
+
+            var data = await (from c in _context.Classes
+                              join u in _context.Users
+                              on c.TeacherId equals u.Id into classUser
+                              from cu in classUser.DefaultIfEmpty()
+                              join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
+                              from cs in classSubject.DefaultIfEmpty()
+                              where (c.SubjectId == idSubject && c.Status == 1 && !_context.ClassExamSchedules.Any(x=>x.ClassId==c.Id))
+                              select new ClassWithUser
+                              {
+                                  Id = c.Id,
+                                  Name = c.Name,
+                                  ClassCode = c.ClassCode,
+                                  Description = c.Description,
+                                  Capacity = c.Capacity,
+                                  TeacherId = c.TeacherId,
+                                  FullName = cu.FullName,
+                                  SubjectId = c.SubjectId,
+                                  SubjectName = cs.Name,
+                                  Status = c.Status
+                              }).ToListAsync(); // Await the result here
+
+            return data;
+        }
+
+
         public async Task<Class> GetByIdClass(int id)
         {
             return await _context.Classes.FindAsync(id);
         }
+
+        public async Task<Class> GetClassByCode(string ClassCode)
+        {
+            return await _context.Classes.FirstOrDefaultAsync(x => x.ClassCode.ToLower().Equals(ClassCode.ToLower()));
+        }
+
         public async Task<Class> AddClass(Class classes) 
         {
             try

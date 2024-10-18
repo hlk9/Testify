@@ -99,6 +99,8 @@ namespace Testify.DAL.Reposiroties
             {
                 var objUpdateExam = await _context.Exams.FindAsync(exam.Id);
 
+                
+
                 objUpdateExam.Name = exam.Name;
                 objUpdateExam.NumberOfQuestions = exam.NumberOfQuestions;
                 objUpdateExam.Status = exam.Status;
@@ -106,6 +108,7 @@ namespace Testify.DAL.Reposiroties
                 objUpdateExam.Description = exam.Description;
                 objUpdateExam.MaximmumMark = exam.MaximmumMark;
                 objUpdateExam.PassMark = exam.PassMark; 
+                objUpdateExam.SubjectId = exam.SubjectId;
 
                 var updateExam = _context.Exams.Update(objUpdateExam).Entity;
                 await _context.SaveChangesAsync();

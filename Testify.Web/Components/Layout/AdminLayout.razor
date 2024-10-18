@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavigationManager
 @if (isLoading == true)
 {
@@ -92,9 +92,9 @@
             if (isTokenValid == false)
             {
                 navigation.NavigateTo("/");
-               
+
             }
-            
+
         }
     }
     private async Task<bool> CheckingToken()
@@ -153,6 +153,7 @@
     private async void Logout()
     {
         await localStorage.RemoveItemAsync("token");
+        await ProtectedSessionStore.DeleteAsync("userLogin");
         navigation.NavigateTo("/");
     }
 

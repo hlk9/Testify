@@ -42,12 +42,15 @@ builder.Services.AddScoped<RoomService>();
 builder.Services.AddScoped<ClassService>();
 builder.Services.AddScoped<AccessService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<LevelService>();
 builder.Services.AddScoped<ExamScheduleService>();
 builder.Services.AddScoped<ExamService>();
 builder.Services.AddScoped<ExamDetailService>();
 builder.Services.AddScoped<ExamDetailQuestionService>();
-
-
+builder.Services.AddScoped<SubmissionServices>();
+builder.Services.AddScoped<AnswerSubmissionServices>();
+builder.Services.AddScoped<ClassUserServices>();
+builder.Services.AddScoped<ClassExamScheduleService>();
 
 // Add response compression services
 builder.Services.AddResponseCompression(options =>
@@ -94,7 +97,7 @@ builder.Services.AddMudServices(config =>
 
 builder.Services.AddScoped(http => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:7128")
+    BaseAddress = new Uri("http://localhost:7128/")
 });
 
 var app = builder.Build();
