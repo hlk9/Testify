@@ -133,6 +133,7 @@
     private int sttList;
     private bool _open = true;
     private HttpContext httpContext;
+    private DotNetObjectReference<ViewExamTest> _objectReference;
 
     private void ToggleDrawer()
     {
@@ -155,10 +156,25 @@
         {
             await LoadExam();
             StartCountdown();
+            _objectReference = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initVisibilityChangeHandler", _objectReference);
         }
     }
 
-    private void CheckInput()
+    [JSInvokable]
+    public void ShowTabOutNotification()
+    {
+        snackbar.Add("Đã tab ra ngoài", Severity.Warning);
+    }
+
+    public void Dispose()
+    {
+        _objectReference?.Dispose();
+    }
+
+
+
+    private void CheckInput()   
     {
         if (idExam <= 0)
         {
@@ -466,3 +482,13 @@
         }
     }
 }
+
+<script>
+    window.initVisibilityChangeHandler = function (dotNetHelper) {
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                dotNetHelper.invokeMethodAsync('ShowTabOutNotification');
+            }
+        });
+    };
+</script>
