@@ -48,6 +48,12 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Users.Where(x => x.LevelId == 3).ToListAsync();
         }
+
+        public async Task<List<User>> GetAllStudent()
+        {
+            return await _context.Users.Where(x => x.LevelId == 4).ToListAsync();
+        }
+
         public async Task<User> GetLecturerById(Guid id)
         {
             return await _context.Users.FindAsync(id);
@@ -117,31 +123,26 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<List<ScoreStatistics>> GetScore(int IDSubject, int IDExam)
+        public async Task<List<ScoreStatistics>> GetScore(int subjectId, int examId)
         {
 
 
-            var data = await (from u in _context.Users
-                              join sub in _context.Submissions
-                              on u.Id equals sub.UserId
-                              from e in _context.Exams
-                              join s in _context.Subjects
-                              on e.SubjectId equals s.Id
-                              where (
-                              s.Id == IDSubject && e.Id == IDExam
-
-                              )
+            var data = await (from exs in _context.ExamSchedules.Where(x => x.SubjectId == subjectId && x.ExamId == examId)
+                              join subject in _context.Subjects
+                              on exs.SubjectId equals subject.Id
+                              join ex in _context.Exams
+                              on exs.ExamId equals ex.Id
+                              join submission in _context.Submissions
+                              on exs.Id equals submission.ExamScheduleId
                               select new ScoreStatistics
                               {
-                                  UserID = u.Id,
-                                  FullName = u.FullName,
-                                  SubjectId = s.Id,
-                                  SubjectName = s.Name,
-                                  ExamId = e.Id,
-                                  ExamName = e.Name,
-                                  SubmissionId = sub.Id,
-                                  Score = sub.TotalMark
-
+                                  UserID = submission.UserId,
+                                  SubjectId = subjectId,
+                                  SubjectName = subject.Name,
+                                  ExamId = ex.Id,
+                                  ExamName = ex.Name,
+                                  SubmissionId = submission.Id,
+                                  Score = submission.TotalMark
                               }).ToListAsync();
             return data;
         }

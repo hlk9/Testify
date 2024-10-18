@@ -1,0 +1,97 @@
+﻿@inject ExamService examService
+@inject SubjectService subjectService
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Chi tiết bài thi</MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="@exam" >
+            <DataAnnotationsValidator />
+            <MudGrid Class="mt-3 mb-3" Justify="Justify.SpaceBetween">
+                <MudItem Class="w-100">
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudTextField T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudAutocomplete T="Subject"
+                                             @bind-Value="subjectCurrent"
+                                             SearchFunc="@SearchSubject"
+                                             Variant="Variant.Outlined"
+                                             Label="Môn"
+                                             Placeholder="Chọn môn"
+                                             Clearable="true"
+                                             ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                                             OnFocus="SubjectChanged" />
+                        </MudItem>
+                    </MudGrid>
+
+                </MudItem>
+
+                <MudItem Class="w-100">
+                    <MudGrid>
+                        <MudItem xs="3">
+                            <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Label="Điểm tối đa"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Label="Tổng số câu"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+
+            </MudGrid>
+            <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
+        
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    private void Cancel() => MudDialog.Cancel();
+    private Exam exam = new Exam();
+    private List<Exam> listExam;
+    private List<Subject> listSubject;
+    private Exam examCurrent;
+    private Subject subjectCurrent;
+
+    private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
+    {
+
+        listSubject = await subjectService.GetAllSub(null, true);
+
+
+        if (string.IsNullOrEmpty(value))
+            return listSubject;
+
+        return listSubject.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+    private async Task SubjectChanged()
+    {
+        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        examCurrent = null;
+        StateHasChanged();
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        exam = await examService.GetExamId(Id);
+        subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+    }
+}
