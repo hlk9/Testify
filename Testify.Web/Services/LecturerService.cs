@@ -21,7 +21,7 @@ namespace Testify.Web.Services
 
         public async Task<List<ScoreStatistics>> GetScore(int idSub, int idExam)
         {
-            var allScore = await _httpClient.GetAsync($"Lecturer/Get-score?idsub={idSub}?idexam={idExam}");
+            var allScore = await _httpClient.GetAsync($"Lecturer/Get-score?idsub={idSub}&idexam={idExam}");
             var response = await allScore.Content.ReadFromJsonAsync<List<ScoreStatistics>>();
 
             return response;
@@ -35,6 +35,11 @@ namespace Testify.Web.Services
         public async Task<List<User>> GetAllTeacher()
         {
             return await _httpClient.GetFromJsonAsync<List<User>>("Lecturer/Get-All-Teacher");
+        }
+
+        public async Task<List<User>> GetAllStudent()
+        {
+            return await _httpClient.GetFromJsonAsync<List<User>>("Lecturer/Get-all-student");
         }
 
         public async Task<bool> CreateLecturer(User user)

@@ -9,7 +9,6 @@ namespace Testify.DAL.ViewModels
     public class ScoreStatistics
     {
         public Guid UserID { get; set; }
-        public string FullName { get; set; }
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
         public int ExamId { get;set; }
