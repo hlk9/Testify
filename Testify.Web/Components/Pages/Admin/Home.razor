@@ -354,26 +354,29 @@
         _lstSubject = await _serSub.GetAllSub("", true);
         _lstClass = await _serClass.GetAllClass("", true);
         _lstUser = await _serLec.GetAllTeacher();
-        if (_lstSubject.Any())
+        if (_lstSV.Count != 0 && _lstSubject.Count != 0 && _lstClass.Count != 0 && _lstUser.Count != 0)
         {
-
-            classId = _lstClass[0];
-            subjectId = _lstSubject[1].Id;
-            _lstExam = await _serExam.GetListOfSubject(subjectId);
-            if(_lstExam != null && _lstExam.Count > 0)
+            if (_lstSubject.Any())
             {
-                examId = _lstExam[0].Id;
-                _lstScore = await _serLec.GetScore(subjectId, examId);
-            }
-            else
-            {
-                isError = true;
+
+                classId = _lstClass[0];
+                subjectId = _lstSubject[1].Id;
+                _lstExam = await _serExam.GetListOfSubject(subjectId);
+                if (_lstExam != null && _lstExam.Count > 0)
+                {
+                    examId = _lstExam[0].Id;
+                    _lstScore = await _serLec.GetScore(subjectId, examId);
+                }
+                else
+                {
+                    isError = true;
+                }
+
             }
 
+
+            totalStudent = _lstSV.Count();
         }
-
-
-        totalStudent = _lstSV.Count();
 
         await LoadDataChart();
     }
@@ -406,8 +409,5 @@
 
         return _lstSubject.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
-
-
-
 
 }
