@@ -57,6 +57,14 @@ namespace Testify.API.Controllers
             return Ok(lstTeacher);
         }
 
+        [HttpGet("Get-All-Student")]
+        public async Task<ActionResult<List<User>>> GetlAllStudent()
+        {
+            var lstStudent = await _repo.GetAllStudent();
+            return Ok(lstStudent);
+        }
+
+
         [HttpDelete("Delete-Lecturer")]
         public async Task<ActionResult<User>> Delete(Guid id)
         {
