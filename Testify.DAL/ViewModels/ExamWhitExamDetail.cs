@@ -25,5 +25,6 @@ namespace Testify.DAL.ViewModels
         public Guid UpdateBy { get; set; }
 
         public double Point { get; set; }
+       
     }
 }
