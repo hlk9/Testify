@@ -4,18 +4,6 @@
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới tài khoản bằng file excel</MudText>
     </TitleContent>
     <DialogContent>
-        <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
-            <MudAutocomplete T="Level"
-                             @bind-Value="levelId"
-                             SearchFunc="@SearchLevel"
-                             Variant="Variant.Outlined"
-                             Label="Chức vụ"
-                             Placeholder="Chọn chức vụ"
-                             Clearable="true"
-                             ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                             OnFocus="ExamChanged"
-                             ResetValueOnEmptyText="true" />
-        </MudItem>
         <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
             <MudTextField T="string" @bind-Value="@nameFileCurrent"></MudTextField>
             <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadChange">
@@ -25,23 +13,19 @@
                 </ActivatorContent>
             </MudFileUpload>
         </MudPaper>
-
-        <MudPaper Elevation="0" Class="bg-transparent mt-3 d-flex justify-content-between align-items-center">
-            <MudButton Class="bg-info text-white"   OnClick="@(() => Submit(false))" >Kiểm tra file excel</MudButton>
-        </MudPaper>
-
         <MudPaper Elevation="0" Class="bg-transparent mt-3">
-             @if (_lstAccountFromExcel != null)
+            @if (_lstAccountFromExcel != null)
             {
                 <MudTable Items="@_lstAccountFromExcel" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true">
                     <RowTemplate>
                         <MudTd DataLabel="Họ và tên" hidden>@context.FullName</MudTd>
                         <MudTd DataLabel="Tên tài khoản">@context.UserName</MudTd>
                         <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
+                        <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
                         <MudTd DataLabel="Địa chỉ">@context.Address</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
                         <MudTd DataLabel="Mật khẩu">@context.PasswordHash</MudTd>
-                        <MudTd DataLabel="Chức vụ">@context.LevelId</MudTd>
+                        @* <MudTd DataLabel="Chức vụ">@context.LevelId</MudTd> *@
                     </RowTemplate>
 
                     <NoRecordsContent>
@@ -51,7 +35,7 @@
                         <MudTablePager />
                     </PagerContent>
                 </MudTable>
-            } 
+            }
         </MudPaper>
     </DialogContent>
     <DialogActions>
@@ -70,6 +54,10 @@
     private string nameFileCurrent;
     private IBrowserFile selectFileCurrent;
     private int countAccount = 0;
+
+    [Inject]
+    private IDialogService _mudDialogServices { get; set; }
+
     private List<AccountExcel>? _lstAccountFromExcel;
     private Level levelId;
     private List<Level> _lstLevel;
@@ -94,25 +82,34 @@
 
     private async Task Submit(bool isSubmit)
     {
-        if(selectFileCurrent == null)
+        int countUser = 0;
+        if (selectFileCurrent == null)
         {
             snackbar.Add("Chưa có file nào được chọn", Severity.Error);
             return;
-
-            using var stream = new MemoryStream();
-            await selectFileCurrent.OpenReadStream().CopyToAsync(stream);
-            stream.Position = 0;
-
-            ExcelPackage package = new ExcelPackage(stream);
-            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-            ExcelWorksheet worksheetQuestion = package.Workbook.Worksheets[0];
-            ExcelWorksheet worksheetAnswer = package.Workbook.Worksheets[1];
-            int rowCount = worksheetQuestion.Dimension.Rows;
-            int colCount = worksheetQuestion.Dimension.Columns;
-
-            _lstAccountFromExcel = new List<AccountExcel>();
-            countAccount = 0;
         }
+
+        var lstUserChecked = await _serLec.ImportExcelUser(selectFileCurrent);
+
+        if (isSubmit == true)
+        {
+            var isSuccessCreate = await _serLec.CreateUserInExcelImport(lstUserChecked);
+            if (isSuccessCreate.IsSuccessStatusCode)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm tài khoản thành công", Severity.Success);
+            }
+            else
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Thêm tài khoảng thất bại", Severity.Error);
+            }
+        }
+        else
+        {
+            snackbar.Add("Không có câu hỏi nào để import", Severity.Warning);
+        }
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -136,11 +133,13 @@
         public string FullName { get; set; }
         public string UserName { get; set; }
         public string PhoneNumber { get; set; }
+        public string DateOfBirth { get; set; }
         public string Address { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
-        public int LevelId { get; set; }
+
 
 
     }
 }
+

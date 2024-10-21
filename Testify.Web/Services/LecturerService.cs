@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -52,6 +53,16 @@ namespace Testify.Web.Services
             return false;
         }
 
+        public async Task<bool> CreateStudents(User user)
+        {
+            var statusCreate = await _httpClient.PostAsJsonAsync<User>("Lecturer/Create-Students", user);
+            if (statusCreate.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public async Task<bool> UpdateLecturer(User user)
         {
             var statusUpdate = await _httpClient.PutAsJsonAsync<User>("Lecturer/Update-Lecturer", user);
@@ -70,6 +81,29 @@ namespace Testify.Web.Services
                 return true;
             }
             return false;
+        }
+
+
+        public async Task<List<User>> ImportExcelUser(IBrowserFile file)
+        {
+            using var content = new MultipartFormDataContent();
+
+            using var stream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(stream);
+            stream.Position = 0;
+
+            content.Add(new StreamContent(stream), "file", file.Name);
+
+            var allUser = await _httpClient.PostAsync("Lecturer/Import-Excel-User", content);
+            var response = await allUser.Content.ReadFromJsonAsync<List<User>>();
+
+            return response;
+        }
+
+        public async Task<HttpResponseMessage> CreateUserInExcelImport(List<User> lstUser)
+        {
+            var response = await _httpClient.PostAsJsonAsync("Lecturer/Create-User-In-Import-Excel", lstUser);
+            return response;
         }
     }
 }
