@@ -63,19 +63,7 @@ namespace Testify.API.Controllers
 
 
 
-        [HttpPost("add-questions-to-exam")]
-        public async Task<IActionResult> AddQuestionsToExam(int examId, [FromBody] List<Question> questions)
-        {
-            try
-            {
-                await _respon.AddQuestionsToExamAsync(examId, questions);
-                return Ok(new { message = "Questions added to exam successfully." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+       
 
         [HttpGet("Get-InfoBasic")]
         public async Task<List<ExamWhitQusetion>> GetInfoBasic()
@@ -105,6 +93,7 @@ namespace Testify.API.Controllers
 
         }
 
+        
 
 
     }
