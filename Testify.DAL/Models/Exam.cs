@@ -18,6 +18,7 @@ namespace Testify.DAL.Models
         public int SubjectId  { get; set; }
         public virtual Subject? Subject { get; set; }
         public int NumberOfQuestions { get; set; }
+        public int NumberOfRepeat { get; set; } = 1;
         public byte Status { get; set; } = 1;
         public double MaximmumMark { get; set; }
         public double PassMark { get; set; }

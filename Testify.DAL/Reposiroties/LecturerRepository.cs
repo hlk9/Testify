@@ -74,6 +74,22 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
+        public async Task<User> CreateStudent(User user)
+        {
+            try
+            {
+                user.LevelId = 4;
+                var addStudent = _context.Users.Add(user).Entity;
+                await _context.SaveChangesAsync();
+                return addStudent;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task<User> UpdateLecturer(User user)
         {
             try
