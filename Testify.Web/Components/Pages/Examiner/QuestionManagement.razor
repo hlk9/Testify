@@ -55,17 +55,13 @@
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI VÀ ĐÁP ÁN</MudText>
     </MudPaper>
     <MudGrid Style="padding:20px 0 ">
-        <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
-            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Export</MudButton>
+        <MudItem xl="6" lg="4" md="2" sm="12" xs="12">
         </MudItem>
-        <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
-            <MudButton Class="button-import" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ImportExcel, -1))">Import</MudButton>
+        <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
+            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Tải danh sách câu hỏi</MudButton>
         </MudItem>
-        <MudItem xl="3" lg="3" md="4" sm="12" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Class="button-add-answer-to-question" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
-        </MudItem>
-        <MudItem xl="3" lg="3" md="4" sm="12" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.Create, -1))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
+        <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidthLarge, OpenDialogType.Create, -1))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -107,7 +103,11 @@
                     <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
                     <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
                     <MudTd DataLabel="Mức độ">
-                        @if (_lstQuestionLevels != null)
+                        @if(context.QuestionLevelId == null)
+                        {
+                            <MudText Style="font-size: 14px">Không có</MudText>
+                        }
+                        else
                         {
                             foreach (var item in _lstQuestionLevels)
                             {
@@ -151,11 +151,11 @@
                     <MudTd DataLabel="Trạng thái">@(context.Status == Convert.ToByte(StatusType.isActive) ? "Hoạt Động" : (context.Status == Convert.ToByte(StatusType.noAnswer) ? "Chưa có đáp án" : "Vô hiệu hóa"))</MudTd>
 
                     <MudTd DataLabel="Thao tác">
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidthMedium,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidthMedium, OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTd>
                     <MudTd>
-                        <MudButton Disabled="@(context.Status == Convert.ToByte(StatusType.noAnswer) ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
+                        <MudButton Disabled="@(context.Status == Convert.ToByte(StatusType.noAnswer) ? true : false)" OnClick="@(()=> OpenDialogAsync(_maxWidthLarge,OpenDialogType.ShowAnswer, context.Id))">Đáp Án</MudButton>
                     </MudTd>
                 </RowTemplate>
                 <NoRecordsContent>
@@ -171,9 +171,9 @@
 
 @code {
     private List<Question> _lstQuestions = new List<Question>();
-    private List<Subject> _lstSubjects;
-    private List<QuestionLevel> _lstQuestionLevels;
-    private List<QuestionType> _lstQuestionTypes;
+    private List<Subject> _lstSubjects = new List<Subject>();
+    private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
+    private List<QuestionType> _lstQuestionTypes = new List<QuestionType>();
     private bool IsDisableShowAnswer;
     private bool isLoading { get; set; } = true;
     private string searchValue = "";
@@ -200,7 +200,8 @@
         await LoadData("");
     }
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    private readonly DialogOptions _maxWidthLarge = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    private readonly DialogOptions _maxWidthMedium = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
     private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
@@ -219,24 +220,9 @@
             {x => x.questionId, id}
         };
 
-        var dialogParametersCreateAnswer = new DialogParameters<Dialog.Answer.CreateAnswerDialog>
-        {
-            {x => x.isQuestionId, true},
-            {y => y.questionIdParams, -1}
-        };
-
         if (name.Equals(OpenDialogType.ShowAnswer))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Answer.ListAnswerDialog>("Options Dialog", dialogParametersQuestionId, options);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await LoadData("");
-            }
-        }
-        else if (name.Equals(OpenDialogType.ShowDialogAddNewAnswer))
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.Answer.CreateAnswerDialog>("Options dialog", dialogParametersCreateAnswer, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -262,11 +248,11 @@
                 await LoadData("");
             }
         }
-        else if(name.Equals(OpenDialogType.ImportExcel)) 
+        else if (name.Equals(OpenDialogType.ImportExcel))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Question.ImportQuestionExcel>("Options Dialog", options);
             var result = await dialog.Result;
-            if(!result.Canceled)
+            if (!result.Canceled)
             {
                 await LoadData("");
             }

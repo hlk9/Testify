@@ -46,6 +46,11 @@ namespace Testify.DAL.Reposiroties
             return await _context.Questions.FindAsync(id);
         }
 
+        public async Task<List<Question>> GetQuestionBySubjectId(int subjectId)
+        {
+            return await _context.Questions.Where(x => x.SubjectId == subjectId && x.Status == 1).ToListAsync();
+        }
+
         public async Task<Question> CreateQuestion(Question question)
         {
             try
