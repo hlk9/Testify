@@ -5,24 +5,25 @@
 
 <MudDialog>
     <TitleContent>
-        <MudGrid Style="padding:20px 0; align-items: center">
-            <MudItem xl="9" lg="8" md="7" sm="6" xs="12">
-                <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Danh Sách Câu Hỏi</MudText>
-            </MudItem>
-            <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
-                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Class="button-add-answer-to-question" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
-            </MudItem>
-        </MudGrid>
-        
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Danh Sách Câu Hỏi</MudText>
     </TitleContent>
     <DialogContent>
-        @if(isLoading)
+        @if (isLoading)
         {
             <LoadingContext />
         }
         else
         {
             <div class="bg-white rounded-3 mb-4" style="width:100%;">
+                <MudGrid Class="m-0 p-0 w-100">
+                    <MudItem lg="3" md="4" xs="12" Class="p-0 pb-3">
+                        @if (CheckTypeQuestion == false)
+                        {
+                            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ShowDialogAddNewAnswer, -1))" Class="button-add-answer-to-question" Variant="Variant.Filled">Thêm mới đáp án cho câu hỏi</MudButton>
+                        }
+                    </MudItem>
+                    <MudItem lg="9" md="8" xs="12" Class="p-0"></MudItem>
+                </MudGrid>
                 <MudTable Items="@lstAnswers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px">
                     <HeaderContent>
                         <MudTh hidden><MudTableSortLabel SortLabel="Id câu hỏi" T="string" hidden>Id đáp án</MudTableSortLabel></MudTh>
@@ -46,7 +47,7 @@
                                 <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@(() => OpenDialogAsync(_SmallWidth, OpenDialogType.Delete, context.Id))" Disabled="CheckTypeQuestion"></MudIconButton>
                             </MudTd>
                         }
-                        
+
                     </RowTemplate>
 
                     <NoRecordsContent>
@@ -72,23 +73,27 @@
     private MudDialogInstance MudDialog { get; set; }
     private bool isLoading { get; set; } = true;
     private int questionTypeId = -1;
-    private bool CheckTypeQuestion = false;
+    private bool CheckTypeQuestion;
 
     private async Task loadData()
     {
         lstAnswers = await _serAnswer.GetAllByQuestionId(questionId);
+        var objQuestion = await _serQuestion.GetQuestionById(questionId);
+        questionTypeId = objQuestion.QuestionTypeId;
+        if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
+        {
+            CheckTypeQuestion = true;
+        }
+        else
+        {
+            CheckTypeQuestion = false;
+        }
         StateHasChanged();
         isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        var objQuestion = await _serQuestion.GetQuestionById(questionId);
-        questionTypeId = objQuestion.QuestionTypeId;
-        if(questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
-        {
-            CheckTypeQuestion = true;
-        }
         await loadData();
     }
 
@@ -111,7 +116,6 @@
 
         var dialogParametersCreateAnswer = new DialogParameters<Dialog.Answer.CreateAnswerDialog>
         {
-            {x => x.isQuestionId, false},
             {y => y.questionIdParams, questionId}
         };
 
