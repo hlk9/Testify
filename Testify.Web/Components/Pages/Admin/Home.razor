@@ -105,10 +105,40 @@
 
             <MudPaper Style="padding: 15px; margin-top: 2rem">
                 <MudGrid Style="align-items: center">
-                    <MudItem xl="4" lg="4" md="4" sm="6" xs="12">
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
                         <MudText Style="font-size: 16px; font-weight: bold">Phổ điểm</MudText>
                     </MudItem>
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
+
+                        <MudSelect T="int" @bind-Value="subjectId" Variant="Variant.Outlined" SelectedValuesChanged="ChangeValueSubject">
+                            @foreach (var item in _lstSubject)
+                            {
+                                <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
+                        @if (_lstExam.Count == 0)
+                        {
+                            <MudSelect T="string" Variant="Variant.Outlined" Text="Không có bài thi nào">
+
+                            </MudSelect>
+                        }
+                        else
+                        {
+                            <MudSelect T="int" @bind-Value="examId" Variant="Variant.Outlined" SelectedValuesChanged="ChangeValueExam">
+                                @foreach (var item in _lstExam)
+                                {
+                                    <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+
+                    </MudItem>
+                    <MudItem xl="3" lg="3" md="3">
+                    </MudItem>
                 </MudGrid>
+                                   
                 <MudGrid Style="margin-top: 2rem; align-items: center">
                     @if (isLoading)
                     {
@@ -153,8 +183,8 @@
                     <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
                         @if (_lstExam.Count == 0)
                         {
-                            <MudSelect T="string" Variant="Variant.Outlined" Text="Không có bài thi nào">                
-                                
+                            <MudSelect T="string" Variant="Variant.Outlined" Text="Không có bài thi nào">
+
                             </MudSelect>
                         }
                         else
@@ -168,7 +198,8 @@
                         }
 
                     </MudItem>
-
+                    <MudItem xl="3" lg="3" md="3">
+                    </MudItem>
                 </MudGrid>
                 <MudGrid Style="margin-top: 2rem; align-items: center">
                     @if (isLoading)
@@ -244,6 +275,14 @@
     private List<ScoreStatistics> _lstScore = new List<ScoreStatistics>();
     private string text;
 
+
+    private List<ClassesWithLecturer> _lstScore2 = new List<ClassesWithLecturer>();
+    private Guid LecturerId;
+
+    private int ClassId;
+    private List<Class> _lstClasses = new List<Class>();
+
+
     private List<User> _lstSV = new List<User>();
 
     //Carousel
@@ -317,6 +356,7 @@
 
     private async Task ChangeValueSubject()
     {
+
         _lstExam = await _serExam.GetListOfSubject(subjectId);
         if (_lstExam != null && _lstExam.Count > 0)
         {
@@ -329,6 +369,29 @@
         {
             isError = true;
         }      
+    }
+
+    private async Task ChangeValueLecturer()
+    {
+        _lstClasses = await _serLec.GetListOfTeacher(LecturerId);
+        if (_lstClasses != null && _lstClasses.Count > 0)
+        {
+            ClassId = _lstClasses[0].Id;
+            _lstScore2 = await _serLec.GetScore2(LecturerId,ClassId);
+            await LoadDataChart();
+            isError = false;
+        }
+        else
+        {
+            isError = true;
+        }
+    }
+
+    private async Task ChangeValueClass()
+    {
+        _lstScore2 = await _serLec.GetScore2(LecturerId, ClassId);
+        await LoadDataChart();
+
     }
 
     private async Task ChangeValueExam()
