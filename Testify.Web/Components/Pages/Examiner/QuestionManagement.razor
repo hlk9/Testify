@@ -22,32 +22,22 @@
             color: #29a69a;
         }
 
+     .button-export {
+         background-color: #fff;
+         border: 1px solid #29a69a;
+         color: #29a69a
+     }
+
+    .button-export:hover {
+            background-color: #29a69a;
+        border: 1px solid #29a69a;
+        color: #fff
+    }
+
     .icon-input-search {
         padding-left: 100px;
     }
 
-    .button-add-answer-to-question {
-        background-color: gold;
-        color: #fff;
-        width: 100%;
-    }
-
-        .button-add-answer-to-question:hover {
-            background-color: transparent;
-            color: gold;
-        }
-
-    .button-import {
-        background-color: red;
-        color: #fff;
-        width: 100%;
-    }
-
-        .button-import:hover {
-            background-color: transparent;
-            color: red;
-            width: 100%;
-        }
 </style>
 
 <div style="font-family:Roboto; padding:30px; background-color:#fafafa">
@@ -58,7 +48,7 @@
         <MudItem xl="6" lg="4" md="2" sm="12" xs="12">
         </MudItem>
         <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
-            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidthMedium, OpenDialogType.ImportExcel, -1))">Tải danh sách câu hỏi</MudButton>
+            <MudButton Class="button-export w-100" Variant="Variant.Outlined" OnClick="@(() => OpenDialogAsync(_maxWidthMedium, OpenDialogType.ImportExcel, -1))">Tải danh sách câu hỏi</MudButton>
         </MudItem>
         <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
             <MudButton OnClick="@(() => OpenDialogAsync(_backdropClickAndWidthLagre, OpenDialogType.Create, -1))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
@@ -103,7 +93,7 @@
                     <MudTd DataLabel="Tên câu hỏi">@context.Content</MudTd>
                     <MudTd DataLabel="Ngày tạo">@context.CreatedDate</MudTd>
                     <MudTd DataLabel="Mức độ">
-                        @if(context.QuestionLevelId == null)
+                        @if (context.QuestionLevelId == null)
                         {
                             <MudText Style="font-size: 14px">Không có</MudText>
                         }
@@ -201,7 +191,7 @@
     }
 
     private readonly DialogOptions _maxWidthLarge = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
-    private readonly DialogOptions _maxWidthMedium = new() { MaxWidth = MaxWidth.Medium, FullWidth = true }; 
+    private readonly DialogOptions _maxWidthMedium = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
     private readonly DialogOptions _backdropClickAndWidthLagre = new() { MaxWidth = MaxWidth.Large, FullWidth = true, BackdropClick = false };
 
     private async Task OpenDialogAsync(DialogOptions options, string name, int id)

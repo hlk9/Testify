@@ -61,12 +61,6 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<HttpResponseMessage> CreateQuestionInExcelImport(List<QuestionInExcel> lstQuestion)
-        {
-            var response = await _httpClient.PostAsJsonAsync("Question/Create-Question-In-Import-Excel", lstQuestion);
-            return response;
-        }
-
         public async Task<Question> UpdateQuestion(Question question)
         {
             var updateQuestion = await _httpClient.PutAsJsonAsync("Question/Update-Question", question);

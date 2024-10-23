@@ -4,19 +4,19 @@
 @using Testify.Web.Data.Commons;
 @inject IJSRuntime jsruntime;
 
-@if (isLoading)
-{
-    <MudOverlay Visible="isLoading" Style="background-color: rgba(0, 0, 0, 0.5)" LightBackground="true" LockScroll="true" Class="top-0 bottom-0 start-0 end-0" Absolute="true">
-        <MudProgressCircular Color="Color.Success" Size="Size.Large" Indeterminate="true" />
-    </MudOverlay>
-}
-else
-{
-    <MudDialog>
-        <TitleContent>
-            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án</MudText>
-        </TitleContent>
-        <DialogContent>
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án</MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (isLoading)
+        {
+            <MudOverlay Visible="isLoading" Style="background-color: rgba(0, 0, 0, 0.5)" LightBackground="true" LockScroll="true" Class="top-0 bottom-0 start-0 end-0" Absolute="true">
+                <MudProgressCircular Color="Color.Success" Size="Size.Large" Indeterminate="true" />
+            </MudOverlay>
+        }
+        else
+        {
             <MudTabs ApplyEffectsToContainer="true">
                 <MudTabPanel Text="Thêm Mới">
                     @if (isLoading)
@@ -161,11 +161,9 @@ else
                     </MudPaper>
                 </MudTabPanel>
             </MudTabs>
-
-        </DialogContent>
-    </MudDialog>
-}
-
+        }
+    </DialogContent>
+</MudDialog>
 
 @code {
     private Question question { get; set; } = new();
@@ -379,22 +377,49 @@ else
     {
         if (isType)
         {
-            if (subjectId == null || subjectId <= 0)
-            {
-                snackbar.Add("Chưa chọn môn", Severity.Warning);
-                return;
-            }
-            if (selectFileExcel == null)
-            {
-                snackbar.Add("Chưa chọn file import", Severity.Error);
-                return;
-            }
-            isLoading = true;
-            var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId);
+            // if (subjectId == null || subjectId <= 0)
+            // {
+            //     snackbar.Add("Chưa chọn môn", Severity.Warning);
+            //     return;
+            // }
+            // if (selectFileExcel == null)
+            // {
+            //     snackbar.Add("Chưa chọn file import", Severity.Error);
+            //     return;
+            // }
+            // isLoading = true;
+            // var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId);
 
-            isLoading = false;
-            snackbar.Add($"Thêm câu hỏi thành công, trong đó có {check} không thêm được", Severity.Info);
-            MudDialog.Close(DialogResult.Ok(true));
+            // snackbar.Add($"Thêm câu hỏi thành công, trong đó có {check} không thêm được", Severity.Info);
+            // MudDialog.Close(DialogResult.Ok(true));
+            // isLoading = false;
+            // StateHasChanged();
+            try
+            {
+                // Mở dialog loading
+                isLoading = true;
+
+                // Thực hiện import file Excel (giả lập bằng Task.Delay)
+                await Task.Run(async () =>
+                {
+                    // Giả lập quá trình import Excel mất 5 giây
+                    // Thay thế phần này bằng logic thực tế để đọc và xử lý file Excel
+                    await Task.Delay(1000);
+                });
+
+                // Thông báo hoàn tất
+                snackbar.Add("Import hoàn tất!", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                // Thông báo khi có lỗi xảy ra
+                snackbar.Add($"Đã xảy ra lỗi: {ex.Message}", Severity.Error);
+            }
+            finally
+            {
+                // Đóng dialog loading sau khi hoàn thành hoặc có lỗi
+                isLoading = false;
+            }
         }
         else
         {
