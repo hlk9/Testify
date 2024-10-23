@@ -4,157 +4,168 @@
 @using Testify.Web.Data.Commons;
 @inject IJSRuntime jsruntime;
 
-<MudDialog>
-    <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án</MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudTabs ApplyEffectsToContainer="true">
-            <MudTabPanel Text="Thêm Mới">
-                @if (isLoading)
-                {
-                    <LoadingContext />
-                }
-                else
-                {
-                    <MudPaper Elevation="0" Class="mt-3">
-                        <div class="w-100 mb-2">
-                            <MudText Style="font-size: 16px; font-weight: bold">Câu Hỏi:</MudText>
-                        </div>
-                        <MudForm Spacing="4" Model="@question" @ref="@form">
-                            <MudGrid Class="p-0 m-0 w-100">
-                                <MudItem md="4" xs="12" Class="w-100 ps-0 pe-0 pe-md-3">
-                                    <MudSelect Class="w-100" T="int" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                        @if (questionLevelId == -1)
-                                        {
-                                            <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
-                                        }
-                                        @foreach (var itemLevel in _lstQuestionLevels)
-                                        {
-                                            <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                </MudItem>
-
-                                <MudItem md="4" xs="12" Class="w-100 px-0 px-md-2   ">
-                                    <MudSelect T="int" @bind-Value="questionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-
-                                        @if (questionTypeId == -1)
-                                        {
-                                            <MudSelectItem Value="-1">Chọn loại câu hỏi</MudSelectItem>
-                                        }
-                                        @foreach (var itemType in _lstQuestionTypes)
-                                        {
-                                            <MudSelectItem Value="@itemType.Id">@itemType.Name</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                </MudItem>
-
-                                <MudItem md="4" xs="12" Class="w-100 pe-0 ps-0 ps-md-3">
-                                    <MudSelect T="int" @bind-Value="subjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                        @if (subjectId == -1)
-                                        {
-                                            <MudSelectItem Value="-1">Chọn môn học</MudSelectItem>
-                                        }
-                                        @foreach (var item in _lstSubjects)
-                                        {
-                                            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                </MudItem>
-                            </MudGrid>
-
-                            <div>
-                                <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Nội dung câu hỏi" @bind-Value="question.Content" />
+@if (isLoading)
+{
+    <MudOverlay Visible="isLoading" Style="background-color: rgba(0, 0, 0, 0.5)" LightBackground="true" LockScroll="true" Class="top-0 bottom-0 start-0 end-0" Absolute="true">
+        <MudProgressCircular Color="Color.Success" Size="Size.Large" Indeterminate="true" />
+    </MudOverlay>
+}
+else
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo mới câu hỏi và đáp án</MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTabs ApplyEffectsToContainer="true">
+                <MudTabPanel Text="Thêm Mới">
+                    @if (isLoading)
+                    {
+                        <LoadingContext />
+                    }
+                    else
+                    {
+                        <MudPaper Elevation="0" Class="mt-3">
+                            <div class="w-100 mb-2">
+                                <MudText Style="font-size: 16px; font-weight: bold">Câu Hỏi:</MudText>
                             </div>
+                            <MudForm Spacing="4" Model="@question" @ref="@form">
+                                <MudGrid Class="p-0 m-0 w-100">
+                                    <MudItem md="4" xs="12" Class="w-100 ps-0 pe-0 pe-md-3">
+                                        <MudSelect Class="w-100" T="int" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                            @if (questionLevelId == -1)
+                                            {
+                                                <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
+                                            }
+                                            @foreach (var itemLevel in _lstQuestionLevels)
+                                            {
+                                                <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
 
-                            <div class="d-flex justify-content-between align-items-center gap-2">
-                                <MudTextField @bind-Value="@nameFileImageCurrent" Style="padding: 0" T="string" ReadOnly=true />
-                                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFileImage" Accept=".jpg, .png, .mp3">
-                                    <ActivatorContent>
-                                        <MudFab StartIcon="@Icons.Material.Filled.Image"
-                                                Label="Thêm Ảnh" />
-                                    </ActivatorContent>
-                                </MudFileUpload>
-                            </div>
-                        </MudForm>
-                    </MudPaper>
-                    <MudPaper Elevation="0" Class="mt-5">
-                        <MudText Style="font-size: 16px; font-weight: bold">Đáp Án:</MudText>
-                        @if (questionTypeId == ((int)listQuestionTypes.YesNo))
-                        {
-                            <MudRadioGroup T="bool" @bind-Value="@isAnswerCorrectInYesNo">
-                                <MudRadio Value="true">Đúng</MudRadio>
-                                <MudRadio Value="false">Sai</MudRadio>
-                            </MudRadioGroup>
-                        }
-                        else
-                        {
-                            <MudDataGrid Items="@lstAnswers" Class="my-3">
-                                <Columns>
-                                    <PropertyColumn Property="x => x.Content" Title="Nội dung" />
-                                    <PropertyColumn Property="x => x.IsCorrect" Title="Đúng/Sai" />
-                                </Columns>
-                            </MudDataGrid>
+                                    <MudItem md="4" xs="12" Class="w-100 px-0 px-md-2   ">
+                                        <MudSelect T="int" @bind-Value="questionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
 
-                            <MudButton Class="btn p-2 text-white" Style="background-color: #29a69a" OnClick="IsShowAddAnswer">Thêm đáp án</MudButton>
+                                            @if (questionTypeId == -1)
+                                            {
+                                                <MudSelectItem Value="-1">Chọn loại câu hỏi</MudSelectItem>
+                                            }
+                                            @foreach (var itemType in _lstQuestionTypes)
+                                            {
+                                                <MudSelectItem Value="@itemType.Id">@itemType.Name</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
 
-                            @if (isShowAddAnswer)
+                                    <MudItem md="4" xs="12" Class="w-100 pe-0 ps-0 ps-md-3">
+                                        <MudSelect T="int" @bind-Value="subjectId" Label="Môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                            @if (subjectId == -1)
+                                            {
+                                                <MudSelectItem Value="-1">Chọn môn học</MudSelectItem>
+                                            }
+                                            @foreach (var item in _lstSubjects)
+                                            {
+                                                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+                                </MudGrid>
+
+                                <div>
+                                    <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Nội dung câu hỏi" @bind-Value="question.Content" />
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <MudTextField @bind-Value="@nameFileImageCurrent" Style="padding: 0" T="string" ReadOnly=true />
+                                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFileImage" Accept=".jpg, .png, .mp3">
+                                        <ActivatorContent>
+                                            <MudFab StartIcon="@Icons.Material.Filled.Image"
+                                                    Label="Thêm Ảnh" />
+                                        </ActivatorContent>
+                                    </MudFileUpload>
+                                </div>
+                            </MudForm>
+                        </MudPaper>
+                        <MudPaper Elevation="0" Class="mt-5">
+                            <MudText Style="font-size: 16px; font-weight: bold">Đáp Án:</MudText>
+                            @if (questionTypeId == ((int)listQuestionTypes.YesNo))
                             {
-                                <MudPaper Elevation="3" Class="w-100 py-3 px-2 my-3">
-                                    <MudForm Model="answer" @ref="form" Spacing="4">
-                                        <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" />
-                                        <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
-                                    </MudForm>
-                                    <MudButton Class="btn p-2" Color="Color.Primary" OnClick="SaveAnswerInQuestion">Lưu đáp án</MudButton>
-                                </MudPaper>
+                                <MudRadioGroup T="bool" @bind-Value="@isAnswerCorrectInYesNo">
+                                    <MudRadio Value="true">Đúng</MudRadio>
+                                    <MudRadio Value="false">Sai</MudRadio>
+                                </MudRadioGroup>
                             }
-                        }
-                    </MudPaper>
+                            else
+                            {
+                                <MudDataGrid Items="@lstAnswers" Class="my-3">
+                                    <Columns>
+                                        <PropertyColumn Property="x => x.Content" Title="Nội dung" />
+                                        <PropertyColumn Property="x => x.IsCorrect" Title="Đúng/Sai" />
+                                    </Columns>
+                                </MudDataGrid>
 
-                    <MudPaper Elevation="0" Class="pt-3 text-end">
-                        <MudButton OnClick="Cancel">Đóng</MudButton>
-                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Lưu câu hỏi</MudButton>
-                    </MudPaper>
-                }
-            </MudTabPanel>
-            <MudTabPanel Text="Thêm bằng excel">
-                <MudButton Class="w-100 bg-success text-white w-25 my-3" OnClick="ExportTemPlateQuestion">Tải file mẫu</MudButton>
-                <MudPaper Class="mb-3" Elevation="0">
-                    <MudSelect T="int" @bind-Value="subjectId" Label="Vui lòng chọn môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                        @if (subjectId == -1)
-                        {
-                            <MudSelectItem Value="-1">Chọn môn học</MudSelectItem>
-                        }
-                        else
-                        {
+                                <MudButton Class="btn p-2 text-white" Style="background-color: #29a69a" OnClick="IsShowAddAnswer">Thêm đáp án</MudButton>
+
+                                @if (isShowAddAnswer)
+                                {
+                                    <MudPaper Elevation="3" Class="w-100 py-3 px-2 my-3">
+                                        <MudForm Model="answer" @ref="form" Spacing="4">
+                                            <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" />
+                                            <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
+                                        </MudForm>
+                                        <MudButton Class="btn p-2" Color="Color.Primary" OnClick="SaveAnswerInQuestion">Lưu đáp án</MudButton>
+                                    </MudPaper>
+                                }
+                            }
+                        </MudPaper>
+
+                        <MudPaper Elevation="0" Class="pt-3 text-end">
+                            <MudButton OnClick="Cancel">Đóng</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Lưu câu hỏi</MudButton>
+                        </MudPaper>
+                    }
+                </MudTabPanel>
+                <MudTabPanel Text="Thêm bằng excel">
+
+                    <MudPaper Class="my-3" Elevation="0">
+                        <MudSelect T="int" @bind-Value="subjectId" Label="Vui lòng chọn môn" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @if (subjectId == -1)
+                            {
+                                <MudSelectItem Value="-1">Chọn môn học</MudSelectItem>
+                            }
                             @foreach (var item in _lstSubjects)
                             {
                                 <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
                             }
-                        }
-                    </MudSelect>
-                </MudPaper>
+                        </MudSelect>
+                    </MudPaper>
 
-                <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
-                    <MudTextField T="string" @bind-Value="@nameFileExcelCurrent"></MudTextField>
-                    <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadFileExcel">
-                        <ActivatorContent>
-                            <MudFab StartIcon="@Icons.Material.Filled.FileUpload"
-                                    Label="File Excel" />
-                        </ActivatorContent>
-                    </MudFileUpload>
-                </MudPaper>
+                    <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
+                        <MudTextField T="string" @bind-Value="@nameFileExcelCurrent"></MudTextField>
+                        <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadFileExcel">
+                            <ActivatorContent>
+                                <MudFab StartIcon="@Icons.Material.Filled.FileUpload"
+                                        Label="File Excel" />
+                            </ActivatorContent>
+                        </MudFileUpload>
+                    </MudPaper>
+                    <MudPaper Elevation="0" Class="d-flex justify-content-start gap-2 align-items-center flex-wrap">
+                        <MudText>Vui lòng soạn câu hỏi đúng với định dạng:</MudText> <MudButton Class="bg-success text-white my-3" OnClick="ExportTemPlateQuestion">Tải file mẫu</MudButton>
+                    </MudPaper>
 
-                <MudPaper Elevation="0" Class="pt-3 text-end">
-                    <MudButton OnClick="Cancel">Cancel</MudButton>
-                    <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Thêm mới</MudButton>
-                </MudPaper>
-            </MudTabPanel>
-        </MudTabs>
 
-    </DialogContent>
-</MudDialog>
+                    <MudPaper Elevation="0" Class="pt-3 text-end">
+                        <MudButton OnClick="Cancel">Cancel</MudButton>
+                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Thêm mới</MudButton>
+                    </MudPaper>
+                </MudTabPanel>
+            </MudTabs>
+
+        </DialogContent>
+    </MudDialog>
+}
+
 
 @code {
     private Question question { get; set; } = new();
@@ -213,50 +224,6 @@
     {
         await LoadData();
     }
-
-    // private async Task AddNewAnswer()
-    // {
-    //     if (lstAnswers.Count == 0 || await answerForms.Last().ValidateAsync())
-    //     {
-    //         var newAnswer = new Answer();
-    //         lstAnswers.Add(newAnswer);
-    //         answerForms.Add(new AnswerForm { answer = newAnswer });
-    //     }
-    // }
-
-    // private async Task ChangeValueQuestionType()
-    // {
-    //     if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
-    //     {
-    //         lstAnswers.Clear();
-    //         answerForms.Clear();
-    //         lstAnswers = new List<Answer>
-    //         {
-    //             new Answer{Content = "Đúng"},
-    //             new Answer{Content = "Sai"},
-    //         };
-
-    //         answerForms.Add(new AnswerForm { answer = { Content = "Đúng" }, questionTypeId = questionTypeId });
-    //         answerForms.Add(new AnswerForm { answer = { Content = "Sai" }, questionTypeId = questionTypeId });
-    //         isDisableAddNewAnswer = true;
-    //         return;
-    //     }
-    //     lstAnswers.Clear();
-    //     answerForms.Clear();
-    //     isDisableAddNewAnswer = false;
-    //     StateHasChanged();
-    // }
-
-
-    // private void RemoveAnswerForm(Answer answerToRemove)
-    // {
-    //     var index = lstAnswers.IndexOf(answerToRemove);
-    //     if (index >= 0)
-    //     {
-    //         lstAnswers.RemoveAt(index);
-    //         answerForms.RemoveAt(index);
-    //     }
-    // }
 
     private void IsShowAddAnswer()
     {
@@ -325,42 +292,6 @@
 
         return false;
     }
-
-    // private bool CheckAnswerIscorrect()
-    // {
-    //     if (lstAnswers != null && lstAnswers.Count > 0)
-    //     {
-    //         int count = lstAnswers.Count(x => x.IsCorrect);
-
-    //         if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
-    //         {
-    //             if (count > 1)
-    //             {
-    //                 snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
-    //                 return true;
-    //             }
-    //         }
-
-    //         if (count == 0)
-    //         {
-    //             snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
-    //             return true;
-    //         }
-
-    //         for (int i = 0; i < lstAnswers.Count; i++)
-    //         {
-    //             for (int j = i + 1; j < lstAnswers.Count; j++)
-    //             {
-    //                 if (lstAnswers[i].Content.ToLower().Trim() == lstAnswers[j].Content.ToLower().Trim())
-    //                 {
-    //                     snackbar.Add("Có đáp án trùng nhau!", Severity.Warning);
-    //                     return true;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return false;
-    // }
 
     private void UploadFileImage(IBrowserFile file)
     {
@@ -448,13 +379,32 @@
     {
         if (isType)
         {
+            if (subjectId == null || subjectId <= 0)
+            {
+                snackbar.Add("Chưa chọn môn", Severity.Warning);
+                return;
+            }
+            if (selectFileExcel == null)
+            {
+                snackbar.Add("Chưa chọn file import", Severity.Error);
+                return;
+            }
+            isLoading = true;
             var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId);
+
+            isLoading = false;
             snackbar.Add($"Thêm câu hỏi thành công, trong đó có {check} không thêm được", Severity.Info);
             MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
             var checkValidation = ValidationForm();
+
+            if (lstAnswers == null || lstAnswers.Count <= 0)
+            {
+                snackbar.Add("Chưa có đáp án", Severity.Warning);
+                return;
+            }
 
             if (questionTypeId == (int)listQuestionTypes.YesNo)
             {

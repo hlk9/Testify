@@ -23,15 +23,15 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
         {
-            if((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == false)
+            if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == false)
             {
                 return await _context.Questions.ToListAsync();
             }
-            else if((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == true)
+            else if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == true)
             {
                 return await _context.Questions.Where(x => x.Status == 1 || x.Status == 255).ToListAsync();
             }
-            else if((textSearch != null || textSearch != "") && isActive == true)
+            else if ((textSearch != null || textSearch != "") && isActive == true)
             {
                 return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1 || x.Status == 255).ToListAsync();
             }
@@ -59,7 +59,7 @@ namespace Testify.DAL.Reposiroties
                 await _context.SaveChangesAsync();
                 return addQuestion;
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -106,7 +106,7 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<Question> UpdateStatusQuestion(int  questionId, byte status)
+        public async Task<Question> UpdateStatusQuestion(int questionId, byte status)
         {
             try
             {
@@ -134,7 +134,7 @@ namespace Testify.DAL.Reposiroties
                 await _context.SaveChangesAsync();
                 return objDeleteQuestion;
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -164,6 +164,33 @@ namespace Testify.DAL.Reposiroties
             };
 
             return QnA;
+        }
+
+        public async Task<List<QuestionInExcel>> Check(int subjectId)
+        {
+            var data = (from q in _context.Questions.Where(x => x.SubjectId == subjectId && x.Status == 1)
+                        join a in _context.Answers
+                        on q.Id equals a.QuestionId
+
+                        select new
+                        {
+                            q.Content,
+                            q.Id,
+                            q.QuestionTypeId,
+                            q.SubjectId,
+                            Answer = a
+                        }).ToList();
+
+            var groupAnswer = data.GroupBy(q => new { q.Content, q.QuestionTypeId, q.Id, q.SubjectId }).Select(g => new QuestionInExcel
+            {
+                QuestionId = g.Key.Id,
+                QuestionTypeId = g.Key.QuestionTypeId,
+                SubjectId = g.Key.SubjectId,
+                Content = g.Key.Content,
+                Answers = g.Select(x => x.Answer).ToList(),
+            }).ToList();
+
+            return groupAnswer;
         }
     }
 }

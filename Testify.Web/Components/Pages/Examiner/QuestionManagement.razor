@@ -58,10 +58,10 @@
         <MudItem xl="6" lg="4" md="2" sm="12" xs="12">
         </MudItem>
         <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
-            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Tải danh sách câu hỏi</MudButton>
+            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidthMedium, OpenDialogType.ImportExcel, -1))">Tải danh sách câu hỏi</MudButton>
         </MudItem>
         <MudItem xl="3" lg="4" md="5" sm="6" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidthLarge, OpenDialogType.Create, -1))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_backdropClickAndWidthLagre, OpenDialogType.Create, -1))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới câu hỏi và đáp án</MudButton>
         </MudItem>
     </MudGrid>
 
@@ -201,7 +201,8 @@
     }
 
     private readonly DialogOptions _maxWidthLarge = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
-    private readonly DialogOptions _maxWidthMedium = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+    private readonly DialogOptions _maxWidthMedium = new() { MaxWidth = MaxWidth.Medium, FullWidth = true }; 
+    private readonly DialogOptions _backdropClickAndWidthLagre = new() { MaxWidth = MaxWidth.Large, FullWidth = true, BackdropClick = false };
 
     private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
@@ -250,7 +251,7 @@
         }
         else if (name.Equals(OpenDialogType.ImportExcel))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Question.ImportQuestionExcel>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.Question.ExportQuestionBySubject>("Options Dialog", options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -269,3 +270,14 @@
 
     }
 }
+
+<script>
+    window.downloadFile = function (url, fileName) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
