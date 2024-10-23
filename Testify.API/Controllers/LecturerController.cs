@@ -32,12 +32,12 @@ namespace Testify.API.Controllers
             return Ok(lstScore);
         }
 
-        [HttpGet("Get-score2")]
-        public async Task<ActionResult<List<ScoreStatistics>>> GetAllScore2(Guid idlec, int idclass)
-        {
-            var lstScore2 = await _repo.GetScore2(idlec, idclass);
-            return Ok(lstScore2);
-        }
+        //[HttpGet("Get-score2")]
+        //public async Task<ActionResult<List<ScoreStatistics>>> GetAllScore2(Guid idlec, int idclass)
+        //{
+        //    var lstScore2 = await _repo.GetScore2(idlec, idclass);
+        //    return Ok(lstScore2);
+        //}
         [HttpGet("Get-Lecturer-By-Id")]
         public async Task<ActionResult<User>> GetLecturerById(Guid id)
         {
@@ -171,5 +171,11 @@ namespace Testify.API.Controllers
             return await _repo.GetAllClassByLecturer(idLec);
         }
 
+        [HttpGet("Get-Score-Class-By-Teacher")]
+        public async Task<ActionResult<List<ClassesWithLecturer>>> Check(Guid teacherId, int classId)
+        {
+            return await _repo.GetScore2(teacherId, classId);
+
+        }
     }
 }
