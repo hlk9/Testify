@@ -29,7 +29,4 @@
   <ItemGroup>
     <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Components\Pages\Examiner\Dialog\Question\ImportQuestionExcel.razor" />
-  </ItemGroup>
 </Project>

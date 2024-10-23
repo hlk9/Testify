@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.Drawing;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -24,7 +25,7 @@ namespace Testify.API.Controllers
             _repoQuestionLevel = new QuestionLevelReposiroty();
             _repoQuestionType = new QuestionTypeReposiroty();
             _repoAnswer = new AnswerReposiroty();
-            _repoSubject =new SubjectRepository();
+            _repoSubject = new SubjectRepository();
         }
 
         [HttpGet("Get-All-Questions")]
@@ -41,13 +42,6 @@ namespace Testify.API.Controllers
             var question = await _repoQuestion.GetQuestionById(id);
             return Ok(question);
         }
-
-        //[HttpGet("Get-Question-By-SubjectId")]
-        //public async Task<ActionResult<List<Question>>> GetQuestionBySubjectId(int subjectId)
-        //{
-        //    var question = await _repoQuestion.GetQuestionBySubjectId(subjectId);
-        //    return Ok(question);
-        //}
 
         [HttpPost("Create-Question")]
         public async Task<ActionResult<Question>> Create(Question question)
@@ -369,7 +363,7 @@ namespace Testify.API.Controllers
                     continue;
                 }
 
-                List<AnswerInExcel> lstAnswer = new List<AnswerInExcel>();
+                List<Answer> lstAnswer = new List<Answer>();
                 int countAnswer = 0;
                 bool isValid = true;
 
@@ -389,14 +383,14 @@ namespace Testify.API.Controllers
                             break;
                         }
 
-                        AnswerInExcel answer = new AnswerInExcel();
+                        Answer answer = new Answer();
                         answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString();
-                        answer.IsCorrect = worksheetsA.Cells[rowA, 3].Value.ToString().Trim() == "1" ? true : false ;
+                        answer.IsCorrect = worksheetsA.Cells[rowA, 3].Value.ToString().Trim() == "1" ? true : false;
                         lstAnswer.Add(answer);
                     }
                 }
 
-                if(isValid && lstAnswer.Count == countAnswer)
+                if (isValid && lstAnswer.Count == countAnswer)
                 {
                     int countAnswerCorrect = lstAnswer.Count(x => x.IsCorrect);
 
@@ -443,156 +437,27 @@ namespace Testify.API.Controllers
                 q.CreatedDate = DateTime.Now;
                 q.Status = 1;
                 q.SubjectId = subjectId;
-                
+
                 var successAddQuestion = await _repoQuestion.CreateQuestion(q);
                 if (successAddQuestion != null)
                 {
                     foreach (var answer in item.Answers)
                     {
-                        Answer a = new Answer();
-                        a.QuestionId = successAddQuestion.Id;
-                        a.Content = answer.Content;
-                        a.IsCorrect = answer.IsCorrect;
-                        a.Status = 1;
+                        //Answer a = new Answer();
+                        //a.QuestionId = successAddQuestion.Id;
+                        //a.Content = answer.Content;
+                        //a.IsCorrect = answer.IsCorrect;
+                        //a.Status = 1;
+                        answer.QuestionId = successAddQuestion.Id;
+                        answer.Status = 1;
 
-                        await _repoAnswer.CreateAnswer(a);
+                        await _repoAnswer.CreateAnswer(answer);
                     }
                 }
             }
 
             return questionFailCount;
         }
-
-        //private async Task<ActionResult<List<QuestionInExcel>>> ProcessExcelFile(Stream stream)
-        //{
-        //    var lstQuestionTemp = new List<QuestionInExcel>();
-
-        //    var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
-        //    var lstQuestionType = await _repoQuestionType.GetAllTypes();
-        //    var lstQuestion = await _repoQuestion.GetAllQuestions("", true);
-
-        //    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-        //    var package = new ExcelPackage(stream);
-
-        //    var worksheetsQ = package.Workbook.Worksheets[0];
-        //    var worksheetsA = package.Workbook.Worksheets[1];
-
-        //    for (   int rowQ = 2; rowQ <= worksheetsQ.Dimension.Rows; rowQ++)
-        //    {
-        //        if (worksheetsQ.Cells[rowQ, 1].Value == null &&
-        //            worksheetsQ.Cells[rowQ, 2].Value == null &&
-        //            worksheetsQ.Cells[rowQ, 3].Value == null &&
-        //            worksheetsQ.Cells[rowQ, 4].Value == null)
-        //        {
-        //            continue;
-        //        }
-
-        //        QuestionInExcel question = new QuestionInExcel();
-        //        question.connectionId = worksheetsQ.Cells[rowQ, 1].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 1].Value.ToString()) : -1;
-        //        question.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString() != null ? worksheetsQ.Cells[rowQ, 2].Value.ToString() : "";
-        //        question.QuestionLevelId = worksheetsQ.Cells[rowQ, 3].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString()) : -1;
-        //        question.QuestionTypeId = worksheetsQ.Cells[rowQ, 4].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString()) : -1;
-
-        //        if (question.QuestionTypeId == -1 || question.connectionId == -1 || question.Content == "")
-        //        {
-        //            question.ErorrMessage = "Có trường dữ liệu trống!";
-        //            question.PassFail = false;
-        //            lstQuestionTemp.Add(question);
-        //            continue;
-        //        }
-        //        else if(question.QuestionLevelId != -1 && !lstQuestionLevel.Any(x => x.Id == question.QuestionLevelId))
-        //        {
-        //            question.ErorrMessage = "Không có mức độ câu hỏi này";
-        //            question.PassFail = false;
-        //            lstQuestionTemp.Add(question);
-        //            continue;
-        //        }
-        //        else if (!lstQuestionType.Any(x => x.Id == question.QuestionTypeId))
-        //        {
-        //            question.ErorrMessage = "Không có loại câu hỏi này";
-        //            question.PassFail = false;
-        //            lstQuestionTemp.Add(question);
-        //            continue;
-        //        }
-        //        //else if (lstQuestion.Any(x => x.Content.Trim().ToLower() == question.Content.Trim().ToLower()))
-        //        //{
-        //        //    question.ErorrMessage = "Đã tồn tại câu hỏi này";
-        //        //    question.PassFail = false;
-        //        //    lstQuestionTemp.Add(question);
-        //        //    continue;
-        //        //}
-
-        //        List<AnswerInExcel> lstAnswer = new List<AnswerInExcel>();
-        //        bool isValid = true;
-        //        int countAnswer = 0;
-
-        //        for (int rowA = 2; rowA <= worksheetsA.Dimension.Rows; rowA++)
-        //        {
-        //            if (worksheetsQ.Cells[rowQ, 1].Value.ToString() == worksheetsA.Cells[rowA, 1].Value.ToString())
-        //            {
-        //                countAnswer++;
-        //                if (worksheetsA.Cells[rowA, 1].Value == null || worksheetsA.Cells[rowA, 2].Value == null || worksheetsA.Cells[rowA, 3].Value == null || worksheetsA.Cells[rowA, 2].Value.ToString().Trim() == "")
-        //                {
-        //                    isValid = false;
-        //                    break;
-        //                }
-        //                AnswerInExcel answer = new AnswerInExcel();
-        //                answer.ConnectionId = Convert.ToInt32(worksheetsA.Cells[rowA, 1].Value.ToString());
-        //                answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString();
-        //                answer.IsCorrect = worksheetsA.Cells[rowA, 3].Value.ToString().Trim() == "1" ? true : false;
-        //                lstAnswer.Add(answer);
-        //            }
-        //        }
-
-        //        if (isValid && lstAnswer.Count == countAnswer)
-        //        {
-        //            int countAnswerCorrect = lstAnswer.Count(x => x.IsCorrect);
-
-        //            if (countAnswerCorrect <= 0)
-        //            {
-        //                question.ErorrMessage = "Câu hỏi không có đáp án đúng!";
-        //                question.PassFail = false;
-        //                lstQuestionTemp.Add(question);
-        //                continue;
-        //            }
-        //            else if ((question.QuestionTypeId == 2 || question.QuestionTypeId == 3) && lstAnswer.Count < 2)
-        //            {
-        //                question.ErorrMessage = "Câu hỏi tối thiểu có 2 đáp án";
-        //                question.PassFail = false;
-        //                lstQuestionTemp.Add(question);
-        //                continue;
-        //            }
-        //            else if (question.QuestionTypeId == 1 && lstAnswer.Count != 2)
-        //            {
-        //                question.ErorrMessage = "Câu hỏi loại đúng sai bắt buộc chỉ 2 đáp án";
-        //                question.PassFail = false;
-        //                lstQuestionTemp.Add(question);
-        //                continue;
-        //            }
-        //            else if ((question.QuestionTypeId == 1 || question.QuestionTypeId == 2) && countAnswerCorrect > 1)
-        //            {
-        //                question.ErorrMessage = "Câu hỏi chỉ được 1 đáp án đúng do loại câu hỏi là chọn 1 đáp án hoặc đúng/sai";
-        //                question.PassFail = false;
-        //                lstQuestionTemp.Add(question);
-        //                continue;
-        //            }
-
-        //            question.Answers = lstAnswer;
-        //            question.PassFail = true;
-        //            lstQuestionTemp.Add(question);
-        //        }
-        //        else
-        //        {
-        //            question.ErorrMessage = "Câu hỏi có đáp án không hợp lệ (rỗng hoặc sai thông tin nhập vào)";
-        //            question.PassFail = false;
-        //            lstQuestionTemp.Add(question);
-        //        }
-        //    }
-
-
-
-        //    return lstQuestionTemp;
-        //}
 
         [HttpGet("Export-Question-By-SubjectId")]
         public async Task<ActionResult> ExportQuestionBySubjectId(int subjectId, bool isAnswer)
@@ -601,20 +466,12 @@ namespace Testify.API.Controllers
             var package = new ExcelPackage();
             if (subjectId != 0 && subjectId != null)
             {
-                var lstQuestionBySubjectId = await _repoQuestion.GetQuestionBySubjectId(subjectId);
                 var objSubject = await _repoSubject.GetSubjectById(subjectId);
-                List<int> lstAnswerCount = new List<int>();
-                foreach (var item in lstQuestionBySubjectId)
-                {
-                    var lst = await _repoAnswer.GetAllAnswerByQuestionId(item.Id);
-                    lstAnswerCount.Add(lst.Count());
-                }
+                var lstQnA = await _repoQuestion.Check(subjectId);
 
-                int maxCountAnswer = lstAnswerCount.OrderByDescending(x => x).FirstOrDefault();
-
-                if (lstQuestionBySubjectId != null)
+                if (lstQnA != null && lstQnA.Count > 0)
                 {
-                    
+                    var countAnswerMax = lstQnA.OrderByDescending(x => x.Answers.Count()).FirstOrDefault().Answers.Count();
                     var worksheetQ = package.Workbook.Worksheets.Add("Câu Hỏi và đáp án");
 
                     worksheetQ.Cells.Style.Font.Name = "Times New Roman";
@@ -662,10 +519,13 @@ namespace Testify.API.Controllers
                     worksheetQ.Cells[1, 3].Style.Font.Bold = true;
                     worksheetQ.Cells[1, 3].Style.Font.Size = 12;
 
-                    if(isAnswer)
+                    if (isAnswer)
                     {
-                        for (int i = 1; i <= maxCountAnswer; i++)
+                        for (int i = 1; i <= countAnswerMax; i++)
                         {
+                            worksheetQ.Column(i + 3).Width = 20;
+                            worksheetQ.Column(i + 3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            worksheetQ.Column(i + 3).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                             worksheetQ.Cells[1, i + 3].Value = $"Đáp án {i}";
                             worksheetQ.Cells[1, i + 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
                             worksheetQ.Cells[1, i + 3].Style.Fill.BackgroundColor.SetColor(customColor);
@@ -678,32 +538,31 @@ namespace Testify.API.Controllers
                         }
                     }
 
-                    for (int i = 1; i <= lstQuestionBySubjectId.Count; i++)
+                    for (int i = 0; i < lstQnA.Count; i++)
                     {
-                        worksheetQ.Cells[i + 1, 1].Value = i.ToString();
-                        worksheetQ.Cells[i + 1, 2].Value = lstQuestionBySubjectId[i].Content;
-                        worksheetQ.Cells[i + 1, 3].Value = objSubject.Name;
-                        worksheetQ.Cells[i, 2].Style.WrapText = true;
-                        worksheetQ.Cells[i, 3].Style.WrapText = true;
+                        worksheetQ.Cells[i + 2, 1].Value = (i + 1).ToString();
+                        worksheetQ.Cells[i + 2, 2].Value = lstQnA[i].Content.ToString();
+                        worksheetQ.Cells[i + 2, 3].Value = objSubject.Name.ToString();
+                        worksheetQ.Cells[i + 2, 2].Style.WrapText = true;
+                        worksheetQ.Cells[i + 2, 3].Style.WrapText = true;
 
                         if (isAnswer)
                         {
-                            var lstAnswer = await _repoAnswer.GetAllAnswerByQuestionId(lstQuestionBySubjectId[i].Id);
-
-                            for (int j = 0; j < maxCountAnswer; j++)
+                            for (int j = 0; j < countAnswerMax; j++)
                             {
-                                if(j <= lstAnswer.Count)
+                                if (j < lstQnA[i].Answers.Count())
                                 {
-                                    worksheetQ.Cells[i + 1, j + 4].Value = lstAnswer[j].Content;
-                                    if (lstAnswer[j].IsCorrect)
+                                    worksheetQ.Cells[i + 2, j + 4].Value = lstQnA[i].Answers[j].Content.ToString();
+                                    if (lstQnA[i].Answers[j].IsCorrect)
                                     {
-                                        worksheetQ.Cells[i + 1, j + 4].Style.Font.Bold = true;
-                                        worksheetQ.Cells[i + 1, j + 4].Style.Font.Color.SetColor(answerCorrect);
+                                        worksheetQ.Cells[i + 2, j + 4].Style.Font.Bold = true;
+                                        worksheetQ.Cells[i + 2, j + 4].Style.Font.Color.SetColor(answerCorrect);
                                     }
                                 }
                                 else
                                 {
-                                    worksheetQ.Cells[i + 1, j + 4].Value = "NaN";
+                                    worksheetQ.Cells[i + 2, j + 4].Value = "NaN";
+                                    worksheetQ.Cells[i + 2, j + 4].Style.Font.Color.SetColor(ColorTranslator.FromHtml("#8e8e8e"));
                                 }
                             }
                         }
@@ -717,7 +576,7 @@ namespace Testify.API.Controllers
                 {
                     return BadRequest();
                 }
-            } 
+            }
             else
             {
                 return BadRequest();

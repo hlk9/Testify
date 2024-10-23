@@ -1,8 +1,0 @@
-﻿@page "/Check"
-<MudButton OnClick="@(() => Check())">Check</MudButton>
-
-@code {
-    private async void Check() {
-        var check = await _serQuestion.ExportQuestionBySubjectId(1, true);
-    }
-}
