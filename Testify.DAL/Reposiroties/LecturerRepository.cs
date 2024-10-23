@@ -164,34 +164,34 @@ namespace Testify.DAL.Reposiroties
             return data;
         }
 
-        public async Task<List<ClassesWithLecturer>> GetScore2(Guid lecId,int classId)
+        public async Task<List<ClassesWithLecturer>> GetScore2(Guid lecId, int classId)
         {
 
 
-            var lecturer = await _context.Users.Where(x => x.LevelId == 3).ToListAsync();
+            var objLect = await _context.Users.FindAsync(lecId);
 
             var data = await (from c in _context.Classes.Where(x => x.TeacherId == lecId && x.Id == classId)
-                              join u in _context.Users
-                              on c.TeacherId equals u.Id
-                              join s in _context.Submissions
-                              on u.Id equals s.UserId
-
+                              join cu in _context.ClassUsers on c.Id equals cu.ClassId
+                              join s in _context.Submissions on cu.UserId equals s.UserId
                               select new ClassesWithLecturer
                               {
-                                  UserID = u.Id,
-                                  ClassID = c.Id,
+                                  TeacherId = lecId,
+                                  TeacherName = objLect.UserName,
+                                  ClassId = c.Id,
                                   ClassName = c.Name,
-                                  LecturerID = u.Id,
                                   SubmissionId = s.Id,
-                            Score = s.TotalMark
-
-                              }).ToListAsync();
+                                  Score = s.TotalMark
+                              }
+                              ).ToListAsync();
             return data;
         }
 
         public async Task<List<Class>> GetAllClassByLecturer(Guid lecId)
         {
-            return _context.Classes.Where(x=>x.TeacherId == lecId).ToList();
+            return await _context.Classes.Where(x => x.TeacherId == lecId).ToListAsync();
         }
+
+
+
     }
 }
