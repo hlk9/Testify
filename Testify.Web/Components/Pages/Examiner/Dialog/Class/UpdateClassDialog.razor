@@ -40,6 +40,20 @@
                         }
                     }
                 </MudSelect>
+
+                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (subjectId == -1)
+                    {
+                        <MudSelectItem Value="-1">Không có môn học nào!</MudSelectItem>
+                    }
+                    else
+                    {
+                        @foreach (var itemName in _lstSubject)
+                        {
+                            <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
             </MudForm>
         }
     </DialogContent>
@@ -52,7 +66,10 @@
     MudForm form;
     private Class classes { get; set; } = new();
     private List<User> _lstTeacher;
+    private List<Subject> _lstSubject;
     private Guid teacherId = Guid.Empty;
+    private int subjectId = -1;
+
     [Parameter]
     public int ClassId { get; set; }
     private bool isLoading { get; set; } = true;
@@ -61,13 +78,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Loaddata();
+        await Loaddata("");
     }
 
-    private async Task Loaddata()
+    private async Task Loaddata(string? textSearch)
     {
         classes = await _serClass.GetClassId(ClassId);
-        
+
         _lstTeacher = await _serLec.GetAllTeacher();
         if (classes.TeacherId != null)
         {
@@ -76,6 +93,16 @@
         else
         {
             teacherId = Guid.Empty;
+        }
+
+        _lstSubject = await _serSub.GetAllSub(textSearch, true);
+        if (classes.SubjectId != null)
+        {
+            subjectId = classes.SubjectId ?? -1;
+        }
+        else
+        {
+            subjectId = -1;
         }
 
         isLoading = false;
@@ -104,6 +131,11 @@
             snackbar.Add("Chưa chọn giáo viên", Severity.Error);
             count += 1;
         }
+        if (subjectId == -1 || subjectId == null)
+        {
+            snackbar.Add("Chưa chọn môn học", Severity.Error);
+            count += 1;
+        }
         if (count > 0)
         {
             return true;
@@ -118,6 +150,7 @@
         if (!checkValidation)
         {
             classes.TeacherId = teacherId;
+            classes.SubjectId = subjectId;
             var checkAddClass = await _serClass.UpdateClass(classes);
             if (checkAddClass != null)
             {

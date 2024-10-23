@@ -25,6 +25,10 @@
                     <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" />
                 </div>
 
+                <div>
+                    <MudTextField For="@(() => classes.ClassCode)" Style="padding: 0" T="string" Label="Mã Code" @bind-Value="classes.ClassCode" />
+                </div>
+
                 <MudSelect T="Guid" @bind-Value="teacherId" Label="Giáo viên quản lý" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     @if (teacherId == Guid.Empty)
                     {
@@ -35,6 +39,20 @@
                         @foreach (var itemLevel in _lstTeacher)
                         {
                             <MudSelectItem Value="@itemLevel.Id">@itemLevel.FullName</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+
+                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (subjectId == -1)
+                    {
+                        <MudSelectItem Value="-1">Không có môn học nào!</MudSelectItem>
+                    }
+                    else
+                    {
+                        @foreach (var itemName in _lstSubject)
+                        {
+                            <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
                         }
                     }
                 </MudSelect>
@@ -49,14 +67,17 @@
     MudForm form;
     private Class classes { get; set; } = new();
     private List<User> _lstTeacher;
+    private List<Subject> _lstSubject;
     private Guid teacherId = Guid.Empty;
+    private int subjectId = -1;
+
     [Parameter]
     public int ClassId { get; set; }
     private bool isLoading { get; set; } = true;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
-    private async Task Loaddata()
+    private async Task Loaddata(string? textSearch)
     {
         classes = await _serClass.GetClassId(ClassId);
 
@@ -70,12 +91,22 @@
             teacherId = Guid.Empty;
         }
 
+        _lstSubject = await _serSub.GetAllSub(textSearch, true);
+        if (classes.SubjectId != null)
+        {
+            subjectId = classes.SubjectId ?? -1;
+        }
+        else
+        {
+            subjectId = -1;
+        }
+
         isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await Loaddata();
+        await Loaddata("");
     }
 
     private void Cancel() => MudDialog.Cancel();
