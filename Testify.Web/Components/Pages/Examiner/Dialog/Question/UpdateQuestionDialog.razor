@@ -23,7 +23,7 @@
                         </ActivatorContent>
                     </MudFileUpload>
                 </div>
-                <MudSelect T="int?" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect T="int" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     @if(questionLevelId == -1)
                     {
                         <MudSelectItem Value="@questionLevelId">Không có</MudSelectItem>
@@ -60,7 +60,7 @@
     [Parameter]
     public int QuestionId { get; set; }
     MudForm form;
-    private int? questionLevelId;
+    private int questionLevelId;
     private IBrowserFile selectFile;
     private string newNameFile;
     private string currentFileImage = "";
@@ -76,9 +76,9 @@
 
         question = await _serQuestion.GetQuestionById(QuestionId);
 
-        questionLevelId = question.QuestionLevelId != null ? question.QuestionLevelId : -1;
+        questionLevelId = question.QuestionLevelId ?? -1;
 
-        currentFileImage = question.DocumentPath;
+        currentFileImage = question.DocumentPath ?? "";
 
         isLoading = false;
     }
