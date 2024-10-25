@@ -23,6 +23,13 @@ namespace Testify.API.Controllers
             return Ok(lstClass);
         }
 
+        [HttpGet("Get-ClassList")]
+        public async Task<ActionResult<List<Class>>> GetList(string? keyword, bool isActive)
+        {
+            var lstClass = await classRepository.GetAllClass(keyword, isActive);
+            return Ok(lstClass);
+        }
+
         [HttpGet("Get-Classes-BySubjectIdExcludeInSchedule")]
         public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId)
         {
@@ -43,6 +50,7 @@ namespace Testify.API.Controllers
             var obj = await classRepository.GetClassByCode(ClassCode);
             return Ok(obj);
         }
+
 
         [HttpPost("Add-Class")]
         public async Task<ActionResult<Class>> CreateClass(Class r)
