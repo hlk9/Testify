@@ -11,9 +11,7 @@
     <DialogContent>
         @if (isLoading)
         {
-            <MudOverlay Visible="isLoading" Style="background-color: rgba(0, 0, 0, 0.5)" LightBackground="true" LockScroll="true" Class="top-0 bottom-0 start-0 end-0" Absolute="true">
-                <MudProgressCircular Color="Color.Success" Size="Size.Large" Indeterminate="true" />
-            </MudOverlay>
+            <LoadingContext />
         }
         else
         {
@@ -45,7 +43,7 @@
                                     </MudItem>
 
                                     <MudItem md="4" xs="12" Class="w-100 px-0 px-md-2   ">
-                                        <MudSelect T="int" @bind-Value="questionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                        <MudSelect T="int" @bind-Value="questionTypeId" Label="Loại" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="changeValueType">
 
                                             @if (questionTypeId == -1)
                                             {
@@ -102,6 +100,11 @@
                                     <Columns>
                                         <PropertyColumn Property="x => x.Content" Title="Nội dung" />
                                         <PropertyColumn Property="x => x.IsCorrect" Title="Đúng/Sai" />
+                                        <TemplateColumn CellClass="d-flex justify-end">
+                                            <CellTemplate>
+                                                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => RemoveAnswer(context.Item.Id))" />
+                                            </CellTemplate>
+                                        </TemplateColumn>
                                     </Columns>
                                 </MudDataGrid>
 
@@ -223,6 +226,11 @@
         await LoadData();
     }
 
+    private void changeValueType()
+    {
+        lstAnswers.Clear();
+    }
+
     private void IsShowAddAnswer()
     {
         if (questionTypeId == -1 || questionTypeId <= 0)
@@ -262,6 +270,11 @@
         isShowAddAnswer = false;
         answer = new();
         StateHasChanged();
+    }
+
+    private void RemoveAnswer(int answerId)
+    {
+        lstAnswers.RemoveAt(answerId);
     }
 
     private bool ValidationForm()
@@ -364,11 +377,7 @@
         {
             var fileContent = await response.Content.ReadAsByteArrayAsync();
             var fileName = "Template_Question_LVT.xlsx";
-
-            // Tạo một URL Blob từ nội dung của file Excel
             var fileUrl = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{Convert.ToBase64String(fileContent)}";
-
-            // Sử dụng JavaScript để tạo link tải file
             await jsruntime.InvokeVoidAsync("downloadFile", fileUrl, fileName);
         }
     }
@@ -377,47 +386,32 @@
     {
         if (isType)
         {
-            // if (subjectId == null || subjectId <= 0)
-            // {
-            //     snackbar.Add("Chưa chọn môn", Severity.Warning);
-            //     return;
-            // }
-            // if (selectFileExcel == null)
-            // {
-            //     snackbar.Add("Chưa chọn file import", Severity.Error);
-            //     return;
-            // }
-            // isLoading = true;
-            // var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId);
 
-            // snackbar.Add($"Thêm câu hỏi thành công, trong đó có {check} không thêm được", Severity.Info);
-            // MudDialog.Close(DialogResult.Ok(true));
-            // isLoading = false;
-            // StateHasChanged();
             try
             {
-                // Mở dialog loading
                 isLoading = true;
 
-                // Thực hiện import file Excel (giả lập bằng Task.Delay)
-                await Task.Run(async () =>
+                if (subjectId == null || subjectId <= 0)
                 {
-                    // Giả lập quá trình import Excel mất 5 giây
-                    // Thay thế phần này bằng logic thực tế để đọc và xử lý file Excel
-                    await Task.Delay(1000);
-                });
+                    snackbar.Add("Chưa chọn môn", Severity.Warning);
+                    return;
+                }
+                if (selectFileExcel == null)
+                {
+                    snackbar.Add("Chưa chọn file import", Severity.Error);
+                    return;
+                }
+                var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId);
 
-                // Thông báo hoàn tất
-                snackbar.Add("Import hoàn tất!", Severity.Success);
+                snackbar.Add($"Thêm câu hỏi thành công, trong đó có {check} không thêm được", Severity.Info);
+                MudDialog.Close(DialogResult.Ok(true));
             }
             catch (Exception ex)
             {
-                // Thông báo khi có lỗi xảy ra
                 snackbar.Add($"Đã xảy ra lỗi: {ex.Message}", Severity.Error);
             }
             finally
             {
-                // Đóng dialog loading sau khi hoàn thành hoặc có lỗi
                 isLoading = false;
             }
         }
@@ -425,17 +419,17 @@
         {
             var checkValidation = ValidationForm();
 
-            if (lstAnswers == null || lstAnswers.Count <= 0)
-            {
-                snackbar.Add("Chưa có đáp án", Severity.Warning);
-                return;
-            }
-
             if (questionTypeId == (int)listQuestionTypes.YesNo)
             {
                 lstAnswers.Clear();
                 lstAnswers.Add(new Answer { Content = "Đúng", IsCorrect = isAnswerCorrectInYesNo });
                 lstAnswers.Add(new Answer { Content = "Sai", IsCorrect = !isAnswerCorrectInYesNo });
+            }
+
+            if (lstAnswers == null || lstAnswers.Count <= 0)
+            {
+                snackbar.Add("Chưa có đáp án", Severity.Warning);
+                return;
             }
 
             if (lstAnswers.Count <= 1 && lstAnswers != null)

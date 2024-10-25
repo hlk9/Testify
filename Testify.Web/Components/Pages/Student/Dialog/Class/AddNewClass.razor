@@ -30,7 +30,7 @@
 
         var objClass = await _serClass.GetClassByCode(classCode);
         var lstClassUser = await _serClassUser.GetAllClassUser(10);
-        if (lstClassUser.FirstOrDefault(x => x.ClassId == objClass.Id) != null)
+        if (lstClassUser.FirstOrDefault(x => x.ClassId == objClass.Id && x.UserId == userId) != null)
         {
             snackbar.Add("Đã tham gia hoặc đang chờ phê duyệt lớp học này!", Severity.Warning);
             return;

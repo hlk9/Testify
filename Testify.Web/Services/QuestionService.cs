@@ -12,6 +12,7 @@ namespace Testify.Web.Services
         public QuestionService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+            _httpClient.Timeout = TimeSpan.FromMinutes(60);
         }
 
         public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
