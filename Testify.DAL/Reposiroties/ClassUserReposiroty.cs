@@ -37,7 +37,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<ClassWithClassUser>> GetClassByStudentId(string studentId, string search, byte Status)
         {
-            var data = await (from clu in _context.ClassUsers.Where(x => x.UserId == Guid.Parse(studentId))
+            var data = await (from clu in _context.ClassUsers.Where(x => x.UserId == Guid.Parse(studentId) && x.Status == Status)
                               join c in _context.Classes
                               on clu.ClassId equals c.Id 
                               join u in _context.Users
@@ -47,7 +47,7 @@ namespace Testify.DAL.Reposiroties
                               where ((string.IsNullOrEmpty(search) ||
                                     c.Name.ToLower().Contains(search.Trim().ToLower()) ||
                                     u.FullName.ToLower().Contains(search.Trim().ToLower()))
-                                    && clu.Status == Status)
+                                    )
                               select new ClassWithClassUser
                               {
                                   ClassId = c.Id,

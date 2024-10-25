@@ -80,7 +80,7 @@
     private List<ClassWithClassUser> _lstCwU = new List<ClassWithClassUser>();
     private int classIsWaiting = 0;
     private int classParticipated = 0;
-    private string Search;
+    private string Search = "";
     private byte Status = 1;
 
     protected async override Task OnInitializedAsync()
@@ -92,7 +92,6 @@
     {
         if(firstRender)
         {
-            
             await LoadData(Search);
         }
     }
@@ -101,8 +100,8 @@
     {
         var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
         _lstCwU = await _serClassUser.GetAll(a.Value, search, Status);
-        var lstIsWaiting = await _serClassUser.GetAllClassUser(2);
-        var lstIsParticipated = await _serClassUser.GetAllClassUser(1);
+        var lstIsWaiting = await _serClassUser.GetAll(a.Value, Search, (byte)2);
+        var lstIsParticipated = await _serClassUser.GetAll(a.Value, Search, (byte)1);
         classIsWaiting = lstIsWaiting.Count;
         classParticipated = lstIsParticipated.Count;
         StateHasChanged();
@@ -116,8 +115,8 @@
     private async Task ChangeStatusClass(byte status)
     {
         Status = status;
-        StateHasChanged();
         await LoadData(Search);
+        StateHasChanged();
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };

@@ -338,7 +338,9 @@ namespace Testify.API.Controllers
             var worksheetsQ = package.Workbook.Worksheets[0];
             var worksheetsA = package.Workbook.Worksheets[1];
 
-            for (int rowQ = 2; rowQ <= worksheetsQ.Dimension.Rows; rowQ++)
+            int batchSize = 100;
+            int totalRows = worksheetsQ.Dimension.Rows;
+            for (int rowQ = 2; rowQ <= totalRows; rowQ++)
             {
                 if (worksheetsQ.Cells[rowQ, 1].Value == null ||
                     worksheetsQ.Cells[rowQ, 2].Value == null ||
@@ -421,42 +423,47 @@ namespace Testify.API.Controllers
                     QnA.QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value);
                     QnA.Answers = lstAnswer;
                     lstQuestionTemp.Add(QnA);
+
+                    if(lstQuestionTemp.Count == batchSize || rowQ == totalRows)
+                    {
+                        await AddQuestionSuccessInDb(lstQuestionTemp, subjectId);
+                        lstQuestionTemp.Clear();
+                    }
                 }
                 else
                 {
                     questionFailCount++;
                 }
             }
+            return questionFailCount;
+        }
 
+        private async Task AddQuestionSuccessInDb(List<QuestionInExcel> lstQuestionTemp, int subjectId)
+        {
             foreach (var item in lstQuestionTemp)
             {
-                Question q = new Question();
-                q.Content = item.Content;
-                q.QuestionLevelId = item.QuestionLevelId == 0 ? null : item.QuestionLevelId;
-                q.QuestionTypeId = item.QuestionTypeId;
-                q.CreatedDate = DateTime.Now;
-                q.Status = 1;
-                q.SubjectId = subjectId;
+                var question = new Question
+                {
+                    Content = item.Content,
+                    QuestionLevelId = item.QuestionLevelId == 0 ? null : item.QuestionLevelId,
+                    QuestionTypeId = item.QuestionTypeId,
+                    CreatedDate = DateTime.Now,
+                    Status = 1,
+                    SubjectId = subjectId
+                };
 
-                var successAddQuestion = await _repoQuestion.CreateQuestion(q);
+                var successAddQuestion = await _repoQuestion.CreateQuestion(question);
+
                 if (successAddQuestion != null)
                 {
                     foreach (var answer in item.Answers)
                     {
-                        //Answer a = new Answer();
-                        //a.QuestionId = successAddQuestion.Id;
-                        //a.Content = answer.Content;
-                        //a.IsCorrect = answer.IsCorrect;
-                        //a.Status = 1;
                         answer.QuestionId = successAddQuestion.Id;
                         answer.Status = 1;
-
                         await _repoAnswer.CreateAnswer(answer);
                     }
                 }
             }
-
-            return questionFailCount;
         }
 
         [HttpGet("Export-Question-By-SubjectId")]
