@@ -175,9 +175,9 @@ namespace Testify.DAL.Reposiroties
                               join s in _context.Submissions on cu.UserId equals s.UserId
                               select new ClassesWithLecturer
                               {
-                                  TeacherId = lecId,
-                                  TeacherName = objLect.UserName,
-                                  ClassId = c.Id,
+                                  UserID = lecId,
+                                  LecturerName = objLect.UserName,
+                                  ClassID = c.Id,
                                   ClassName = c.Name,
                                   SubmissionId = s.Id,
                                   Score = s.TotalMark

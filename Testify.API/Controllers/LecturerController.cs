@@ -32,12 +32,12 @@ namespace Testify.API.Controllers
             return Ok(lstScore);
         }
 
-        //[HttpGet("Get-score2")]
-        //public async Task<ActionResult<List<ScoreStatistics>>> GetAllScore2(Guid idlec, int idclass)
-        //{
-        //    var lstScore2 = await _repo.GetScore2(idlec, idclass);
-        //    return Ok(lstScore2);
-        //}
+        [HttpGet("Get-score2")]
+        public async Task<ActionResult<List<ScoreStatistics>>> GetAllScore2(Guid idlec, int idclass)
+        {
+            var lstScore2 = await _repo.GetScore2(idlec, idclass);
+            return Ok(lstScore2);
+        }
         [HttpGet("Get-Lecturer-By-Id")]
         public async Task<ActionResult<User>> GetLecturerById(Guid id)
         {

@@ -114,9 +114,9 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<List<ClassesWithLecturer>> GetListOfTeacher(Guid lecturerId)
+        public async Task<List<Class>> GetListOfTeacher(Guid lecturerId)
         {
-            var lst = await _httpClient.GetFromJsonAsync<List<ClassesWithLecturer>>("Lecturer/Get-Score-Class-By-Teacher?id=" + lecturerId);
+            var lst = await _httpClient.GetFromJsonAsync<List<Class>>("Lecturer/Get-Score-Class-By-Teacher?id=" + lecturerId);
             return lst;
         }
 
