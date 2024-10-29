@@ -1,5 +1,7 @@
-﻿using Testify.API.DTOs;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Testify.API.DTOs;
 using Testify.DAL.Models;
+using Testify.Web.Components.Pages.Examiner;
 
 namespace Testify.Web.Services
 {
@@ -34,6 +36,26 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<List<User>>("User/get-all-users");
         }
 
+
+        public async Task<int> ImportExcelUser(IBrowserFile file, int levelId)
+        {
+            using var content = new MultipartFormDataContent();
+
+            using var stream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(stream);
+            stream.Position = 0;
+
+            content.Add(new StreamContent(stream), "file", file.Name);
+            content.Add(new StringContent(levelId.ToString()), "levelId");
+
+
+            var allUser = await _httpClient.PostAsync("User/Import-Excel-User", content);
+            var response = await allUser.Content.ReadFromJsonAsync<int>();
+
+            return response;
+
+
+        }
 
     }
 }
