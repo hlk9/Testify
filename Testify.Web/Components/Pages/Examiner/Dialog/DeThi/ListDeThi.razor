@@ -16,7 +16,7 @@
             <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
             </MudItem>
             <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm đề mới </MudButton>
             </MudItem>
        </MudGrid>
 
@@ -72,8 +72,8 @@
                         }
                         
                     </MudTd>
-                    <MudTd DataLabel="Ngày tạo"> @context.CreateDate</MudTd>
-                    <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate</MudTd>
+                    <MudTd DataLabel="Ngày tạo"> @context.CreateDate.ToString("dd/MM/yyyy")</MudTd>
+                    <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
                     <MudTd DataLabel="Thao tác">
                         <MudTooltip Text="Sửa">
                             <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
@@ -119,7 +119,7 @@
     private Subject subjectCurrent;
 
     private void Cancel() => MudDialog.Cancel();
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
 
 
     private async Task OpenDialogAsync(DialogOptions options, string name)
@@ -127,7 +127,7 @@
 
         if (name.Equals("create"))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Exam.CreateExam>("Options Dialog", options);
+            var dialog = await DialogService.ShowAsync<Dialog.DeThi.CreateDeThi>("Options Dialog", options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {

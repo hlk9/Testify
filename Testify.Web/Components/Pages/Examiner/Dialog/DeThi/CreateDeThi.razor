@@ -1,0 +1,84 @@
+﻿@using Testify.DAL.ViewModels
+@layout AdminLayout
+@inject IDialogService DialogService
+@inject ExamService examService
+@inject SubjectService subjectService
+@inject ExamDetailService examdetailService
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h5">Danh sách câu hỏi </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
+            </MudItem>
+            <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
+                <MudButton  Class="add-button-end" Variant="Variant.Filled">Thêm câu hỏi </MudButton>
+            </MudItem>
+        </MudGrid>
+        <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+            <MudTable Items="@lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+                <HeaderContent>
+                    <MudTh> <MudTableSortLabel SortLabel="Câu hỏi" T="string">Câu hỏi</MudTableSortLabel> </MudTh>
+                    <MudTh> <MudTableSortLabel SortLabel="Loại câu hỏi" T="string">Loại câu hỏi</MudTableSortLabel> </MudTh>
+                    <MudTh> <MudTableSortLabel SortLabel="Mức độ câu hỏi" T="string">Mức độ câu hỏi</MudTableSortLabel> </MudTh>
+                    <MudTh> <MudTableSortLabel SortLabel="Điểm" T="double">Điểm</MudTableSortLabel> </MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Câu hỏi"> </MudTd>
+                    <MudTd DataLabel="Loại câu hỏi"> </MudTd>
+                    <MudTd DataLabel="Mức độ câu hỏi"> </MudTd>
+                    <MudTd DataLabel="Điểm"> </MudTd>
+                    <MudTd DataLabel="Thao tác">
+                        <MudTooltip Text="Sửa">
+                            <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        </MudTooltip>
+                       
+                        <MudTooltip Text="Xoá">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText>No matching records found</MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Loading...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+                
+            </MudTable>
+
+                <MudTextField T="double" Label="Tổng điểm" Class="w-25 mt-3"> </MudTextField>
+
+            <MudText Typo="Typo.h6">Trạng thái công khai:</MudText>
+                <MudRadioGroup @bind-Value="Dense_Radio">
+                    <MudRadio Value="true" Color="Color.Primary" Dense="true">Công khai</MudRadio>
+                    <MudRadio Value="false" Color="Color.Secondary" Dense="false">Chỉ mình tôi</MudRadio>
+                </MudRadioGroup>
+           
+            
+
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    private void Cancel() => MudDialog.Cancel();
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+    // Radio
+    public bool Dense_Radio { get; set; } = true;
+
+    private List<Dethi> lst = new List<Dethi>();
+}
