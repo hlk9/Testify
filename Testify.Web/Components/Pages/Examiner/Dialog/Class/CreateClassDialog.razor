@@ -40,6 +40,20 @@
                         }
                     }
                 </MudSelect>
+
+                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (subjectId == -1)
+                    {
+                        <MudSelectItem Value="-1">Không có giảng viên nào!</MudSelectItem>
+                    }
+                    else
+                    {
+                        @foreach (var itemName in _lstSubject)
+                        {
+                            <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
             </MudForm>
         }
     </DialogContent>
@@ -52,17 +66,19 @@
     MudForm form;
     private Class classes { get; set; } = new();
     private List<User> _lstTeacher;
+    private List<Subject> _lstSubject;
     private Guid teacherId = Guid.Empty;
+    private int subjectId = -1;
     private bool isLoading { get; set; } = true;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await Loaddata();
+        await Loaddata("");
     }
 
-    private async Task Loaddata()
+    private async Task Loaddata(string? textSearch)
     {
         _lstTeacher = await _serLec.GetAllTeacher();
         if (_lstTeacher.Any())
@@ -73,7 +89,15 @@
         {
             teacherId = Guid.Empty;
         }
-
+        _lstSubject = await _serSub.GetAllSub(textSearch, true);
+        if(_lstSubject.Any())
+        {
+            subjectId = _lstSubject[0].Id;
+        }
+        else
+        {
+            subjectId = -1;
+        }
         isLoading = false;
     }
 
@@ -100,6 +124,11 @@
             snackbar.Add("Chưa chọn giáo viên", Severity.Error);
             count += 1;
         }
+        if (subjectId == -1 || subjectId == null)
+        {
+            snackbar.Add("Chưa chọn môn", Severity.Error);
+            count += 1;
+        }
         if(count > 0)
         {
             return true;
@@ -123,6 +152,7 @@
         {
             classes.Status = Convert.ToByte(StatusType.isActive);
             classes.TeacherId = teacherId;
+            classes.SubjectId = subjectId;
             classes.ClassCode = GenerateRandomString();
             var checkAddClass = await _serClass.CreateClass(classes);
             if(checkAddClass != null)

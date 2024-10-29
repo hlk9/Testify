@@ -37,10 +37,15 @@ namespace Testify.DAL.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
 
                     b.ToTable("Answers");
                 });
@@ -73,6 +78,30 @@ namespace Testify.DAL.Migrations
                     b.ToTable("AnswerSubmissions");
                 });
 
+            modelBuilder.Entity("Testify.DAL.Models.BlackListToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("BlacklistAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BlackListTokens");
+                });
+
             modelBuilder.Entity("Testify.DAL.Models.Class", b =>
                 {
                     b.Property<int>("Id")
@@ -84,6 +113,10 @@ namespace Testify.DAL.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -92,22 +125,46 @@ namespace Testify.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<int?>("SubjectId")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganizationId");
+                    b.HasIndex("ClassCode")
+                        .IsUnique();
 
                     b.HasIndex("SubjectId");
 
                     b.ToTable("Classes");
+                });
+
+            modelBuilder.Entity("Testify.DAL.Models.ClassExamSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExamScheduleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("ExamScheduleId");
+
+                    b.ToTable("ClassExamSchedule");
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.ClassUser", b =>
@@ -121,8 +178,8 @@ namespace Testify.DAL.Migrations
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -163,10 +220,13 @@ namespace Testify.DAL.Migrations
                     b.Property<int>("NumberOfQuestions")
                         .HasColumnType("int");
 
+                    b.Property<int>("NumberOfRepeat")
+                        .HasColumnType("int");
+
                     b.Property<double>("PassMark")
                         .HasColumnType("float");
 
-                    b.Property<int>("ScoreMethodId")
+                    b.Property<int?>("ScoreMethodId")
                         .HasColumnType("int");
 
                     b.Property<byte>("Status")
@@ -207,8 +267,8 @@ namespace Testify.DAL.Migrations
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<Guid>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
@@ -257,11 +317,7 @@ namespace Testify.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EndTime")
@@ -270,17 +326,20 @@ namespace Testify.DAL.Migrations
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomId")
+                    b.Property<int?>("RoomId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<int?>("SubjectId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -303,12 +362,38 @@ namespace Testify.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
                     b.ToTable("Levels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Admin",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Examiner",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Teacher",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Student",
+                            Status = (byte)1
+                        });
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.Organization", b =>
@@ -333,35 +418,17 @@ namespace Testify.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Organizations");
-                });
-
-            modelBuilder.Entity("Testify.DAL.Models.OrganizationUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("OrganizationCode")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganizationId");
+                    b.HasIndex("OrganizationCode")
+                        .IsUnique();
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("OrganizationUsers");
+                    b.ToTable("Organization");
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.Permission", b =>
@@ -380,12 +447,91 @@ namespace Testify.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
                     b.ToTable("Permissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Quyền tối cao, cao nhất của tổ chức, có thể thi hành mọi chức năng của hệ thống",
+                            Name = "Quản Trị Viên",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Xem giảng viên, khảo thí, sinh viên",
+                            Name = "Xem Giảng viên, Khảo thí và Sinh viên",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Chỉnh sửa giảng viên, khảo thí, sinh viên",
+                            Name = "Chỉnh sửa Giảng viên, Khảo thí và Sinh viên",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Chỉnh sửa và Xoá giảng viên, khảo thí, sinh viên",
+                            Name = "Chỉnh sửa và Xoá Giảng viên, Khảo thí và Sinh viên",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Xem bài thi, câu hỏi, đáp án",
+                            Name = "Xem bài thi, câu hỏi, đáp án",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án",
+                            Name = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án",
+                            Name = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Xem lớp, môn",
+                            Name = "Xem lớp, môn",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Chỉnh sửa và Xoá lớp, môn",
+                            Name = "Chỉnh sửa và Xoá lớp, môn",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Xem bài làm đã nộp",
+                            Name = "Xem bài làm đã nộp",
+                            Status = (byte)1
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Description = "Chỉnh sửa và Xoá Xem bài làm đã nộp",
+                            Name = "Chỉnh sửa và Xoá Xem bài làm đã nộp",
+                            Status = (byte)1
+                        });
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.Question", b =>
@@ -403,18 +549,17 @@ namespace Testify.DAL.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DocumentURL")
-                        .IsRequired()
+                    b.Property<string>("DocumentPath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QuestionLevelId")
+                    b.Property<int?>("QuestionLevelId")
                         .HasColumnType("int");
 
                     b.Property<int>("QuestionTypeId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
@@ -496,6 +641,66 @@ namespace Testify.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("QuestionTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Chọn câu trả lời Đúng hoặc Sai",
+                            Name = "Đúng / Sai",
+                            Status = true
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Chọn đáp án đúng nhất",
+                            Name = "Chọn đáp án đúng nhất",
+                            Status = true
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Chọn các đáp án đúng",
+                            Name = "Chọn nhiều đáp án đúng",
+                            Status = true
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Nhập câu trả lời",
+                            Name = "Nhập đáp án đúng",
+                            Status = true
+                        });
+                });
+
+            modelBuilder.Entity("Testify.DAL.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(550)
+                        .HasColumnType("nvarchar(550)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.Room", b =>
@@ -517,15 +722,10 @@ namespace Testify.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrganizationId");
 
                     b.ToTable("Rooms");
                 });
@@ -546,8 +746,8 @@ namespace Testify.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
 
@@ -563,22 +763,16 @@ namespace Testify.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("Status")
-                        .HasColumnType("bit");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrganizationId");
 
                     b.ToTable("Subjects");
                 });
@@ -607,9 +801,6 @@ namespace Testify.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int");
-
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
@@ -636,8 +827,6 @@ namespace Testify.DAL.Migrations
                     b.HasIndex("ExamDetailId");
 
                     b.HasIndex("ExamScheduleId");
-
-                    b.HasIndex("OrganizationId");
 
                     b.HasIndex("UserId");
 
@@ -673,11 +862,7 @@ namespace Testify.DAL.Migrations
                     b.Property<DateTime?>("LastLogin")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("LevelId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("LevelId1")
+                    b.Property<int>("LevelId")
                         .HasColumnType("int");
 
                     b.Property<string>("PasswordHash")
@@ -697,32 +882,63 @@ namespace Testify.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LevelId1");
+                    b.HasIndex("LevelId");
 
                     b.ToTable("Users");
-                });
 
-            modelBuilder.Entity("Testify.DAL.Models.UserExamSchedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ExamScheduleId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExamScheduleId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserExamSchedules");
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("529cb6d6-3b14-485b-842b-59d7e24f1735"),
+                            Address = "A",
+                            DateOfBirth = new DateTime(2024, 10, 28, 10, 30, 31, 551, DateTimeKind.Local).AddTicks(4113),
+                            Email = "abcde@gmail.com",
+                            FullName = "Nguyen Van A",
+                            LevelId = 4,
+                            PasswordHash = "4297f44b13955235245b2497399d7a93",
+                            PhoneNumber = "0987654321",
+                            Status = (byte)1,
+                            UserName = "nva"
+                        },
+                        new
+                        {
+                            Id = new Guid("8e57275a-4011-426e-beda-99f2445028c5"),
+                            Address = "A",
+                            DateOfBirth = new DateTime(2024, 10, 28, 10, 30, 31, 551, DateTimeKind.Local).AddTicks(4128),
+                            Email = "abscde@gmail.com",
+                            FullName = "Nguyen Van B",
+                            LevelId = 3,
+                            PasswordHash = "4297f44b13955235245b2497399d7a93",
+                            PhoneNumber = "0987654322",
+                            Status = (byte)1,
+                            UserName = "nvb"
+                        },
+                        new
+                        {
+                            Id = new Guid("5faf6ccd-8067-4647-bc91-fe0beb25204c"),
+                            Address = "A",
+                            DateOfBirth = new DateTime(2024, 10, 28, 10, 30, 31, 551, DateTimeKind.Local).AddTicks(4131),
+                            Email = "aabscde@gmail.com",
+                            FullName = "Nguyen Van C",
+                            LevelId = 2,
+                            PasswordHash = "4297f44b13955235245b2497399d7a93",
+                            PhoneNumber = "0987254322",
+                            Status = (byte)1,
+                            UserName = "nvc"
+                        },
+                        new
+                        {
+                            Id = new Guid("207d0750-76f3-41b1-947e-c1054a347f39"),
+                            Address = "A",
+                            DateOfBirth = new DateTime(2024, 10, 28, 10, 30, 31, 551, DateTimeKind.Local).AddTicks(4133),
+                            Email = "absscde@gmail.com",
+                            FullName = "Nguyen Van D",
+                            LevelId = 1,
+                            PasswordHash = "4297f44b13955235245b2497399d7a93",
+                            PhoneNumber = "0287654322",
+                            Status = (byte)1,
+                            UserName = "nvd"
+                        });
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.UserPermission", b =>
@@ -746,6 +962,17 @@ namespace Testify.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserPermissions");
+                });
+
+            modelBuilder.Entity("Testify.DAL.Models.Answer", b =>
+                {
+                    b.HasOne("Testify.DAL.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Question");
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.AnswerSubmission", b =>
@@ -777,19 +1004,30 @@ namespace Testify.DAL.Migrations
 
             modelBuilder.Entity("Testify.DAL.Models.Class", b =>
                 {
-                    b.HasOne("Testify.DAL.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Testify.DAL.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId");
 
-                    b.Navigation("Organization");
-
                     b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("Testify.DAL.Models.ClassExamSchedule", b =>
+                {
+                    b.HasOne("Testify.DAL.Models.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Testify.DAL.Models.ExamSchedule", "ExamSchedule")
+                        .WithMany()
+                        .HasForeignKey("ExamScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("ExamSchedule");
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.ClassUser", b =>
@@ -819,9 +1057,7 @@ namespace Testify.DAL.Migrations
 
                     b.HasOne("Testify.DAL.Models.ScoreMethod", "ScoreMethod")
                         .WithMany("Exams")
-                        .HasForeignKey("ScoreMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ScoreMethodId");
 
                     b.HasOne("Testify.DAL.Models.Subject", "Subject")
                         .WithMany("Exams")
@@ -837,7 +1073,7 @@ namespace Testify.DAL.Migrations
             modelBuilder.Entity("Testify.DAL.Models.ExamDetail", b =>
                 {
                     b.HasOne("Testify.DAL.Models.Exam", "Exam")
-                        .WithMany()
+                        .WithMany("ExamDetails")
                         .HasForeignKey("ExamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -868,9 +1104,7 @@ namespace Testify.DAL.Migrations
                 {
                     b.HasOne("Testify.DAL.Models.Room", "Room")
                         .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoomId");
 
                     b.HasOne("Testify.DAL.Models.Subject", "Subject")
                         .WithMany("ExamSchedules")
@@ -881,32 +1115,11 @@ namespace Testify.DAL.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("Testify.DAL.Models.OrganizationUser", b =>
-                {
-                    b.HasOne("Testify.DAL.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Testify.DAL.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Testify.DAL.Models.Question", b =>
                 {
                     b.HasOne("Testify.DAL.Models.QuestionLevel", "QuestionLevel")
                         .WithMany("Questions")
-                        .HasForeignKey("QuestionLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuestionLevelId");
 
                     b.HasOne("Testify.DAL.Models.QuestionType", "QuestionType")
                         .WithMany()
@@ -938,28 +1151,6 @@ namespace Testify.DAL.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("Testify.DAL.Models.Room", b =>
-                {
-                    b.HasOne("Testify.DAL.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Organization");
-                });
-
-            modelBuilder.Entity("Testify.DAL.Models.Subject", b =>
-                {
-                    b.HasOne("Testify.DAL.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Organization");
-                });
-
             modelBuilder.Entity("Testify.DAL.Models.Submission", b =>
                 {
                     b.HasOne("Testify.DAL.Models.ExamDetail", "ExamDetail")
@@ -971,12 +1162,6 @@ namespace Testify.DAL.Migrations
                     b.HasOne("Testify.DAL.Models.ExamSchedule", "ExamSchedule")
                         .WithMany()
                         .HasForeignKey("ExamScheduleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Testify.DAL.Models.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -994,8 +1179,6 @@ namespace Testify.DAL.Migrations
 
                     b.Navigation("ExamSchedule");
 
-                    b.Navigation("Organization");
-
                     b.Navigation("User");
                 });
 
@@ -1003,28 +1186,11 @@ namespace Testify.DAL.Migrations
                 {
                     b.HasOne("Testify.DAL.Models.Level", "Level")
                         .WithMany("Users")
-                        .HasForeignKey("LevelId1");
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Level");
-                });
-
-            modelBuilder.Entity("Testify.DAL.Models.UserExamSchedule", b =>
-                {
-                    b.HasOne("Testify.DAL.Models.ExamSchedule", "ExamSchedule")
-                        .WithMany()
-                        .HasForeignKey("ExamScheduleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Testify.DAL.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ExamSchedule");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.UserPermission", b =>
@@ -1049,6 +1215,11 @@ namespace Testify.DAL.Migrations
             modelBuilder.Entity("Testify.DAL.Models.Class", b =>
                 {
                     b.Navigation("ClassUsers");
+                });
+
+            modelBuilder.Entity("Testify.DAL.Models.Exam", b =>
+                {
+                    b.Navigation("ExamDetails");
                 });
 
             modelBuilder.Entity("Testify.DAL.Models.ExamSchedule", b =>

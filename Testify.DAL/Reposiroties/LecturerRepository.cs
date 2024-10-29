@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using Testify.DAL.Context;
@@ -162,6 +163,35 @@ namespace Testify.DAL.Reposiroties
                               }).ToListAsync();
             return data;
         }
+
+        public async Task<List<ClassesWithLecturer>> GetScore2(Guid lecId, int classId)
+        {
+
+
+            var objLect = await _context.Users.FindAsync(lecId);
+
+            var data = await (from c in _context.Classes.Where(x => x.TeacherId == lecId && x.Id == classId)
+                              join cu in _context.ClassUsers on c.Id equals cu.ClassId
+                              join s in _context.Submissions on cu.UserId equals s.UserId
+                              select new ClassesWithLecturer
+                              {
+                                  UserID = lecId,
+                                  LecturerName = objLect.UserName,
+                                  ClassID = c.Id,
+                                  ClassName = c.Name,
+                                  SubmissionId = s.Id,
+                                  Score = s.TotalMark
+                              }
+                              ).ToListAsync();
+            return data;
+        }
+
+        public async Task<List<Class>> GetAllClassByLecturer(Guid lecId)
+        {
+            return await _context.Classes.Where(x => x.TeacherId == lecId).ToListAsync();
+        }
+
+
 
     }
 }

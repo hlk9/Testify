@@ -12,6 +12,7 @@ namespace Testify.Web.Services
         public QuestionService(HttpClient httpClient)
         {
             _httpClient = httpClient;
+            _httpClient.Timeout = TimeSpan.FromMinutes(60);
         }
 
         public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
@@ -29,10 +30,15 @@ namespace Testify.Web.Services
 
         public async Task<HttpResponseMessage> ExportExcelQuestion()
         {
-            return await _httpClient.GetAsync("Question/Export-Excel-Demo-Question");
+            return await _httpClient.GetAsync("Question/Export-Excel-Template-Question");
         }
 
-        public async Task<List<QuestionInExcel>> ImportExcelQuestion(IBrowserFile file)
+        public async Task<HttpResponseMessage> ExportQuestionBySubjectId(int subjectId, bool isAnswer)
+        {
+            return await _httpClient.GetAsync($"Question/Export-Question-By-SubjectId?subjectId={subjectId}&isAnswer={isAnswer}");
+        }
+
+        public async Task<int> ImportExcelQuestion(IBrowserFile file, int subjectId)
         {
             using var content = new MultipartFormDataContent();
 
@@ -41,9 +47,10 @@ namespace Testify.Web.Services
             stream.Position = 0;
 
             content.Add(new StreamContent(stream), "file", file.Name);
+            content.Add(new StringContent(subjectId.ToString()), "subjectId");
 
             var allQuestion = await _httpClient.PostAsync("Question/Import-Excel-Question", content);
-            var response = await allQuestion.Content.ReadFromJsonAsync<List<QuestionInExcel>>();
+            var response = await allQuestion.Content.ReadFromJsonAsync<int>();
 
             return response;
         }
@@ -53,12 +60,6 @@ namespace Testify.Web.Services
             var newQuestion = await _httpClient.PostAsJsonAsync("Question/Create-Question", question);
             var reponse = await newQuestion.Content.ReadFromJsonAsync<Question>();
             return reponse;
-        }
-
-        public async Task<HttpResponseMessage> CreateQuestionInExcelImport(List<QuestionInExcel> lstQuestion)
-        {
-            var response = await _httpClient.PostAsJsonAsync("Question/Create-Question-In-Import-Excel", lstQuestion);
-            return response;
         }
 
         public async Task<Question> UpdateQuestion(Question question)

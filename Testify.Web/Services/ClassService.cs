@@ -20,6 +20,13 @@ namespace Testify.Web.Services
             return response;
         }
 
+        public async Task<List<Class>> GetClassList(string? textSearch, bool isActive)
+        {
+            var allClass = await _httpClient.GetAsync($"Class/Get-ClassList?KeyWord={textSearch}&isActive={isActive}");
+            var response = await allClass.Content.ReadFromJsonAsync<List<Class>>();
+            return response;
+        }
+
         public async Task<Class> GetClassId(int id)
         {
             return await _httpClient.GetFromJsonAsync<Class>($"Class/get-classes-by-id?id={id}");

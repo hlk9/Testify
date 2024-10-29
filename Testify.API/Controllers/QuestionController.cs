@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.Drawing;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -16,6 +17,7 @@ namespace Testify.API.Controllers
         QuestionLevelReposiroty _repoQuestionLevel;
         QuestionTypeReposiroty _repoQuestionType;
         AnswerReposiroty _repoAnswer;
+        SubjectRepository _repoSubject;
 
         public QuestionController()
         {
@@ -23,6 +25,7 @@ namespace Testify.API.Controllers
             _repoQuestionLevel = new QuestionLevelReposiroty();
             _repoQuestionType = new QuestionTypeReposiroty();
             _repoAnswer = new AnswerReposiroty();
+            _repoSubject = new SubjectRepository();
         }
 
         [HttpGet("Get-All-Questions")]
@@ -82,7 +85,7 @@ namespace Testify.API.Controllers
             return Ok(obj);
         }
 
-        [HttpGet("Export-Excel-Demo-Question")]
+        [HttpGet("Export-Excel-Template-Question")]
         public async Task<ActionResult> ExportExcel()
         {
             var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
@@ -310,7 +313,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpPost("Import-Excel-Question")]
-        public async Task<ActionResult<List<QuestionInExcel>>> UploadFile(IFormFile file)
+        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int subjectId)
         {
             if (file == null || file.Length == 0)
             {
@@ -321,85 +324,68 @@ namespace Testify.API.Controllers
             await file.CopyToAsync(stream);
             stream.Position = 0;
 
-            var result = await ProcessExcelFile(stream);
-            return Ok(result.Value);
-        }
-
-        private async Task<ActionResult<List<QuestionInExcel>>> ProcessExcelFile(Stream stream)
-        {
-            var lstQuestionTemp = new List<QuestionInExcel>();
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            var package = new ExcelPackage(stream);
 
             var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
             var lstQuestionType = await _repoQuestionType.GetAllTypes();
             var lstQuestion = await _repoQuestion.GetAllQuestions("", true);
 
-            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-            var package = new ExcelPackage(stream);
+            var lstQuestionTemp = new List<QuestionInExcel>();
+
+            var questionFailCount = 0;
 
             var worksheetsQ = package.Workbook.Worksheets[0];
             var worksheetsA = package.Workbook.Worksheets[1];
 
-            for (   int rowQ = 2; rowQ <= worksheetsQ.Dimension.Rows; rowQ++)
+            int batchSize = 100;
+            int totalRows = worksheetsQ.Dimension.Rows;
+            for (int rowQ = 2; rowQ <= totalRows; rowQ++)
             {
-                if (worksheetsQ.Cells[rowQ, 1].Value == null &&
-                    worksheetsQ.Cells[rowQ, 2].Value == null &&
-                    worksheetsQ.Cells[rowQ, 3].Value == null &&
+                if (worksheetsQ.Cells[rowQ, 1].Value == null ||
+                    worksheetsQ.Cells[rowQ, 2].Value == null ||
                     worksheetsQ.Cells[rowQ, 4].Value == null)
                 {
+                    questionFailCount++;
+                    continue;
+                }
+                else if ((lstQuestionTemp.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower())) || lstQuestion.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.SubjectId == subjectId)))
+                {
+                    questionFailCount++;
+                    continue;
+                }
+                else if (worksheetsQ.Cells[rowQ, 3].Value != null && !lstQuestionLevel.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value)))
+                {
+                    questionFailCount++;
+                    continue;
+                }
+                else if (!lstQuestionType.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value)))
+                {
+                    questionFailCount++;
                     continue;
                 }
 
-                QuestionInExcel question = new QuestionInExcel();
-                question.connectionId = worksheetsQ.Cells[rowQ, 1].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 1].Value.ToString()) : -1;
-                question.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString() != null ? worksheetsQ.Cells[rowQ, 2].Value.ToString() : "";
-                question.QuestionLevelId = worksheetsQ.Cells[rowQ, 3].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString()) : -1;
-                question.QuestionTypeId = worksheetsQ.Cells[rowQ, 4].Value != null ? Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString()) : -1;
-
-                if (question.QuestionTypeId == -1 || question.connectionId == -1 || question.Content == "")
-                {
-                    question.ErorrMessage = "Có trường dữ liệu trống!";
-                    question.PassFail = false;
-                    lstQuestionTemp.Add(question);
-                    continue;
-                }
-                else if(question.QuestionLevelId != -1 && !lstQuestionLevel.Any(x => x.Id == question.QuestionLevelId))
-                {
-                    question.ErorrMessage = "Không có mức độ câu hỏi này";
-                    question.PassFail = false;
-                    lstQuestionTemp.Add(question);
-                    continue;
-                }
-                else if (!lstQuestionType.Any(x => x.Id == question.QuestionTypeId))
-                {
-                    question.ErorrMessage = "Không có loại câu hỏi này";
-                    question.PassFail = false;
-                    lstQuestionTemp.Add(question);
-                    continue;
-                }
-                //else if (lstQuestion.Any(x => x.Content.Trim().ToLower() == question.Content.Trim().ToLower()))
-                //{
-                //    question.ErorrMessage = "Đã tồn tại câu hỏi này";
-                //    question.PassFail = false;
-                //    lstQuestionTemp.Add(question);
-                //    continue;
-                //}
-
-                List<AnswerInExcel> lstAnswer = new List<AnswerInExcel>();
-                bool isValid = true;
+                List<Answer> lstAnswer = new List<Answer>();
                 int countAnswer = 0;
+                bool isValid = true;
 
                 for (int rowA = 2; rowA <= worksheetsA.Dimension.Rows; rowA++)
                 {
-                    if (worksheetsQ.Cells[rowQ, 1].Value.ToString() == worksheetsA.Cells[rowA, 1].Value.ToString())
+                    if (worksheetsA.Cells[rowA, 1].Value == null)
+                    {
+                        continue;
+                    }
+
+                    if (worksheetsQ.Cells[rowQ, 1].Value.ToString().Trim() == worksheetsA.Cells[rowA, 1].Value.ToString().Trim())
                     {
                         countAnswer++;
-                        if (worksheetsA.Cells[rowA, 1].Value == null || worksheetsA.Cells[rowA, 2].Value == null || worksheetsA.Cells[rowA, 3].Value == null || worksheetsA.Cells[rowA, 2].Value.ToString().Trim() == "")
+                        if (worksheetsA.Cells[rowA, 2].Value == null || worksheetsA.Cells[rowA, 3].Value == null)
                         {
                             isValid = false;
                             break;
                         }
-                        AnswerInExcel answer = new AnswerInExcel();
-                        answer.ConnectionId = Convert.ToInt32(worksheetsA.Cells[rowA, 1].Value.ToString());
+
+                        Answer answer = new Answer();
                         answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString();
                         answer.IsCorrect = worksheetsA.Cells[rowA, 3].Value.ToString().Trim() == "1" ? true : false;
                         lstAnswer.Add(answer);
@@ -412,82 +398,191 @@ namespace Testify.API.Controllers
 
                     if (countAnswerCorrect <= 0)
                     {
-                        question.ErorrMessage = "Câu hỏi không có đáp án đúng!";
-                        question.PassFail = false;
-                        lstQuestionTemp.Add(question);
+                        questionFailCount++;
                         continue;
                     }
-                    else if ((question.QuestionTypeId == 2 || question.QuestionTypeId == 3) && lstAnswer.Count < 2)
+                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 2 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 3) && lstAnswer.Count < 2)
                     {
-                        question.ErorrMessage = "Câu hỏi tối thiểu có 2 đáp án";
-                        question.PassFail = false;
-                        lstQuestionTemp.Add(question);
+                        questionFailCount++;
                         continue;
                     }
-                    else if (question.QuestionTypeId == 1 && lstAnswer.Count != 2)
+                    else if (Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 1 && lstAnswer.Count != 2)
                     {
-                        question.ErorrMessage = "Câu hỏi loại đúng sai bắt buộc chỉ 2 đáp án";
-                        question.PassFail = false;
-                        lstQuestionTemp.Add(question);
+                        questionFailCount++;
                         continue;
                     }
-                    else if ((question.QuestionTypeId == 1 || question.QuestionTypeId == 2) && countAnswerCorrect > 1)
+                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 1 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 2) && countAnswerCorrect > 1)
                     {
-                        question.ErorrMessage = "Câu hỏi chỉ được 1 đáp án đúng do loại câu hỏi là chọn 1 đáp án hoặc đúng/sai";
-                        question.PassFail = false;
-                        lstQuestionTemp.Add(question);
+                        questionFailCount++;
                         continue;
                     }
 
-                    question.Answers = lstAnswer;
-                    question.PassFail = true;
-                    lstQuestionTemp.Add(question);
+                    QuestionInExcel QnA = new QuestionInExcel();
+                    QnA.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString();
+                    QnA.QuestionLevelId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value);
+                    QnA.QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value);
+                    QnA.Answers = lstAnswer;
+                    lstQuestionTemp.Add(QnA);
+
+                    if(lstQuestionTemp.Count == batchSize || rowQ == totalRows)
+                    {
+                        await AddQuestionSuccessInDb(lstQuestionTemp, subjectId);
+                        lstQuestionTemp.Clear();
+                    }
                 }
                 else
                 {
-                    question.ErorrMessage = "Câu hỏi có đáp án không hợp lệ (rỗng hoặc sai thông tin nhập vào)";
-                    question.PassFail = false;
-                    lstQuestionTemp.Add(question);
+                    questionFailCount++;
                 }
             }
-
-
-
-            return lstQuestionTemp;
+            return questionFailCount;
         }
 
-        [HttpPost("Create-Question-In-Import-Excel")]
-        public async Task<ActionResult> CreateInImportExcel(List<QuestionInExcel> lstQuestion)
+        private async Task AddQuestionSuccessInDb(List<QuestionInExcel> lstQuestionTemp, int subjectId)
         {
-            if(lstQuestion.Count > 0 && lstQuestion != null)
+            foreach (var item in lstQuestionTemp)
             {
-                foreach(var item in lstQuestion)
+                var question = new Question
                 {
-                    Question q = new Question();
-                    q.Content = item.Content;
-                    q.QuestionLevelId = item.QuestionLevelId != -1 ? item.QuestionLevelId : null;
-                    q.QuestionTypeId = item.QuestionTypeId;
-                    q.SubjectId = item.SubjectId;
-                    q.Status = 1;
-                    q.CreatedDate = DateTime.Now;
+                    Content = item.Content,
+                    QuestionLevelId = item.QuestionLevelId == 0 ? null : item.QuestionLevelId,
+                    QuestionTypeId = item.QuestionTypeId,
+                    CreatedDate = DateTime.Now,
+                    Status = 1,
+                    SubjectId = subjectId
+                };
 
-                    var objQ = await _repoQuestion.CreateQuestion(q);
+                var successAddQuestion = await _repoQuestion.CreateQuestion(question);
 
-                    if(objQ != null)
+                if (successAddQuestion != null)
+                {
+                    foreach (var answer in item.Answers)
                     {
-                        foreach (var a in item.Answers)
-                        {
-                            Answer ans = new Answer();
-                            ans.QuestionId = objQ.Id;
-                            ans.Content = a.Content;
-                            ans.IsCorrect = a.IsCorrect;
-                            ans.Status = 1;
-                            var objA = await _repoAnswer.CreateAnswer(ans);
-                        }
+                        answer.QuestionId = successAddQuestion.Id;
+                        answer.Status = 1;
+                        await _repoAnswer.CreateAnswer(answer);
                     }
                 }
+            }
+        }
 
-                return Ok();
+        [HttpGet("Export-Question-By-SubjectId")]
+        public async Task<ActionResult> ExportQuestionBySubjectId(int subjectId, bool isAnswer)
+        {
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            var package = new ExcelPackage();
+            if (subjectId != 0 && subjectId != null)
+            {
+                var objSubject = await _repoSubject.GetSubjectById(subjectId);
+                var lstQnA = await _repoQuestion.Check(subjectId);
+
+                if (lstQnA != null && lstQnA.Count > 0)
+                {
+                    var countAnswerMax = lstQnA.OrderByDescending(x => x.Answers.Count()).FirstOrDefault().Answers.Count();
+                    var worksheetQ = package.Workbook.Worksheets.Add("Câu Hỏi và đáp án");
+
+                    worksheetQ.Cells.Style.Font.Name = "Times New Roman";
+                    System.Drawing.Color customColor = System.Drawing.Color.FromArgb(41, 166, 154); //màu chính của web
+                    System.Drawing.Color answerCorrect = System.Drawing.Color.FromArgb(112, 173, 71);
+
+                    worksheetQ.Column(1).Width = 6;
+                    worksheetQ.Column(2).Width = 62;
+                    worksheetQ.Column(3).Width = 25;
+
+                    worksheetQ.Row(1).Height = 30;
+
+                    worksheetQ.Column(1).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheetQ.Column(1).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheetQ.Column(3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheetQ.Column(3).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                    worksheetQ.Cells[1, 1].Value = "Stt";
+                    worksheetQ.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheetQ.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(customColor);
+                    worksheetQ.Cells[1, 1].Style.WrapText = true;
+                    worksheetQ.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheetQ.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheetQ.Cells[1, 1].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                    worksheetQ.Cells[1, 1].Style.Font.Bold = true;
+                    worksheetQ.Cells[1, 1].Style.Font.Size = 12;
+
+                    worksheetQ.Cells[1, 2].Value = "Nội dung câu hỏi";
+                    worksheetQ.Cells[1, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheetQ.Cells[1, 2].Style.Fill.BackgroundColor.SetColor(customColor);
+                    worksheetQ.Cells[1, 2].Style.WrapText = true;
+                    worksheetQ.Cells[1, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheetQ.Cells[1, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheetQ.Cells[1, 2].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                    worksheetQ.Cells[1, 2].Style.Font.Bold = true;
+                    worksheetQ.Cells[1, 2].Style.Font.Size = 12;
+
+                    worksheetQ.Cells[1, 3].Value = "Môn";
+                    worksheetQ.Cells[1, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheetQ.Cells[1, 3].Style.Fill.BackgroundColor.SetColor(customColor);
+                    worksheetQ.Cells[1, 3].Style.WrapText = true;
+                    worksheetQ.Cells[1, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheetQ.Cells[1, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheetQ.Cells[1, 3].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                    worksheetQ.Cells[1, 3].Style.Font.Bold = true;
+                    worksheetQ.Cells[1, 3].Style.Font.Size = 12;
+
+                    if (isAnswer)
+                    {
+                        for (int i = 1; i <= countAnswerMax; i++)
+                        {
+                            worksheetQ.Column(i + 3).Width = 20;
+                            worksheetQ.Column(i + 3).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            worksheetQ.Column(i + 3).Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                            worksheetQ.Cells[1, i + 3].Value = $"Đáp án {i}";
+                            worksheetQ.Cells[1, i + 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            worksheetQ.Cells[1, i + 3].Style.Fill.BackgroundColor.SetColor(customColor);
+                            worksheetQ.Cells[1, i + 3].Style.WrapText = true;
+                            worksheetQ.Cells[1, i + 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            worksheetQ.Cells[1, i + 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                            worksheetQ.Cells[1, i + 3].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                            worksheetQ.Cells[1, i + 3].Style.Font.Bold = true;
+                            worksheetQ.Cells[1, i + 3].Style.Font.Size = 12;
+                        }
+                    }
+
+                    for (int i = 0; i < lstQnA.Count; i++)
+                    {
+                        worksheetQ.Cells[i + 2, 1].Value = (i + 1).ToString();
+                        worksheetQ.Cells[i + 2, 2].Value = lstQnA[i].Content.ToString();
+                        worksheetQ.Cells[i + 2, 3].Value = objSubject.Name.ToString();
+                        worksheetQ.Cells[i + 2, 2].Style.WrapText = true;
+                        worksheetQ.Cells[i + 2, 3].Style.WrapText = true;
+
+                        if (isAnswer)
+                        {
+                            for (int j = 0; j < countAnswerMax; j++)
+                            {
+                                if (j < lstQnA[i].Answers.Count())
+                                {
+                                    worksheetQ.Cells[i + 2, j + 4].Value = lstQnA[i].Answers[j].Content.ToString();
+                                    if (lstQnA[i].Answers[j].IsCorrect)
+                                    {
+                                        worksheetQ.Cells[i + 2, j + 4].Style.Font.Bold = true;
+                                        worksheetQ.Cells[i + 2, j + 4].Style.Font.Color.SetColor(answerCorrect);
+                                    }
+                                }
+                                else
+                                {
+                                    worksheetQ.Cells[i + 2, j + 4].Value = "NaN";
+                                    worksheetQ.Cells[i + 2, j + 4].Style.Font.Color.SetColor(ColorTranslator.FromHtml("#8e8e8e"));
+                                }
+                            }
+                        }
+                    }
+
+                    var excelByBytes = package.GetAsByteArray();
+
+                    return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Question_in_{objSubject.Name}.xlsx");
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             else
             {

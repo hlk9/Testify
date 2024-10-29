@@ -1,5 +1,4 @@
 ﻿@using Testify.DAL.Models;
-@using Testify.Web.Components.Pages.Examiner.Component;
 @using Testify.Web.Shared;
 @using Testify.Web.Data.Commons;
 
@@ -15,82 +14,40 @@
         else
         {
             <MudForm Spacing="5" @ref="form">
-                @if(isQuestionId)
-                {
-                    <MudSelect T="int" @bind-Value="@questionId" Label="Chọn câu hỏi cần thêm đáp án" SelectedValuesChanged="@(() =>ChangeValue())">
-
-                        <MudSelectItem Value="-1">Chọn câu hỏi</MudSelectItem>
-
-                        @if (lstQuestion != null)
-                        {
-                            foreach (var item in lstQuestion)
-                            {
-                                if (item.Status == Convert.ToByte(StatusType.noAnswer))
-                                {
-                                    <MudSelectItem Value="@item.Id">@item.Content</MudSelectItem>
-                                }
-                            }
-                        }
-                    </MudSelect>
-                }
-
-                <div class="w-100 d-flex justify-content-between align-items-center">
-                    <MudText>Thêm đáp án:</MudText>
-                    <MudIconButton Class="p-0" Icon="@Icons.Material.Filled.Add" aria-label="AddNeuAnswer" Disabled=@(isQuestionId == true ? IsDisableNewAnswer : false) OnClick="AddNewAnswer"></MudIconButton>
-                </div>
-
-                @if (lstAnswers != null)
-                {
-                    @foreach (var item in lstAnswers)
-                    {
-                        <AnswerForm answer="item" OnRemove="RemoveAnswerForm" questionId="questionId" questionTypeId="questionTypeId" @ref="answerForms[lstAnswers.IndexOf(item)]" />
-                    }
-                }
-
+                <MudForm Model="answer" @ref="form" Spacing="4">
+                    <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" />
+                    <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
+                </MudForm>
             </MudForm>
         }
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancle</MudButton>
-        <MudButton Style="color: gold" OnClick="Submit">Thêm mới</MudButton>
+        <MudButton Style="color: #29a69a" OnClick="Submit">Thêm mới</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    MudForm form;
     private Answer answer { get; set; } = new();
-    private List<Question>? lstQuestion;
-    private List<QuestionType>? lstQuestionType;
+
+    private List<QuestionType> lstQuestionType = new List<QuestionType>();
     private List<Answer> lstAnswers = new List<Answer>();
-    private List<AnswerForm> answerForms = new List<AnswerForm>();
     private List<Answer> lstAnswered = new List<Answer>();
 
     private bool isLoading { get; set; } = true;
-    private bool IsDisableNewAnswer = true;
-    private int ValueQuestionTypeChoice;
-    private int questionId;
     private int questionTypeId;
 
     [Parameter]
-    public bool isQuestionId { get; set; }
-
-    [Parameter]
     public int questionIdParams { get; set; }
-
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
+    MudForm form;
 
     private async Task LoadData()
     {
-        lstQuestion = await _serQuestion.GetAllQuestions("", true);
-        questionId = questionIdParams;
-
-        if(isQuestionId == false)
-        {
-            var objQuestion = await _serQuestion.GetQuestionById(questionId);
-            questionTypeId = objQuestion.QuestionTypeId;
-            lstAnswered = await _serAnswer.GetAllByQuestionId(questionId);
-        }
+        var objQuestion = await _serQuestion.GetQuestionById(questionIdParams);
+        questionTypeId = objQuestion.QuestionTypeId;
+        lstAnswered = await _serAnswer.GetAllByQuestionId(questionIdParams);
         isLoading = false;
     }
 
@@ -99,142 +56,37 @@
         await LoadData();
     }
 
-    private async Task ChangeValue()
-    {
-        if (lstAnswers.Count > 0 || lstAnswers != null)
-        {
-            var objQuestion = await _serQuestion.GetQuestionById(questionId);
-            questionTypeId = objQuestion.QuestionTypeId;
-            IsDisableNewAnswer = false;
-        }
-    }
-
-    private async Task AddNewAnswer()
-    {
-        if (lstAnswers.Count == 0 || await answerForms.Last().ValidateAsync())
-        {
-            var newAnswer = new Answer();
-            lstAnswers.Add(newAnswer);
-            answerForms.Add(new AnswerForm { answer = newAnswer });
-        }
-    }
-
-    private void RemoveAnswerForm(Answer answerToRemove)
-    {
-        var index = lstAnswers.IndexOf(answerToRemove);
-        if (index >= 0)
-        {
-            lstAnswers.RemoveAt(index);
-            answerForms.RemoveAt(index);
-        }
-    }
-
     private async Task Submit()
     {
-        if (questionId == -1)
+        int answerCorrect = lstAnswered.Count(x => x.IsCorrect);
+
+        if (lstAnswered.Any(x => x.Content.Trim().ToLower().Equals(answer.Content.Trim().ToLower())))
         {
-            snackbar.Add("Chưa chọn câu hỏi", Severity.Warning);
-            return;
-        }
-        else if (answerForms.Count == 0 || answerForms == null)
-        {
-            snackbar.Add("Chưa nhập đáp án", Severity.Warning);
+            snackbar.Add("Đã có nội dung đáp án này", Severity.Warning);
             return;
         }
 
-        if(lstAnswered.Count != 0 && isQuestionId == false)
+        if (questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
         {
-            foreach (var item in lstAnswered)
+            if (answerCorrect >= 1 && answer.IsCorrect == true)
             {
-                if (lstAnswers.Any(x => x.Content.Trim().ToLower() == item.Content.Trim().ToLower()))
-                {
-                    snackbar.Add("Có đáp án trùng nhau!", Severity.Warning);
-                    return;
-                }
-            }
-        }
-
-        if(isQuestionId == true && lstAnswers.Count != 0)
-        {
-            for (int i = 0; i < lstAnswers.Count; i++)
-            {
-                for (int j = i + 1; j < lstAnswers.Count ; j++)
-                {
-                    if(lstAnswers[i].Content.ToLower().Trim() == lstAnswers[j].Content.ToLower().Trim())
-                    {
-                        snackbar.Add("Có đáp án trùng nhau!", Severity.Warning);
-                        return;
-                    }
-                }
-            }
-        }
-
-        int count = 0;
-        for (int i = 0; i < lstAnswers.Count; i++)
-        {
-            if (lstAnswers[i].IsCorrect == true)
-            {
-                count++;
-            }
-        }
-
-        if (questionTypeId == Convert.ToInt32(listQuestionTypes.YesNo) || questionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice))
-        {
-            if(isQuestionId == false && lstAnswered.Count != 0)
-            {
-                int countCorrect = lstAnswered.Count(x => x.IsCorrect);
-                if(countCorrect >= 1 && count >= 1)
-                {
-                    snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
-                    return;
-                }
-            }
-
-            if (count > 1 && isQuestionId == true)
-            {
-                snackbar.Add("Chỉ được 1 đáp án đúng!", Severity.Warning);
+                snackbar.Add("Câu hỏi này chỉ 1 đáp án đúng", Severity.Warning);
                 return;
             }
         }
 
-        if (count == 0 && isQuestionId == true)
+        answer.QuestionId = questionIdParams;
+        answer.Status = 1;
+        var checkAddSuccess = await _serAnswer.Create(answer);
+        if (checkAddSuccess)
         {
-            snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
-            return;
-        }
-
-        if (lstAnswers != null && lstAnswers.Count < 2 && isQuestionId == true)
-        {
-            snackbar.Add("Phải có tối thiểu 2 đáp án", Severity.Error);
-            return;
-        }
-
-        bool allValid = true;
-
-        foreach (var form in answerForms)
-        {
-            if (!await form.ValidateAsync())
-            {
-                allValid = false;
-            }
-        }
-
-        if (allValid)
-        {
-
-            for (int i = 0; i < lstAnswers.Count; i++)
-            {
-                lstAnswers[i].Status = Convert.ToByte(StatusType.isActive);
-                var check = await _serAnswer.Create(lstAnswers[i]);
-            }
-
-            var question = await _serQuestion.UpdateStatus(questionId, Convert.ToByte(StatusType.isActive));
+            snackbar.Add("Thêm đáp án thành công", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thành công", Severity.Success);
         }
         else
         {
-            snackbar.Add("Có đáp án chưa được điền đủ thông tin", Severity.Error);
+            snackbar.Add("Thêm đáp án không thành công", Severity.Error);
+            MudDialog.Close(DialogResult.Ok(true));
         }
     }
 

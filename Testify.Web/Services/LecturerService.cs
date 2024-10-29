@@ -28,6 +28,14 @@ namespace Testify.Web.Services
             return response;
         }
 
+        public async Task<List<ClassesWithLecturer>> GetScore2(Guid idLec, int idClass)
+        {
+            var allScore2 = await _httpClient.GetAsync($"Lecturer/Get-score2?idlec={idLec}&idclass={idClass}");
+            var response = await allScore2.Content.ReadFromJsonAsync<List<ClassesWithLecturer>>();
+
+            return response;
+        }
+
         public async Task<User> GetLecturerById(Guid id)
         {
             return await _httpClient.GetFromJsonAsync<User>($"Lecturer/Get-Lecturer-By-Id?id={id}");
@@ -105,5 +113,13 @@ namespace Testify.Web.Services
             var response = await _httpClient.PostAsJsonAsync("Lecturer/Create-User-In-Import-Excel", lstUser);
             return response;
         }
+
+        public async Task<List<Class>> GetListOfTeacher(Guid lecturerId)
+        {
+            var lst = await _httpClient.GetFromJsonAsync<List<Class>>("Lecturer/Get-ClassByTeacher?id=" + lecturerId);
+            return lst;
+        }
+
+        
     }
 }

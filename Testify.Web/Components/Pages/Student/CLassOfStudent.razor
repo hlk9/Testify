@@ -42,26 +42,28 @@
     </MudPaper>
 
     <MudPaper Elevation=0 Class="w-100 mt-5 hidden-scroll" Style="min-width: 100%; max-height: 600px; overflow: auto">
-        <MudPaper Elevation="0" Style="max-width: 100%; min-width: 900px; padding: 15px 8px; font-weight: bold; border-bottom: 1px solid rgba(0, 0, 0, 0.2); display: flex; justify-content: left; overflow: auto; position: sticky; top: 0">
+        <MudPaper Elevation="0" Style="max-width: 100%; min-width: 1300px; padding: 15px 8px; font-weight: bold; border-bottom: 1px solid rgba(0, 0, 0, 0.2); display: flex; justify-content: left; overflow: auto; position: sticky; top: 0">
             <MudPaper Elevation="0" Width="373px">Tên Lớp</MudPaper>
             <MudPaper Elevation="0" Width="185px">Mã Lớp</MudPaper>
             <MudPaper Elevation="0" Width="371px">Giáo Viên Quản Lý</MudPaper>
             <MudPaper Elevation="0" Width="185px">Môn</MudPaper>
             <MudPaper Elevation="0" Width="464px">Mô tả</MudPaper>
-            <MudPaper Elevation="0" Width="278px">Thao Tác</MudPaper>
+            <MudPaper Elevation="0" Width="178px">Trạng thái</MudPaper>
+            <MudPaper Elevation="0" Width="100px">Thao Tác</MudPaper>
         </MudPaper>
 
         @if(_lstCwU.Count != 0)
         {
             foreach (var item in _lstCwU)
             {
-                <MudPaper Elevation="2" Style="max-width: 100%; min-width: 900px; padding: 24px 8px; margin-bottom: 20px; display: flex; justify-content: left; overflow: auto">
+                <MudPaper Elevation="2" Style="max-width: 100%; min-width: 1300px; padding: 24px 8px; margin-bottom: 20px; display: flex; justify-content: left; overflow: auto">
                     <MudPaper Elevation="0" Width="373px" Style="text-transform:full-width">@item.Name</MudPaper>
                     <MudPaper Elevation="0" Width="185px">@item.ClassCode</MudPaper>
                     <MudPaper Elevation="0" Width="371px">@item.TeacherName</MudPaper>
                     <MudPaper Elevation="0" Width="185px">@item.SubjectName</MudPaper>
                     <MudPaper Elevation="0" Width="464px">@item.Description</MudPaper>
-                    <MudPaper Elevation="0" Width="278px">Không có</MudPaper>
+                    <MudPaper Elevation="0" Width="178px">@(item.Status == 2 ? "Chờ phê duyệt" : (item.Status == 1 ? "Đã tham gia" : ""))</MudPaper>
+                    <MudPaper Elevation="0" Width="100px">Không có</MudPaper>
                 </MudPaper>
             }
         }
@@ -78,7 +80,7 @@
     private List<ClassWithClassUser> _lstCwU = new List<ClassWithClassUser>();
     private int classIsWaiting = 0;
     private int classParticipated = 0;
-    private string Search;
+    private string Search = "";
     private byte Status = 1;
 
     protected async override Task OnInitializedAsync()
@@ -90,10 +92,6 @@
     {
         if(firstRender)
         {
-            var lstIsWaiting = await _serClassUser.GetAllClassUser(2);
-            var lstIsParticipated = await _serClassUser.GetAllClassUser(1);
-            classIsWaiting = lstIsWaiting.Count;
-            classParticipated = lstIsParticipated.Count;
             await LoadData(Search);
         }
     }
@@ -102,6 +100,10 @@
     {
         var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
         _lstCwU = await _serClassUser.GetAll(a.Value, search, Status);
+        var lstIsWaiting = await _serClassUser.GetAll(a.Value, Search, (byte)2);
+        var lstIsParticipated = await _serClassUser.GetAll(a.Value, Search, (byte)1);
+        classIsWaiting = lstIsWaiting.Count;
+        classParticipated = lstIsParticipated.Count;
         StateHasChanged();
     }
 
