@@ -45,9 +45,21 @@
                         </MudItem>
                     </MudGrid>
                </MudItem>
+
+               <MudItem Class="w-100">
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Tổng số câu"></MudTextField>
+                        </MudItem>
+
+                    </MudGrid>
+               </MudItem>
                
             </MudGrid>
-            <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+           
       </EditForm>
     </DialogContent>
     <DialogActions>
