@@ -85,9 +85,7 @@ namespace Testify.API.Controllers
                     SubjectId = item.SubjectId,
                     SubjectName = lstSub.FirstOrDefault(x=> x.Id == item.SubjectId).Name,
                     Duration = item.Duration,
-                    NumberOfQuestion = item.NumberOfQuestions,
-                    NumberOfRepeat = item.NumberOfRepeat,
-                    
+                    NumberOfQuestion = item.NumberOfQuestions
 
                 });
             }
