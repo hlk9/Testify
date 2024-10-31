@@ -28,6 +28,48 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<Question>($"Question/Get-Question-By-Id?id={id}");
         }
 
+        public async Task<List<QuestionInExam>> GetAllQuestioneByIdSub(int id_sub)
+        {
+            //return await _httpClient.GetFromJsonAsync<Question>($"Question/Get-Question-By-Id_Sub?id={id_sub}");
+            //var allQuestionBysub = await _httpClient.GetFromJsonAsync<Question>($"Question/Get-Question-By-Id_Sub?id={id_sub}");
+            //var response = await allQuestionBysub.Content.ReadFromJsonAsync<List<Question>>();
+
+            //return response;
+
+            var response = await _httpClient.GetAsync($"Question/Get-Question-By-Id_Sub?id_sub={id_sub}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Chuyển đổi dữ liệu JSON từ phản hồi thành danh sách câu hỏi
+                var questions = await response.Content.ReadFromJsonAsync<List<QuestionInExam>>();
+                return questions ?? new List<QuestionInExam>();
+            }
+            else
+            {
+                // Nếu không thành công, trả về danh sách rỗng hoặc ném lỗi
+                return new List<QuestionInExam>();
+            }
+        }
+
+        public async Task<List<QuestionInExam>> GetAllQuestioneByIdSub_And_Level(int id_sub, int id_level)
+        {
+            
+
+            var response = await _httpClient.GetAsync($"Question/Get-Question-By-Id_Sub-And-Level?id_sub={id_sub}&id_level={id_level}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Chuyển đổi dữ liệu JSON từ phản hồi thành danh sách câu hỏi
+                var questions = await response.Content.ReadFromJsonAsync<List<QuestionInExam>>();
+                return questions ?? new List<QuestionInExam>();
+            }
+            else
+            {
+                // Nếu không thành công, trả về danh sách rỗng hoặc ném lỗi
+                return new List<QuestionInExam>();
+            }
+        }
+
         public async Task<HttpResponseMessage> ExportExcelQuestion()
         {
             return await _httpClient.GetAsync("Question/Export-Excel-Template-Question");
