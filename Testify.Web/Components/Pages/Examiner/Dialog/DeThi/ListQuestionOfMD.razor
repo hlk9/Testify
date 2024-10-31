@@ -1,0 +1,116 @@
+﻿@using Testify.API.DTOs
+@using Testify.DAL.Context
+@using Testify.DAL.ViewModels
+@layout AdminLayout
+@inject IDialogService DialogService
+@inject ExamService examService
+@inject SubjectService subjectService
+@inject ExamDetailService examdetailService
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6"> Danh sách câu hỏi mới </MudText>
+    </TitleContent>
+    <DialogContent>
+       @*  @if (isLoading)
+        {
+            <LoadingContext />
+        }else{ *@
+            <MudTabs ApplyEffectsToContainer="true">
+                <MudTabPanel Text="Thêm thủ công">
+                   @*  @if (isLoading)
+                    {
+                        <LoadingContext />
+                    }else{ *@
+                        <MudPaper Elevation="0" Class="mt-3">
+                            <div class="w-100 mb-2">
+                                <MudText Style="font-size: 16px; font-weight: bold">Chọn câu Hỏi:</MudText>
+                            </div>
+                            <MudForm Spacing="6" >
+                                <MudGrid Class="p-0 m-0 w-100">
+                                    <MudItem md="6" xs="12" Class="w-100 ps-0 pe-0 pe-md-3">
+
+                                        @* So luong ch cho muc do *@
+                                        <div>
+                                            @* <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" /> *@
+                                        </div>
+                                      
+                                    </MudItem>
+
+                                    <MudItem md="6" xs="12" Class="w-100 ps-0 pe-0 pe-md-3">
+                                       
+                                       @*  Muc do ch  *@
+                                        <MudSelect Class="w-100" T="int"  Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                                           @*  @if (questionLevelId == -1)
+                                            {
+                                                <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
+                                            }
+                                            @foreach (var itemLevel in _lstQuestionLevels)
+                                            {
+                                                <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                                            } *@
+                                        </MudSelect>
+                                    </MudItem>
+
+
+                                   
+                                </MudGrid>
+
+                                <MudGrid>
+                                    <MudItem xs="6">
+                                        <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                                            <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                                                <MudTooltip Text="Danh sách chọn câu hỏi theo mức độ">
+                                                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowRightAlt" Label="Chọn"  />
+                                                </MudTooltip>
+                                            </MudItem>
+                                            <MudItem xs="6" Class="d-flex justify-content-end">
+                                            </MudItem>
+                                        </MudItem>
+                                    </MudItem>
+
+                                    <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                                        <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                                            <MudTooltip Text="Loại bỏ câu hỏi ra khỏi danh sách">
+                                                <MudFab Color="Color.Warning" StartIcon="@Icons.Material.Filled.Clear" Label="Loại bỏ"/>
+                                            </MudTooltip>
+                                        </MudItem>
+                                        
+                                    </MudItem>
+
+                                    
+
+                                   
+                                </MudGrid>
+                            </MudForm>
+
+                        </MudPaper>
+                    @* } *@
+                </MudTabPanel>
+                <MudTabPanel Text="Thêm tự động">
+                    <div>
+                        Chưa có babe ơi
+                    </div>
+                </MudTabPanel>
+            </MudTabs>
+       @*  } *@
+
+
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    private void Cancel() => MudDialog.Cancel();
+    private bool isLoading { get; set; } = true;
+
+
+}
+

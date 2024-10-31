@@ -100,7 +100,7 @@
         _lst = await examService.GetInforBasic();
     }
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
 
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
@@ -191,6 +191,10 @@
         {
             //listSchedule = await scheduleService.GetInforBasic();
             _lst = await examService.GetInforBasic();
+        }
+        else
+        {
+           
         }
     }
 
