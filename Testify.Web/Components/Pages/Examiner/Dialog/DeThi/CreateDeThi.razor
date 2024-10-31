@@ -14,7 +14,7 @@
             <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
             </MudItem>
             <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-                <MudButton  Class="add-button-end" Variant="Variant.Filled">Thêm câu hỏi </MudButton>
+                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm câu hỏi </MudButton>
             </MudItem>
         </MudGrid>
         <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
@@ -76,9 +76,26 @@
     private MudDialogInstance MudDialog { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
     private void Cancel() => MudDialog.Cancel();
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
     // Radio
     public bool Dense_Radio { get; set; } = true;
 
     private List<Dethi> lst = new List<Dethi>();
+
+
+    private async Task OpenDialogAsync(DialogOptions options, string name)
+    {
+        if (name.Equals("create"))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.DeThi.ListQuestionOfMD>("Options Dialog", options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                // listSchedule = await scheduleService.GetInforBasic();
+                // _lstDT = await examService.GetInforBasic();
+
+            }
+
+        }
+    }
 }
