@@ -17,7 +17,7 @@ namespace Testify.DAL.ViewModels
         public DateTime UpdateDate { get; set; }
         public Guid UpdateBy { get; set; }
 
-        public List<Question> Questions { get; set; }
+        public List<QuestionInExam> Questions { get; set; }
         public int IdExamDetail { get; set; }
         public int IdExamDetailQues { get; set; }
         public int? NumberOfQuestions { get; set; }

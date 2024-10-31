@@ -6,6 +6,7 @@
 @inject ExamService examService
 @inject SubjectService subjectService
 @inject ExamDetailService examdetailService
+@inject ExamDetailQuestionService examdetailQuestionService
 
 <MudDialog>
     <TitleContent>
@@ -26,7 +27,7 @@
                             <div class="w-100 mb-2">
                                 <MudText Style="font-size: 16px; font-weight: bold">Chọn câu Hỏi:</MudText>
                             </div>
-                            <MudForm Spacing="6" >
+                    <MudForm Spacing="6" Model="@question" @ref="@form">
                                 <MudGrid Class="p-0 m-0 w-100">
                                     <MudItem md="6" xs="12" Class="w-100 ps-0 pe-0 pe-md-3">
 
@@ -39,50 +40,185 @@
 
                                     <MudItem md="6" xs="12" Class="w-100 ps-0 pe-0 pe-md-3">
                                        
-                                       @*  Muc do ch  *@
-                                        <MudSelect Class="w-100" T="int"  Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                                           @*  @if (questionLevelId == -1)
-                                            {
-                                                <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
-                                            }
-                                            @foreach (var itemLevel in _lstQuestionLevels)
-                                            {
-                                                <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
-                                            } *@
-                                        </MudSelect>
+                                     
+                               @*  <MudSelect Class="w-100" T="int" @bind-Value="questionLevelId"  Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" >
+                                    <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
+                                    @foreach (var itemLevel in _lstQuestionLevels)
+                                    {
+                                        <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                                    }
+                                </MudSelect> *@
+
+                                <MudSelect Class="w-100" T="int" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Value="@questionLevelId" ValueChanged="@OnQuestionLevelChanged">
+                                    <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
+                                    @foreach (var itemLevel in _lstQuestionLevels)
+                                    {
+                                        <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                                    }
+                                </MudSelect>
+
+
+
                                     </MudItem>
 
 
                                    
                                 </MudGrid>
 
-                                <MudGrid>
-                                    <MudItem xs="6">
-                                        <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
-                                            <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
-                                                <MudTooltip Text="Danh sách chọn câu hỏi theo mức độ">
-                                                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowRightAlt" Label="Chọn"  />
-                                                </MudTooltip>
-                                            </MudItem>
-                                            <MudItem xs="6" Class="d-flex justify-content-end">
-                                            </MudItem>
-                                        </MudItem>
-                                    </MudItem>
+                               
 
-                                    <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
-                                        <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
-                                            <MudTooltip Text="Loại bỏ câu hỏi ra khỏi danh sách">
-                                                <MudFab Color="Color.Warning" StartIcon="@Icons.Material.Filled.Clear" Label="Loại bỏ"/>
-                                            </MudTooltip>
-                                        </MudItem>
-                                        
-                                    </MudItem>
-
-                                    
-
-                                   
-                                </MudGrid>
                             </MudForm>
+
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                                <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                                    <MudTooltip Text="Danh sách chọn câu hỏi theo mức độ">
+                                        <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowRightAlt" Label="Chọn" OnClick="AddQuestionsToRight" />
+                                    </MudTooltip>
+                                </MudItem>
+                                <MudItem xs="6" Class="d-flex justify-content-end">
+                                </MudItem>
+                            </MudItem>
+                        </MudItem>
+
+                        <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                            <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                                <MudTooltip Text="Loại bỏ câu hỏi ra khỏi danh sách">
+                                    <MudFab Color="Color.Warning" StartIcon="@Icons.Material.Filled.Clear" Label="Loại bỏ" />
+                                </MudTooltip>
+                            </MudItem>
+
+                        </MudItem>
+
+                        <MudItem xs="6">
+                            <MudTable Items="@_lstQuestion" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listQuestionSelected">
+                                <ToolBarContent>
+                                    <MudText Typo="Typo.h6">Danh sách câu hỏi</MudText>
+                                    <MudSpacer></MudSpacer>
+                                </ToolBarContent>
+                                <HeaderContent>
+                                    <MudTh>Nội dung</MudTh>
+                                    <MudTh>Loại câu hỏi</MudTh>
+                                    <MudTh>Mức độ</MudTh>
+
+                                    <MudTh>Trạng thái</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Nội dung">@context.Content</MudTd>
+                                    <MudTd DataLabel="Loại câu hỏi">
+                                        @if (_lstQuestionTypes != null)
+                                        {
+                                            foreach (var item in _lstQuestionTypes)
+                                            {
+                                                if (item.Id == context.QuestionTypeId)
+                                                {
+                                                    @item.Name
+                                                    ;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    </MudTd>
+                                    <MudTd DataLabel="Mức độ">
+                                        @if (context.QuestionLevelId == null)
+                                        {
+                                            <MudText Style="font-size: 14px">Không có</MudText>
+                                        }
+                                        else
+                                        {
+                                            foreach (var item in _lstQuestionLevels)
+                                            {
+                                                if (item.Id == context.QuestionLevelId)
+                                                {
+                                                    @item.Name
+                                                    ;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    </MudTd>
+                                    <MudTd DataLabel="Trạng thái">
+                                        @if (@context.Status == 1)
+                                        {
+                                            <span class="text-center btn btn-success">    </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-center btn btn-danger">  </span>
+                                        }
+
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </MudItem>
+
+
+                        <MudItem xs="6">
+                            <MudTable Items="@listQuestionInDethi" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listQuestionSelected">
+                                <ToolBarContent>
+                                    <MudText Typo="Typo.h6">Danh sách câu hỏi đã chọn</MudText>
+                                    <MudSpacer></MudSpacer>
+                                </ToolBarContent>
+                                <HeaderContent>
+                                    <MudTh>Nội dung</MudTh>
+                                    <MudTh>Loại câu hỏi</MudTh>
+                                    <MudTh>Mức độ</MudTh>
+
+                                    <MudTh>Trạng thái</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Nội dung">@context.Content</MudTd>
+                                    <MudTd DataLabel="Loại câu hỏi">
+                                        @if (_lstQuestionTypes != null)
+                                        {
+                                            foreach (var item in _lstQuestionTypes)
+                                            {
+                                                if (item.Id == context.QuestionTypeId)
+                                                {
+                                                    @item.Name
+                                                    ;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    </MudTd>
+                                    <MudTd DataLabel="Mức độ">
+                                        @if (context.QuestionLevelId == null)
+                                        {
+                                            <MudText Style="font-size: 14px">Không có</MudText>
+                                        }
+                                        else
+                                        {
+                                            foreach (var item in _lstQuestionLevels)
+                                            {
+                                                if (item.Id == context.QuestionLevelId)
+                                                {
+                                                    @item.Name
+                                                    ;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    </MudTd>
+                                    <MudTd DataLabel="Trạng thái">
+                                        @if (@context.Status == 1)
+                                        {
+                                            <span class="text-center btn btn-success">    </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-center btn btn-danger">  </span>
+                                        }
+
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </MudItem>
+
+
+
+                    </MudGrid>
 
                         </MudPaper>
                     @* } *@
@@ -105,11 +241,104 @@
 @code {
     [Parameter]
     public int Id { get; set; }
+    [Parameter]
+    public int Id_Sub { get; set; }
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
     private void Cancel() => MudDialog.Cancel();
     private bool isLoading { get; set; } = true;
+    MudForm form;
+    private Question question { get; set; } = new();
+    //private List<Question> _lstQuestion = new List<Question>();
+
+    private List<Answer> lstAnswers = new List<Answer>();
+    private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
+    private List<QuestionType> _lstQuestionTypes = new List<QuestionType>();
+    private List<Subject> _lstSubjects = new List<Subject>();
+    private int questionLevelId = -1;
+    public List<QuestionInExam> _lstQuestion { get; set; }
+    public HashSet<QuestionInExam> listQuestionSelected { get; set; }
+    public List<QuestionInExam> newQuestionsToAdd { get; set; } = new List<QuestionInExam>();
+    public Dethi currentDETHI { get; set; } = new Dethi();
+    public List<QuestionInExam> listQuestionInDethi { get; set; }
+
+
+
+    private async Task LoadData()
+    {
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
+        if (questionLevelId > -1)
+        {
+            _lstQuestion = await _serQuestion.GetAllQuestioneByIdSub_And_Level(Id_Sub, questionLevelId);
+            StateHasChanged();
+        }
+        else
+        {
+            _lstQuestion = await _serQuestion.GetAllQuestioneByIdSub(Id_Sub);
+            StateHasChanged();
+        }
+        
+
+    }
+
+    private async void OnQuestionLevelChanged(int newValue)
+    {
+        // Handle the change
+        questionLevelId = newValue;
+        await LoadData();
+        // Additional logic if needed
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadQuestionsByLevel(int levelId)
+    {
+        // // Kiểm tra nếu levelId hợp lệ
+        // if (levelId != -1)
+        // {
+        //     _lstQuestion = await examService.GetQuestionsByLevel(levelId);
+        // }
+        // else
+        // {
+        //     // Nếu chọn lại "Chọn mức độ câu hỏi" thì có thể giữ trống danh sách
+        //     _lstQuestion = new List<Question>();
+        // }
+
+        // StateHasChanged(); // Cập nhật giao diện sau khi tải dữ liệu
+    }
+
+    private async Task AddQuestionsToRight()
+    {
+        // if (listQuestionSelected == null || listQuestionSelected.Count == 0)
+        // {
+        //     Snackbar.Add("Bạn chưa chọn chọn câu hỏi nào", Severity.Warning);
+        // }
+        // else
+        // {
+        //     foreach (var item in listQuestionSelected)
+        //     {
+        //         _lstQuestion.Remove(item);
+        //         newQuestionsToAdd.Add(item);
+        //     }
+
+        //     var stats = await examdetailQuestionService.AddListQuestionToExamDetail(newQuestionsToAdd, currentDETHI.Id);
+        //     if (stats)
+        //     {
+        //         Snackbar.Add("Thêm " + newQuestionsToAdd.Count + " câu hỏi thành công", Severity.Info);
+        //         newQuestionsToAdd.Clear();
+
+        //     }
+        //     else
+        //         Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
+
+        //     await LoadData();
+        // }
+    }
 
 
 }

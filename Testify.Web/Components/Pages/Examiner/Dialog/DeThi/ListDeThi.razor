@@ -16,7 +16,7 @@
             <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
             </MudItem>
             <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm đề mới </MudButton>
+                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, subjectCurrent.Id))" Class="add-button-end" Variant="Variant.Filled">Thêm đề mới </MudButton>
             </MudItem>
        </MudGrid>
 
@@ -122,34 +122,23 @@
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
 
-    private async Task OpenDialogAsync(DialogOptions options, string name)
+    private async Task OpenDialogAsync(DialogOptions options, int ID_Sub)
     {
+        var parameters = new DialogParameters
+        {
+              // { "Id", ID_Sub },
+              { "Id_Sub", ID_Sub }
+        };
+        
+        var dialog = await DialogService.ShowAsync<Dialog.DeThi.CreateDeThi>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            // listSchedule = await scheduleService.GetInforBasic();
+            // _lstDT = await examService.GetInforBasic();
 
-        if (name.Equals("create"))
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.DeThi.CreateDeThi>("Options Dialog", options);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                // listSchedule = await scheduleService.GetInforBasic();
-                // _lstDT = await examService.GetInforBasic();
-
-            }
-
         }
-        else if (name.Equals("update"))
-        {
-            DialogService.ShowAsync<Dialog.Exam.UpdateExam>("Options Dialog", options);
-        }
-        else if (name.Equals("details"))
-        {
-            DialogService.ShowAsync<Dialog.Exam.DetailExam>("Options Dialog", options);
-        }
-        else
-        {
-            DialogService.ShowAsync<Dialog.Exam.DeleteExam>("Options Dialog", options);
-        }
-        StateHasChanged();
+       
 
     }
 
@@ -180,12 +169,10 @@
     {
         lisDThi = await examdetailService.GetExamDetailByExamId(Id);
 
-        var examId = lisDThi.First().ExamId;
+        
+        var examId = lisDThi.FirstOrDefault().ExamId;
         var exam = await examService.GetExamId(examId);
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
-
-
-       
     }
     
 
