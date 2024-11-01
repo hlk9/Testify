@@ -19,6 +19,5 @@ namespace Testify.DAL.Models
         public Guid UserId { get; set; }
         public virtual User? User { get; set; }
         public byte? Status { get; set; }
-
     }
 }

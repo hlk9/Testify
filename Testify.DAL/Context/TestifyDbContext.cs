@@ -22,7 +22,7 @@ namespace Testify.DAL.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=127.0.0.1,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
+            optionsBuilder.UseSqlServer("Data Source=20.195.15.184,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
         }
 
         public DbSet<Answer> Answers { get; set; }
@@ -116,19 +116,19 @@ namespace Testify.DAL.Context
                 new Permission { Id = 9, Name = "Chỉnh sửa và Xoá lớp, môn", Description = "Chỉnh sửa và Xoá lớp, môn", Status = 1 },
                 new Permission { Id = 10, Name = "Xem bài làm đã nộp", Description = "Xem bài làm đã nộp", Status = 1 },
                 new Permission { Id = 11, Name = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Description = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Status = 1 }
-
                 );
             modelBuilder.Entity<User>()
                .HasData(
-              new User { Id = Guid.NewGuid(), Address="A", FullName = "Nguyen Van A", UserName = "nva", DateOfBirth = DateTime.Now, PhoneNumber = "0987654321", Email = "abcde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 4 },
+                new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van A", UserName = "nva", DateOfBirth = DateTime.Now, PhoneNumber = "0987654321", Email = "abcde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 4 },
                 new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van B", UserName = "nvb", DateOfBirth = DateTime.Now, PhoneNumber = "0987654322", Email = "abscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 3 },
-                   new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van C", UserName = "nvc", DateOfBirth = DateTime.Now, PhoneNumber = "0987254322", Email = "aabscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 2 },
-                      new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van D", UserName = "nvd", DateOfBirth = DateTime.Now, PhoneNumber = "0287654322", Email = "absscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 1 }
-
-
+                new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van C", UserName = "nvc", DateOfBirth = DateTime.Now, PhoneNumber = "0987254322", Email = "aabscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 2 },
+                new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van D", UserName = "nvd", DateOfBirth = DateTime.Now, PhoneNumber = "0287654322", Email = "absscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 1 }
                );
-
-
+            modelBuilder.Entity<ClassUser>()
+                .HasData(
+                new ClassUser { Id = 1, ClassId = 1, UserId = Guid.NewGuid(), Status = 1 },
+                new ClassUser { Id = 2, ClassId = 2, UserId = Guid.NewGuid(), Status = 1 }
+                );
         }
     }
 }

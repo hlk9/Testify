@@ -57,5 +57,11 @@ namespace Testify.Web.Services
 
         }
 
+        public async Task<List<User>> GetUsersWithStatus(int classId)
+        {
+            return await _httpClient.GetFromJsonAsync<List<User>>($"User/Get-Users-With-Status-One?classId={classId}");
+            
+        }
+
     }
 }

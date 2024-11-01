@@ -157,6 +157,7 @@ namespace Testify.DAL.Reposiroties
                 objUpdateClass.Capacity = classes.Capacity;
                 objUpdateClass.Description = classes.Description;
                 objUpdateClass.TeacherId = classes.TeacherId;
+                objUpdateClass.SubjectId = classes.SubjectId;
 
                 var updateClass = _context.Classes.Update(objUpdateClass).Entity;
                 await _context.SaveChangesAsync();

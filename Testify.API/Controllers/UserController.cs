@@ -121,5 +121,12 @@ namespace Testify.API.Controllers
 
             return userFailCount++;
         }
+
+        [HttpGet("Get-Users-With-Status-One")]
+        public async Task<List<User>> UsersWithStatus(int classId)
+        {
+            var usersWithStatusOne = await userRepos.GetUsersWithStatusOne(classId);
+            return usersWithStatusOne;
+        }
     }
 }

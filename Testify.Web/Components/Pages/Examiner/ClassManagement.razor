@@ -63,14 +63,14 @@
                 <MudTh><MudTableSortLabel SortLabel="Tên lớp học" T="string">Tên lớp học</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Giáo viên quản lý" T="string">Giáo viên quản lý</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Môn Học" T="string">Môn Học</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Số lượng" T="string">Số lượng</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Số lượng Học Sinh" T="string">Số lượng Học Sinh</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
-                @if(isLoading)
+                @if (isLoading)
                 {
-                    <LoadingContext/>
+                    <LoadingContext />
                 }
                 else
                 {
@@ -78,9 +78,9 @@
                     {
                         <MudTd DataLabel="Tên lớp học">@context.Name</MudTd>
                         <MudTd DataLabel="Giáo viên quản lý">
-                            @if(_lstUser != null)
+                            @if (_lstUser != null)
                             {
-                                foreach(var item in _lstUser)
+                                foreach (var item in _lstUser)
                                 {
                                     if (item.Id == context.TeacherId)
                                     {
@@ -105,7 +105,15 @@
                                 }
                             }
                         </MudTd>
-                        <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                        <MudTd DataLabel="Số lượng Học Sinh" onclick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.List, context.Id))">
+                            50/@context.Capacity
+                            <div style="position: relative; display: inline-block;">
+                                <MudIcon Icon="@Icons.Material.Filled.Notifications" Style="color: #FFD700; margin-right: 5px;" />
+                                <span style="position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                                    1
+                                </span>
+                            </div>
+                        </MudTd>
                         <MudTd DataLabel="Trạng thái">
                             @if (context.Status == Convert.ToByte(StatusType.isActive))
                             {
@@ -139,8 +147,6 @@
 
     </div>
 
-
-
 </div>
 @code {
     private bool isLoading { get; set; } = true;
@@ -168,7 +174,7 @@
         await LoadData("");
     }
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
     private async Task OpenDialogAsync(DialogOptions options, string name, int id)
     {
@@ -183,6 +189,11 @@
         };
 
         var dialogParametersDetail = new DialogParameters<Dialog.Class.DetailsClassDialog>
+        {
+            {x => x.ClassId, id}
+        };
+
+        var dialogParametersList = new DialogParameters<Dialog.Class.ListUserDialog>
         {
             {x => x.ClassId, id}
         };
@@ -208,6 +219,15 @@
         else if (name.Equals(OpenDialogType.Detail))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Class.DetailsClassDialog>("Options Dialog", dialogParametersDetail, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+        else if (name.Equals(OpenDialogType.List))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Class.ListUserDialog>("Options Dialog", dialogParametersList, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
