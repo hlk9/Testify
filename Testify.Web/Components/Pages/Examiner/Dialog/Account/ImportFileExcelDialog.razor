@@ -56,7 +56,6 @@
     [Inject]
     private IDialogService _mudDialogServices { get; set; }
 
-    private List<AccountExcel>? _lstAccountFromExcel;
     private int levelId = 1;
     private List<Level> _lstLevel = new List<Level>();
 
@@ -131,77 +130,12 @@
         if (response.IsSuccessStatusCode)
         {
             var fileContent = await response.Content.ReadAsByteArrayAsync();
-            var fileName = "Template_Question_LVT.xlsx";
+            var fileName = "Import_Account.xlsx";
             var fileUrl = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{Convert.ToBase64String(fileContent)}";
             await jsruntime.InvokeVoidAsync("downloadFile", fileUrl, fileName);
         }
     }
 
-
-    private bool ValidationForm()
-    {
-        int count = 0;
-        if (user.FullName == null || user.FullName.Trim().Length == 0)
-        {
-            snackbar.Add("Họ và tên trống!", Severity.Error);
-            count += 1;
-        }
-        if (user.UserName == null)
-        {
-            snackbar.Add("Tên tài khoản trống trống!", Severity.Error);
-            count += 1;
-        }
-        if (user.DateOfBirth == null || user.DateOfBirth == DateTime.Now)
-        {
-            snackbar.Add("Ngày sinh không hơp lệ hoặc trống", Severity.Error);
-            count += 1;
-        }
-        if (user.PhoneNumber == null)
-        {
-            snackbar.Add("Số điện thoại trống!", Severity.Error);
-            count += 1;
-
-        }
-        if (user.Address == null || user.Address.Trim().Length == 0)
-        {
-            snackbar.Add("Địa chỉ trống!", Severity.Error);
-            count += 1;
-
-        }
-        if (user.Email == null)
-        {
-            snackbar.Add("Email trống!", Severity.Error);
-            count += 1;
-
-        }
-        if (user.PasswordHash == null)
-        {
-            snackbar.Add("Mật khẩu trống!", Severity.Error);
-            count += 1;
-
-        }
-        if (count > 0)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    private class AccountExcel()
-    {
-        public string FullName { get; set; }
-        public string UserName { get; set; }
-        public string PhoneNumber { get; set; }
-        public string DateOfBirth { get; set; }
-        public string Address { get; set; }
-        public string Email { get; set; }
-        public string PasswordHash { get; set; }
-
-
-
-    }
 }
 
 <script>
