@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using Testify.API.DTOs;
+using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -31,6 +32,15 @@ namespace Testify.Web.Services
             if (a.IsSuccessStatusCode)
                 return true;
             return false;
+        }
+
+        public async Task<List<ClassWithUser>> CheckListClassInSchedule(List<ClassWithUser> data, int scheduleId)
+        {
+            CheckClassScheduleRequest reqData = new CheckClassScheduleRequest();
+            reqData.DataList = data;
+            reqData.ScheduleId = scheduleId;    
+            var a = await _httpClient.PostAsJsonAsync<CheckClassScheduleRequest>("ClassExamSchedule/Get-StudentExist-InSchedule",reqData);
+          
         }
 
     }
