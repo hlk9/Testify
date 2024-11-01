@@ -74,7 +74,7 @@ namespace Testify.DAL.Reposiroties
                 foreach (var c in data)
                 {
 
-                    var a = _context.ClassExamSchedules.Find(c.Id);
+                    var a = _context.ClassExamSchedules.FirstOrDefault(x => x.ClassId == c.Id);
 
                     if (a != null)
                     {
