@@ -27,5 +27,13 @@ namespace Testify.Web.Services
         {
             return await _httpClient.GetFromJsonAsync<List<ExamDetail>>($"ExamDetail/Get-ExamDetail-By-ExamID?examId={examId}");
         }
+
+        public async Task<ExamDetail> CreateExamDetail(ExamDetail examDetail)
+        {
+            var objNew = await _httpClient.PostAsJsonAsync("ExamDetail/Create-Exam-Detail", examDetail);
+            var reponse = await objNew.Content.ReadFromJsonAsync<ExamDetail>();
+
+            return reponse;
+        }
     }
 }

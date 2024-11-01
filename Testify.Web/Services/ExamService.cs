@@ -31,19 +31,11 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
         }
 
-        public async Task<bool> CreateExam(Exam e)
+        public async Task<Exam> CreateExam(Exam e)
         {
             var newExam = await _httpClient.PostAsJsonAsync("Exam/Add-Exam", e);
-            if (newExam.IsSuccessStatusCode) 
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-            //var reponse = await newExam.Content.ReadFromJsonAsync<Exam>();
-            //return reponse;
+            var reponse = await newExam.Content.ReadFromJsonAsync<Exam>();
+            return reponse;
         }
 
         public async Task<bool> UpdateExam(Exam e)
