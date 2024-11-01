@@ -66,6 +66,8 @@ namespace Testify.DAL.Reposiroties
             return data;
         }
 
+        
+
         public async Task<ClassUser> Create(ClassUser classUser)
         {
             try
