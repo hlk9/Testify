@@ -96,10 +96,22 @@ namespace Testify.API.Controllers
                     userFailCount++;
                     continue;
                 }
-                //else if(lstUser.Any((x=>x.UserName.Trim().ToLower().Equals(worksheetsU.Cells[rowU, 1].Value.ToString().Trim().ToLower())){
-                //    userFailCount++;
-                //    continue;
-                //}
+                else if (lstUser.Any(x => x.UserName.Trim().ToLower().Equals(worksheetsU.Cells[rowU,2].Value.ToString().Trim().ToLower())))
+                {
+                    userFailCount++;
+                    continue;
+                }
+                else if (lstUser.Any(x => x.PhoneNumber.Trim().Equals(worksheetsU.Cells[rowU,4].Value.ToString().Trim())))
+                {
+                    userFailCount++;
+                    continue;
+                }
+                else if (lstUser.Any(x => x.Email.Trim().Equals(worksheetsU.Cells[rowU,6].Value.ToString())))
+                {
+                    userFailCount++;
+                    continue;
+                }
+            
                 //else if()
                 User u = new User();
                 u.FullName = worksheetsU.Cells[rowU, 1].Value.ToString();
