@@ -16,6 +16,11 @@ namespace Testify.DAL.Reposiroties
         {
             _context = new TestifyDbContext();
         }
+
+        public List<ClassExamSchedule> GetAllActive()
+        {
+            return _context.ClassExamSchedules.ToList();
+        }
         public List<ClassWithUser> GetClassInSchedule(int scheduleId)
         {
             var data = (from c in _context.Classes
