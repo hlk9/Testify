@@ -39,54 +39,84 @@ namespace Testify.API.Controllers
             return repos.RemoveListClassToSchedule(data, scheduleId);
         }
 
-        [HttpPost("Get-StudentExist-InSchedule")]
-        public async Task<List<ClassWithUser>> GetStudentExist(CheckClassScheduleRequest req)
+        [HttpPost("Checks-StudentExist-InSchedule")]
+        public async Task<List<User>> GetStudentExist(CheckClassScheduleRequest req)
         {
             int scheduleId = req.ScheduleId;
             ExamScheduleRepository examScheduleRepository = new ExamScheduleRepository();
             ClassUserReposiroty classUserReposiroty = new ClassUserReposiroty();
+            ClassRepository repoClass = new ClassRepository();
             List<ClassWithUser> data = new List<ClassWithUser>();
             data = req.DataList;
-            var listData_1 =
-                (from schedule in scheduleRepo.GetAll()
-                    join classExam in repos.GetAllActive()
-                        on schedule.Id equals classExam.ExamScheduleId
-                    where schedule.Id == scheduleId
-                    select classExam
-                ).ToList();
-            ClassRepository repoClass = new ClassRepository();
-            List<Class> listClass = new List<Class>();
-            foreach (var item in listData_1)
-            {
-                listClass.Add(await repoClass.GetByIdClass(item.ClassId));
-            }
+            var tesD = await repoClass.GetAllClass(null, true);
+
 
             var oneSchedule = await scheduleRepo.GetById(scheduleId);
 
             var scheduleInTime =
-                examScheduleRepository.CheckIsContaintInTime(oneSchedule.StartTime, oneSchedule.EndTime);
+                examScheduleRepository.CheckIsContaintInTimeWithoutSubject(oneSchedule.StartTime, oneSchedule.EndTime);
             if (scheduleInTime != null)
             {
-                var listStudent_ExistInSchedule =
-                    (from schedule in scheduleRepo.GetAll()
-                        join classExam in repos.GetAllActive()
-                            on schedule.Id equals classExam.ExamScheduleId into classExams
-                        from classE in classExams.DefaultIfEmpty()
-                        join classOrigin in await repoClass.GetAllClass(null, true)
-                            on classE.ClassId equals classOrigin.Id into classOrigins
-                        from classO in classOrigins.DefaultIfEmpty()
-                        join classU in await classUserReposiroty.GetAll(1)
-                            on classO.Id equals classU.ClassId into classUsers
-                        from classUsr in classUsers.DefaultIfEmpty()
-                        join usr in await repoUser.GetAllUsers()
-                            on classUsr.UserId equals usr.Id
-                        where usr.Id == classUsr.UserId
-                        select usr
+                try
+                {
+                    var listStudent_Prepare =
+                    (
+                     from classO in data
+                     join classU in await classUserReposiroty.GetAll(1)
+                        on classO.Id equals classU.ClassId into classUsers
+                     from classUsr in classUsers.DefaultIfEmpty()
+                     join usr in await repoUser.GetAllUsers()
+                        on classUsr.UserId equals usr.Id
+                     where usr.Id == classUsr.UserId
+                     select usr
                     ).ToList();
+
+
+
+                    var listSche = scheduleRepo.GetAll();
+                    var listClasE = repos.GetAllActive();
+
+                    var listClassExam = (from schedule in scheduleRepo.GetAll()
+                                         join classExam in repos.GetAllActive()
+                                             on schedule.Id equals classExam.Id
+                                         select classExam).ToList();
+
+
+
+                    var listStudent_ExistInSchedule =
+                         (from classE in listClassExam
+                          join classOrigin in await repoClass.GetAllClass(null, true)
+                      on classE.ClassId equals classOrigin.Id into classOrigins
+                          from classO in classOrigins.DefaultIfEmpty()
+                          join classU in await classUserReposiroty.GetAll(1)
+                      on classO.Id equals classU.ClassId into classUsers
+                          from classUsr in classUsers.DefaultIfEmpty()
+                          join usr in await repoUser.GetAllUsers()
+                      on classUsr.UserId equals usr.Id
+                          where usr.Id == classUsr.UserId
+                          select usr
+                        ).ToList();
+
+                    if (listStudent_Prepare.Any(s => listStudent_ExistInSchedule.Contains(s)))
+                    {
+                        var commonStudents = (from s in listStudent_ExistInSchedule
+                                              where listStudent_Prepare.Contains(s)
+                                              select s).ToList();
+                        return commonStudents;
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    return null;
+                }
+
+
+
+
             }
-
-
             return null;
+
         }
     }
 }
