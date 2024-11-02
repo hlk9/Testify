@@ -91,12 +91,12 @@ namespace Testify.Web.Services
             return lst;
         }
 
-        public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end)
+        public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end,int? subjectId)
         {
             var startStr = Uri.EscapeDataString(start.ToString("MM/dd/yyyy HH:mm:ss"));
             var endStr = Uri.EscapeDataString(end.ToString("MM/dd/yyyy HH:mm:ss"));
 
-            var response = await _httpClient.GetAsync($"ExamSchedule/Get-InTime?start={startStr}&end={endStr}");
+            var response = await _httpClient.GetAsync($"ExamSchedule/Get-InTime?start={startStr}&end={endStr}&subjectId={subjectId}");
 
             if (response.StatusCode == HttpStatusCode.NoContent) // 204 No Content
             {

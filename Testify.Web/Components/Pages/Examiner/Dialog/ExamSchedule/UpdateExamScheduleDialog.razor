@@ -90,7 +90,7 @@
     {
         DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
         DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
-        if (subjectCurrent == null || startDate == null || startTime == null || endDate == null || endTime == null || examCurrent == null || currentSchedule.Title=="")
+        if (subjectCurrent == null || startDate == null || startTime == null || endDate == null || endTime == null || examCurrent == null || currentSchedule.Title == "")
         {
             Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
             return;
@@ -110,17 +110,17 @@
                 Snackbar.Add("Thất bại, Thời gian không hợp lệ", Severity.Error);
                 return;
             }
-            else
+
+
+            var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime, subjectCurrent.Id);
+
+            if (ojb != null && ojb.Id == currentSchedule.Id)
             {
-                var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime);
-
-                if (ojb != null&&ojb.Id==currentSchedule.Id)
-                {
-                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
-                    return;
-                }
-
+                Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
+                return;
             }
+
+
 
             currentSchedule.RoomId = null;
             currentSchedule.SubjectId = subjectCurrent.Id;

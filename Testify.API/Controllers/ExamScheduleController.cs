@@ -60,20 +60,20 @@ namespace Testify.API.Controllers
         [HttpGet("Get-InfoBasic")]
         public async Task<List<ExamScheduleDto>> GetInfoBasic()
         {
-            List<ExamScheduleDto> listResult= new List<ExamScheduleDto>();
+            List<ExamScheduleDto> listResult = new List<ExamScheduleDto>();
             SubjectRepository subjectRepository = new SubjectRepository();
-            
+
             var lstSchedule = await repos.GetSchedulesActive();
             var lstSubject = await subjectRepository.GetAllSubject(null, true);
             //var lstExam = 
 
-          foreach ( var item in lstSchedule )
+            foreach (var item in lstSchedule)
             {
 
-                listResult.Add(new ExamScheduleDto { Id = item.Id,Description = item.Description , EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x=>x.Id == item.SubjectId).Name, Title = item.Title});
+                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
 
-            }  
-           return listResult;
+            }
+            return listResult;
 
         }
 
@@ -92,9 +92,15 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-InTime")]
-        public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end)
+        public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end, int subjectId)
         {
-            return await repos.CheckIsContaintInTime(start, end);
+            return await repos.CheckIsContaintInTime(start, end, subjectId);
+        }
+
+        [HttpGet("Get-InTime-NoSubject")]
+        public async Task<ExamSchedule> GetInTimeNoSubject(DateTime start, DateTime end)
+        {
+            return await repos.CheckIsContaintInTimeWithoutSubject(start, end);
         }
 
         [HttpGet("Get-ById")]

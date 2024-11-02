@@ -31,8 +31,7 @@
                                      Clearable="true"
                                      ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
                                      OnFocus="ExamChanged"
-                                     ResetValueOnEmptyText="true"
-                                    />
+                                     ResetValueOnEmptyText="true" />
 
                 </MudItem>
                 <MudItem Class="w-50">
@@ -103,7 +102,7 @@
 
     private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
     {
-      
+
         listExam = await examService.GetListOfSubject(subjectCurrent.Id);
 
 
@@ -116,7 +115,7 @@
 
     private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
     {
-      
+
         listSubject = await subjectService.GetAllSub(null, true);
 
 
@@ -151,16 +150,12 @@
                 Snackbar.Add("Thất bại, Thời gian không hợp lệ", Severity.Error);
                 return;
             }
-            else
+            var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime, subjectCurrent.Id);
+
+            if (ojb != null)
             {
-                var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime);
-
-                if (ojb != null)
-                {
-                    Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
-                    return;
-                }
-
+                Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
+                return;
             }
 
             currentSchedule.RoomId = null;
