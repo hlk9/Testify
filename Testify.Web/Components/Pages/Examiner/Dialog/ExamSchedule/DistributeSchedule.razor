@@ -36,7 +36,7 @@
                     <MudItem xs="6" Class="d-flex justify-content-end">
                         <MudTooltip Text="Gửi email thông báo tới các thí sinh được xếp lịch thi này">
                             <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Mail" Label="Gửi Email" />
-                        </MudTooltip>                     
+                        </MudTooltip>
                     </MudItem>
                 </MudItem>
                 <MudItem xs="6">
@@ -129,14 +129,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await  ReloadData();
+        await ReloadData();
     }
 
     private async Task ReloadData()
     {
         currentSchedule = await scheduleService.GetById(Id);
         listClass = await _serClass.GetClassBySubjectId(currentSchedule.SubjectId);
-        listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);        
+        listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);
     }
 
 
@@ -150,15 +150,42 @@
         {
             foreach (var item in listClassSelected)
             {
-                listClass.Remove(item);              
                 newClassToAdd.Add(item);
             }
+            List<User> listStudentNotAble = new List<User>();
+            listStudentNotAble = await classExamScheduleService.CheckListClassInSchedule(newClassToAdd, currentSchedule.Id);
+
+            if (listStudentNotAble != null && listStudentNotAble.Count > 0)
+            {
+                string mes = "";
+                foreach (var item in listStudentNotAble)
+                {
+                    mes += item.FullName + "\n";
+                }
+                newClassToAdd.Clear();
+                Snackbar.Add("THẤT BẠI\n Thí sinh " + mes + " đã có trong đợt thi khác", Severity.Error);
+                return;
+            }
+
 
             var stats = await classExamScheduleService.AddListClassToSchedule(newClassToAdd, currentSchedule.Id);
             if (stats)
             {
                 Snackbar.Add("Thêm " + newClassToAdd.Count + " lớp thành công", Severity.Info);
                 newClassToAdd.Clear();
+                foreach (var item in listClassSelected)
+                {
+                    listClass.Remove(item);
+                }
+                try
+
+                {
+                    listStudentNotAble.Clear();
+
+                }
+                catch { }
+                await ReloadData();
+                return;
 
             }
             else
@@ -176,30 +203,29 @@
         }
         else
         {
-            foreach (var item in listClassSelectedInSchedule)
-            {               
-                try
+
+            try
+            {
+                var stats = await classExamScheduleService.RemoveListClassToSchedule(listClassSelectedInSchedule.ToList(), currentSchedule.Id);
+                if (stats)
                 {
-                    var stats =  await classExamScheduleService.RemoveListClassToSchedule(listClassSelectedInSchedule.ToList(), currentSchedule.Id);
-                    if (stats)
-                    {
-                        Snackbar.Add("Xoá " + listClassSelectedInSchedule.Count + " lớp thành công", Severity.Info);
-                        listClassSelectedInSchedule.Clear();
-
-                    }
-                    else
-                        Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
-
-                    await ReloadData();
+                    Snackbar.Add("Xoá " + listClassSelectedInSchedule.Count + " lớp thành công", Severity.Info);
+                    listClassSelectedInSchedule.Clear();
 
                 }
-                catch
-                {
-                    
-                }
+                else
+                    Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
+
+                await ReloadData();
+
+            }
+            catch
+            {
+                Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
             }
 
-            Snackbar.Add("Rút " + listClassSelectedInSchedule.Count + " lớp thành công", Severity.Info);
+
+          
         }
     }
 
