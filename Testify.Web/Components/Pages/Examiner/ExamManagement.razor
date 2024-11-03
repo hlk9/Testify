@@ -27,6 +27,7 @@
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
             <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            
         </MudItem>
     </MudGrid>
 
@@ -51,6 +52,8 @@
                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Tên Môn</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thời gian" T="int">Thời gian làm bài</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số câu hỏi" T="int">Số câu hỏi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Số lần làm bài" T="int">Số lần làm bài</MudTableSortLabel></MudTh>
+
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
 
@@ -60,6 +63,8 @@
                 <MudTd DataLabel="Môn">@context.SubjectName </MudTd>
                 <MudTd DataLabel="Thời gian">@context.Duration </MudTd>
                 <MudTd DataLabel="Số câu hỏi">@context.NumberOfQuestion </MudTd>
+                <MudTd DataLabel="Số lần làm bài">@context.NumberOfRepeat </MudTd>
+
                 <MudTd DataLabel="Trạng thái">@context.Status </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
@@ -100,7 +105,7 @@
         _lst = await examService.GetInforBasic();
     }
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)

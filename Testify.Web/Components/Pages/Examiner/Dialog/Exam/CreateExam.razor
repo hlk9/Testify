@@ -1,4 +1,6 @@
-﻿@inject ExamService examService
+﻿@page "/Examiner/ExamManagement/CreateExam"
+@layout AdminLayout
+@inject ExamService examService
 @inject SubjectService subjectService
 
 <MudDialog>
@@ -45,7 +47,7 @@
 
             
         </EditForm>
-        <MudPaper Elevation="0" Class="my-4">
+       @*  <MudPaper Elevation="0" Class="my-4">
             <MudText Style="font-size: 16px; font-weight: bold">Đề:</MudText>
             
                 <MudDataGrid Items="@lisDThi" Class="my-3">
@@ -72,25 +74,14 @@
                             <MudTextField T="string" Style="padding: 0" Label="Code" @bind-Value="examdetail.Code"></MudTextField>
                             <MudTextField T="string" @bind-Value="examdetail.Code"/>
 
-                            @* <MudRadioGroup @bind-Value="examdetail.Status">
-                                <MudRadio Value="true" Color="Color.Primary" Dense="true">Công khai</MudRadio>
-                                <MudRadio Value="false" Color="Color.Secondary" Dense="false">Chỉ mình tôi</MudRadio>
-                            </MudRadioGroup> *@
-                            @* <MudGrid>
-                                <MudItem xs="6">
-                                    <MudDatePicker Label="Ngày tạo" @bind-Value="examdetail.CreateDate" DateFormat="dd/MM/yyyy"></MudDatePicker>
-                                </MudItem>
-                                <MudItem xs="6">
-                                    <MudDatePicker Label="Ngày tạo" @bind-Value="examdetail.UpdateDate" DateFormat="dd/MM/yyyy"></MudDatePicker>
-                                </MudItem>
-                            </MudGrid> *@
+                          
                     </MudForm>
                     <MudButton Class="btn p-2" Color="Color.Primary" OnClick="SaveExamDetailInExam">Lưu đề</MudButton>
                 </MudPaper>
 
                 }
             
-        </MudPaper>
+        </MudPaper> *@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
@@ -181,13 +172,13 @@
                 var stats = await examService.CreateExam(exam);
                 if (stats != null)
                 {
-                    examdetail.ExamId = stats.Id;
-                    examdetail.CreateBy = Guid.Parse(userId.Value);
-                    examdetail.UpdateBy = Guid.Parse(userId.Value);
-                    examdetail.CreateDate = DateTime.Now;
-                    examdetail.UpdateDate = DateTime.Now;
-                    examdetail.Status = 1;
-                    var objNewExamDetail = await _serExamDetail.CreateExamDetail(examdetail);
+                    // examdetail.ExamId = stats.Id;
+                    // examdetail.CreateBy = Guid.Parse(userId.Value);
+                    // examdetail.UpdateBy = Guid.Parse(userId.Value);
+                    // examdetail.CreateDate = DateTime.Now;
+                    // examdetail.UpdateDate = DateTime.Now;
+                    // examdetail.Status = 1;
+                    // var objNewExamDetail = await _serExamDetail.CreateExamDetail(examdetail);
                     Snackbar.Add("Tạo bài thi mới thành công", Severity.Success);
                     MudDialog.Close(DialogResult.Ok(true));
                     StateHasChanged();

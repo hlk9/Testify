@@ -1,0 +1,177 @@
+﻿@page "/Examiner/CreateExamDetail"
+@using Testify.API.DTOs
+@using Testify.DAL.ViewModels
+@layout AdminLayout
+@inject IDialogService DialogService
+@inject ExamService examService
+@inject SubjectService subjectService
+@inject ExamDetailService examdetailService
+
+
+
+<div style="font-family:Roboto; padding:30px; height: calc(100vh - 64px); background-color:#fafafa">
+
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TẠO ĐỀ THI</MudText>
+    </MudPaper>
+
+    <MudSelect T="int" Class="w-100 mt-4" Label="Chọn bài thi để thêm" @bind-Value="@ExamID" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="SelectValueChanged">
+        @if (ExamID == -1)
+        {
+            <MudSelectItem Value="-1">Chọn bài thi</MudSelectItem>
+        }
+        @foreach (var item in _lstExam)
+        {
+            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+        }
+    </MudSelect>
+    <MudGrid Style="padding:20px 0 ">
+        <MudItem xl="10" lg="10" md="8" sm="6" xs="12">
+        </MudItem>
+        <MudItem xl="2" lg="2" md="4" sm="6" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth))" Class="w-100 btn btn-success" Variant="Variant.Filled">Thêm đề mới </MudButton>
+        </MudItem>
+    </MudGrid>
+
+    @if (ExamID > 0 && lisDThi.Count > 0)
+    {
+        <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="450px">
+
+            <ToolBarContent>
+                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách đề thi</MudText>
+
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="ID" T="string">Mã đề</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Người tạo</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Công khai</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Ngày Cập Nhật" T="string">Ngày cập nhật</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="ID"> @context.Id</MudTd>
+                <MudTd DataLabel="Môn">
+                    @subjectCurrent.Name
+                </MudTd>
+                <MudTd DataLabel="Người tạo"> @context.CreateBy</MudTd>
+                <MudTd DataLabel="Công khai">
+                    @if (context.Status == 0)
+                    {
+                        <span class="text-center btn btn-danger">Chỉ mình tôi </span>
+                    }
+                    else
+                    {
+                        <span class="text-center btn btn-success">Công khai </span>
+                    }
+
+                </MudTd>
+                <MudTd DataLabel="Ngày tạo"> @context.CreateDate.ToString("dd/MM/yyyy")</MudTd>
+                <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <MudTooltip Text="Sửa">
+                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Chi tiết">
+                        <MudIconButton Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Xoá">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No matching records found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    }
+    else
+    {
+        <MudText Class="w-100 py-4 text-center">Chưa chọn bài thi hoặc không có đề thi nào</MudText>
+    }
+</div>
+
+@code {
+    private List<Exam> _lstExam = new List<Exam>();
+    private int ExamID = -1;
+    private int questionLevelId = -1;
+    private int stt;
+    private int SubjectId = -1;
+    private MudDialogInstance MudDialog { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    private List<Subject> listSubject = new List<Subject>();
+    private Subject subjectCurrent = new Subject();
+    private void Cancel() => MudDialog.Cancel();
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    private List<ExamDetail> lisDThi = new List<ExamDetail>();
+
+    private async Task LoadData()
+    {
+        lisDThi = await examdetailService.GetExamDetailByExamId(ExamID);
+        var exam = await examService.GetExamId(ExamID);
+        subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+    }
+
+    private async void SelectValueChanged()
+    {
+        try
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lstExam = await _serExam.GetAllActive();
+    }
+    private async Task OpenDialogAsync(DialogOptions options)
+    {
+        if(ExamID == -1)
+        {
+            snackbar.Add("Vui lòng chọn bài thi", Severity.Warning);
+            return;
+        }
+        var dialogParameters = new DialogParameters<Dialog.DeThi.CreateDeThi>
+        {
+            {x => x.ExamID, ExamID},
+            {x => x.SubjectId, subjectCurrent.Id}
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.DeThi.CreateDeThi>("Options Dialog", dialogParameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadData();
+        }
+
+
+    }
+
+    private class IsCheckQuestion
+    {
+        public int IdQues { get; set; }
+
+        public bool IsChecked { get; set; }
+    }
+}

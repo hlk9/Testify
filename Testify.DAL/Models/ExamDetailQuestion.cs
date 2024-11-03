@@ -14,10 +14,10 @@ namespace Testify.DAL.Models
         public int Id { get; set; }
         [ForeignKey("ExamDetailId")]
         public int ExamDetailId { get; set; }
-        public virtual ExamDetail ExamDetail { get; set; }
+        public virtual ExamDetail? ExamDetail { get; set; }
         [ForeignKey("QuestionId")]
         public int QuestionId { get; set; }     
-        public virtual Question Question { get; set; }
+        public virtual Question? Question { get; set; }
         public double Point { get; set; }
     }
 } 

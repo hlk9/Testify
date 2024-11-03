@@ -20,5 +20,19 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.ExamDetailQuestions.Where(x => x.ExamDetailId == examDetailId).ToListAsync();
         }
+
+        public async Task<ExamDetailQuestion> Create(ExamDetailQuestion examDetailQuestion)
+        {
+            try
+            {
+                var obj = _context.ExamDetailQuestions.Add(examDetailQuestion).Entity;
+                await _context.SaveChangesAsync();
+                return obj;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

@@ -92,7 +92,7 @@
                         </MudItem>
 
                         <MudItem xs="6">
-                            <MudTable Items="@_lstQuestion" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listQuestionSelected">
+                            <MudTable Items="@_lstQuestion" Class="w-100" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listQuestionSelected">
                                 <ToolBarContent>
                                     <MudText Typo="Typo.h6">Danh sách câu hỏi</MudText>
                                     <MudSpacer></MudSpacer>
@@ -155,16 +155,14 @@
 
 
                         <MudItem xs="6">
-                            <MudTable Items="@listQuestionInDethi" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listQuestionSelected">
+                            <MudTable Items="@listQuestionInDethi" Class="w-100" MultiSelection="true" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" @bind-SelectedItems="listQuestionSelected">
                                 <ToolBarContent>
                                     <MudText Typo="Typo.h6">Danh sách câu hỏi đã chọn</MudText>
                                     <MudSpacer></MudSpacer>
                                 </ToolBarContent>
                                 <HeaderContent>
                                     <MudTh>Nội dung</MudTh>
-                                    <MudTh>Loại câu hỏi</MudTh>
                                     <MudTh>Mức độ</MudTh>
-
                                     <MudTh>Trạng thái</MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
@@ -207,8 +205,7 @@
                                             <span class="text-center btn btn-success">    </span>
                                         }
                                         else
-                                        {
-                                            <span class="text-center btn btn-danger">  </span>
+                                        {     <span class="text-center btn btn-danger">  </span>
                                         }
 
                                     </MudTd>
