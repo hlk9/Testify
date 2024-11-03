@@ -20,6 +20,7 @@ namespace Testify.DAL.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string? AvatarUrl { get; set; }
+        public bool Sex { get; set; }
         public DateTime? LastLogin {  get; set; }
         public byte Status { get; set; } = 1;
         [ForeignKey("LevelId")]

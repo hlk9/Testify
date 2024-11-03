@@ -495,7 +495,7 @@
             {
 
                 classId = _lstClass[0];
-                subjectId = _lstSubject[1].Id;
+                subjectId = _lstSubject[0].Id;
                 _lstExam = await _serExam.GetListOfSubject(subjectId);
                 if (_lstExam != null && _lstExam.Count > 0)
                 {
