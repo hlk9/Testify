@@ -1,5 +1,6 @@
 ﻿@using Testify.Web.Data.Commons
 @using Testify.Web.Shared
+@using Testify.DAL.ViewModels
 
 
 <MudDialog>
@@ -31,9 +32,6 @@
                     <PagerContent>
                         <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
                     </PagerContent>
-                    <FooterContent>
-                        <MudTd colspan="3">Select All</MudTd>
-                    </FooterContent>
                 </MudTable>
 
             </MudTabPanel>
@@ -77,9 +75,6 @@
                     <PagerContent>
                         <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
                     </PagerContent>
-                    <FooterContent>
-                        <MudTd colspan="4">Select All</MudTd>
-                    </FooterContent>
                 </MudTable>
             </MudTabPanel>
         </MudTabs>
@@ -162,28 +157,49 @@
 
     private async Task Submit()
     {
-        var lstUser = await _serUser.GetUsers();
+        var a = await _serClass.GetAllClass("", true);
 
-        var obj = lstUser.FirstOrDefault(x => x.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && x.LevelId == 4);
-
-        ClassUser classUser = new ClassUser();
-
-        classUser.Status = 1;
-        classUser.UserId = obj.Id;
-        classUser.ClassId = ClassId;
-
-        var checkAddClassUser = await _serClassUser.CreateClassUser(classUser);
-        if (checkAddClassUser != null)
+        var compare = a.Where(x => x.Id == ClassId).Select(x => new
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thành công", Severity.Success);
+            x.Capacity,
+            x.CountUser
+        }).FirstOrDefault();
+
+        if (compare.CountUser < compare.Capacity)
+        {
+            var lstUser = await _serUser.GetUsers();
+
+            var obj = lstUser.FirstOrDefault(x => x.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && x.LevelId == 4);
+
+            ClassUser classUser = new ClassUser();
+
+            classUser.Status = 1;
+            classUser.UserId = obj.Id;
+            classUser.ClassId = ClassId;
+
+            var checkAddClassUser = await _serClassUser.CreateClassUser(classUser);
+            if (checkAddClassUser != null)
+            {
+                snackbar.Add("Thêm thành công", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                snackbar.Add("Thêm thất bại", Severity.Error);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            await LoadData();
         }
         else
         {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thất bại", Severity.Error);
+            snackbar.Add("Vượt quá số học sinh cho phép", Severity.Error);
+
         }
     }
 
-    private void Cancel() => MudDialog.Cancel();
+    private void Cancel()
+    {
+       MudDialog.Close(DialogResult.Ok(true));
+    } 
+
 }
