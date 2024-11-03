@@ -20,5 +20,12 @@ namespace Testify.API.Controllers
             var objExamId = await _respon.GetAllByExamDetailId(examDetailID);
             return Ok(objExamId);
         }
+
+        [HttpPost("Create")]
+        public async Task<ActionResult<ExamDetailQuestion>> CreateExamDetailQuestion(ExamDetailQuestion examDetailQuestion)
+        {
+            var obj = await _respon.Create(examDetailQuestion);
+            return Ok(obj);
+        }
     }
 }

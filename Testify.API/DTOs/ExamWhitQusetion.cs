@@ -14,5 +14,6 @@
         public string? SubjectName { get; set; }
         public int? Duration { get; set; }
         public int? NumberOfQuestion { get; set; }
+        public int? NumberOfRepeat { get; set; }
     }
 }

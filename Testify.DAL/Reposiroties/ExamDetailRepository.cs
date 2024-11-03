@@ -37,7 +37,7 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 var objNew = _context.ExamDetails.Add(examDetail).Entity;
-                _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return objNew;
             }
             catch (Exception)
