@@ -135,10 +135,17 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Users-With-Status-One")]
-        public async Task<List<User>> UsersWithStatus(int classId)
+        public async Task<List<User>> UsersWithStatusOne(int classId)
         {
             var usersWithStatusOne = await userRepos.GetUsersWithStatusOne(classId);
             return usersWithStatusOne;
+        }
+
+        [HttpGet("Get-Users-With-Status-Two")]
+        public async Task<List<User>> UsersWithStatusTwo(int classId)
+        {
+            var usersWithStatusTwo = await userRepos.GetUsersWithStatusTwo(classId);
+            return usersWithStatusTwo;
         }
     }
 }
