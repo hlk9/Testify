@@ -1,105 +1,60 @@
 ﻿@page "/ExamList"
 @using Testify.DAL.ViewModels
+@inject IDialogService DialogService
 @layout Layout.StudentLayout
 <MudContainer MaxWidth="MaxWidth.Large" Class="py-5">
-    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Variant="Variant.Outlined"
-                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate=true></MudTextField>
 
     <MudPaper Elevation="0" Style="min-height: 640px; width: 100%; margin-top: 48px">
-        <MudPaper Elevation="2" Class="p-5 mb-4 w-100" Style="border-radius: 15px; border-left: 5px solid #29a69a">
-            <MudGrid Class="p-0 m-0 w-100 align-items-center">
-                <MudItem Items md="10" Class="p-0">
-                    <MudText Style="font-weight: bold; font-size: 20px">Bài thi giữa kì II</MudText>
-                    <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Môn: Toán 12</MudText>
-                    <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : 24-10-2024 12:00 PM đến 25-10-2024 12:00 AM</MudText>
-                </MudItem>
-                <MudItem md="2" Class="p-0">
-                    <div class="w-100 d-flex justify-content-between align-items-center">
-                        <MudChip T="string">Chưa mở</MudChip>
-                        <MudButton Style="background-color: #29a69a; color: #fff">Chi tiết</MudButton>
-                    </div>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
+        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Variant="Variant.Outlined"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate=true></MudTextField>
+        <br />
+            
+                @foreach (var item in _lstExam)
+                {
+                    <MudPaper Elevation="2" Class="p-5 mb-4 w-100" Style="border-radius: 15px; border-left: 5px solid #29a69a">
+                        <MudGrid @bind-Value="studentId" Class="p-0 m-0 w-100 align-items-center">
 
-        <MudPaper Elevation="2" Class="p-5 mb-4 w-100" Style="border-radius: 15px; border-left: 5px solid #29a69a">
-            <MudGrid Class="p-0 m-0 w-100 align-items-center">
-                <MudItem md="10" Class="p-0">
-                    <MudText Style="font-weight: bold; font-size: 20px">Bài thi giữa kì II</MudText>
-                    <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Môn: Toán 12</MudText>
-                    <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : 24-10-2024 12:00 PM đến 25-10-2024 12:00 AM</MudText>
-                </MudItem>
-                <MudItem md="2" Class="p-0">
-                    <div class="w-100 d-flex justify-content-between align-items-center">
-                        <MudChip T="string">Chưa mở</MudChip>
-                        <MudButton Style="background-color: #29a69a; color: #fff">Chi tiết</MudButton>
-                    </div>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-
-        <MudPaper Elevation="2" Class="p-5 mb-4 w-100" Style="border-radius: 15px; border-left: 5px solid #29a69a">
-            <MudGrid Class="p-0 m-0 w-100 align-items-center">
-                <MudItem md="10" Class="p-0">
-                    <MudText Style="font-weight: bold; font-size: 20px">Bài thi giữa kì II</MudText>
-                    <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Môn: Toán 12</MudText>
-                    <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : 24-10-2024 12:00 PM đến 25-10-2024 12:00 AM</MudText>
-                </MudItem>
-                <MudItem md="2" Class="p-0">
-                    <div class="w-100 d-flex justify-content-between align-items-center">
-                        <MudChip T="string">Chưa mở</MudChip>
-                        <MudButton Style="background-color: #29a69a; color: #fff">Chi tiết</MudButton>
-                    </div>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-
-
-        <MudTable Items="@_lstExam" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
-
-            <ToolBarContent>
-                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách tài khoản</MudText>
-
-                    </MudItem>
-
-                </MudGrid>
-
-            </ToolBarContent>
-
-            <RowTemplate>
-                <MudTd>@context.ExamScheduleName</MudTd>
-                <MudTd>@context.SubjectName</MudTd>
-                <MudTd>@context.ExamScheduleStartTime</MudTd>
-                <MudTd>@context.ExamScheduleEndTime</MudTd>
-                <MudTd>@context.Status</MudTd>
-
-            </RowTemplate>
-
-            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
+                            <MudItem md="10" Class="p-0">
+                                <MudText Style="font-weight: bold; font-size: 20px">@item.ExamScheduleName</MudText>
+                                <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">@item.SubjectName</MudText>
+                                <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : @item.ExamScheduleStartTime đến @item.ExamScheduleEndTime.Date</MudText>
+                            </MudItem>
+                            <MudItem md="2" Class="p-0">
+                                <div class="w-100 d-flex justify-content-between align-items-center">
+                                    <MudChip T="string">Chưa mở</MudChip>
+                                    <MudButton OnClick="@(() => OpenDialogAsync(item.ExamScheduleId, _noHeader))" Style="background-color: #29a69a; color: #fff">Chi tiết</MudButton>
+                                </div>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                }   
     </MudPaper>
 </MudContainer>
 
 @code {
-    private List<ListExamsOfStudent> _lstExam { get; set; }
-
+    private List<ListExamsOfStudent> _lstExam = new List<ListExamsOfStudent>();
+    private Guid userId = Guid.Empty;
 
     [Parameter]
     public Guid studentId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var a = await ProtectedSessionStore.GetAsync<Guid>("userLogin");
-        _lstExam = await _serLec.GetListExam(a.Value);
+        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        userId = Guid.Parse(a.Value);
+        _lstExam = await _serLec.GetListExam(userId);
+   
+    }
+
+
+    private readonly DialogOptions _noHeader = new() { NoHeader = true };
+
+    private Task OpenDialogAsync(int id, DialogOptions options)
+    {
+        var dialogParametersDetail = new DialogParameters<Student.Dialog.DialogDetailExam>
+        {
+            {x => x.ExamScheduleId, id}
+        };
+        return DialogService.ShowAsync<Student.Dialog.DialogDetailExam>("", dialogParametersDetail, options);
     }
 }
