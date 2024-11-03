@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using System.Net.Http.Json;
+using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -29,6 +30,13 @@ namespace Testify.Web.Services
         public async Task<ClassUser> CreateClassUser(ClassUser classUser)
         {
             var obj = await _httpClient.PostAsJsonAsync("ClassUser/Create-ClassUser", classUser);
+            var reponse = await obj.Content.ReadFromJsonAsync<ClassUser>();
+            return reponse;
+        }
+
+        public async Task<ClassUser> UpdateStatus(ClassUser classUser)
+        {
+            var obj = await _httpClient.PutAsJsonAsync($"ClassUser/Update-Status",classUser);
             var reponse = await obj.Content.ReadFromJsonAsync<ClassUser>();
             return reponse;
         }

@@ -36,5 +36,12 @@ namespace Testify.API.Controllers
             var obj = await _repo.Create(classUser);
             return Ok(obj);
         }
+
+        [HttpPut("Update-Status")]
+        public async Task<ActionResult<ClassUser>> UpdateStatus(ClassUser classUser)
+        {
+            var obj = await _repo.UpdateStatusAsync(classUser);
+            return Ok(obj);
+        }
     }
 }
