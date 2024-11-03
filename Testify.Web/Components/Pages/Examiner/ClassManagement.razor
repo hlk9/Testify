@@ -106,7 +106,7 @@
                             }
                         </MudTd>
                         <MudTd DataLabel="Số lượng Học Sinh" onclick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.List, context.Id))">
-                            50/@context.Capacity
+                            @context.CountUser/@context.Capacity
                             <div style="position: relative; display: inline-block;">
                                 <MudIcon Icon="@Icons.Material.Filled.Notifications" Style="color: #FFD700; margin-right: 5px;" />
                                 <span style="position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;">
@@ -155,6 +155,9 @@
     private int Index = -1;
     private List<ClassWithUser>? classWithUsers { get; set; } = new List<ClassWithUser>();
     private string searchValue = "";
+    private int countUser = 0;
+
+    private List<ClassUser> _lstClassUser = new List<ClassUser>();
 
     private async Task onChangeSearch()
     {
