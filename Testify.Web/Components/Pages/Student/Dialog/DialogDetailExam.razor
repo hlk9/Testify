@@ -23,7 +23,21 @@
                     </MudItem>
                 </MudItem>
             </MudGrid>
-            <MudButton OnClick="Open"  Style="background-color: #29a69a;width:100%; color: #fff ;margin-top:20px;">Chi tiết</MudButton>
+            @if(DateTime.Now >= _ListExamsOfStudent.ExamScheduleStartTime && DateTime.Now <= _ListExamsOfStudent.ExamScheduleEndTime)
+            {
+                <MudButton OnClick="Open" Style="background-color: #29a69a;width:100%; color: #fff ;margin-top:20px;">Vào thi</MudButton>
+              
+            }
+            else if(DateTime.Now < _ListExamsOfStudent.ExamScheduleStartTime)
+            {
+                <MudButton OnClick="Open" Disabled Color="Color.Surface" Style=";width:100%; color: #fff ;margin-top:20px;">Chưa mở</MudButton>
+
+            }
+            else if(DateTime.Now > _ListExamsOfStudent.ExamScheduleEndTime)
+            {
+                <MudButton OnClick="Open" Disabled Color="Color.Surface" Style=";width:100%; color: #fff ;margin-top:20px;">Đã kết thúc bài thi</MudButton>
+            }
+
 
         </div>
           
@@ -37,6 +51,9 @@
     private List<ListExamsOfStudent> _list = new List<ListExamsOfStudent>();
     private ListExamsOfStudent _ListExamsOfStudent = new ListExamsOfStudent();
     private Guid userId = Guid.NewGuid();
+    bool Active;
+
+
 
     protected async override Task OnInitializedAsync()
     {
@@ -51,4 +68,18 @@
         navigation.NavigateTo($"/ExamTest/{_ListExamsOfStudent.ExamId}");
     }
 
+    private bool ValidationForm()
+    {
+
+        if(DateTime.Now >= _ListExamsOfStudent.ExamScheduleStartTime && DateTime.Now <= _ListExamsOfStudent.ExamScheduleEndTime)
+        {
+            Active = true;
+            return true;
+        }
+        else
+        {
+            Active = false;
+            return false;
+        }
+    }
 }
