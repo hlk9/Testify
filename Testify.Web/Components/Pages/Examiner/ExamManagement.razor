@@ -3,6 +3,7 @@
 @layout AdminLayout
 @inject IDialogService DialogService
 @inject ExamService examService
+@inject ExamDetailService examdetailService
 
 <style>
     .add-button-end {
@@ -78,9 +79,9 @@
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xem đề thi">
-
                         
-                        <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end" Variant="Variant.Filled">Xem đề </MudButton>
+                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end" Variant="Variant.Filled">Xem đề </MudButton>
+
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
@@ -100,11 +101,15 @@
 </div>
 @code {
     private List<ExamWhitQusetion> _lst = new List<ExamWhitQusetion>();
+    private List<ExamDetail> lisDThi = new List<ExamDetail>();
     protected override async Task OnInitializedAsync()
     {
         _lst = await examService.GetInforBasic();
+
+
     }
 
+    [Inject] ISnackbar Snackbar { get; set; }
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
 
@@ -190,17 +195,26 @@
         {
               { "Id", Id }
         };
-        var dialog = await DialogService.ShowAsync<Dialog.DeThi.ListDeThi>("Options Dialog", parameters, options);
-        var result = await dialog.Result;
-        if (result == null || !result.Canceled)
+
+        lisDThi = await examdetailService.GetExamDetailByExamId(Id);
+        if (lisDThi.Count > 0)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            var dialog = await DialogService.ShowAsync<Dialog.DeThi.ListDeThi>("Options Dialog", parameters, options);
+            var result = await dialog.Result;
+            if (result == null || !result.Canceled)
+            {
+                _lst = await examService.GetInforBasic();
+            }
+            else
+            {
+
+            }
         }
         else
         {
-           
+            Snackbar.Add("Bài thi chưa có đề nào!", Severity.Warning);
         }
+
     }
 
 }

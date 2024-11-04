@@ -288,11 +288,11 @@
 
     private async Task AutoGenQuestion()
     {
-        if (questionLevelId == -1)
-        {
-            snackbar.Add("Vui lòng chọn mức độ", Severity.Warning);
-            return;
-        }
+        // if (questionLevelId == -1)
+        // {
+        //     snackbar.Add("Vui lòng chọn mức độ", Severity.Warning);
+        //     return;
+        // }
 
         if (NumberOfQuestion <= 0)
         {
@@ -302,7 +302,7 @@
 
         if (NumberOfQuestion + _lstChoice.Count > exam.NumberOfQuestions)
         {
-            snackbar.Add("checkcheck", Severity.Warning);
+            snackbar.Add("Số lượng câu hỏi nhập nhiều hơn số câu hỏi của đề ", Severity.Warning);
             return;
         }
 
@@ -321,6 +321,14 @@
         else
         {
             _lstQuestion = await _serQuestion.GetAllQuestioneByIdSub(SubjectId);
+            if (_lstQuestion.Count < NumberOfQuestion)
+            {
+                snackbar.Add("Số lượng câu hỏi không đủ", Severity.Warning);
+                return;
+            }
+            Random random = new Random();
+            var lstQuesRandom = _lstQuestion.OrderBy(x => random.Next()).Take(NumberOfQuestion).ToList();
+            _lstChoice.AddRange(lstQuesRandom);
         }
     }
 
@@ -341,12 +349,13 @@
         var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
         var userId = Guid.Parse(a.Value);
 
-        examDetail.ExamId = ExamID;
         examDetail.CreateBy = userId;
         examDetail.CreateDate = DateTime.Now;
         examDetail.UpdateBy = userId;
         examDetail.UpdateDate = DateTime.Now;
         examDetail.Status = 1;
+        //Hop them dl 05/11
+        examDetail.ExamId = ExamID;
 
         var addSuccessExamDetail = await _serExamDetail.CreateExamDetail(examDetail);
         if (addSuccessExamDetail != null)
