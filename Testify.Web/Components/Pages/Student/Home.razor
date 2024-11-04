@@ -1,9 +1,10 @@
 @layout StudentLayout
 @page "/Student/Home"
+@using Testify.DAL.ViewModels
 @using Testify.Web.Components.Pages.Student.Component
-<MudGrid Style="padding: 1%" Spacing="4">
-    <MudItem lg="3" md="5" sm="12" xs="12">
-        <MudPaper Width="100%" Elevation="2" Style="padding: 5%">
+<MudGrid Style="padding: 1%; height: calc(100vh - 64px);" Spacing="4">
+    <MudItem lg="3" md="5" sm="12" xs="12" Style="height: 100%">
+        <MudPaper Width="100%" Height="100%" Elevation="2" Style="padding: 5%">
             <MudGrid Justify="Justify.SpaceBetween" Spacing="1">
                 <MudItem xs="0" Style="align-content: center; align-items: center; display: flex">
                     <MudText Typo="Typo.h6" Style="font-weight: bold">Lich thi của tôi</MudText>
@@ -34,11 +35,26 @@
                 </MudItem>
 
             </MudGrid>
-            <MudPaper Elevation="0">
-                <ExamScheduleListItem></ExamScheduleListItem>
-                <ExamScheduleListItem></ExamScheduleListItem>
-                <ExamScheduleListItem></ExamScheduleListItem>
-                <ExamScheduleListItem></ExamScheduleListItem>
+            <MudPaper Elevation="0" Style="min-height: 300px">
+                @foreach (var item in _lstExam)
+                {
+                    <MudPaper Elevation="0" Style="padding-top: 4%; padding-bottom: 4%; border-bottom: 2px dashed #D9D9D9 ">
+                        <MudGrid Class="p-0 m-0 w-100" Style="align-items: center; align-content: center">
+                            <MudItem xs="3" Class="pt-0">
+                                <MudPaper Elevation="0" Class="border-none" Style="text-align: center;" Width="100%">
+                                    <MudText Style="font-size: 14px; padding-left: 0">@item.ExamScheduleStartTime.ToShortDateString()</MudText>
+                                    <MudText Color="Color.Secondary" Style="font-weight: bold">@item.ExamScheduleStartTime.TimeOfDay</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="8" Style="font-weight: bold; display: flex;padding-left: 0; justify-content: center; padding-top: 0">
+                                @item.ExamScheduleName
+                            </MudItem>
+                            <MudItem xs="1" Style="padding-left: 0; padding-top: 0">
+                                <MudIcon Icon="@Icons.Material.Filled.ArrowOutward"></MudIcon>
+                            </MudItem>
+                        </MudGrid>
+                    </MudPaper>
+                }
             </MudPaper>
             <MudGrid Justify="Justify.SpaceBetween" Spacing="1" Style="margin-top:2%">
                 <MudItem xs="0" Style="align-content: center; align-items: center; display: flex">
@@ -60,7 +76,7 @@
         </MudPaper>
     </MudItem>
     <MudItem lg="9" md="7" sm="12" xs="12">
-        <MudGrid Class="">
+        <MudGrid>
             <MudItem xs="12" lg="6" md="6" sm="12">
                 <MudPaper Class="d-flex align-center justify-center mud-width-full pa-5" Elevation="0" Style="background-color:#E7E6FB">
                     <MudGrid Style="padding:0; margin:0;">
@@ -197,6 +213,22 @@
     private List<Model> _items = new List<Model>();
 
     private List<ModelTable> itemTable = new List<ModelTable>();
+
+    private Guid _userId = Guid.Empty;
+
+    private List<ListExamsOfStudent> _lstExam = new List<ListExamsOfStudent>();
+
+    private async Task LoadData()
+    {
+        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        _userId = Guid.Parse(a.Value);
+        _lstExam = await _serLec.GetListExam(_userId);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
 
     protected override void OnInitialized()
     {
