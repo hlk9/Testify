@@ -8,26 +8,41 @@
         <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Variant="Variant.Outlined"
                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate=true></MudTextField>
         <br />
-            
-                @foreach (var item in _lstExam)
-                {
-                    <MudPaper Elevation="2" Class="p-5 mb-4 w-100" Style="border-radius: 15px; border-left: 5px solid #29a69a">
-                        <MudGrid @bind-Value="studentId" Class="p-0 m-0 w-100 align-items-center">
 
-                            <MudItem md="10" Class="p-0">
-                                <MudText Style="font-weight: bold; font-size: 20px">@item.ExamScheduleName</MudText>
-                                <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Môn: @item.SubjectName</MudText>
-                                <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : @item.ExamScheduleStartTime đến @item.ExamScheduleEndTime.Date</MudText>
-                            </MudItem>
-                            <MudItem md="2" Class="p-0">
-                                <div class="w-100 d-flex justify-content-between align-items-center">
-                                    <MudChip T="string">Chưa mở</MudChip>
-                                    <MudButton OnClick="@(() => OpenDialogAsync(item.ExamScheduleId, _noHeader))" Style="background-color: #29a69a; color: #fff">Chi tiết</MudButton>
-                                </div>
-                            </MudItem>
-                        </MudGrid>
-                    </MudPaper>
-                }   
+        @foreach (var item in _lstExam)
+        {
+            <MudPaper Elevation="2" Class="p-5 mb-4 w-100" Style="border-radius: 15px; border-left: 5px solid #29a69a">
+                <MudGrid @bind-Value="studentId" Class="p-0 m-0 w-100 align-items-center">
+
+                    <MudItem md="9" Class="p-0">
+                        <MudText Style="font-weight: bold; font-size: 20px">@item.ExamScheduleName</MudText>
+                        <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Môn: @item.SubjectName</MudText>
+                        <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : @item.ExamScheduleStartTime đến @item.ExamScheduleEndTime.Date</MudText>
+                    </MudItem>
+                    <MudItem md="1" Class="p-0">
+                        <div class="w-100 d-flex justify-content-between align-items-center">
+                            @if (DateTime.Now >= item.ExamScheduleStartTime && DateTime.Now <= item.ExamScheduleEndTime)
+                            {
+                                <MudChip T="string">Vào thi</MudChip>
+
+                            }
+                            else if (DateTime.Now < item.ExamScheduleStartTime)
+                            {
+                                <MudChip T="string">Chưa mở</MudChip>
+
+                            }
+                            else if (DateTime.Now > item.ExamScheduleEndTime)
+                            {
+                                <MudChip T="string">Bài thi đã kết thúc</MudChip>
+                            }
+                        </div>
+                    </MudItem>
+                    <MudItem md="2" Class="p-0">
+                        <MudButton Class="w-100" OnClick="@(() => OpenDialogAsync(item.ExamScheduleId, _noHeader))" Style="background-color: #29a69a; color: #fff">Chi tiết</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        }
     </MudPaper>
 </MudContainer>
 
@@ -43,7 +58,7 @@
         var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
         userId = Guid.Parse(a.Value);
         _lstExam = await _serLec.GetListExam(userId);
-   
+
     }
 
 
