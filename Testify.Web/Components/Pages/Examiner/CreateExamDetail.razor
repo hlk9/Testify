@@ -64,7 +64,17 @@
                 <MudTd DataLabel="Môn">
                     @subjectCurrent.Name
                 </MudTd>
-                <MudTd DataLabel="Người tạo"> @context.CreateBy</MudTd>
+                <MudTd DataLabel="Người tạo">
+                    @foreach (var item in user)
+                    {
+                        if (item.Id == context.CreateBy)
+                        {
+                            @item.FullName
+                            ;
+                            break;
+                        }
+                    }
+                    </MudTd>
                 <MudTd DataLabel="Công khai">
                     @if (context.Status == 0)
                     {
@@ -120,6 +130,7 @@
     private void Cancel() => MudDialog.Cancel();
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
+    private List<User> user = new List<User>();
 
     private async Task LoadData()
     {
@@ -144,6 +155,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        user = await _serUser.GetUsers();
         _lstExam = await _serExam.GetAllActive();
     }
     private async Task OpenDialogAsync(DialogOptions options)
