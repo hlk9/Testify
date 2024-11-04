@@ -1,4 +1,4 @@
-﻿@page "/ViewExam"
+﻿@page "/ExamTest/{idExam:int}"
 @using System.Text.Json
 @using Testify.DAL.ViewModels
 @using Testify.Web.Data.Commons
@@ -116,7 +116,8 @@
 @code {
     [Inject]
     private IDialogService _mudDialogServices { get; set; }
-
+    [Parameter]
+    public int idExam { get; set; }
     private Exam exam { get; set; } = new();
     private List<ExamDetail> _lstexamDetails;
     private List<ExamDetailQuestion> _lstexamDetailsQuestion;
@@ -127,7 +128,7 @@
     private System.Timers.Timer timer;
     private int countdownTime;
     private bool isLoading;
-    private int idExam = 4;
+    // private int idExam = id;
     private int idExamDetail;
     private int stt;
     private int sttList;
@@ -135,6 +136,7 @@
     private HttpContext httpContext;
     private int _tabCount = 0;
     private DotNetObjectReference<ViewExamTest> _objectReference;
+
 
     private void ToggleDrawer()
     {
@@ -149,6 +151,8 @@
         // countdownTime = exam.Duration * 60;
 
         // StartCountdown();
+
+        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -259,6 +263,8 @@
         await localStorage.SetItemAsync("IdExam", idExam);
         await localStorage.SetItemAsync("IdExamDetail", idExamDetail);
         await localStorage.SetItemAsync("_lstQAndASelect", _lstQAndASelect);
+
+
     }
 
     private async Task IsSelectAnswerSingle(int questionId, int answerId)
