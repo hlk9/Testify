@@ -53,18 +53,20 @@ namespace Testify.API.Controllers
 
             var oneSchedule = await scheduleRepo.GetById(scheduleId);
 
-            var scheduleInTime =
+            var scheduleInTime = await 
                 examScheduleRepository.CheckIsContaintInTimeWithoutSubject(oneSchedule.StartTime, oneSchedule.EndTime);
             if (scheduleInTime != null)
             {
                 try
                 {
-                    var listStudent_Prepare =
+                    var listClwU = await classUserReposiroty.GetAll(1);
+                   
+                    var listStudentPrepare =
                     (
                      from classO in data
-                     join classU in await classUserReposiroty.GetAll(1)
+                     join classU in listClwU
                         on classO.Id equals classU.ClassId into classUsers
-                     from classUsr in classUsers.DefaultIfEmpty()
+                     from classUsr in classUsers
                      join usr in await repoUser.GetAllUsers()
                         on classUsr.UserId equals usr.Id
                      where usr.Id == classUsr.UserId
@@ -78,7 +80,7 @@ namespace Testify.API.Controllers
 
                     var listClassExam = (from schedule in scheduleRepo.GetAll()
                                          join classExam in repos.GetAllActive()
-                                             on schedule.Id equals classExam.Id
+                                             on schedule.Id equals classExam.ExamScheduleId
                                          select classExam).ToList();
 
 
@@ -97,10 +99,10 @@ namespace Testify.API.Controllers
                           select usr
                         ).ToList();
 
-                    if (listStudent_Prepare.Any(s => listStudent_ExistInSchedule.Contains(s)))
+                    if (listStudentPrepare.Any(s => listStudent_ExistInSchedule.Contains(s)))
                     {
                         var commonStudents = (from s in listStudent_ExistInSchedule
-                                              where listStudent_Prepare.Contains(s)
+                                              where listStudentPrepare.Contains(s)
                                               select s).ToList();
                         return commonStudents;
                     }
