@@ -1,4 +1,6 @@
 ﻿@using Testify.DAL.ViewModels
+@using SendGrid;
+@using SendGrid.Helpers.Mail;
 @inject ExamScheduleService scheduleService
 @inject ClassExamScheduleService classExamScheduleService
 <MudDialog>
@@ -35,7 +37,7 @@
                     </MudItem>
                     <MudItem xs="6" Class="d-flex justify-content-end">
                         <MudTooltip Text="Gửi email thông báo tới các thí sinh được xếp lịch thi này">
-                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Mail" Label="Gửi Email" />
+                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Mail" Label="Gửi Email" OnClick="SendEmail" />
                         </MudTooltip>
                     </MudItem>
                 </MudItem>
@@ -139,6 +141,23 @@
         listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);
     }
 
+    private async Task SendEmail()
+    {
+        Execute().Wait();
+    }
+
+    static async Task Execute()
+    {
+        var apiKey = @"";
+        var client = new SendGridClient(apiKey);
+        var from = new EmailAddress("hlk9@proton.me", "Testify Team");
+        var subject = "Sending with SendGrid";
+        var to = new EmailAddress("hoanglong.cmb@gmail.com", "Hoang Long");
+        var plainTextContent = "and easy to do anywhere, even with C#";
+        var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+        var response = await client.SendEmailAsync(msg);
+    }
 
     private async Task AddClassToRight()
     {
