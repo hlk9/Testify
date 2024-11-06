@@ -1,14 +1,13 @@
-﻿@inject ExamService examService
-@inject ExamDetailService examDetailService
+﻿@inject ExamDetailService examDetailService
 @inject ExamDetailQuestionService examDetailQuestionService
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            Xóa bài thi
+            Xóa đề thi
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Bài thi này có... đề thi, bạn có muốn xóa bài thi này không?</MudText>
+        <MudText>Bạn có muốn xóa đề thi này không?</MudText>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Cancel</MudButton>
@@ -16,26 +15,23 @@
     </DialogActions>
 </MudDialog>
 
+
+
+
+
 @code {
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Parameter]
-    public int Id { get; set; }
+    public int IdExamDetail { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
-    private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private void Cancel() => MudDialog.Cancel();
 
     private async Task DeleteExcute()
     {
-        lisDThi = await examDetailService.GetExamDetailByExamId(Id);
-        foreach (var item in lisDThi)
-        {
-            await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(item.Id);
-
-            await examDetailService.DeleteExamDetail(item.Id);
-        }
-        bool stats = await examService.DeleteExam(Id);
-        if (stats)
+        bool stats = await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(IdExamDetail);
+        bool stats_1 = await examDetailService.DeleteExamDetail(IdExamDetail);
+        if (stats && stats_1)
         {
             Snackbar.Add("Xoá thành công!", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
