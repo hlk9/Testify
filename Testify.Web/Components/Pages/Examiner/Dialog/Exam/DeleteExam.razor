@@ -8,7 +8,7 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Bài thi này có... đề thi, bạn có muốn xóa bài thi này không?</MudText>
+        <MudText>Bài thi này có @lisDThi.Count đề thi, bạn có muốn xóa bài thi này không?</MudText>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Cancel</MudButton>
@@ -44,5 +44,10 @@
         {
             Snackbar.Add("Xoá thất bại", Severity.Error);
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        lisDThi = await examDetailService.GetExamDetailByExamId(Id);
     }
 }
