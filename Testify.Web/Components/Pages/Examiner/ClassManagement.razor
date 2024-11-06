@@ -107,7 +107,7 @@
                         </MudTd>
                         <MudTd style="cursor: pointer" DataLabel="Số lượng Học Sinh" onclick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.List, context.Id))">
                             @context.CountUser/@context.Capacity
-                            <MudBadge Content="88" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
+                            <MudBadge Content="@context.CountConfirm" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
                                 <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Default" />
                             </MudBadge>
                         </MudTd>
@@ -153,6 +153,7 @@
     private List<ClassWithUser>? classWithUsers { get; set; } = new List<ClassWithUser>();
     private string searchValue = "";
     private int countUser = 0;
+    private int countConfirm = 0;
 
     private List<ClassUser> _lstClassUser = new List<ClassUser>();
 
