@@ -45,5 +45,20 @@ namespace Testify.DAL.Reposiroties
                 throw;
             }
         }
+
+        public async Task<ExamDetail> DeleteExamDetail(int id)
+        {
+            try
+            {
+                var objDelete = await _context.ExamDetails.FindAsync(id);
+                _context.ExamDetails.Remove(objDelete);
+                await _context.SaveChangesAsync();
+                return objDelete;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     } 
 }

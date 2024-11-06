@@ -96,7 +96,7 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xoá">
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteDeThiDialog(_maxWidth,context.Id))" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
@@ -132,11 +132,14 @@
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private List<User> user = new List<User>();
 
+
     private async Task LoadData()
     {
         lisDThi = await examdetailService.GetExamDetailByExamId(ExamID);
         var exam = await examService.GetExamId(ExamID);
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+        GetHashCode();
+
     }
 
     private async void SelectValueChanged()
@@ -178,6 +181,22 @@
         }
 
 
+    }
+
+    private async Task DeleteDeThiDialog(DialogOptions options, int IdExamDetail)
+    {
+        var parameters = new DialogParameters
+        {
+              { "IdExamDetail", IdExamDetail }
+             
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.DeThi.DeleteExamDetail>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || !result.Canceled)
+        {
+            //listSchedule = await scheduleService.GetInforBasic();
+            await LoadData();
+        }
     }
 
     private class IsCheckQuestion

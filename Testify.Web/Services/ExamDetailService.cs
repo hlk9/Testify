@@ -35,5 +35,15 @@ namespace Testify.Web.Services
 
             return reponse;
         }
+
+        public async Task<bool> DeleteExamDetail(int id)
+        {
+            var status = await _httpClient.DeleteAsync($"ExamDetail/Delete-ExamDetail?id={id}");
+            if (status.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

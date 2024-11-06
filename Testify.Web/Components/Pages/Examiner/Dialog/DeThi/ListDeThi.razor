@@ -38,6 +38,7 @@
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh><MudTableSortLabel SortLabel="ID" T="string">Mã đề</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Name" T="string">Tên đề</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Người tạo</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Công khai</MudTableSortLabel></MudTh>
@@ -48,6 +49,7 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="ID"> @context.Id</MudTd>
+                    <MudTd DataLabel="Name"> @context.Code</MudTd>
                     <MudTd DataLabel="Môn">
                         @* <MudAutocomplete T="Subject"
                                          @bind-Value="subjectCurrent"

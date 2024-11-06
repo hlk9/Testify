@@ -21,5 +21,15 @@ namespace Testify.Web.Services
             var reponse = await objNew.Content.ReadFromJsonAsync<ExamDetailQuestion>();
             return reponse;
         }
+
+        public async Task<bool> DeleteExamDetailQuestionsByExamDetailId(int idExamDetail)
+        {
+            var status = await _httpClient.DeleteAsync($"ExamDetailQuestion/Delete?idExamDetail={idExamDetail}");
+            if (status.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

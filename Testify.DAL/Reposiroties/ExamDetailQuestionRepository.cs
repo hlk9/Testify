@@ -34,5 +34,22 @@ namespace Testify.DAL.Reposiroties
                 throw;
             }
         }
+
+        public async Task<bool> DeleteExamDetailQuestionByExamDetailID(int idExamDetail)
+        {
+            try
+            {
+                //var objDelete = await _context.ExamDetails.FindAsync(id);
+                var relatedQuestions = _context.ExamDetailQuestions.Where(q => q.ExamDetailId == idExamDetail).ToList();
+
+                _context.ExamDetailQuestions.RemoveRange(relatedQuestions);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
