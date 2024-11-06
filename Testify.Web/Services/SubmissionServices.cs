@@ -34,5 +34,13 @@ namespace Testify.Web.Services
 
             return reponse;
         }
+
+        public async Task<int> NumberSubmit(Guid userId, int examscheduleId)
+        {
+            var numberofsubmit = await _httpClient.GetAsync($"submission/Check-NumberOfSubmit?userId={userId}&examscheduleId={examscheduleId}");
+            var reponse = await numberofsubmit.Content.ReadFromJsonAsync<int>();
+
+            return reponse;
+        }
     }
 }
