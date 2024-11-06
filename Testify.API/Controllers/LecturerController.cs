@@ -131,19 +131,21 @@ namespace Testify.API.Controllers
                    worksheetsU.Cells[rowU, 4].Value == null ||
                    worksheetsU.Cells[rowU, 5].Value == null ||
                    worksheetsU.Cells[rowU, 6].Value == null ||
-                   worksheetsU.Cells[rowU, 7].Value == null)
+                   worksheetsU.Cells[rowU, 7].Value == null||
+                   worksheetsU.Cells[rowU,9].Value == null)
                 {
                     continue;
                 }
 
                 User user = new DAL.Models.User();
                user.FullName = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.UserName = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.PhoneNumber = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.DateOfBirth = DateTime.Parse( worksheetsU.Cells[rowU, 1].Value.ToString());
-               user.Address = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.Email = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.PasswordHash = worksheetsU.Cells[rowU, 1].Value.ToString();
+               user.UserName = worksheetsU.Cells[rowU, 2].Value.ToString();
+               user.PhoneNumber = worksheetsU.Cells[rowU, 3].Value.ToString();
+               user.DateOfBirth = DateTime.Parse( worksheetsU.Cells[rowU, 3].Value.ToString());
+               user.Address = worksheetsU.Cells[rowU, 4].Value.ToString();
+               user.Email = worksheetsU.Cells[rowU, 5].Value.ToString();
+               user.PasswordHash = worksheetsU.Cells[rowU, 7].Value.ToString();
+                user.Sex = Convert.ToBoolean(worksheetsU.Cells[rowU, 9].Value.ToString());
             }
             return lstUser;
         }

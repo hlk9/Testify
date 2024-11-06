@@ -213,6 +213,7 @@ namespace Testify.DAL.Reposiroties
                                   Limit = ex.NumberOfRepeat,
                                   ExamScheduleId = exsch.Id,
                                   ExamScheduleName = exsch.Title,
+                                  SubjectId = sub.Id,
                                   SubjectName = sub.Name,
                                   ExamScheduleStartTime = exsch.StartTime,
                                   ExamScheduleEndTime = exsch.EndTime,
@@ -223,5 +224,6 @@ namespace Testify.DAL.Reposiroties
             return data;
         }
 
+    
     }
 }
