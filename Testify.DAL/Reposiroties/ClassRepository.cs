@@ -63,7 +63,8 @@ namespace Testify.DAL.Reposiroties
                                   SubjectId = c.SubjectId,
                                   SubjectName = cs.Name,
                                   Status = c.Status,
-                                  CountUser = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 1).Count()
+                                  CountUser = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 1).Count(),
+                                  CountConfirm = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 2).Count(),
                               }).ToListAsync(); // Await the result here
 
             return data;
