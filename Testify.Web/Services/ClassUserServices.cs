@@ -40,5 +40,15 @@ namespace Testify.Web.Services
             var reponse = await obj.Content.ReadFromJsonAsync<ClassUser>();
             return reponse;
         }
+
+        public async Task<bool> DeleteUserInClass(Guid id, int classId)
+        {
+            var obj = await _httpClient.DeleteAsync($"ClassUser/Delete-User-In-Class?id={id}&&classId={classId}");
+            if(obj.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

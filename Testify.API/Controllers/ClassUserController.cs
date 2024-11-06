@@ -11,10 +11,12 @@ namespace Testify.API.Controllers
     public class ClassUserController : ControllerBase
     {
         ClassUserReposiroty _repo;
+        ClassExamScheduleRepository _repoShede;
 
         public ClassUserController()
         {
             _repo = new ClassUserReposiroty();
+            _repoShede = new ClassExamScheduleRepository();
         }
 
         [HttpGet("Get-All")]
@@ -41,6 +43,13 @@ namespace Testify.API.Controllers
         public async Task<ActionResult<ClassUser>> UpdateStatus(ClassUser classUser)
         {
             var obj = await _repo.UpdateStatusAsync(classUser);
+            return Ok(obj);
+        }
+
+        [HttpDelete("Delete-User-In-Class")]
+        public async Task<ActionResult<ClassUser>> DeleteUserInClass(Guid id, int classId)
+        {
+            var obj = await _repo.DeleteUserInClass(id, classId);
             return Ok(obj);
         }
     }

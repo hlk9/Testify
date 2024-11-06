@@ -105,14 +105,11 @@
                                 }
                             }
                         </MudTd>
-                        <MudTd DataLabel="Số lượng Học Sinh" onclick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.List, context.Id))">
+                        <MudTd style="cursor: pointer" DataLabel="Số lượng Học Sinh" onclick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.List, context.Id))">
                             @context.CountUser/@context.Capacity
-                            <div style="position: relative; display: inline-block;">
-                                <MudIcon Icon="@Icons.Material.Filled.Notifications" Style="color: #FFD700; margin-right: 5px;" />
-                                <span style="position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                                    1
-                                </span>
-                            </div>
+                            <MudBadge Content="88" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
+                                <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Default" />
+                            </MudBadge>
                         </MudTd>
                         <MudTd DataLabel="Trạng thái">
                             @if (context.Status == Convert.ToByte(StatusType.isActive))
@@ -170,6 +167,8 @@
         _lstSubject = await _serSub.GetAllSub(textSearch, true);
         classWithUsers = await _serClass.GetAllClass(textSearch, true);
         isLoading = false;
+
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

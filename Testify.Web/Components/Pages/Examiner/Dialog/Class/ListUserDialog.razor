@@ -6,7 +6,7 @@
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
+            <MudIcon Class="" />
             Thêm mới sinh viên vào lớp
         </MudText>
     </TitleContent>
@@ -14,26 +14,28 @@
     <DialogContent>
         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
             <MudTabPanel OnClick="@(() => ViewList())" Text="Danh sách sinh viên lớp ">
-
-                <MudText>Selected items (@selectedItems?.Count): @(selectedItems == null ? "" : string.Join(", ", selectedItems.Select(x => $"{x.Id} - {x.FullName} - {x.Email}")))</MudText>
-
-                <MudTable @ref="_table" T="User" Items="@Users" MultiSelection="true" SelectionChangeable="_selectionChangeable" Hover="true"
-                          @bind-SelectedItems="selectedItems" OnRowClick="@(args => OnRowClick(args))" SelectOnRowClick="@_selectOnRowClick">
+                <MudTable @ref="_table" T="User" Items="@Users">
                     <HeaderContent>
-                        <MudTh>Id</MudTh>
                         <MudTh>Name</MudTh>
+                        <MudTh>Sex</MudTh>
                         <MudTh>Email</MudTh>
+                        <MudTh>Thao Tác</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Id">@context.Id</MudTd>
                         <MudTd DataLabel="Name">@context.FullName</MudTd>
+                        <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
+                        <MudTd>
+                            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context.Id))">
+                                Xoá
+                            </MudButton>
+                        </MudTd>
                     </RowTemplate>
                     <PagerContent>
                         <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
                     </PagerContent>
                 </MudTable>
-
+                    `
             </MudTabPanel>
             <MudTabPanel Text="Thêm Thủ Công">
                 <MudContainer Class="d-flex align-center justify-center mt-10">
@@ -54,17 +56,16 @@
                 </MudContainer>
             </MudTabPanel>
             <MudTabPanel Text="Chờ Xác Nhận">
-                <MudTable @ref="_tableConfirm" T="User" Items="@UsersConfirm" MultiSelection="true" SelectionChangeable="_selectionChangeableConfirm" Hover="true"
-                          @bind-SelectedItems="selectedConfirmItems" OnRowClick="@(args => OnRowConfirmClick(args))" SelectOnRowClick="@_selectOnRowConfirmClick">
+                <MudTable @ref="_tableConfirm" T="User" Items="@UsersConfirm">
                     <HeaderContent>
-                        <MudTh>Id</MudTh>
                         <MudTh>Name</MudTh>
+                        <MudTh>Sex</MudTh>
                         <MudTh>Email</MudTh>
                         <MudTh>Thao Tác</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Id">@context.Id</MudTd> 
                         <MudTd DataLabel="Name">@context.FullName</MudTd>
+                        <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
                         <MudTd>
                             <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ConfirmUser(context.Id))">
@@ -95,17 +96,11 @@
 
     private List<ClassUser> UsersConfirmClick = new List<ClassUser>();
 
-    private HashSet<User> selectedItems = new HashSet<User>();
-    private HashSet<User> selectedConfirmItems = new HashSet<User>();
     private IEnumerable<User> Users = new List<User>();
     private IEnumerable<User> UsersConfirm = new List<User>();
-    private bool _selectOnRowClick = true;
-    private bool _selectOnRowConfirmClick = true;
-    private bool _selectionChangeable = true;
-    private bool _selectionChangeableConfirm = true;
+
     private MudTable<User> _table;
     private MudTable<User> _tableConfirm;
-    private string _selectedItemText = "No row clicked";
 
     protected override async Task OnInitializedAsync()
     {
@@ -124,16 +119,6 @@
         await LoadData();
     }
 
-    void OnRowClick(TableRowClickEventArgs<User> args)
-    {
-        _selectedItemText = $"{args.Item.FullName} ({args.Item.Email})";
-    }
-
-    void OnRowConfirmClick(TableRowClickEventArgs<User> args)
-    {
-        _selectedItemText = $"{args.Item.FullName} ({args.Item.Email})";
-    }
-
     private async Task ConfirmUser(Guid userId)
     {
         ClassUser classUser = new ClassUser()
@@ -147,11 +132,25 @@
         if(addSuccess != null)
         {
             snackbar.Add("Thêm thành công");  
-            await LoadData();
+            MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
             snackbar.Add("Thêm thất bại");
+        }
+    }
+
+    private async Task DeleteUser(Guid userId)
+    {
+        var check = await _serClassUser.DeleteUserInClass(userId, ClassId);
+        if (check != null)
+        {
+            snackbar.Add("Xoá thành công");
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            snackbar.Add("Xoá thất bại");
         }
     }
 
