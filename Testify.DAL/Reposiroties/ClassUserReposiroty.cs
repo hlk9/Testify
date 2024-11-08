@@ -92,6 +92,16 @@ namespace Testify.DAL.Reposiroties
             return objUpdateStatus; 
         }
 
+        //public async Task<ClassUser> RefuseUserAsync(ClassUser classUser)
+        //{
+        //    var _classUser = await _context.ClassUsers.FirstOrDefaultAsync(cu => cu.UserId == classUser.UserId && cu.ClassId == classUser.ClassId);
+
+        //    _classUser.Status = 0;
+        //    var objUpdateStatus = _context.ClassUsers.Update(_classUser).Entity;
+        //    await _context.SaveChangesAsync();
+        //    return objUpdateStatus;
+        //}
+
         public async Task<ClassUser> DeleteUserInClass(Guid id, int classId)
         {
             try
