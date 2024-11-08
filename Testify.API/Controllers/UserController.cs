@@ -135,9 +135,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Users-With-Status-One")]
-        public async Task<List<User>> UsersWithStatusOne(int classId)
+        public async Task<List<User>> UsersWithStatusOne(int classId, string? searchValue)
         {
-            var usersWithStatusOne = await userRepos.GetUsersWithStatusOne(classId);
+            var usersWithStatusOne = await userRepos.GetUsersWithStatusOne(classId, searchValue);
             return usersWithStatusOne;
         }
 

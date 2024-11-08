@@ -46,6 +46,13 @@ namespace Testify.API.Controllers
             return Ok(obj);
         }
 
+        //[HttpPut("Refuse-User")]
+        //public async Task<ActionResult<ClassUser>> RefuseUser(ClassUser classUser)
+        //{
+        //    var obj = await _repo.RefuseUserAsync(classUser);
+        //    return Ok(obj);
+        //}
+
         [HttpDelete("Delete-User-In-Class")]
         public async Task<ActionResult<ClassUser>> DeleteUserInClass(Guid id, int classId)
         {

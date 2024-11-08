@@ -141,7 +141,17 @@ namespace Testify.DAL.Reposiroties
             return null;
         }
 
-
+        public Task<List<ExamSchedule>> GetExamScheduleTimesByClassUserIdAsync(Guid userId)
+        {
+            var result = (from cu in _context.ClassUsers
+                          join ces in _context.ClassExamSchedules
+                          on cu.ClassId equals ces.ClassId
+                          join es in _context.ExamSchedules
+                          on ces.ExamScheduleId equals es.Id
+                          where cu.UserId == userId && DateTime.Now >= es.StartTime && DateTime.Now <= es.EndTime
+                          select es).ToListAsync();
+            return result;
+        }
 
 
     }
