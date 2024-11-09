@@ -122,11 +122,12 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<List<User>> GetUsersWithStatusOne(int classId)
+        public async Task<List<User>> GetUsersWithStatusOne(int classId, string? searchValue)
         {
             var usersWithStatusOne = await (from u in _context.Users
                                             join cu in _context.ClassUsers on u.Id equals cu.UserId
                                             where cu.Status == 1 && cu.ClassId == classId
+                                            && (string.IsNullOrEmpty(searchValue) || u.FullName.Contains(searchValue))
                                             select u).ToListAsync();
 
             return usersWithStatusOne;

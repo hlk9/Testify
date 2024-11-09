@@ -108,6 +108,12 @@ namespace Testify.API.Controllers
         {
             return await repos.GetById(id);
         }
+
+        [HttpGet("Get-ExamScheduleTimes-By-ClassUserIdAsync")]
+        public async Task<List<ExamSchedule>> GetExamScheduleTimesByClassUserIdAsync(Guid userId)
+        {
+            return await repos.GetExamScheduleTimesByClassUserIdAsync(userId);
+        }
     }
 
 

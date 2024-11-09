@@ -40,6 +40,22 @@ namespace Testify.DAL.Reposiroties
             {
                 return null;
             }
+
+           
+            
+        }
+        public async Task<int> CheckNumberOfSubmit(Guid userId, int examscheduleId)
+        {
+            try
+            {
+                var numberrepeat = await _context.Submissions.Where(x => x.UserId == userId && x.ExamScheduleId == examscheduleId).ToListAsync();
+                return numberrepeat.Count();
+            }
+            catch (Exception ex)
+            {
+
+                return -1;
+            }
         }
     }
 }

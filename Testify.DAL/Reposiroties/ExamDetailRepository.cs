@@ -37,12 +37,27 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 var objNew = _context.ExamDetails.Add(examDetail).Entity;
-                _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return objNew;
             }
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public async Task<ExamDetail> DeleteExamDetail(int id)
+        {
+            try
+            {
+                var objDelete = await _context.ExamDetails.FindAsync(id);
+                _context.ExamDetails.Remove(objDelete);
+                await _context.SaveChangesAsync();
+                return objDelete;
+            }
+            catch
+            {
+                return null;
             }
         }
     } 

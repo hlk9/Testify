@@ -16,7 +16,7 @@
             <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
             </MudItem>
             <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, subjectCurrent.Id))" Class="add-button-end" Variant="Variant.Filled">Thêm đề mới </MudButton>
+                @* <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, subjectCurrent.Id))" Class="add-button-end" Variant="Variant.Filled">Thêm đề mới </MudButton> *@
             </MudItem>
        </MudGrid>
 
@@ -38,16 +38,18 @@
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh><MudTableSortLabel SortLabel="ID" T="string">Mã đề</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Name" T="string">Tên đề</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Người tạo</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Công khai</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Ngày Cập Nhật" T="string">Ngày cập nhật</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                    @* <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh> *@
 
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="ID"> @context.Id</MudTd>
+                    <MudTd DataLabel="Name"> @context.Code</MudTd>
                     <MudTd DataLabel="Môn">
                         @* <MudAutocomplete T="Subject"
                                          @bind-Value="subjectCurrent"
@@ -60,7 +62,18 @@
                                          OnFocus="SubjectChanged" /> *@
                             @subjectCurrent.Name
                     </MudTd>
-                    <MudTd DataLabel="Người tạo"> @context.CreateBy</MudTd>
+                    <MudTd DataLabel="Người tạo">
+                        @foreach (var item in user)
+                        {
+                            if (item.Id == context.CreateBy)
+                            {
+                                @item.FullName
+                                ;
+                                break;
+                            }
+                        }
+                        
+                     </MudTd>
                     <MudTd DataLabel="Công khai"> 
                         @if (context.Status == 0)
                         {
@@ -74,7 +87,7 @@
                     </MudTd>
                     <MudTd DataLabel="Ngày tạo"> @context.CreateDate.ToString("dd/MM/yyyy")</MudTd>
                     <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
-                    <MudTd DataLabel="Thao tác">
+                    @* <MudTd DataLabel="Thao tác">
                         <MudTooltip Text="Sửa">
                             <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                         </MudTooltip>
@@ -84,7 +97,7 @@
                         <MudTooltip Text="Xoá">
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                         </MudTooltip>
-                    </MudTd>
+                    </MudTd> *@
                 </RowTemplate>
                 <NoRecordsContent>
                     <MudText>No matching records found</MudText>
@@ -96,6 +109,7 @@
                     <MudTablePager />
                 </PagerContent>
             </MudTable>
+        
         </div>
 
     </DialogContent>
@@ -129,7 +143,7 @@
               // { "Id", ID_Sub },
               { "Id_Sub", ID_Sub }
         };
-        
+
         var dialog = await DialogService.ShowAsync<Dialog.DeThi.CreateDeThi>("Options Dialog", parameters, options);
         var result = await dialog.Result;
         if (!result.Canceled)
@@ -138,7 +152,7 @@
             // _lstDT = await examService.GetInforBasic();
 
         }
-       
+
 
     }
 
@@ -161,12 +175,14 @@
 
     }
 
-
+    private List<User> user = new List<User>();
+    //private User user { get; set; } = new();
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private List<Dethi> lst = new List<Dethi>();
 
     protected override async Task OnInitializedAsync()
     {
+        user = await _serUser.GetUsers();
         lisDThi = await examdetailService.GetExamDetailByExamId(Id);
 
         

@@ -39,8 +39,15 @@ namespace Testify.API.Controllers
         [HttpPost("Create-Exam-Detail")]
         public async Task<ActionResult<ExamDetail>> Create(ExamDetail examDetail)
         {
-            var objNew = await _respon.CreateExamDetail(examDetail);
-            return Ok(objNew);
+            var obj = await _respon.CreateExamDetail(examDetail);
+            return Ok(obj);
+        }
+
+        [HttpDelete("Delete-ExamDetail")]
+        public async Task<ActionResult<ExamDetail>> DeleteExamDetail(int id)
+        {
+            var deleteEx = await _respon.DeleteExamDetail(id);
+            return Ok(deleteEx);
         }
     }
 }

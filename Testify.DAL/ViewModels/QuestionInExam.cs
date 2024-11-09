@@ -17,13 +17,12 @@ namespace Testify.DAL.ViewModels
         public int SubjectId { get; set; }
         public string? SubjectName { get; set; }
         public string? DocumentPath { get; set; }
-        
         public int QuestionTypeId { get; set; }
         public string? QuestionTypeName { get; set; }
-
-
         public int? QuestionLevelId { get; set; }
         public string? QuestionLeveName { get; set; }
+
+        public bool IsChoosen { get; set; } = false;    
 
     }
 }

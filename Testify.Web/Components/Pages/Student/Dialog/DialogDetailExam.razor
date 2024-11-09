@@ -1,0 +1,105 @@
+﻿@using Testify.DAL.ViewModels
+
+@if(isLoading)
+{
+        <Testify.Web.Shared.LoadingContext />
+}
+else
+{
+    <MudDialog Class="w-50">
+        <DialogContent>
+            <div class="p-2 m-2">
+                <MudText Style="font-weight: bold; font-size: 20px; text-align:center">Bài thi giữa kì II</MudText>
+                <MudGrid Class="p-0 m-0 w-100 align-items-center ">
+                    <MudItem Class=" d-flex justify-space-between flex-grow-1 gap-4">
+                        <MudItem xl="5">
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Thời gian làm bài</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Thời gian mở đề</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Thời gian kết thúc</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Số lượng câu hỏi</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Môn học</MudText>
+                        </MudItem>
+                        <MudItem xl="2"></MudItem>
+                        <MudItem xl="5">
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">@_ListExamsOfStudent.Duration</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">@_ListExamsOfStudent.ExamScheduleStartTime.Date</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">@_ListExamsOfStudent.ExamScheduleEndTime.Date</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">@_ListExamsOfStudent.TotalQuestion</MudText>
+                            <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">@_ListExamsOfStudent.SubjectName</MudText>
+
+                        </MudItem>
+                    </MudItem>
+                </MudGrid>
+                @if (DateTime.Now >= _ListExamsOfStudent.ExamScheduleStartTime && DateTime.Now <= _ListExamsOfStudent.ExamScheduleEndTime)
+                {
+                    <MudButton OnClick="Open" Style="background-color: #29a69a;width:100%; color: #fff ;margin-top:20px;">Vào thi</MudButton>
+
+                }
+                else if (DateTime.Now < _ListExamsOfStudent.ExamScheduleStartTime)
+                {
+                    <MudButton OnClick="Open" Disabled Color="Color.Surface" Style=";width:100%; color: #fff ;margin-top:20px;">Chưa mở</MudButton>
+
+                }
+                else if (DateTime.Now > _ListExamsOfStudent.ExamScheduleEndTime)
+                {
+                    <MudButton OnClick="Open" Disabled Color="Color.Surface" Style=";width:100%; color: #fff ;margin-top:20px;">Đã kết thúc bài thi</MudButton>
+                }
+
+
+            </div>
+
+
+        </DialogContent>
+    </MudDialog>
+}
+
+
+@code {
+    [Parameter]
+    public int ExamScheduleId { get; set; }
+    private List<ListExamsOfStudent> _list = new List<ListExamsOfStudent>();
+    private ListExamsOfStudent _ListExamsOfStudent = new ListExamsOfStudent();
+    private Guid userId = Guid.NewGuid();
+    bool Active;
+    private bool isLoading = true;
+
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            userId = Guid.Parse(a.Value);
+            _list = await _serLec.GetListExam(userId);
+            _ListExamsOfStudent = _list.FirstOrDefault(x => x.ExamScheduleId == ExamScheduleId);
+        }
+        catch
+        {
+
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void Open()
+    {
+        navigation.NavigateTo($"/ExamTest/{_ListExamsOfStudent.ExamId}");
+    }
+
+    private bool ValidationForm()
+    {
+
+        if(DateTime.Now >= _ListExamsOfStudent.ExamScheduleStartTime && DateTime.Now <= _ListExamsOfStudent.ExamScheduleEndTime)
+        {
+            Active = true;
+            return true;
+        }
+        else
+        {
+            Active = false;
+            return false;
+        }
+    }
+}

@@ -34,5 +34,11 @@ namespace Testify.API.Controllers
             var obj = await _repo.Create(submission);
             return Ok(obj);
         }
+
+        [HttpGet("Check-NumberOfSubmit")]
+        public async Task<ActionResult<int>> NumberOfSubmits(Guid userId,int examscheduleId)
+        {
+            return await _repo.CheckNumberOfSubmit(userId, examscheduleId);
+        }
     }
 }

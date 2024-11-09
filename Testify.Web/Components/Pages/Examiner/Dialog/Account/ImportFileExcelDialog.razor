@@ -7,7 +7,10 @@
 
         <MudPaper Class="my-3" Elevation="0">
             <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" >
-
+                @if (levelId == -1)
+                {
+                    <MudSelectItem Value="-1">Chọn chức vụ</MudSelectItem>
+                }
                 @foreach (var item in _lstLevel)
                 {
                     <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
@@ -56,7 +59,7 @@
     [Inject]
     private IDialogService _mudDialogServices { get; set; }
 
-    private int levelId = 1;
+    private int levelId =-1;
     private List<Level> _lstLevel = new List<Level>();
 
     private async Task UploadFileExcel(IBrowserFile file)
@@ -108,10 +111,11 @@
     protected override async Task OnInitializedAsync()
     {
         _lstLevel = await _serLevel.GetAllLevel();
-        if (_lstLevel.Any())
-        {
-            levelId = _lstLevel[0].Id;
-        }
+        // if (_lstLevel.Any())
+        // {
+        //     levelId = _lstLevel[0].Id;
+           
+        // }
     }
 
     private async Task<IEnumerable<Level>> SearchLevel(string value, CancellationToken token)

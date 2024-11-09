@@ -1,41 +1,43 @@
 ﻿@using Testify.Web.Data.Commons
 @using Testify.Web.Shared
+@using Testify.DAL.ViewModels
 
 
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
+            <MudIcon Class="" />
             Thêm mới sinh viên vào lớp
         </MudText>
     </TitleContent>
 
     <DialogContent>
         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-            <MudTabPanel OnClick="@(() => ViewList())" Text="Danh sách sinh viên lớp ">
+            <MudTabPanel OnClick="@(() => ViewList(searchValue))" Text="Danh sách sinh viên lớp ">
+                <MudTextField T="string" Placeholder="Tìm kiếm tên học sinh, sinh viên" Adornment="Adornment.Start" @bind-Value="searchValue"
+                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
 
-                <MudText>Selected items (@selectedItems?.Count): @(selectedItems == null ? "" : string.Join(", ", selectedItems.Select(x => $"{x.Id} - {x.FullName} - {x.Email}")))</MudText>
-
-                <MudTable @ref="_table" T="User" Items="@Users" MultiSelection="true" SelectionChangeable="_selectionChangeable" Hover="true"
-                          @bind-SelectedItems="selectedItems" OnRowClick="@(args => OnRowClick(args))" SelectOnRowClick="@_selectOnRowClick">
+                <MudTable @ref="_table" T="User" Items="@Users">
                     <HeaderContent>
-                        <MudTh>Id</MudTh>
                         <MudTh>Name</MudTh>
+                        <MudTh>Sex</MudTh>
                         <MudTh>Email</MudTh>
+                        <MudTh>Thao Tác</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Id">@context.Id</MudTd>
                         <MudTd DataLabel="Name">@context.FullName</MudTd>
+                        <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
+                        <MudTd>
+                            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context.Id))">
+                                Xoá
+                            </MudButton>
+                        </MudTd>
                     </RowTemplate>
                     <PagerContent>
                         <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
                     </PagerContent>
-                    <FooterContent>
-                        <MudTd colspan="3">Select All</MudTd>
-                    </FooterContent>
                 </MudTable>
-
             </MudTabPanel>
             <MudTabPanel Text="Thêm Thủ Công">
                 <MudContainer Class="d-flex align-center justify-center mt-10">
@@ -50,36 +52,35 @@
                         </MudCardContent>
                         <MudCardActions>
                             <MudButton Variant="Variant.Filled" Color="Color.Default" Class="ml-auto me-2" OnClick="Cancel">Close</MudButton>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Thêm sinh viên</MudButton>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await Submit()">Thêm sinh viên</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudContainer>
             </MudTabPanel>
             <MudTabPanel Text="Chờ Xác Nhận">
-                <MudTable @ref="_tableConfirm" T="User" Items="@UsersConfirm" MultiSelection="true" SelectionChangeable="_selectionChangeableConfirm" Hover="true"
-                          @bind-SelectedItems="selectedConfirmItems" OnRowClick="@(args => OnRowConfirmClick(args))" SelectOnRowClick="@_selectOnRowConfirmClick">
+                <MudTable @ref="_tableConfirm" T="User" Items="@UsersConfirm">
                     <HeaderContent>
-                        <MudTh>Id</MudTh>
                         <MudTh>Name</MudTh>
+                        <MudTh>Sex</MudTh>
                         <MudTh>Email</MudTh>
                         <MudTh>Thao Tác</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Id">@context.Id</MudTd> 
                         <MudTd DataLabel="Name">@context.FullName</MudTd>
+                        <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
                         <MudTd DataLabel="Email">@context.Email</MudTd>
                         <MudTd>
                             <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ConfirmUser(context.Id))">
                                 Xác Nhận
+                            </MudButton>
+                            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => RefuseUser(context.Id))">
+                                Từ Chối
                             </MudButton>
                         </MudTd>
                     </RowTemplate>
                     <PagerContent>
                         <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
                     </PagerContent>
-                    <FooterContent>
-                        <MudTd colspan="4">Select All</MudTd>
-                    </FooterContent>
                 </MudTable>
             </MudTabPanel>
         </MudTabs>
@@ -98,61 +99,54 @@
 
     private List<User> _lstUser;
 
+    Guid userId = Guid.NewGuid();
+
     private List<ClassUser> UsersConfirmClick = new List<ClassUser>();
 
-    private HashSet<User> selectedItems = new HashSet<User>();
-    private HashSet<User> selectedConfirmItems = new HashSet<User>();
     private IEnumerable<User> Users = new List<User>();
     private IEnumerable<User> UsersConfirm = new List<User>();
-    private bool _selectOnRowClick = true;
-    private bool _selectOnRowConfirmClick = true;
-    private bool _selectionChangeable = true;
-    private bool _selectionChangeableConfirm = true;
+
     private MudTable<User> _table;
     private MudTable<User> _tableConfirm;
-    private string _selectedItemText = "No row clicked";
+
+    private string searchValue = "";
+
+    private async Task onChangeSearch()
+    {
+        await LoadData(searchValue);
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData("");
     }
 
-    private async Task LoadData()
+    private async Task LoadData(string? textSearch)
     {
-        Users = await _serUser.GetUsersWithStatus(ClassId) ?? new List<User>();
+        Users = await _serUser.GetUsersWithStatus(ClassId, textSearch) ?? new List<User>();
         UsersConfirm = await _serUser.GetUsersWithStatusTwo(ClassId) ?? new List<User>();
     }
 
-    private async Task ViewList()
+    private async Task ViewList(string? textSearch)
     {
-        Users = await _serUser.GetUsersWithStatus(ClassId) ?? new List<User>();
-        await LoadData();
-    }
-
-    void OnRowClick(TableRowClickEventArgs<User> args)
-    {
-        _selectedItemText = $"{args.Item.FullName} ({args.Item.Email})";
-    }
-
-    void OnRowConfirmClick(TableRowClickEventArgs<User> args)
-    {
-        _selectedItemText = $"{args.Item.FullName} ({args.Item.Email})";
+        Users = await _serUser.GetUsersWithStatus(ClassId, textSearch) ?? new List<User>();
+        await LoadData("");
     }
 
     private async Task ConfirmUser(Guid userId)
     {
         ClassUser classUser = new ClassUser()
-        {
-            ClassId = ClassId,
-            UserId = userId,
-            Status = 1
-        };
+            {
+                ClassId = ClassId,
+                UserId = userId,
+                Status = 1
+            };
 
         var addSuccess = await _serClassUser.UpdateStatus(classUser);
-        if(addSuccess != null)
+        if (addSuccess != null)
         {
-            snackbar.Add("Thêm thành công");  
-            await LoadData();
+            snackbar.Add("Thêm thành công");
+            MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
@@ -160,30 +154,110 @@
         }
     }
 
-    private async Task Submit()
+    private async Task RefuseUser(Guid userId)
     {
-        var lstUser = await _serUser.GetUsers();
-
-        var obj = lstUser.FirstOrDefault(x => x.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && x.LevelId == 4);
-
-        ClassUser classUser = new ClassUser();
-
-        classUser.Status = 1;
-        classUser.UserId = obj.Id;
-        classUser.ClassId = ClassId;
-
-        var checkAddClassUser = await _serClassUser.CreateClassUser(classUser);
-        if (checkAddClassUser != null)
+        var check = await _serClassUser.DeleteUserInClass(userId, ClassId);
+        if (check != null)
         {
+            snackbar.Add("Từ chối thành công");
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thành công", Severity.Success);
         }
         else
         {
+            snackbar.Add("Từ chối thất bại");
+        }
+        // ClassUser classUser = new ClassUser()
+        //     {
+        //         ClassId = ClassId,
+        //         UserId = userId,
+        //         Status = 0
+        //     };
+
+        // var refuseSuccess = await _serClassUser.RefuseUser(classUser);
+        // if (refuseSuccess != null)
+        // {
+        //     snackbar.Add("Từ chối thành công");
+        //     MudDialog.Close(DialogResult.Ok(true));
+        // }
+        // else
+        // {
+        //     snackbar.Add("Từ chối thất bại");
+        // }
+    }
+
+    private async Task DeleteUser(Guid userId)
+    {
+        var check = await _serClassUser.DeleteUserInClass(userId, ClassId);
+        if (check != null)
+        {
+            snackbar.Add("Xoá thành công");
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Thêm thất bại", Severity.Error);
+        }
+        else
+        {
+            snackbar.Add("Xoá thất bại");
         }
     }
 
-    private void Cancel() => MudDialog.Cancel();
+    private async Task Submit()
+    {
+        var a = await _serClass.GetAllClass("", true);
+
+        var compare = a.Where(x => x.Id == ClassId).Select(x => new
+        {
+            x.Capacity,
+            x.CountUser,
+        }).FirstOrDefault();
+
+        if (compare.CountUser < compare.Capacity)
+        {
+            var lstUser = await _serUser.GetUsers();
+
+            var obj = lstUser.FirstOrDefault(x => x.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && x.LevelId == 4);
+
+            var userInClass = await _serClassUser.GetAllClassUser(1);
+
+            var existingUserInClass = userInClass
+            .Where(cu => cu.ClassId == ClassId && cu.UserId == obj.Id)
+            .FirstOrDefault();
+
+            if (existingUserInClass != null)
+            {
+                snackbar.Add("Đã có học sinh này trong lớp", Severity.Error);
+                return;
+            }
+
+            ClassUser classUser = new ClassUser();
+
+            classUser.Status = 1;
+            classUser.UserId = obj.Id;
+            classUser.ClassId = ClassId;
+
+            var checkAddClassUser = await _serClassUser.CreateClassUser(classUser);
+            if (checkAddClassUser != null)
+            {
+                snackbar.Add("Thêm thành công", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                snackbar.Add("Thêm thất bại", Severity.Error);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            await LoadData("");
+            // }
+        }
+        else
+        {
+            snackbar.Add("Vượt quá số học sinh cho phép", Severity.Error);
+        }
+    }
+
+
+
+    private void Cancel()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
 }
