@@ -7,6 +7,8 @@ using System.Globalization;
 using Testify.DAL.Models;
 using Testify.Web.Components;
 using Testify.Web.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using Testify.Web.Data.Commons;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,8 @@ builder.Services.AddMudServices(
     }
 
     );
+string apiKey = builder.Configuration["SendGrid:APIKey"];
+builder.Services.AddSingleton(sp => new CommonServices(apiKey));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

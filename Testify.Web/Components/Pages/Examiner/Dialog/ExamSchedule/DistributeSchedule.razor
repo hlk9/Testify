@@ -1,4 +1,6 @@
 ﻿@using Testify.DAL.ViewModels
+@using SendGrid;
+@using SendGrid.Helpers.Mail;
 @inject ExamScheduleService scheduleService
 @inject ClassExamScheduleService classExamScheduleService
 <MudDialog>
@@ -35,7 +37,7 @@
                     </MudItem>
                     <MudItem xs="6" Class="d-flex justify-content-end">
                         <MudTooltip Text="Gửi email thông báo tới các thí sinh được xếp lịch thi này">
-                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Mail" Label="Gửi Email" />
+                            <MudFab Color="Color.Info" StartIcon="@Icons.Material.Filled.Mail" Label="Gửi Email" OnClick="SendEmail" />
                         </MudTooltip>
                     </MudItem>
                 </MudItem>
@@ -139,6 +141,15 @@
         listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);
     }
 
+    private async Task SendEmail()
+    {
+        List<EmailAddress> emails = new List<EmailAddress>();
+        emails.Add(new EmailAddress { Email = "hoanglong.cmb@gmail.com" });
+        string content = "haha";
+        await commonServices.sendEmail(emails, "TestList", content, null);
+    }
+
+  
 
     private async Task AddClassToRight()
     {

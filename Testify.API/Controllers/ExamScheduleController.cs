@@ -114,6 +114,35 @@ namespace Testify.API.Controllers
         {
             return await repos.GetExamScheduleTimesByClassUserIdAsync(userId);
         }
+        [HttpGet("Get-All-Schedule-ByStudentId")]
+        public async Task<List<ExamScheduleDto>>GetAllScheduleOfStudentById(string studentId)
+        {
+            List<ExamScheduleDto> listResult = new List<ExamScheduleDto>();
+            SubjectRepository subjectRepository = new SubjectRepository();
+            UserRepository usrRepos = new UserRepository();
+            ClassExamScheduleRepository classExamScheduleRepository = new ClassExamScheduleRepository();
+            ClassUserReposiroty classUserReposiroty = new ClassUserReposiroty();
+            var lstClass = await classUserReposiroty.GetClassByStudentId(studentId, null, 1);
+
+
+            var lstSchedule = (from cu in lstClass
+                                     join classEx in classExamScheduleRepository.GetAllActive()
+                                     on cu.ClassId equals classEx.ClassId
+                                     join schedule in repos.GetAll()
+                                     on classEx.ExamScheduleId equals schedule.Id
+                                     select schedule).ToList();
+
+            var lstSubject = await subjectRepository.GetAllSubject(null, true);
+
+            foreach (var item in lstSchedule)
+            {
+
+                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
+
+            }
+            return listResult;
+
+        }
     }
 
 

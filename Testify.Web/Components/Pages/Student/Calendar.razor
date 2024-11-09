@@ -1,29 +1,98 @@
 ﻿@page "/Student/Calendar"
 @layout StudentLayout
+@using Testify.API.DTOs;
 
 
-<MudCalendar Items="_events" ShowDay="false"  />
+@if(listCalendar.Count==null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else
+{
+    <MudCalendar Items="listCalendar" MonthCellMinHeight="100" ItemClicked="ItemClickInCalendar">
+        <CellTemplate>
+            <div style="width: 100%; height: 100%; border: 2px solid @GetColor(((CustomItem)context).Color)">
+                <div style="background-color: @GetColor(((CustomItem)context).Color)"><MudText Style="color: #ffffff;" Typo="Typo.body1" Align="Align.Center">@(((CustomItem)context).Title)</MudText></div>
+                <div class="pa-2"><MudText Typo="Typo.body2">@context.Text</MudText></div>
+            </div>
+        </CellTemplate>
+    </MudCalendar>
+}
+
+
+
 @code {
-
-  
-  
-
-    private List<CalendarItem> _events = new()
+    private string currentSutdentId;
+    private List<CalendarItem> listCalendar = new List<CalendarItem>();
+    private string GetColor(Color color) => $"var(--mud-palette-{color.ToDescriptionString()})";
+    protected override void OnInitialized()
     {
 
-        
+    }
 
-        new CalendarItem
+    private Task ItemClickInCalendar(CalendarItem item)
+    {
+        return DialogService.ShowMessageBox("Chi tiết lịch thi "+((CustomItem)item).Title," "+ item.Text + " | Thời gian: " + item.Start.ToString("HH:mm dd/MM/yyyy") + " tới "+item.End?.ToString("HH:mm dd/MM/yyyy"));
+    }
+
+    [Inject]
+    private IDialogService DialogService { get; set; }
+
+
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+
+        if(firstRender)
         {
-            Start = DateTime.Today.AddHours(10),
-            End = DateTime.Today.AddHours(11),
-            Text = "Event today"
-        },
-        new CalendarItem
-        {
-            Start = DateTime.Today.AddDays(1).AddHours(11),
-            End = DateTime.Today.AddDays(1).AddHours(12.5),
-            Text = "Event tomorrow"
+            var current = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            currentSutdentId = current.Value;
+            List<ExamScheduleDto> lstDto = new List<ExamScheduleDto>();
+            lstDto = await _serExamSche.GetAllScheduleByStudentId(currentSutdentId);
+            if (lstDto.Count > 0)
+            {
+                foreach (var item in lstDto)
+                {
+                    string status = item.StartTime < DateTime.Now && item.EndTime < DateTime.Now ? " - Đã kết thúc" : " ";
+                    listCalendar.Add(
+                        new CustomItem
+                            {
+                                ScheduleId = item.Id,
+                                Start = item.StartTime,
+                                End = item.EndTime,
+                                Text = "Môn "+item.SubjectName+"\n"+status,
+                                Title = item.Title
+                            });
+                }
+            }
+            int numberInFuture = 0;
+            if (listCalendar != null && listCalendar.Count > 0)
+            {
+                numberInFuture = listCalendar.Where(x => x.Start > DateTime.Now).Count();
+            }
+            if (numberInFuture > 0)
+            {
+                await DialogService.ShowMessageBox("Thông báo", "Bạn có " + numberInFuture + " lịch thi sắp tới, hãy kiểm tra để biết thêm chi tiết");
+            }
+            else
+            {
+                await DialogService.ShowMessageBox("Thông báo", "Hiện tại không có lịch thi nào của bạn");
+            }
+            StateHasChanged();
         }
-    };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private class CustomItem : CalendarItem
+    {
+        public string Title { get; set; } = string.Empty;
+        public Color Color { get; set; } = Color.Primary;
+        public string Location { get; set; } = "123123";
+        public int ScheduleId { get; set; }
+    }
+
 }
