@@ -143,21 +143,13 @@
 
     private async Task SendEmail()
     {
-        Execute().Wait();
+        List<EmailAddress> emails = new List<EmailAddress>();
+        emails.Add(new EmailAddress { Email = "hoanglong.cmb@gmail.com" });
+        string content = "haha";
+        await commonServices.sendEmail(emails, "TestList", content, null);
     }
 
-    static async Task Execute()
-    {
-        var apiKey = @"";
-        var client = new SendGridClient(apiKey);
-        var from = new EmailAddress("hlk9@proton.me", "Testify Team");
-        var subject = "Sending with SendGrid";
-        var to = new EmailAddress("hoanglong.cmb@gmail.com", "Hoang Long");
-        var plainTextContent = "and easy to do anywhere, even with C#";
-        var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-        var response = await client.SendEmailAsync(msg);
-    }
+  
 
     private async Task AddClassToRight()
     {
