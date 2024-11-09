@@ -13,31 +13,43 @@
 
     <DialogContent>
         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+
             <MudTabPanel OnClick="@(() => ViewList(searchValue))" Text="Danh sách sinh viên lớp ">
                 <MudTextField T="string" Placeholder="Tìm kiếm tên học sinh, sinh viên" Adornment="Adornment.Start" @bind-Value="searchValue"
                               AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
-
-                <MudTable @ref="_table" T="User" Items="@Users">
-                    <HeaderContent>
-                        <MudTh>Name</MudTh>
-                        <MudTh>Sex</MudTh>
-                        <MudTh>Email</MudTh>
-                        <MudTh>Thao Tác</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Name">@context.FullName</MudTd>
-                        <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
-                        <MudTd DataLabel="Email">@context.Email</MudTd>
-                        <MudTd>
-                            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context.Id))">
-                                Xoá
-                            </MudButton>
-                        </MudTd>
-                    </RowTemplate>
-                    <PagerContent>
-                        <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
-                    </PagerContent>
-                </MudTable>
+                @if (isLoading)
+                {
+                    <LoadingContext />
+                }
+                else
+                {
+                    <MudTable @ref="_table" T="User" Items="@Users">
+                        <HeaderContent>
+                            <MudTh>Name</MudTh>
+                            <MudTh>Sex</MudTh>
+                            <MudTh>Email</MudTh>
+                            <MudTh>Thao Tác</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            
+                                <MudTd DataLabel="Name">@context.FullName</MudTd>
+                                <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
+                                <MudTd DataLabel="Email">@context.Email</MudTd>
+                                <MudTd>
+                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context.Id))">
+                                        Xoá
+                                    </MudButton>
+                                </MudTd>
+                            
+                        </RowTemplate>
+                        <NoRecordsContent>
+                            <MudText>Không có học sinh nào trong lớp</MudText>
+                        </NoRecordsContent>
+                        <PagerContent>
+                            <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+                        </PagerContent>
+                    </MudTable>
+                }
             </MudTabPanel>
             <MudTabPanel Text="Thêm Thủ Công">
                 <MudContainer Class="d-flex align-center justify-center mt-10">
@@ -58,30 +70,40 @@
                 </MudContainer>
             </MudTabPanel>
             <MudTabPanel Text="Chờ Xác Nhận">
-                <MudTable @ref="_tableConfirm" T="User" Items="@UsersConfirm">
-                    <HeaderContent>
-                        <MudTh>Name</MudTh>
-                        <MudTh>Sex</MudTh>
-                        <MudTh>Email</MudTh>
-                        <MudTh>Thao Tác</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Name">@context.FullName</MudTd>
-                        <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
-                        <MudTd DataLabel="Email">@context.Email</MudTd>
-                        <MudTd>
-                            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ConfirmUser(context.Id))">
-                                Xác Nhận
-                            </MudButton>
-                            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => RefuseUser(context.Id))">
-                                Từ Chối
-                            </MudButton>
-                        </MudTd>
-                    </RowTemplate>
-                    <PagerContent>
-                        <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
-                    </PagerContent>
-                </MudTable>
+                @if (isLoading)
+                {
+                    <LoadingContext />
+                }
+                else
+                {
+                    <MudTable @ref="_tableConfirm" T="User" Items="@UsersConfirm">
+                        <HeaderContent>
+                            <MudTh>Name</MudTh>
+                            <MudTh>Sex</MudTh>
+                            <MudTh>Email</MudTh>
+                            <MudTh>Thao Tác</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Name">@context.FullName</MudTd>
+                            <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
+                            <MudTd DataLabel="Email">@context.Email</MudTd>
+                            <MudTd>
+                                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ConfirmUser(context.Id))">
+                                    Xác Nhận
+                                </MudButton>
+                                <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(() => RefuseUser(context.Id))">
+                                    Từ Chối
+                                </MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                        <NoRecordsContent>
+                            <MudText>Không có học sinh nào trong hàng chờ</MudText>
+                        </NoRecordsContent>
+                        <PagerContent>
+                            <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+                        </PagerContent>
+                    </MudTable>
+                }
             </MudTabPanel>
         </MudTabs>
     </DialogContent>
@@ -89,6 +111,8 @@
 
 
 @code {
+    private bool isLoading { get; set; } = true;
+
     private string email;
 
     [Parameter]
@@ -125,6 +149,7 @@
     {
         Users = await _serUser.GetUsersWithStatus(ClassId, textSearch) ?? new List<User>();
         UsersConfirm = await _serUser.GetUsersWithStatusTwo(ClassId) ?? new List<User>();
+        isLoading = false;
     }
 
     private async Task ViewList(string? textSearch)
@@ -166,23 +191,6 @@
         {
             snackbar.Add("Từ chối thất bại");
         }
-        // ClassUser classUser = new ClassUser()
-        //     {
-        //         ClassId = ClassId,
-        //         UserId = userId,
-        //         Status = 0
-        //     };
-
-        // var refuseSuccess = await _serClassUser.RefuseUser(classUser);
-        // if (refuseSuccess != null)
-        // {
-        //     snackbar.Add("Từ chối thành công");
-        //     MudDialog.Close(DialogResult.Ok(true));
-        // }
-        // else
-        // {
-        //     snackbar.Add("Từ chối thất bại");
-        // }
     }
 
     private async Task DeleteUser(Guid userId)
