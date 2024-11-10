@@ -80,8 +80,15 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<User>> GetUserByIdLevel(int levelId)
         {
-            return await _context.Users.Where(x=>x.LevelId == levelId).ToListAsync();
-           
+            if(levelId < 0)
+            {
+                return await _context.Users.ToListAsync();
+            }
+            else
+            {
+                return await _context.Users.Where(x => x.LevelId == levelId).ToListAsync();
+            }
+
         }
     }
 }
