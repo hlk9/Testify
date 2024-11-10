@@ -27,6 +27,7 @@ else
     <MudDrawer @bind-Open="@_open" Width="30%" ClipMode="DrawerClipMode.Never" Elevation="3" Anchor="Anchor.End" Variant="@DrawerVariant.Responsive">
         <MudDrawerHeader Class="align-items-center">
             <MudText Class="fs-6">Thí sinh: <b>@user.FullName</b></MudText>
+            <MudText>Số lần làm bài: <b>@numberofsubmit/@limitofsubmit</b></MudText>
         </MudDrawerHeader>
         <MudPaper Elevation="0" Class="w-100 pt-5 px-4 h-100 position-relative">
             <MudText Class="fs-5 fw-bold text-center text-uppercase">@exam.Name</MudText>
@@ -63,6 +64,9 @@ else
     <MudMainContent>
         <MudAppBar Elevation="2">
             <MudText>Thời gian còn lại: <b>@timeRemaining</b></MudText>
+            <MudText>          Số lần làm bài: <b>@numberofsubmit/@limitofsubmit</b></MudText>
+           
+
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Class="d-lg-none d-block" Edge="Edge.End" OnClick="@ToggleDrawer" />
         </MudAppBar>
@@ -131,7 +135,6 @@ else
 
     private Exam exam { get; set; } = new();
     private User user { get; set; } = new();
-
     private int timeDoExam = 0;
     private string timeRemaining = "";
     private System.Timers.Timer timer;
@@ -143,7 +146,12 @@ else
     private int sttList;
     private bool _open = true;
     private int _tabCount = 0;
+    private int limitofsubmit;
+    private int numberofsubmit;
+    private int examscheduleId;
 
+    [Parameter]
+    public int submissionId { get; set; }
     private DotNetObjectReference<ViewExamTest> _objectReference;
 
     private List<ExamDetail> _lstexamDetails = new List<ExamDetail>();
@@ -164,8 +172,8 @@ else
         // countdownTime = exam.Duration * 60;
 
         // StartCountdown();
-
-        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        numberofsubmit = await _serSubmission.NumberSubmit(_userId, examscheduleId);
+        limitofsubmit = exam.NumberOfRepeat;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -214,6 +222,7 @@ else
         var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
         _userId = Guid.Parse(userId.Value);
         user = await _serLec.GetLecturerById(_userId);
+       
     }
 
     private void CheckInput()   
@@ -448,6 +457,8 @@ else
 
     }
 
+    private readonly DialogOptions _noHeader = new() { NoHeader = true };
+
     private async Task OnSubmit()
     {
         DialogOptions backdropClick = new() { BackdropClick = false };
@@ -467,6 +478,12 @@ else
         {
             await ScoreExam();
         }
+
+        // var dialogParametersDetail = new DialogParameters<Student.Dialog.FinalViewExam.FinalView>
+        // {
+        //     {x => x.submissionId, id}
+        // };
+        // return DialogService.ShowAsync<Student.Dialog.FinalViewExam.FinalView>("", dialogParametersDetail, options);
     }
 
     private async void StartCountdown()

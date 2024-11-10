@@ -33,7 +33,6 @@ namespace Testify.API.Controllers
         {
            var allUser = await _repo.GetUserByIdLevel(levelId);
             return Ok(allUser);
-;
         }
     }
 }

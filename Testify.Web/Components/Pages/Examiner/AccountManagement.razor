@@ -43,10 +43,7 @@
             </MudSelect> *@
 
             <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueLevel">
-                @if (levelId == -1)
-                {
-                    <MudSelectItem Value="-1">Chọn chức vụ</MudSelectItem>
-                }
+                <MudSelectItem Value="-1">Tất cả</MudSelectItem>
                 @foreach (var item in _lstLevel)
                 {
                     <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
@@ -67,7 +64,7 @@
 
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
 
-        <MudTable Items="@_lstUser" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -126,6 +123,7 @@
     private string searchValue = "";
     private bool isLoading { get; set; } = true;
     private List<User>? _lstUser { get; set; }
+    private List<User>? _userList = new List<User>();
 
     private Level level { get; set; }
     private int levelId =-1;
@@ -148,37 +146,19 @@
     private async Task LoadData(string? textSearch)
     {
         _lstLevel = await _serLevel.GetAllLevel();
-        _lstUser = await _serLec.GetAllLecturer(textSearch,true);
+      
+        _userList = await _serLevel.GetAllUserByLevelId(levelId);
         isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        _lstUser = await _serLec.GetAllLecturer("", true);
-        _lstLevel = await _serLevel.GetAllLevel();
-        if (_lstLevel.Any())
-        { 
-            if (_lstLevel != null && _lstLevel.Count > 0)
-            {
-                _lstLevel = await _serLevel.GetAllLevel();
-                _lstUser = await _serLevel.GetAllUserByLevelId(levelId);
-            }
-            
-        }
         await LoadData("");
     }
 
     private async Task ChangeValueLevel()
     {
-        _lstLevel = await _serLevel.GetAllLevel();
-        
-       
-        if(_lstLevel != null || _lstLevel.Count > 0)
-        {
-            _lstUser = await _serLec.GetAllLecturer("", true);
-            _lstUser = await _serLevel.GetAllUserByLevelId(levelId);
-        }
-        await LoadData("");
+        _userList = await _serLevel.GetAllUserByLevelId(levelId);
     }
 
 
