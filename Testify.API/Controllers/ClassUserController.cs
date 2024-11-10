@@ -59,5 +59,11 @@ namespace Testify.API.Controllers
             var obj = await _repo.DeleteUserInClass(id, classId);
             return Ok(obj);
         }
+
+        [HttpGet("Get-All-Class-By-UserId")]
+        public async Task<ActionResult<List<ClassUser>>> GetAllClassByUserId(Guid userId)
+        {
+            return Ok(await _repo.GetAllClassByUserId(userId));
+        }
     }
 }

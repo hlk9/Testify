@@ -117,5 +117,10 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
+
+        public async Task<List<ClassUser>> GetAllClassByUserId(Guid userId)
+        {
+            return _context.ClassUsers.Where(x => x.UserId == userId && x.Status == 1).ToList();
+        }
     }
 }
