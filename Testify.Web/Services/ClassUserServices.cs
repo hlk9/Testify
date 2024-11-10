@@ -50,5 +50,13 @@ namespace Testify.Web.Services
             }
             return false;
         }
+
+        public async Task<List<ClassUser>> GetAllClassByUserId(Guid userId)
+        {
+            var lst = await _httpClient.GetAsync($"ClassUser/Get-All-Class-By-UserId?userId={userId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<ClassUser>>();
+
+            return response;
+        }
     }
 }
