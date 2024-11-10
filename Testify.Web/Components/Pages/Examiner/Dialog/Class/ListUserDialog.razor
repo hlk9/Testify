@@ -1,7 +1,7 @@
 ﻿@using Testify.Web.Data.Commons
 @using Testify.Web.Shared
 @using Testify.DAL.ViewModels
-
+@inject IDialogService DialogService
 
 <MudDialog>
     <TitleContent>
@@ -31,16 +31,19 @@
                             <MudTh>Thao Tác</MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            
-                                <MudTd DataLabel="Name">@context.FullName</MudTd>
-                                <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
-                                <MudTd DataLabel="Email">@context.Email</MudTd>
-                                <MudTd>
-                                    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context.Id))">
-                                        Xoá
-                                    </MudButton>
-                                </MudTd>
-                            
+
+                            <MudTd DataLabel="Name">@context.FullName</MudTd>
+                            <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
+                            <MudTd DataLabel="Email">@context.Email</MudTd>
+                            <MudTd>
+                                <MudButton Color="Color.Surface" Variant="Variant.Filled" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))">
+                                    Chi Tiết
+                                </MudButton>
+                                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context.Id))">
+                                    Xoá
+                                </MudButton>
+                            </MudTd>
+
                         </RowTemplate>
                         <NoRecordsContent>
                             <MudText>Không có học sinh nào trong lớp</MudText>
@@ -117,6 +120,9 @@
 
     [Parameter]
     public int ClassId { get; set; }
+
+    [Parameter]
+    public Guid idUser { get; set; }
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
@@ -261,11 +267,28 @@
         }
     }
 
-
-
     private void Cancel()
     {
         MudDialog.Close(DialogResult.Ok(true));
     }
 
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+    private async Task OpenDialogAsync(DialogOptions options, string name, Guid id)
+    {
+        var dialogParametersDetail = new DialogParameters<Dialog.Class.DetailUserInListDialog>
+        {
+            {x => x.UserId, id}
+        };
+
+        if (name.Equals(OpenDialogType.Detail))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Class.DetailUserInListDialog>("Options Dialog", dialogParametersDetail, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+    }
 }

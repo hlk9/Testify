@@ -1,4 +1,5 @@
-﻿@using Testify.Web.Data.Commons
+﻿@using Testify.DAL.ViewModels
+@using Testify.Web.Data.Commons
 @using Testify.Web.Shared
 <MudDialog>
     <TitleContent>
@@ -67,6 +68,7 @@
     private Class classes { get; set; } = new();
     private List<User> _lstTeacher;
     private List<Subject> _lstSubject;
+    private List<ClassWithUser> _lstClass;
     private Guid teacherId = Guid.Empty;
     private int subjectId = -1;
     private bool isLoading { get; set; } = true;
@@ -98,6 +100,7 @@
         {
             subjectId = -1;
         }
+        _lstClass = await _serClass.GetAllClass(textSearch, true);
         isLoading = false;
     }
 
@@ -146,6 +149,13 @@
 
     private async Task Submit()
     {
+        bool classExists = _lstClass.Any(c => c.Name == classes.Name);
+        if(classExists)
+        {
+            snackbar.Add("Lớp học đã tồn tại!", Severity.Error);
+            return;
+        }
+
         var checkValidation = ValidateForm();
 
         if (!checkValidation)
