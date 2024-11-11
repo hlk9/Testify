@@ -40,6 +40,13 @@ namespace Testify.API.Controllers
             return Ok(lstUser);
         }
 
+        [HttpGet("Get-By-idUser")]
+        public async Task<ActionResult<List<User>>> GetByidUser(Guid id)
+        {
+            var idUser = await userRepos.GetByidUserSendMail(id);
+            return Ok(idUser);
+        }
+
         [HttpPost("create-user")]
         public async Task<ActionResult<User>> CreateAccount(User user)
         {

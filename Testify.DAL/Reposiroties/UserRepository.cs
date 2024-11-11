@@ -51,6 +51,12 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Users.FindAsync(Guid.Parse(id));
         }
+
+        public async Task<User> GetByidUserSendMail(Guid id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
         public async Task<User> AddUser(User user)
         {
             try

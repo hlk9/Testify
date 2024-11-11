@@ -1,7 +1,11 @@
-﻿@using Testify.Web.Data.Commons
+﻿@using SendGrid;
+@using SendGrid.Helpers.Mail;
+@using Testify.Web.Data.Commons
 @using Testify.Web.Shared
 @using Testify.DAL.ViewModels
 @inject IDialogService DialogService
+@inject CommonServices commonServices
+
 
 <MudDialog>
     <TitleContent>
@@ -177,6 +181,7 @@
         if (addSuccess != null)
         {
             snackbar.Add("Thêm thành công");
+            await SendEmail(userId);
             MudDialog.Close(DialogResult.Ok(true));
         }
         else
@@ -211,6 +216,16 @@
         {
             snackbar.Add("Xoá thất bại");
         }
+    }
+
+    private async Task SendEmail(Guid userId)
+    {
+        var mailUser = await _serUser.GetByidUser(userId);
+
+        List<EmailAddress> emails = new List<EmailAddress>();
+        emails.Add(new EmailAddress { Email = mailUser.Email});
+        string content = "Em đã được thêm mới vào lớp học";
+        await commonServices.sendEmail(emails, "Thông Báo", content, null);
     }
 
     private async Task Submit()
@@ -251,6 +266,7 @@
             if (checkAddClassUser != null)
             {
                 snackbar.Add("Thêm thành công", Severity.Success);
+                await SendEmail(obj.Id);
                 MudDialog.Close(DialogResult.Ok(true));
             }
             else
@@ -259,7 +275,6 @@
                 MudDialog.Close(DialogResult.Ok(true));
             }
             await LoadData("");
-            // }
         }
         else
         {
