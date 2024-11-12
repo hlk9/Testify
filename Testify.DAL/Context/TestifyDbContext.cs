@@ -51,10 +51,12 @@ namespace Testify.DAL.Context
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<BlackListToken> BlackListTokens { get; set; }
         public DbSet<ClassExamSchedule> ClassExamSchedules { get; set; }
+        public DbSet<UserLog> UserLogs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserLog>().ToTable("UserLogs");
 
             modelBuilder.Entity<Class>()
                 .HasIndex(c => c.ClassCode).IsUnique();

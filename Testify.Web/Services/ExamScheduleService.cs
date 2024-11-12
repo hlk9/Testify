@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Azure.Core;
+using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System.Net;
+using System.Net.Http.Headers;
 using Testify.API;
 using Testify.API.DTOs;
 using Testify.DAL.Models;
@@ -9,13 +12,16 @@ namespace Testify.Web.Services
     public class ExamScheduleService
     {
         private readonly HttpClient _httpClient;
-        public ExamScheduleService(HttpClient httpClient)
+        private readonly TokenService _tokenService;
+        public ExamScheduleService(HttpClient httpClient, TokenService  tokenService)
         {
             _httpClient = httpClient;
+            _tokenService = tokenService;
+
         }
 
         public async Task<List<ExamSchedule>> GetAll()
-        {
+        {           
             var lst = await _httpClient.GetFromJsonAsync<List<ExamSchedule>>("ExamSchedule/Get-All");
             return lst;
         }
@@ -87,11 +93,19 @@ namespace Testify.Web.Services
 
         public async Task<List<ExamScheduleDto>> GetInforBasic()
         {
-            var lst = await _httpClient.GetFromJsonAsync<List<ExamScheduleDto>>("ExamSchedule/Get-InfoBasic");
-            return lst;
+            var token = await _tokenService.GetTokenAsync();
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var lst = await _httpClient.GetFromJsonAsync<List<ExamScheduleDto>>("ExamSchedule/Get-InfoBasic");
+                return lst;
+            }
+            return null;
+          
         }
 
-        public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end,int? subjectId)
+        public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end, int? subjectId)
         {
             var startStr = Uri.EscapeDataString(start.ToString("MM/dd/yyyy HH:mm:ss"));
             var endStr = Uri.EscapeDataString(end.ToString("MM/dd/yyyy HH:mm:ss"));
@@ -100,26 +114,26 @@ namespace Testify.Web.Services
 
             if (response.StatusCode == HttpStatusCode.NoContent) // 204 No Content
             {
-              
-                return null; 
+
+                return null;
             }
             else
             {
                 var content = await response.Content.ReadAsStringAsync();
 
-               
-                    var schedule = JsonConvert.DeserializeObject<ExamSchedule>(content);
-                    return schedule;
-                
-            }    
-        
+
+                var schedule = JsonConvert.DeserializeObject<ExamSchedule>(content);
+                return schedule;
+
+            }
+
 
 
         }
 
         public async Task<ExamSchedule> GetById(int? id)
         {
-            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-ById?id="+id.ToString());
+            var schedule = await _httpClient.GetFromJsonAsync<ExamSchedule>("ExamSchedule/Get-ById?id=" + id.ToString());
             return schedule;
         }
 
