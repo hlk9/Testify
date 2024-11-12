@@ -129,7 +129,7 @@
     private Subject subjectCurrent = new Subject();
     private void Cancel() => MudDialog.Cancel();
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
-    private readonly DialogOptions _maxWidthUpdate = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
+    private readonly DialogOptions _maxWidthUpdate = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true, BackdropClick = false };
 
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private List<User> user = new List<User>();
@@ -221,7 +221,6 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
             await LoadData();
         }
     }
