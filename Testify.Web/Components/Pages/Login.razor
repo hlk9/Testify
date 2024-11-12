@@ -398,10 +398,10 @@
     {
 
     }
-    protected override void OnAfterRender(bool firstRender)
+    protected override async void OnAfterRender(bool firstRender)
     {
         if(firstRender)
-            CheckToken();
+            await CheckToken();
     }
 
     private async Task CheckToken()
@@ -431,7 +431,7 @@
         if (ult != null && ult.IsLoginSucces == true)
         {
             await ProtectedSessionStore.SetAsync("userLogin", ult.Id);
-            Snackbar.Add("Đăng nhập thành công!", Severity.Success);
+            Snackbar.Add("Đăng nhập thành công!", Severity.Success);           
             var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
             Snackbar.Add(a.Value, Severity.Success);
             await localStorage.SetItemAsync("token", ult.Token);
@@ -439,12 +439,19 @@
 
             if (ult.LevelId == 1)
             {
+                LogService.LogInformation($"Quản trị {username} đăng nhập vào hệ thống | {ult.Id}");
                 Navigation.NavigateTo("/admin/Home");
             }
             else if (ult.LevelId == 2|| ult.LevelId==3)
+            {
+                LogService.LogInformation($"Khảo thí/Giáo viên {username} đăng nhập vào hệ thống | {ult.Id}");
                 Navigation.NavigateTo("/Examiner/Home");
+            }
             else if (ult.LevelId == 4)
+            {
+                LogService.LogInformation($"Thí sinh {username} đăng nhập vào hệ thống | {ult.Id}");
                 Navigation.NavigateTo("/Student/Home");
+            }
 
 
         }
