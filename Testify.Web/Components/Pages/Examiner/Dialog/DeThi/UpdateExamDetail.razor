@@ -127,7 +127,7 @@
     </DialogContent>
     <DialogActions>
         @* <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton> *@
-        <MudButton Class="btn btn-warning" OnClick="Submit">Sửa</MudButton>
+        <MudButton  OnClick="Submit">Đóng</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -258,6 +258,7 @@
 
                     Snackbar.Add("Thêm " + newListToAdd.Count + "câu hỏi thành công", Severity.Info);
                     newListToAdd.Clear();
+                    listQuestionSelected.Clear();
 
                     foreach (var item in listQuestionSelected)
                     {
