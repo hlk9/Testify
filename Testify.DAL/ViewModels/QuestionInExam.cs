@@ -13,6 +13,7 @@ namespace Testify.DAL.ViewModels
         public int Id { get; set; }
         public string Content { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string Code { get; set; }
         public byte? Status { get; set; }
         public int SubjectId { get; set; }
         public string? SubjectName { get; set; }
@@ -22,7 +23,8 @@ namespace Testify.DAL.ViewModels
         public int? QuestionLevelId { get; set; }
         public string? QuestionLeveName { get; set; }
 
-        public bool IsChoosen { get; set; } = false;    
+        public bool IsChoosen { get; set; } = false; 
+        
 
     }
 }
