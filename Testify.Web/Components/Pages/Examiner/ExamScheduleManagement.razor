@@ -113,7 +113,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        listSchedule = await scheduleService.GetInforBasic();
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            listSchedule = await scheduleService.GetInforBasic();
+            StateHasChanged();
+        }
     }
 
 
