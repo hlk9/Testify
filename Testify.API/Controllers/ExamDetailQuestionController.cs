@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -35,5 +36,39 @@ namespace Testify.API.Controllers
 
             return Ok(isDeleted);
         }
+
+        [HttpGet("Get-Question-By-ExamDetailID")]
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID( int examdetailID)
+        {
+            var objGetAll = await _respon.GetQuestionByExamDetailID(examdetailID);
+            return Ok(objGetAll);
+        }
+
+        [HttpGet("Get-Question-By-ExamDetailID-Not")]
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID)
+        {
+            var objGetAll = await _respon.GetQuestionByExamDetailID_NOT(examdetailID);
+            return Ok(objGetAll);
+        }
+
+        [HttpGet("Get-Question-By-ExamDetailID-NotAndLevel")]
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID)
+        {
+            var objGetAll = await _respon.GetQuestionByExamDetailID_NOTAndLevel(examdetailID, levelID);
+            return Ok(objGetAll);
+        }
+
+        [HttpPost("Add-ListQuestionToExam")]
+        public bool AddListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
+        {
+            return _respon.AddListQuestionToExam(data, idExamDetail);
+        }
+
+        [HttpPost("Remove-ListQuestionToExam")]
+        public bool RemoveFromListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
+        {
+            return _respon.RemoveFromListQuestionToExam(data, idExamDetail);
+        }
+
     }
 }

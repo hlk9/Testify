@@ -43,8 +43,16 @@
 
 
 
-            <MudTextField Class="mt-4" T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
-
+            <MudItem Class="w-100">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
             
         </EditForm>
        @*  <MudPaper Elevation="0" Class="my-4">
