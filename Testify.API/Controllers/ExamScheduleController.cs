@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Testify.API.DTOs;
 using Testify.API.TokenHelper;
 using Testify.DAL.Models;
@@ -58,6 +59,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-InfoBasic")]
+        [Authorize]
         public async Task<List<ExamScheduleDto>> GetInfoBasic()
         {
             List<ExamScheduleDto> listResult = new List<ExamScheduleDto>();
