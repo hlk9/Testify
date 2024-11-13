@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -37,13 +32,13 @@ namespace Testify.DAL.Reposiroties
                 await _context.SaveChangesAsync();
                 return objSubmission;
             }
-            catch 
+            catch
             {
                 return null;
             }
 
-           
-            
+
+
         }
         public async Task<int> CheckNumberOfSubmit(Guid userId, int examscheduleId)
         {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Testify.API.DTOs;
-using Testify.API.TokenHelper;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -117,7 +116,7 @@ namespace Testify.API.Controllers
             return await repos.GetExamScheduleTimesByClassUserIdAsync(userId);
         }
         [HttpGet("Get-All-Schedule-ByStudentId")]
-        public async Task<List<ExamScheduleDto>>GetAllScheduleOfStudentById(string studentId)
+        public async Task<List<ExamScheduleDto>> GetAllScheduleOfStudentById(string studentId)
         {
             List<ExamScheduleDto> listResult = new List<ExamScheduleDto>();
             SubjectRepository subjectRepository = new SubjectRepository();
@@ -128,11 +127,11 @@ namespace Testify.API.Controllers
 
 
             var lstSchedule = (from cu in lstClass
-                                     join classEx in classExamScheduleRepository.GetAllActive()
-                                     on cu.ClassId equals classEx.ClassId
-                                     join schedule in repos.GetAll()
-                                     on classEx.ExamScheduleId equals schedule.Id
-                                     select schedule).ToList();
+                               join classEx in classExamScheduleRepository.GetAllActive()
+                               on cu.ClassId equals classEx.ClassId
+                               join schedule in repos.GetAll()
+                               on classEx.ExamScheduleId equals schedule.Id
+                               select schedule).ToList();
 
             var lstSubject = await subjectRepository.GetAllSubject(null, true);
 

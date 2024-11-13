@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -16,7 +15,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-ExamDetail")]
-        public async Task<ActionResult<List<ExamDetail>>> GetAll() 
+        public async Task<ActionResult<List<ExamDetail>>> GetAll()
         {
             var lstExamDetail = await _respon.GetAllExamDetail();
             return Ok(lstExamDetail);

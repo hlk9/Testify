@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-public class LogService
+﻿public class LogService
 {
     private readonly ILogger<LogService> _logger;
 

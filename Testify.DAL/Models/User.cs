@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Testify.DAL.Models
 {
@@ -21,10 +16,10 @@ namespace Testify.DAL.Models
         public string PasswordHash { get; set; }
         public string? AvatarUrl { get; set; }
         public bool Sex { get; set; }
-        public DateTime? LastLogin {  get; set; }
+        public DateTime? LastLogin { get; set; }
         public byte Status { get; set; } = 1;
         [ForeignKey("LevelId")]
-        public int LevelId { get; set; } 
+        public int LevelId { get; set; }
         public virtual Level? Level { get; set; }
         public virtual ICollection<ClassUser>? ClassUsers { get; set; }
         public virtual ICollection<UserPermission>? UserPermissions { get; set; }

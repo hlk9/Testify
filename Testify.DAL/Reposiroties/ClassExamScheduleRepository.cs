@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Testify.DAL.Context;
+﻿using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 

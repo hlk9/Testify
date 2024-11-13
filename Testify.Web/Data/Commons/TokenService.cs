@@ -1,5 +1,4 @@
 ﻿using Blazored.LocalStorage;
-using System.Threading.Tasks;
 
 public class TokenService
 {

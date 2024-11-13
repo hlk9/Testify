@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -83,13 +78,13 @@ namespace Testify.DAL.Reposiroties
         }
 
         public async Task<ClassUser> UpdateStatusAsync(ClassUser classUser)
-        { 
+        {
             var _classUser = await _context.ClassUsers.FirstOrDefaultAsync(cu => cu.UserId == classUser.UserId && cu.ClassId == classUser.ClassId);
 
             _classUser.Status = 1;
             var objUpdateStatus = _context.ClassUsers.Update(_classUser).Entity;
             await _context.SaveChangesAsync();
-            return objUpdateStatus; 
+            return objUpdateStatus;
         }
 
         //public async Task<ClassUser> RefuseUserAsync(ClassUser classUser)

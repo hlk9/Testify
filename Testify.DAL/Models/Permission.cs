@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Testify.DAL.Models
+﻿namespace Testify.DAL.Models
 {
     public class Permission
     {

@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -72,14 +67,14 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<ClassWithUser>> GetClassWithSubjectId(int idSubject)
         {
-           
+
             var data = await (from c in _context.Classes
                               join u in _context.Users
                               on c.TeacherId equals u.Id into classUser
                               from cu in classUser.DefaultIfEmpty()
                               join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
                               from cs in classSubject.DefaultIfEmpty()
-                              where (c.SubjectId==idSubject && c.Status==1) 
+                              where (c.SubjectId == idSubject && c.Status == 1)
                               select new ClassWithUser
                               {
                                   Id = c.Id,
@@ -107,7 +102,7 @@ namespace Testify.DAL.Reposiroties
                               from cu in classUser.DefaultIfEmpty()
                               join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
                               from cs in classSubject.DefaultIfEmpty()
-                              where (c.SubjectId == idSubject && c.Status == 1 && !_context.ClassExamSchedules.Any(x=>x.ClassId==c.Id))
+                              where (c.SubjectId == idSubject && c.Status == 1 && !_context.ClassExamSchedules.Any(x => x.ClassId == c.Id))
                               select new ClassWithUser
                               {
                                   Id = c.Id,
@@ -136,7 +131,7 @@ namespace Testify.DAL.Reposiroties
             return await _context.Classes.FirstOrDefaultAsync(x => x.ClassCode.ToLower().Equals(ClassCode.ToLower()));
         }
 
-        public async Task<Class> AddClass(Class classes) 
+        public async Task<Class> AddClass(Class classes)
         {
             try
             {

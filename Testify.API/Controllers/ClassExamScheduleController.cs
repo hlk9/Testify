@@ -53,14 +53,14 @@ namespace Testify.API.Controllers
 
             var oneSchedule = await scheduleRepo.GetById(scheduleId);
 
-            var scheduleInTime = await 
+            var scheduleInTime = await
                 examScheduleRepository.CheckIsContaintInTimeWithoutSubject(oneSchedule.StartTime, oneSchedule.EndTime);
             if (scheduleInTime != null)
             {
                 try
                 {
                     var listClwU = await classUserReposiroty.GetAll(1);
-                   
+
                     var listStudentPrepare =
                     (
                      from classO in data

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Testify.DAL.Models;
-using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -30,26 +29,26 @@ namespace Testify.Web.Services
 
         public async Task<List<QuestionInExam>> GetAllQuestioneByIdSub(int id_sub)
         {
-            
+
 
             var response = await _httpClient.GetAsync($"Question/Get-Question-By-Id_Sub?id_sub={id_sub}");
 
             if (response.IsSuccessStatusCode)
             {
-                
+
                 var questions = await response.Content.ReadFromJsonAsync<List<QuestionInExam>>();
                 return questions ?? new List<QuestionInExam>();
             }
             else
             {
-                
+
                 return new List<QuestionInExam>();
             }
         }
 
         public async Task<List<QuestionInExam>> GetAllQuestioneByIdSub_And_Level(int id_sub, int id_level)
         {
-            
+
 
             var response = await _httpClient.GetAsync($"Question/Get-Question-By-Id_Sub-And-Level?id_sub={id_sub}&id_level={id_level}");
 
@@ -136,6 +135,6 @@ namespace Testify.Web.Services
             return response;
         }
 
-        
+
     }
 }

@@ -63,7 +63,7 @@ namespace Testify.Web.Services
         }
         public async Task<List<Exam>> GetListOfSubject(int id)
         {
-            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamBySubject?id="+id);
+            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamBySubject?id=" + id);
             return lst;
         }
 
@@ -73,7 +73,7 @@ namespace Testify.Web.Services
             return lst;
         }
 
-       
+
 
     }
 }

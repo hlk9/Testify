@@ -2,9 +2,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Testify.DAL.Models;
-using Microsoft.Extensions.Configuration;
 using Testify.API.Utilities;
+using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
 namespace Testify.API.TokenHelper
@@ -28,16 +27,16 @@ namespace Testify.API.TokenHelper
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.FullName),
             };
-                var jwtToken = new JwtSecurityToken(
-                    claims: claims,
-                    notBefore: regDate,
-                    expires: expried,
-                    signingCredentials: new SigningCredentials(
-                        new SymmetricSecurityKey(
-                           Encoding.UTF8.GetBytes(_configuration["ApplicationSettings:JWT_Secret"])
-                            ),
-                        SecurityAlgorithms.HmacSha256Signature)
-                    );
+            var jwtToken = new JwtSecurityToken(
+                claims: claims,
+                notBefore: regDate,
+                expires: expried,
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(
+                       Encoding.UTF8.GetBytes(_configuration["ApplicationSettings:JWT_Secret"])
+                        ),
+                    SecurityAlgorithms.HmacSha256Signature)
+                );
 
             TokenUserModel tokenUserModel = new TokenUserModel();
             tokenUserModel.UserId = user.Id;
@@ -56,7 +55,7 @@ namespace Testify.API.TokenHelper
 
         }
 
-        
+
 
     }
 }

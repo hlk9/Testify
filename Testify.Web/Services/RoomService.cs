@@ -1,5 +1,4 @@
 ﻿using Testify.DAL.Models;
-using Testify.DAL.Reposiroties;
 
 namespace Testify.Web.Services
 {

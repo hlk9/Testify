@@ -1,15 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
 namespace Testify.DAL.Reposiroties
 {
-    public class UserRepository 
+    public class UserRepository
     {
         private readonly TestifyDbContext _context;
         public UserRepository()
@@ -19,28 +14,28 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<User> GetByKeyAndPassword(string keyword, string hashPassword)
         {
-            User avaiableUser = await _context.Users.FirstOrDefaultAsync(x=>x.UserName == keyword || x.Email == keyword || x.PhoneNumber == keyword);
+            User avaiableUser = await _context.Users.FirstOrDefaultAsync(x => x.UserName == keyword || x.Email == keyword || x.PhoneNumber == keyword);
             if (avaiableUser == null)
             {
                 return null;
             }
-            else 
+            else
             {
-                if(avaiableUser.PasswordHash.ToUpper() == hashPassword.ToUpper())
+                if (avaiableUser.PasswordHash.ToUpper() == hashPassword.ToUpper())
                 {
                     return avaiableUser;
-                }    
-                    
+                }
+
                 else
                 {
                     ///wrong password
                     avaiableUser.PasswordHash = "-1";
                     return avaiableUser;
-                }    
-            }    
-           
-           
-               
+                }
+            }
+
+
+
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -119,7 +114,7 @@ namespace Testify.DAL.Reposiroties
                 if (u == null)
                     return null;
                 return u;
-                
+
 
             }
             catch

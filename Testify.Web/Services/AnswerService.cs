@@ -31,7 +31,7 @@ namespace Testify.Web.Services
         public async Task<bool> Create(Answer answer)
         {
             var result = await _httpClient.PostAsJsonAsync<Answer>("Answer/Create-Answer", answer);
-            if(result.IsSuccessStatusCode)
+            if (result.IsSuccessStatusCode)
             {
                 return true;
             }
@@ -45,7 +45,7 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<Answer> UpdateStatus(int id,  byte status)
+        public async Task<Answer> UpdateStatus(int id, byte status)
         {
             var updateStatus = await _httpClient.PutAsJsonAsync($"Answer/Update-Status-Answer?questionId={id}&status={status}", status);
             var response = await updateStatus.Content.ReadFromJsonAsync<Answer>();

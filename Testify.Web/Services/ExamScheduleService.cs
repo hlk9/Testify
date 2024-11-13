@@ -1,9 +1,6 @@
-﻿using Azure.Core;
-using Newtonsoft.Json;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+﻿using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
-using Testify.API;
 using Testify.API.DTOs;
 using Testify.DAL.Models;
 
@@ -13,7 +10,7 @@ namespace Testify.Web.Services
     {
         private readonly HttpClient _httpClient;
         private readonly TokenService _tokenService;
-        public ExamScheduleService(HttpClient httpClient, TokenService  tokenService)
+        public ExamScheduleService(HttpClient httpClient, TokenService tokenService)
         {
             _httpClient = httpClient;
             _tokenService = tokenService;
@@ -21,7 +18,7 @@ namespace Testify.Web.Services
         }
 
         public async Task<List<ExamSchedule>> GetAll()
-        {           
+        {
             var lst = await _httpClient.GetFromJsonAsync<List<ExamSchedule>>("ExamSchedule/Get-All");
             return lst;
         }
@@ -102,7 +99,7 @@ namespace Testify.Web.Services
                 return lst;
             }
             return null;
-          
+
         }
 
         public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end, int? subjectId)
