@@ -1,13 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -22,7 +16,7 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public async  Task<List<Exam>> GetAllExam(string? textSearch, bool isActive)
+        public async Task<List<Exam>> GetAllExam(string? textSearch, bool isActive)
         {
             var qr = _context.Exams.AsQueryable();
 
@@ -52,7 +46,7 @@ namespace Testify.DAL.Reposiroties
             var filteredExam = await GetAllExam(textSearch, isActive);
             var data = await (from _ex in _context.Exams
                               join _exdt in _context.ExamDetails
-                              on _ex.Id equals _exdt.ExamId 
+                              on _ex.Id equals _exdt.ExamId
                               join _exdtqs in _context.ExamDetailQuestions
                               on _exdt.Id equals _exdtqs.ExamDetailId
                               join _qs in _context.Questions
@@ -74,7 +68,7 @@ namespace Testify.DAL.Reposiroties
                                   UpdateDate = _exdt.UpdateDate,
                                   Point = _exdtqs.Point,
                                   Description = _ex.Description,
-                                  
+
                               }
                               ).ToListAsync();
             return data;
@@ -100,7 +94,7 @@ namespace Testify.DAL.Reposiroties
             {
                 var objUpdateExam = await _context.Exams.FindAsync(exam.Id);
 
-                
+
 
                 objUpdateExam.Name = exam.Name;
                 objUpdateExam.NumberOfQuestions = exam.NumberOfQuestions;
@@ -109,7 +103,7 @@ namespace Testify.DAL.Reposiroties
                 objUpdateExam.Duration = exam.Duration;
                 objUpdateExam.Description = exam.Description;
                 objUpdateExam.MaximmumMark = exam.MaximmumMark;
-                objUpdateExam.PassMark = exam.PassMark; 
+                objUpdateExam.PassMark = exam.PassMark;
                 objUpdateExam.SubjectId = exam.SubjectId;
 
                 var updateExam = _context.Exams.Update(objUpdateExam).Entity;
@@ -138,17 +132,17 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-       
+
 
         public async Task<List<Exam>> GetAllActicve()
         {
-            return _context.Exams.Where(x=>x.Status == 1).ToList();
+            return _context.Exams.Where(x => x.Status == 1).ToList();
         }
 
         public async Task<List<Exam>> GetAllActicveOfSubject(int subjectId)
         {
-            return _context.Exams.Where(x => x.Status == 1&&x.SubjectId==subjectId).ToList();
+            return _context.Exams.Where(x => x.Status == 1 && x.SubjectId == subjectId).ToList();
         }
-        
+
     }
 }

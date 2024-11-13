@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -76,7 +71,7 @@ namespace Testify.DAL.Reposiroties
                             SubjectId = b.SubjectId,
                             Code = e.Code,
                         }).ToList();
-            
+
             return data;
         }
 
@@ -106,7 +101,7 @@ namespace Testify.DAL.Reposiroties
             return data.DistinctBy(x => x.Id).ToList();
         }
 
-        public async Task<List<QuestionInExam>> GetQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID )
+        public async Task<List<QuestionInExam>> GetQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID)
         {
             var data = (from a in _context.ExamDetailQuestions
                         join b in _context.Questions on a.QuestionId equals b.Id
@@ -139,12 +134,12 @@ namespace Testify.DAL.Reposiroties
             {
                 foreach (var h in data)
                 {
-                    _context.ExamDetailQuestions.Add(new ExamDetailQuestion {QuestionId = h.Id , ExamDetailId =idExamDetail });
+                    _context.ExamDetailQuestions.Add(new ExamDetailQuestion { QuestionId = h.Id, ExamDetailId = idExamDetail });
                 }
                 _context.SaveChanges();
                 return true;
             }
-            catch 
+            catch
             {
                 return false;
             }
@@ -155,7 +150,7 @@ namespace Testify.DAL.Reposiroties
             {
                 foreach (var item in data)
                 {
-                    var a = _context.ExamDetailQuestions.FirstOrDefault( x=> x.ExamDetailId == idExamDetail && x.QuestionId == item.Id);
+                    var a = _context.ExamDetailQuestions.FirstOrDefault(x => x.ExamDetailId == idExamDetail && x.QuestionId == item.Id);
                     if (a != null)
                     {
                         _context.ExamDetailQuestions.Remove(a);
@@ -164,7 +159,7 @@ namespace Testify.DAL.Reposiroties
                 _context.SaveChanges();
                 return true;
             }
-            catch 
+            catch
             {
 
                 return false;

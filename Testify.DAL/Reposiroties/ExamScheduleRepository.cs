@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
@@ -19,7 +14,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> GetById(int id)
         {
-              var a=  await _context.ExamSchedules.FindAsync(id);
+            var a = await _context.ExamSchedules.FindAsync(id);
             return a;
         }
 
@@ -119,9 +114,9 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> CheckIsContaintInTime(DateTime startDate, DateTime endDate, int subjectId)
         {
-            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId==subjectId || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255 && x.SubjectId == subjectId);
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255 && x.SubjectId == subjectId);
 
-            if(ojb!= null)
+            if (ojb != null)
             {
                 return ojb;
             }
@@ -131,7 +126,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> CheckIsContaintInTimeWithoutSubject(DateTime startDate, DateTime endDate)
         {
-            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255) ;
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255);
 
             if (ojb != null)
             {

@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -53,7 +48,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<Question>> GetQuestionBySubjectIdAndLevel(int subjectId, int levelId)
         {
-            return await _context.Questions.Where(x => x.SubjectId == subjectId && x.QuestionLevelId ==levelId && x.Status == 1 ).ToListAsync();
+            return await _context.Questions.Where(x => x.SubjectId == subjectId && x.QuestionLevelId == levelId && x.Status == 1).ToListAsync();
         }
 
         //public async Task<List<QuestionInExam>> GetQuesBySub_Level_CHosen(int subID, int levelId, bool choosen)

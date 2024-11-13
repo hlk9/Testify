@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using Testify.DAL.Models;
+﻿using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -42,7 +40,7 @@ namespace Testify.Web.Services
             var newClass = await _httpClient.PostAsJsonAsync("Class/Add-Class", c);
             var reponse = await newClass.Content.ReadFromJsonAsync<Class>();
             return reponse;
-           
+
         }
 
         public async Task<Class> UpdateClass(Class c)

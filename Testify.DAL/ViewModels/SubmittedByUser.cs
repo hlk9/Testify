@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Testify.DAL.ViewModels
+﻿namespace Testify.DAL.ViewModels
 {
     public class SubmittedByUser
     {
@@ -14,7 +8,7 @@ namespace Testify.DAL.ViewModels
 
         public int ExamScheduleId { get; set; }
 
-        public string NameExam {  get; set; }
+        public string NameExam { get; set; }
 
         public DateTime ExamDate { get; set; }
 

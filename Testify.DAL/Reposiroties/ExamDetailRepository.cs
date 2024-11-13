@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
@@ -30,7 +25,7 @@ namespace Testify.DAL.Reposiroties
         public async Task<List<ExamDetail>> GetExamDetailByExamId(int examId)
         {
             return await _context.ExamDetails.Where(x => x.ExamId == examId).ToListAsync();
-        } 
+        }
 
         public async Task<ExamDetail> CreateExamDetail(ExamDetail examDetail)
         {
@@ -60,5 +55,5 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
-    } 
+    }
 }

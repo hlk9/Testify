@@ -1,11 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -193,15 +186,15 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<ListExamsOfStudent>> GetListExamOfStudent(Guid studentId)
         {
-        
 
-            var data = await (from cluser in _context.ClassUsers.Where(x=>x.UserId == studentId)
+
+            var data = await (from cluser in _context.ClassUsers.Where(x => x.UserId == studentId)
                               join cla in _context.Classes on cluser.ClassId equals cla.Id
                               join classschedule in _context.ClassExamSchedules on cla.Id equals classschedule.ClassId
                               join exsch in _context.ExamSchedules on classschedule.ExamScheduleId equals exsch.Id
                               join ex in _context.Exams on exsch.ExamId equals ex.Id
                               join sub in _context.Subjects on exsch.SubjectId equals sub.Id
-                              
+
 
                               select new ListExamsOfStudent
                               {
@@ -220,10 +213,10 @@ namespace Testify.DAL.Reposiroties
                                   Status = exsch.Status
                               }
                               ).ToListAsync();
-           
+
             return data;
         }
 
-    
+
     }
 }

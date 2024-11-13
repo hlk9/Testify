@@ -1,9 +1,7 @@
-﻿using Testify.DAL.Models;
-
-namespace Testify.Web.Services
+﻿namespace Testify.Web.Services
 {
     public class UserPermissionService
     {
-        
+
     }
 }

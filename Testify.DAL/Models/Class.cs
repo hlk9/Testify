@@ -1,9 +1,4 @@
-﻿ using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Testify.DAL.Models
 {
@@ -14,7 +9,7 @@ namespace Testify.DAL.Models
         public string ClassCode { get; set; }
         public string Description { get; set; }
         public int Capacity { get; set; }
-        public Guid TeacherId { get; set; }        
+        public Guid TeacherId { get; set; }
         //[ForeignKey("OrganizationId")]
         //public int OrganizationId { get; set; }
         //public virtual Organization? Organization { get; set; }

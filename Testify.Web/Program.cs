@@ -3,14 +3,11 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using MudBlazor;
 using MudBlazor.Services;
-using System.Globalization;
-using Testify.DAL.Models;
-using Testify.Web.Components;
-using Testify.Web.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using Testify.Web.Data.Commons;
 using Serilog;
-using Serilog.Sinks.MSSqlServer;
+using System.Globalization;
+using Testify.Web.Components;
+using Testify.Web.Data.Commons;
+using Testify.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

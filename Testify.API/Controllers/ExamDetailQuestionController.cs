@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -38,7 +37,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Question-By-ExamDetailID")]
-        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID( int examdetailID)
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID(int examdetailID)
         {
             var objGetAll = await _respon.GetQuestionByExamDetailID(examdetailID);
             return Ok(objGetAll);

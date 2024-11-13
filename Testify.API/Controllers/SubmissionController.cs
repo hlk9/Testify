@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -37,7 +36,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Check-NumberOfSubmit")]
-        public async Task<ActionResult<int>> NumberOfSubmits(Guid userId,int examscheduleId)
+        public async Task<ActionResult<int>> NumberOfSubmits(Guid userId, int examscheduleId)
         {
             return await _repo.CheckNumberOfSubmit(userId, examscheduleId);
         }
