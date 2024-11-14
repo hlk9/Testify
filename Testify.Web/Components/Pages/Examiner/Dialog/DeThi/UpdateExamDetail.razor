@@ -241,43 +241,45 @@
         }
         else
         {
-            foreach (var item in listQuestionSelected)
-            {
-                newListToAdd.Add(item);
-            }
-
             if (_lstChoice.Count + listQuestionSelected.Count > exam.NumberOfQuestions)
             {
                 Snackbar.Add("Số câu hỏi thêm không được vượt quá câu hỏi của đề", Severity.Warning);
-            }
-            else
+            }else
             {
+                foreach (var item in listQuestionSelected)
+                {
+                    newListToAdd.Add(item);
+                }
+
                 var status = await examdetailQuestionService.AddListQuestionToExam(newListToAdd, examDetail.Id);
-                if (status)
-                {
-
-                    Snackbar.Add("Thêm " + newListToAdd.Count + "câu hỏi thành công", Severity.Info);
-                    newListToAdd.Clear();
-                    listQuestionSelected.Clear();
-
-                    foreach (var item in listQuestionSelected)
+                    if (status)
                     {
-                        _lstChoice.Remove(item);
+
+                        Snackbar.Add("Thêm " + newListToAdd.Count + "câu hỏi thành công", Severity.Info);
+                        newListToAdd.Clear();
+                        listQuestionSelected.Clear();
+                        listQuestionSelectedInList.Clear();
+
+                        foreach (var item in listQuestionSelected)
+                        {
+                            _lstChoice.Remove(item);
+                        }
+                        await LoadData();
+                        return;
                     }
-                    await LoadData();
-                    return;
-                }
-                else
-                {
-                    Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
+                    else
+                    {
+                        Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
 
-                    await LoadData();
-                }
-
+                        await LoadData();
+                    }
             }
+
+            
 
 
         }
+
         StateHasChanged();
 
     }

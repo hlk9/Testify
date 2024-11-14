@@ -104,7 +104,8 @@
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     protected override async Task OnInitializedAsync()
     {
-        _lst = await examService.GetInforBasic();
+        //_lst = await examService.GetInforBasic();
+        _lst = (await examService.GetInforBasic()).Where(x => x.Status != 255).ToList();
 
 
     }
