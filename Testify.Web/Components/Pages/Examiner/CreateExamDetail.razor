@@ -33,7 +33,7 @@
         </MudItem>
     </MudGrid>
 
-    @if (ExamID > 0 && lisDThi.Count > 0)
+    @if (ExamID > 0 && lisDThi.Count > 0 )
     {
         <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="450px">
 
@@ -137,10 +137,16 @@
 
     private async Task LoadData()
     {
-        lisDThi = await examdetailService.GetExamDetailByExamId(ExamID);
+        // lisDThi = await examdetailService.GetExamDetailByExamId(ExamID);
+        // var exam = await examService.GetExamId(ExamID);
+        // subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+        // GetHashCode();
+        var allExamDetails = await examdetailService.GetExamDetailByExamId(ExamID);
+        lisDThi = allExamDetails.Where(x => x.Status != 255).ToList(); 
         var exam = await examService.GetExamId(ExamID);
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         GetHashCode();
+
 
     }
 

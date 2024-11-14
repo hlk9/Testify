@@ -182,13 +182,25 @@
 
     protected override async Task OnInitializedAsync()
     {
-        user = await _serUser.GetUsers();
-        lisDThi = await examdetailService.GetExamDetailByExamId(Id);
+        // user = await _serUser.GetUsers();
+        // lisDThi = await examdetailService.GetExamDetailByExamId(Id);
 
         
-        var examId = lisDThi.FirstOrDefault().ExamId;
-        var exam = await examService.GetExamId(examId);
-        subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+        // var examId = lisDThi.FirstOrDefault().ExamId;
+        // var exam = await examService.GetExamId(examId);
+        // subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+        user = await _serUser.GetUsers();
+
+        // Lọc bỏ các đề thi có trạng thái là 255
+        var allExamDetails = await examdetailService.GetExamDetailByExamId(Id);
+        lisDThi = allExamDetails.Where(x => x.Status != 255).ToList(); 
+
+        if (lisDThi.Any())
+        {
+            var examId = lisDThi.FirstOrDefault().ExamId;
+            var exam = await examService.GetExamId(examId);
+            subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+        }
     }
     
 

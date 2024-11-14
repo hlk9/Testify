@@ -29,9 +29,9 @@
 
     private async Task DeleteExcute()
     {
-        bool stats = await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(IdExamDetail);
+        //bool stats = await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(IdExamDetail);
         bool stats_1 = await examDetailService.DeleteExamDetail(IdExamDetail);
-        if (stats && stats_1)
+        if ( stats_1)
         {
             Snackbar.Add("Xoá thành công!", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));

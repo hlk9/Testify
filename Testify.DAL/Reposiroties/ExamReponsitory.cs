@@ -121,8 +121,9 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 var objDeleteExam = await _context.Exams.FindAsync(id);
+                objDeleteExam.Status = 255;
 
-                _context.Exams.Remove(objDeleteExam);
+                _context.Exams.Update(objDeleteExam);
                 await _context.SaveChangesAsync();
                 return objDeleteExam;
             }

@@ -46,7 +46,13 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 var objDelete = await _context.ExamDetails.FindAsync(id);
-                _context.ExamDetails.Remove(objDelete);
+                if (objDelete == null)
+                {
+                    return null;
+                }
+
+                objDelete.Status = 255;
+                _context.ExamDetails.Update(objDelete);
                 await _context.SaveChangesAsync();
                 return objDelete;
             }
@@ -55,5 +61,6 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
+
     }
 }
