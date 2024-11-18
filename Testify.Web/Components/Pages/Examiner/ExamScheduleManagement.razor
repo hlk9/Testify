@@ -9,7 +9,6 @@
         color: white;
         width: 100%;
     }
-
         .add-button-end:hover {
             background-color: white;
             color: #29a69a;
@@ -63,7 +62,7 @@
                 <MudTd DataLabel="Thời gian bắt đầu">@context.StartTime</MudTd>
                 <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
                 <MudTd DataLabel="Trạng thái">@(DateTime.Now < context.StartTime ? "Chưa diễn ra" : DateTime.Now > context.EndTime ? "Kết thúc" : "Đang diễn ra")
-                </MudTd>x
+                </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Xếp lịch">
                         <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
