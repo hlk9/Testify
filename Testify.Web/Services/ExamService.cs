@@ -54,7 +54,7 @@ namespace Testify.Web.Services
 
         public async Task<bool> DeleteExam(int id)
         {
-            var status = await _httpClient.DeleteAsync($"Exam/Delete-Exam?id={id}");
+            var status = await _httpClient.PutAsync($"Exam/Delete-Exam?id={id}", null);
             if (status.IsSuccessStatusCode)
             {
                 return true;

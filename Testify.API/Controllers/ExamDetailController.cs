@@ -42,11 +42,16 @@ namespace Testify.API.Controllers
             return Ok(obj);
         }
 
-        [HttpDelete("Delete-ExamDetail")]
+        [HttpPut("Delete-ExamDetail")]
         public async Task<ActionResult<ExamDetail>> DeleteExamDetail(int id)
         {
             var deleteEx = await _respon.DeleteExamDetail(id);
-            return Ok(deleteEx);
+            if (deleteEx != null)
+            {
+                return Ok(deleteEx);
+            }
+            return NotFound(); 
         }
+
     }
 }
