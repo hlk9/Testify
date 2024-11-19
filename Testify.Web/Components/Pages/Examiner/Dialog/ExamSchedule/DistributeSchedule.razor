@@ -137,7 +137,7 @@
     private async Task ReloadData()
     {
         currentSchedule = await scheduleService.GetById(Id);
-        listClass = await _serClass.GetClassBySubjectId(currentSchedule.SubjectId);
+        listClass = await _serClass.GetClassBySubjectId(currentSchedule.SubjectId, currentSchedule.Id); //exclude class in schedule, get class after schedule
         listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);
     }
 
