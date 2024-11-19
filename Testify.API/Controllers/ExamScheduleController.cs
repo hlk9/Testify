@@ -66,12 +66,23 @@ namespace Testify.API.Controllers
 
             var lstSchedule = await repos.GetSchedulesActive();
             var lstSubject = await subjectRepository.GetAllSubject(null, true);
+            var lstExams =  new ExamRepository().GetAllActive();
             //var lstExam = 
 
             foreach (var item in lstSchedule)
             {
+                string name;
+                try
+                {
+                     name = lstExams.FirstOrDefault(x => x.Id == item.ExamId).Name;
 
-                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
+                }
+                catch
+                {
+                    name = "Không";
+                }
+
+                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = name, Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
 
             }
             return listResult;

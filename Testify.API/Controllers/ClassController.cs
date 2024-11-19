@@ -29,9 +29,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Classes-BySubjectIdExcludeInSchedule")]
-        public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId)
+        public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId,int scheduleId)
         {
-            var lstClass = await classRepository.GetClassWithSubjectIdExcludeInSchedule(subjectId);
+            var lstClass = await classRepository.GetClassWithSubjectIdExcludeInSchedule(subjectId,scheduleId);
             return Ok(lstClass);
         }
 

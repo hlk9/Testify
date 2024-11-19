@@ -9,7 +9,6 @@
         color: white;
         width: 100%;
     }
-
         .add-button-end:hover {
             background-color: white;
             color: #29a69a;
@@ -62,14 +61,14 @@
                 <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
                 <MudTd DataLabel="Thời gian bắt đầu">@context.StartTime</MudTd>
                 <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
+                <MudTd DataLabel="Trạng thái">@(DateTime.Now < context.StartTime ? "Chưa diễn ra" : DateTime.Now > context.EndTime ? "Kết thúc" : "Đang diễn ra")
+                </MudTd>
                 <MudTd DataLabel="Thao tác">
-
                     <MudTooltip Text="Xếp lịch">
                         <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
                     </MudTooltip>
 
-                    <MudTooltip Text="Sửa">
+                    <MudTooltip Text="Sửa"> 
                         <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Chi tiết">
@@ -78,8 +77,6 @@
                     <MudTooltip Text="Xoá">
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
-
-
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -99,15 +96,7 @@
 
 </div>
 @code {
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
-
-    public List<ChartSeries> Series = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "United States", Data = new double[] { 40, 20, 25, 27, 46, 60, 48, 80, 15 } },
-        new ChartSeries() { Name = "Germany", Data = new double[] { 19, 24, 35, 13, 28, 15, 13, 16, 31 } },
-        new ChartSeries() { Name = "Sweden", Data = new double[] { 8, 6, 11, 13, 4, 16, 10, 16, 18 } },
-    };
-    public string[] XAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" };
+    private int Index = -1;
 
     private List<ExamScheduleDto> listSchedule = new List<ExamScheduleDto>();
 
@@ -117,7 +106,7 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             listSchedule = await scheduleService.GetInforBasic();
             StateHasChanged();
@@ -131,7 +120,7 @@
 
 
 
-    private async Task ShowDistributeDialog(DialogOptions options, int Id,string title)
+    private async Task ShowDistributeDialog(DialogOptions options, int Id, string title)
     {
         var parameters = new DialogParameters
         {
@@ -152,7 +141,7 @@
         var parameters = new DialogParameters
         {
               { "Id", Id }
-          
+
         };
         var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.DeleteExamSchedule>("Options Dialog", parameters, options);
         var result = await dialog.Result;
