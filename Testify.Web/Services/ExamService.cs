@@ -27,23 +27,14 @@ namespace Testify.Web.Services
 
         public async Task<Exam> GetExamId(int id)
         {
-            var a = await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
             return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
         }
 
-        public async Task<bool> CreateExam(Exam e)
+        public async Task<Exam> CreateExam(Exam e)
         {
             var newExam = await _httpClient.PostAsJsonAsync("Exam/Add-Exam", e);
-            if (newExam.IsSuccessStatusCode) 
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-            //var reponse = await newExam.Content.ReadFromJsonAsync<Exam>();
-            //return reponse;
+            var reponse = await newExam.Content.ReadFromJsonAsync<Exam>();
+            return reponse;
         }
 
         public async Task<bool> UpdateExam(Exam e)
@@ -63,7 +54,7 @@ namespace Testify.Web.Services
 
         public async Task<bool> DeleteExam(int id)
         {
-            var status = await _httpClient.DeleteAsync($"Exam/Delete-Exam?id={id}");
+            var status = await _httpClient.PutAsync($"Exam/Delete-Exam?id={id}", null);
             if (status.IsSuccessStatusCode)
             {
                 return true;
@@ -72,7 +63,7 @@ namespace Testify.Web.Services
         }
         public async Task<List<Exam>> GetListOfSubject(int id)
         {
-            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamBySubject?id="+id);
+            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamBySubject?id=" + id);
             return lst;
         }
 
@@ -82,7 +73,7 @@ namespace Testify.Web.Services
             return lst;
         }
 
-       
+
 
     }
 }

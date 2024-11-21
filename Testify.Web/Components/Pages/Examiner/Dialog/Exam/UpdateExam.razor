@@ -47,7 +47,16 @@
                 </MudItem>
 
             </MudGrid>
-            <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+            <MudItem Class="w-100">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -102,7 +111,7 @@
 
     private async Task SubmitValid()
     {
-        if (subjectCurrent == null || exam.Name == null || exam.MaximmumMark == null || exam.PassMark == null || exam.NumberOfQuestions == null || exam.Duration == null)
+        if (subjectCurrent == null || exam.Name == null || exam.MaximmumMark == null || exam.PassMark == null || exam.NumberOfQuestions == null || exam.Duration == null ||exam.NumberOfRepeat == null)
         {
             Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
             return;
@@ -132,6 +141,11 @@
             if (exam.Duration <= 0)
             {
                 Snackbar.Add("Thất bại, Thời gian cho bài thi không được nhỏ hơn 0", Severity.Error);
+                return;
+            }
+            if (exam.NumberOfRepeat <= 0)
+            {
+                Snackbar.Add("Thất bại, Số lần làm bài thi không được nhỏ hơn 0", Severity.Error);
                 return;
             }
             

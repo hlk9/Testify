@@ -1,0 +1,331 @@
+﻿@using Testify.DAL.ViewModels
+@layout AdminLayout
+@inject IDialogService DialogService
+@inject ExamService examService
+@inject SubjectService subjectService
+@inject ExamDetailService examdetailService
+@inject ExamDetailQuestionService examdetailQuestionService
+
+<style>
+    .mud-table-head .mud-checkbox {
+        display: none;
+    }
+</style>
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h5">Sửa đề thi </MudText>
+    </TitleContent>
+    <DialogContent>
+
+
+        <EditForm Model="@_lstChoice" OnInvalidSubmit="Submit">
+            <MudTextField Class="w-100 mb-3" T="string" @bind-Value="@examDetail.Code" Placeholder="Nhập tên đề thi" Label="Tên đề thi" />
+
+            <MudGrid Class="align-items-center">
+                <MudItem xl="5" lg="5" md="4" xs="12">
+                    <MudSelect Class="w-100" T="int" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Value="@questionLevelId" ValueChanged="@OnQuestionLevelChanged">
+                        <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
+                        @foreach (var itemLevel in _lstQuestionLevel)
+                        {
+                            <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xl="5" lg="5" md="4" xs="12">
+                    <MudText Class="w-100 text-end h5 fw-bold">Số câu hỏi đã chọn: @_lstChoice.Count / @exam.NumberOfQuestions</MudText>
+                </MudItem>
+
+            </MudGrid>
+
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                        <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                            <MudTooltip Text="Xếp câu hỏi vào danh sách đã chọn">
+                                <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowRightAlt" Label="Xếp câu hỏi" OnClick="AddQuestionToRight" />
+                            </MudTooltip>
+                        </MudItem>
+                        <MudItem xs="6" Class="d-flex justify-content-end">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a; text-align:center;">Kho câu hỏi</MudText>
+                        </MudItem>
+
+                    </MudItem>
+                </MudItem>
+                <MudItem xs="6" Class="d-flex justify-content-between align-items-center">
+                    <MudItem xs="6" Class="d-flex justify-content-start align-items-center">
+                        <MudTooltip Text="Loại bỏ câu hỏi ra khỏi đề thi này">
+                            <MudFab Color="Color.Warning" StartIcon="@Icons.Material.Filled.Clear" Label="Loại bỏ" OnClick="RemoveFromListExam" />
+                        </MudTooltip>
+                    </MudItem>
+                    <MudItem xs="6" Class="d-flex ">
+                        
+                                <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a;">Danh sách câu hỏi trong đề</MudText>
+                           
+                    </MudItem>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudItem xs="12" md="12" lg="12">
+                        <MudTable Items="@_lstChoice_Select" MultiSelection="true" Context="_lstChoiceSelect" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="400px" @bind-SelectedItems="listQuestionSelected" Striped="true">
+                            <ToolBarContent>
+                                
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh hidden><MudTableSortLabel SortLabel="ID" T="string">Mã câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Nội dung câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Mức độ câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Loại câu hỏi</MudTableSortLabel></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd hidden>@_lstChoiceSelect.Id</MudTd>
+                                <MudTd>@_lstChoiceSelect.Content</MudTd>
+                                <MudTd>@_lstChoiceSelect.QuestionLeveName</MudTd>
+                                <MudTd>@_lstChoiceSelect.QuestionTypeName</MudTd>
+                            </RowTemplate>
+                            <NoRecordsContent>
+                                <MudText>No matching records found</MudText>
+                            </NoRecordsContent>
+                            <LoadingContent>
+                                <MudText>Loading...</MudText>
+                            </LoadingContent>
+                        </MudTable>
+                    </MudItem>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudItem xs="12" md="12" lg="12">
+                        <MudTable Items="@_lstChoice" MultiSelection="true" Context="_lstChoiceContext" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="400px" @bind-SelectedItems="listQuestionSelectedInList">
+                            <ToolBarContent>
+                               
+                            </ToolBarContent>
+                            <HeaderContent>
+                                <MudTh hidden><MudTableSortLabel SortLabel="ID" T="string">Mã câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Nội dung câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Mức độ câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Loại câu hỏi</MudTableSortLabel></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd hidden>@_lstChoiceContext.Id</MudTd>
+                                <MudTd>@_lstChoiceContext.Content</MudTd>
+                                <MudTd>@_lstChoiceContext.QuestionLeveName</MudTd>
+                                <MudTd>@_lstChoiceContext.QuestionTypeName</MudTd>
+                            </RowTemplate>
+                            <NoRecordsContent>
+                                <MudText>No matching records found</MudText>
+                            </NoRecordsContent>
+                            <LoadingContent>
+                                <MudText>Loading...</MudText>
+                            </LoadingContent>
+                        </MudTable>
+                    </MudItem>
+                </MudItem>
+            </MudGrid>
+
+
+
+        </EditForm>
+
+    </DialogContent>
+    <DialogActions>
+        @* <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton> *@
+        <MudButton  OnClick="Submit">Đóng</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Parameter]
+    public int ExamID { get; set; }
+    [Parameter]
+    public int ExamDetailID { get; set; }
+    [Parameter]
+    public int SubjectId { get; set; }
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    public string textSearch = "";
+
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+    // Radio
+    public byte Dense_Radio { get; set; } = 1;
+    private int questionLevelId = -1;
+    private int stt;
+    private int NumberOfQuestion = 0;
+    private ExamDetail examDetail = new ExamDetail();
+
+
+    private Exam exam { get; set; } = new();
+
+    private HashSet<QuestionInExam> selectedItemQuestion = new HashSet<QuestionInExam>();
+    private List<QuestionInExam> _lstChoice = new List<QuestionInExam>();
+    private List<QuestionInExam> _lstChoice_Select { get; set; }
+
+    private List<ExamDetailQuestion> _lstExamDetailQues = new List<ExamDetailQuestion>();
+    public List<QuestionInExam> _lstQuestion = new List<QuestionInExam>();
+    private List<Dethi> _lstExamDetail = new List<Dethi>();
+    private List<QuestionLevel> _lstQuestionLevel = new List<QuestionLevel>();
+    private List<QuestionType> _lstQuestionType = new List<QuestionType>();
+    private List<Answer> _lstAnswer = new List<Answer>();
+    private List<IsCheckQuestion> _lstIsCheck = new List<IsCheckQuestion>();
+    private List<Question> _lstQues = new List<Question>();
+
+    public HashSet<QuestionInExam> listQuestionSelected { get; set; }
+    public HashSet<QuestionInExam> listQuestionSelectedInList { get; set; }
+    public List<QuestionInExam> newListToAdd { get; set; } = new List<QuestionInExam>();
+
+    private readonly DialogOptions _dialogOptions = new DialogOptions()
+    {
+        /* DisableBackdropClick = true  */
+    };
+    private async void OnQuestionLevelChanged(int newValue)
+    {
+        questionLevelId = newValue;
+        newListToAdd.Clear();
+        await LoadData();
+        StateHasChanged();
+    }
+
+    private async Task LoadData()
+    {
+        exam = await _serExam.GetExamId(ExamID);
+        _lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
+        examDetail = await examdetailService.GetExamDetailById(ExamDetailID);
+        _lstChoice = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync(ExamDetailID);
+
+        if (questionLevelId > -1)
+        {
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOTAndLevel(ExamDetailID, questionLevelId);
+        }
+        else
+        {
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOT(ExamDetailID);
+
+        }
+
+    }
+
+
+    private async Task Submit()
+    {
+
+        if (_lstChoice.Count  < exam.NumberOfQuestions)
+        {
+            Snackbar.Add("Đề chưa đủ số câu hỏi yêu cầu", Severity.Warning);
+        }else
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private class IsCheckQuestion
+    {
+        public int IdQues { get; set; }
+
+        public bool IsChecked { get; set; }
+    }
+
+    ///=========================================================
+    private async Task AddQuestionToRight()
+    {
+        if (listQuestionSelected == null || listQuestionSelected.Count == 0)
+        {
+            Snackbar.Add("Bạn chưa chọn câu hỏi nào để sửa!", Severity.Warning);
+        }
+        else
+        {
+            if (_lstChoice.Count + listQuestionSelected.Count > exam.NumberOfQuestions)
+            {
+                Snackbar.Add("Số câu hỏi thêm không được vượt quá câu hỏi của đề", Severity.Warning);
+            }else
+            {
+                foreach (var item in listQuestionSelected)
+                {
+                    newListToAdd.Add(item);
+                }
+
+                var status = await examdetailQuestionService.AddListQuestionToExam(newListToAdd, examDetail.Id);
+                    if (status)
+                    {
+
+                        Snackbar.Add("Thêm " + newListToAdd.Count + "câu hỏi thành công", Severity.Info);
+                        newListToAdd.Clear();
+                        listQuestionSelected.Clear();
+                        listQuestionSelectedInList.Clear();
+
+                        foreach (var item in listQuestionSelected)
+                        {
+                            _lstChoice.Remove(item);
+                        }
+                        await LoadData();
+                        return;
+                    }
+                    else
+                    {
+                        Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
+
+                        await LoadData();
+                    }
+            }
+
+            
+
+
+        }
+
+        StateHasChanged();
+
+    }
+
+    private async Task RemoveFromListExam()
+    {
+        if (listQuestionSelectedInList == null || listQuestionSelectedInList.Count == 0)
+        {
+            Snackbar.Add("Bạn chưa chọn câu hỏi nào", Severity.Warning);
+        }else
+        {
+            try
+            {
+                var status = await examdetailQuestionService.RemoveFromListQuestionToExam(listQuestionSelectedInList.ToList(), examDetail.Id);
+                if (status)
+                {
+
+                    Snackbar.Add("Xóa " + listQuestionSelectedInList.Count + " câu hỏi thành công", Severity.Info);
+                    listQuestionSelectedInList.Clear();
+
+                }else
+                {
+                    Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
+                }
+                await LoadData();
+            }
+            catch 
+            {
+                Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
+            }
+        }
+        StateHasChanged();
+        
+        
+    }
+
+
+    
+
+
+   
+
+
+
+
+}
+
+
+

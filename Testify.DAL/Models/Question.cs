@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Testify.DAL.Models
 {
@@ -17,7 +12,7 @@ namespace Testify.DAL.Models
         public string? DocumentPath { get; set; }
         [ForeignKey("QuestionTypeId")]
         public int QuestionTypeId { get; set; }
-         public virtual QuestionType? QuestionType { get; set; }
+        public virtual QuestionType? QuestionType { get; set; }
         [ForeignKey("QuestionLevelId")]
         public int? QuestionLevelId { get; set; }
         public virtual QuestionLevel? QuestionLevel { get; set; }

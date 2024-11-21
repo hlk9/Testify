@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -16,7 +15,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-ExamDetail")]
-        public async Task<ActionResult<List<ExamDetail>>> GetAll() 
+        public async Task<ActionResult<List<ExamDetail>>> GetAll()
         {
             var lstExamDetail = await _respon.GetAllExamDetail();
             return Ok(lstExamDetail);
@@ -35,5 +34,24 @@ namespace Testify.API.Controllers
             var objExamId = await _respon.GetExamDetailByExamId(examId);
             return Ok(objExamId);
         }
+
+        [HttpPost("Create-Exam-Detail")]
+        public async Task<ActionResult<ExamDetail>> Create(ExamDetail examDetail)
+        {
+            var obj = await _respon.CreateExamDetail(examDetail);
+            return Ok(obj);
+        }
+
+        [HttpPut("Delete-ExamDetail")]
+        public async Task<ActionResult<ExamDetail>> DeleteExamDetail(int id)
+        {
+            var deleteEx = await _respon.DeleteExamDetail(id);
+            if (deleteEx != null)
+            {
+                return Ok(deleteEx);
+            }
+            return NotFound(); 
+        }
+
     }
 }

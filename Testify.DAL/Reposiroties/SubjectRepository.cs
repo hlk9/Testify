@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
@@ -17,7 +12,7 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public async Task< List<Subject>> GetAllSubject(string? textSearch, bool isActive)
+        public async Task<List<Subject>> GetAllSubject(string? textSearch, bool isActive)
         {
             //return await _context.Subjects.ToListAsync();
             if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == false)
@@ -30,7 +25,7 @@ namespace Testify.DAL.Reposiroties
             }
             else if ((textSearch != null || textSearch != "") && isActive == true)
             {
-                return await _context.Subjects.Where(x => x.Name.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1 ).ToListAsync();
+                return await _context.Subjects.Where(x => x.Name.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1).ToListAsync();
             }
             else
             {
@@ -40,7 +35,7 @@ namespace Testify.DAL.Reposiroties
 
         }
 
-          public async Task<Subject> GetSubjectById(int id)
+        public async Task<Subject> GetSubjectById(int id)
         {
             return await _context.Subjects.FindAsync(id);
         }
@@ -64,11 +59,11 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
-               var updateSubject = _context.Subjects.Find(sub.Id); 
-                
+                var updateSubject = _context.Subjects.Find(sub.Id);
+
                 updateSubject.Name = sub.Name;
                 updateSubject.Description = sub.Description;
-                updateSubject.Status = sub.Status;           
+                updateSubject.Status = sub.Status;
                 var objSubject = _context.Subjects.Update(updateSubject).Entity;
                 await _context.SaveChangesAsync();
                 return objSubject;
@@ -84,7 +79,7 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
-                var deleteSubject =_context.Subjects.Find(id);
+                var deleteSubject = _context.Subjects.Find(id);
 
                 var objSubject = _context.Subjects.Remove(deleteSubject).Entity;
                 await _context.SaveChangesAsync();

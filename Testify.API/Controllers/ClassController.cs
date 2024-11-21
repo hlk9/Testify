@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -31,9 +29,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Classes-BySubjectIdExcludeInSchedule")]
-        public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId)
+        public async Task<ActionResult<List<ClassWithUser>>> GetAll(int subjectId,int scheduleId)
         {
-            var lstClass = await classRepository.GetClassWithSubjectIdExcludeInSchedule(subjectId);
+            var lstClass = await classRepository.GetClassWithSubjectIdExcludeInSchedule(subjectId,scheduleId);
             return Ok(lstClass);
         }
 

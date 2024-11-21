@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -16,9 +15,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("get-all-subject")]
-        public async Task<ActionResult<List<Subject>>> GetAll(string? keyWord, bool isActive) 
+        public async Task<ActionResult<List<Subject>>> GetAll(string? keyWord, bool isActive)
         {
-        var lstSubject = await _repo.GetAllSubject(keyWord, isActive);
+            var lstSubject = await _repo.GetAllSubject(keyWord, isActive);
             return Ok(lstSubject);
         }
 

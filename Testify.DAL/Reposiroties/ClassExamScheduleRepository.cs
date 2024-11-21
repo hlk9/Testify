@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Testify.DAL.Context;
+﻿using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
@@ -15,6 +10,11 @@ namespace Testify.DAL.Reposiroties
         public ClassExamScheduleRepository()
         {
             _context = new TestifyDbContext();
+        }
+
+        public List<ClassExamSchedule> GetAllActive()
+        {
+            return _context.ClassExamSchedules.ToList();
         }
         public List<ClassWithUser> GetClassInSchedule(int scheduleId)
         {
@@ -69,7 +69,7 @@ namespace Testify.DAL.Reposiroties
                 foreach (var c in data)
                 {
 
-                    var a = _context.ClassExamSchedules.Find(c.Id);
+                    var a = _context.ClassExamSchedules.FirstOrDefault(x => x.ClassId == c.Id);
 
                     if (a != null)
                     {

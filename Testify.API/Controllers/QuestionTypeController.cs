@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -19,7 +18,7 @@ namespace Testify.API.Controllers
         [HttpGet("Get-All-Question-Type")]
         public async Task<ActionResult<List<QuestionType>>> GetAllQuestionTypes()
         {
-            var lstQuestionType = await _repo.GetAllTypes();            
+            var lstQuestionType = await _repo.GetAllTypes();
             return Ok(lstQuestionType);
         }
 

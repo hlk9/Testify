@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -424,7 +423,7 @@ namespace Testify.API.Controllers
                     QnA.Answers = lstAnswer;
                     lstQuestionTemp.Add(QnA);
 
-                    if(lstQuestionTemp.Count == batchSize || rowQ == totalRows)
+                    if (lstQuestionTemp.Count == batchSize || rowQ == totalRows)
                     {
                         await AddQuestionSuccessInDb(lstQuestionTemp, subjectId);
                         lstQuestionTemp.Clear();
@@ -589,5 +588,24 @@ namespace Testify.API.Controllers
                 return BadRequest();
             }
         }
+
+
+        [HttpGet("Get-Question-By-Id_Sub-And-Level")]
+        //[Authorize]
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionById_sub_andlevel(int id_sub, int id_level)
+        {
+            var lstQuestion = await _repoQuestion.GetQuestionBySubjectIdAndLevel(id_sub, id_level);
+            return Ok(lstQuestion);
+        }
+
+        [HttpGet("Get-Question-By-Id_Sub")]
+        //[Authorize]
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionById_sub(int id_sub)
+        {
+            var lstQuestion = await _repoQuestion.GetQuestionBySubjectId(id_sub);
+            return Ok(lstQuestion);
+        }
+
+
     }
 }

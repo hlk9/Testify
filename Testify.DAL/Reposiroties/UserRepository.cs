@@ -1,15 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
 namespace Testify.DAL.Reposiroties
 {
-    public class UserRepository 
+    public class UserRepository
     {
         private readonly TestifyDbContext _context;
         public UserRepository()
@@ -19,28 +14,28 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<User> GetByKeyAndPassword(string keyword, string hashPassword)
         {
-            User avaiableUser = await _context.Users.FirstOrDefaultAsync(x=>x.UserName == keyword || x.Email == keyword || x.PhoneNumber == keyword);
+            User avaiableUser = await _context.Users.FirstOrDefaultAsync(x => x.UserName == keyword || x.Email == keyword || x.PhoneNumber == keyword);
             if (avaiableUser == null)
             {
                 return null;
             }
-            else 
+            else
             {
-                if(avaiableUser.PasswordHash.ToUpper() == hashPassword.ToUpper())
+                if (avaiableUser.PasswordHash.ToUpper() == hashPassword.ToUpper())
                 {
                     return avaiableUser;
-                }    
-                    
+                }
+
                 else
                 {
                     ///wrong password
                     avaiableUser.PasswordHash = "-1";
                     return avaiableUser;
-                }    
-            }    
-           
-           
-               
+                }
+            }
+
+
+
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -51,6 +46,12 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Users.FindAsync(Guid.Parse(id));
         }
+
+        public async Task<User> GetByidUserSendMail(Guid id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
         public async Task<User> AddUser(User user)
         {
             try
@@ -113,13 +114,34 @@ namespace Testify.DAL.Reposiroties
                 if (u == null)
                     return null;
                 return u;
-                
+
 
             }
             catch
             {
                 return null;
             }
+        }
+
+        public async Task<List<User>> GetUsersWithStatusOne(int classId, string? searchValue)
+        {
+            var usersWithStatusOne = await (from u in _context.Users
+                                            join cu in _context.ClassUsers on u.Id equals cu.UserId
+                                            where cu.Status == 1 && cu.ClassId == classId
+                                            && (string.IsNullOrEmpty(searchValue) || u.FullName.Contains(searchValue))
+                                            select u).ToListAsync();
+
+            return usersWithStatusOne;
+        }
+
+        public async Task<List<User>> GetUsersWithStatusTwo(int classId)
+        {
+            var usersWithStatusTwo = await (from u in _context.Users
+                                            join cu in _context.ClassUsers on u.Id equals cu.UserId
+                                            where cu.Status == 2 && cu.ClassId == classId
+                                            select u).ToListAsync();
+
+            return usersWithStatusTwo;
         }
     }
 }

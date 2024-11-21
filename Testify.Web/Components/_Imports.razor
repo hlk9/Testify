@@ -13,6 +13,7 @@
 @using Testify.Web.Components
 @using Testify.Web.Components.Layout
 @using Heron.MudCalendar
+@using Testify.Web.Data.Commons
 @using Testify.Web.Services
 @using Testify.DAL.Models
 @using Microsoft.AspNetCore.Authentication;
@@ -35,7 +36,11 @@
 @inject SubmissionServices _serSubmission
 @inject AnswerSubmissionServices _serAnS
 @inject ClassUserServices _serClassUser
-
+@inject UserService _serUser
+@inject ExamScheduleService _serExamSche
+@inject Testify.Web.Data.Commons.CommonServices commonServices
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject ISnackbar snackbar
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject TokenService TokenService
+@inject LogService LogService

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Testify.DAL.Models;
-using Testify.DAL.Reposiroties;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Testify.API.Controllers
 {
@@ -9,6 +6,6 @@ namespace Testify.API.Controllers
     [ApiController]
     public class PermissionController : ControllerBase
     {
-        
+
     }
 }

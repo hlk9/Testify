@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
@@ -21,7 +16,7 @@ namespace Testify.DAL.Reposiroties
         {
             //return await _context.Users.ToListAsync();
             return await _context.Users.Where(x => x.LevelId == 4).ToListAsync();
-            
+
         }
 
         public async Task<User> GetCandidateById(Guid id)
@@ -63,7 +58,7 @@ namespace Testify.DAL.Reposiroties
                 updateCandidate.Status = user.Status;
                 updateCandidate.LevelId = 4;
                 //updateCandidate.Level = user.Level;
-               
+
 
                 var objCandidate = _context.Users.Update(updateCandidate).Entity;
                 await _context.SaveChangesAsync();
@@ -82,7 +77,7 @@ namespace Testify.DAL.Reposiroties
             {
                 var objCandidate = await _context.Users.FindAsync(id);
 
-                 _context.Users.Remove(objCandidate);
+                _context.Users.Remove(objCandidate);
                 await _context.SaveChangesAsync();
                 return objCandidate;
             }

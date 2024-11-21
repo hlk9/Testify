@@ -32,5 +32,37 @@ namespace Testify.Web.Services
             var reponse = await obj.Content.ReadFromJsonAsync<ClassUser>();
             return reponse;
         }
+
+        public async Task<ClassUser> UpdateStatus(ClassUser classUser)
+        {
+            var obj = await _httpClient.PutAsJsonAsync($"ClassUser/Update-Status", classUser);
+            var reponse = await obj.Content.ReadFromJsonAsync<ClassUser>();
+            return reponse;
+        }
+
+        //public async Task<ClassUser> RefuseUser(ClassUser classUser)
+        //{
+        //    var obj = await _httpClient.PutAsJsonAsync($"ClassUser/Refuse-User", classUser);
+        //    var reponse = await obj.Content.ReadFromJsonAsync<ClassUser>();
+        //    return reponse;
+        //}
+
+        public async Task<bool> DeleteUserInClass(Guid id, int classId)
+        {
+            var obj = await _httpClient.DeleteAsync($"ClassUser/Delete-User-In-Class?id={id}&&classId={classId}");
+            if (obj.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<List<ClassUser>> GetAllClassByUserId(Guid userId)
+        {
+            var lst = await _httpClient.GetAsync($"ClassUser/Get-All-Class-By-UserId?userId={userId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<ClassUser>>();
+
+            return response;
+        }
     }
 }

@@ -1,0 +1,24 @@
+﻿<MudDialog Style="width:600px; height:330px;">
+    <DialogContent >
+        <MudForm Style="text-align:center" Class="pt-2" Spacing="2">
+            <MudImage Style="padding-left:70px;" Src="Asset/image/congratulations.jpg" Width="500" Class="rounded-lg" />
+            <MudText Typo="Typo.h5">
+                CHÚC MỪNG! Bạn đã hoàn thành bài thi
+            </MudText>
+            <MudText>
+                Thời gian làm bài: 00:30:00
+            </MudText>
+            <MudText>
+                Trở về trang chủ sau 10 giây
+            </MudText>
+        </MudForm>
+       
+
+    </DialogContent>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+   
+}

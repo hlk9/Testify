@@ -9,7 +9,7 @@ namespace Testify.Web.Services
         private readonly HttpClient _httpClient;
         public LecturerService(HttpClient httpClien)
         {
-                _httpClient = httpClien;
+            _httpClient = httpClien;
         }
 
         public async Task<List<User>> GetAllLecturer(string? textSearch, bool isActive)
@@ -120,6 +120,12 @@ namespace Testify.Web.Services
             return lst;
         }
 
-        
+        public async Task<List<ListExamsOfStudent>> GetListExam(Guid studentId)
+        {
+            var lst = await _httpClient.GetFromJsonAsync<List<ListExamsOfStudent>>($"Lecturer/Get-All-List-Exam-By-StudentId?studentId={studentId}");
+            return lst;
+        }
+
+
     }
 }

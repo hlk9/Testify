@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
@@ -19,11 +14,11 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<string> GetUserIdByToken(string token)
         {
-            var usr = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token.Equals(token.Replace("\"","")));
+            var usr = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token.Equals(token.Replace("\"", "")));
 
             if (usr != null)
             {
-                return  usr.UserId.ToString();
+                return usr.UserId.ToString();
             }
             return null;
 
@@ -71,7 +66,7 @@ namespace Testify.DAL.Reposiroties
         {
             string a = token.Replace("\"", "");
             var token1 = _context.RefreshTokens.FirstOrDefault(x => x.Token == token.Replace("\"", ""));
-            var tok = _context.RefreshTokens.FirstOrDefault(x =>  x.Token == token.Replace("\"","") && x.ExpiryDate>DateTime.UtcNow);
+            var tok = _context.RefreshTokens.FirstOrDefault(x => x.Token == token.Replace("\"", "") && x.ExpiryDate > DateTime.UtcNow);
 
             if (tok != null)
                 return true;

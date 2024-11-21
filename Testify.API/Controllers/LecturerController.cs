@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
@@ -21,14 +19,14 @@ namespace Testify.API.Controllers
         [HttpGet("Get-All-Lecturer")]
         public async Task<ActionResult<List<User>>> GetlAllLecturer(string? keyWord, bool isActive)
         {
-            var lstLecturer = await _repo.GetAllLecturer(keyWord,isActive);
+            var lstLecturer = await _repo.GetAllLecturer(keyWord, isActive);
             return Ok(lstLecturer);
         }
 
         [HttpGet("Get-score")]
-        public async Task<ActionResult<List<ScoreStatistics>>> GetAllScore( int idsub, int idexam)
+        public async Task<ActionResult<List<ScoreStatistics>>> GetAllScore(int idsub, int idexam)
         {
-            var lstScore = await _repo.GetScore(idsub,idexam);
+            var lstScore = await _repo.GetScore(idsub, idexam);
             return Ok(lstScore);
         }
 
@@ -80,6 +78,15 @@ namespace Testify.API.Controllers
         }
 
 
+        [HttpGet("Get-All-List-Exam-By-StudentId")]
+
+        public async Task<ActionResult<List<ListExamsOfStudent>>> GetExamStudentId(Guid studentId)
+        {
+            var lstExam = await _repo.GetListExamOfStudent(studentId);
+            return Ok(lstExam);
+        }
+
+
         [HttpDelete("Delete-Lecturer")]
         public async Task<ActionResult<User>> Delete(Guid id)
         {
@@ -122,19 +129,21 @@ namespace Testify.API.Controllers
                    worksheetsU.Cells[rowU, 4].Value == null ||
                    worksheetsU.Cells[rowU, 5].Value == null ||
                    worksheetsU.Cells[rowU, 6].Value == null ||
-                   worksheetsU.Cells[rowU, 7].Value == null)
+                   worksheetsU.Cells[rowU, 7].Value == null ||
+                   worksheetsU.Cells[rowU, 9].Value == null)
                 {
                     continue;
                 }
 
                 User user = new DAL.Models.User();
-               user.FullName = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.UserName = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.PhoneNumber = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.DateOfBirth = DateTime.Parse( worksheetsU.Cells[rowU, 1].Value.ToString());
-               user.Address = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.Email = worksheetsU.Cells[rowU, 1].Value.ToString();
-               user.PasswordHash = worksheetsU.Cells[rowU, 1].Value.ToString();
+                user.FullName = worksheetsU.Cells[rowU, 1].Value.ToString();
+                user.UserName = worksheetsU.Cells[rowU, 2].Value.ToString();
+                user.PhoneNumber = worksheetsU.Cells[rowU, 3].Value.ToString();
+                user.DateOfBirth = DateTime.Parse(worksheetsU.Cells[rowU, 3].Value.ToString());
+                user.Address = worksheetsU.Cells[rowU, 4].Value.ToString();
+                user.Email = worksheetsU.Cells[rowU, 5].Value.ToString();
+                user.PasswordHash = worksheetsU.Cells[rowU, 7].Value.ToString();
+                user.Sex = Convert.ToBoolean(worksheetsU.Cells[rowU, 9].Value.ToString());
             }
             return lstUser;
         }
@@ -177,5 +186,6 @@ namespace Testify.API.Controllers
             return await _repo.GetScore2(teacherId, classId);
 
         }
+
     }
 }

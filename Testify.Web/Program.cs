@@ -1,14 +1,22 @@
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.ResponseCompression;
 using MudBlazor;
 using MudBlazor.Services;
+using Serilog;
 using System.Globalization;
-using Testify.DAL.Models;
 using Testify.Web.Components;
+using Testify.Web.Data.Commons;
 using Testify.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add MudBlazor services
 builder.Services.AddMudServices(
@@ -16,7 +24,6 @@ builder.Services.AddMudServices(
     config =>
     {
         config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
-
         config.SnackbarConfiguration.PreventDuplicates = false;
         config.SnackbarConfiguration.NewestOnTop = false;
         config.SnackbarConfiguration.ShowCloseIcon = true;
@@ -27,6 +34,8 @@ builder.Services.AddMudServices(
     }
 
     );
+string apiKey = builder.Configuration["SendGrid:APIKey"];
+builder.Services.AddSingleton(sp => new CommonServices(apiKey));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -51,6 +60,8 @@ builder.Services.AddScoped<SubmissionServices>();
 builder.Services.AddScoped<AnswerSubmissionServices>();
 builder.Services.AddScoped<ClassUserServices>();
 builder.Services.AddScoped<ClassExamScheduleService>();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<LogService>();
 
 // Add response compression services
 builder.Services.AddResponseCompression(options =>
@@ -125,5 +136,5 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
+app.UseSerilogRequestLogging();
 app.Run();

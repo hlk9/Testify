@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -62,7 +57,9 @@ namespace Testify.DAL.Reposiroties
                                   FullName = cu.FullName,
                                   SubjectId = c.SubjectId,
                                   SubjectName = cs.Name,
-                                  Status = c.Status
+                                  Status = c.Status,
+                                  CountUser = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 1).Count(),
+                                  CountConfirm = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 2).Count(),
                               }).ToListAsync(); // Await the result here
 
             return data;
@@ -70,14 +67,14 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<ClassWithUser>> GetClassWithSubjectId(int idSubject)
         {
-           
+
             var data = await (from c in _context.Classes
                               join u in _context.Users
                               on c.TeacherId equals u.Id into classUser
                               from cu in classUser.DefaultIfEmpty()
                               join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
                               from cs in classSubject.DefaultIfEmpty()
-                              where (c.SubjectId==idSubject && c.Status==1) 
+                              where (c.SubjectId == idSubject && c.Status == 1)
                               select new ClassWithUser
                               {
                                   Id = c.Id,
@@ -96,16 +93,34 @@ namespace Testify.DAL.Reposiroties
         }
 
 
-        public async Task<List<ClassWithUser>> GetClassWithSubjectIdExcludeInSchedule(int idSubject)
+        public async Task<List<ClassWithUser>> GetClassWithSubjectIdExcludeInSchedule(int idSubject,int scheduleId)
         {
 
+            // Lấy StartTime của ExamSchedule có Id = scheduleId
+            var scheduleStartTime = await _context.ExamSchedules
+                .Where(es => es.Id == scheduleId)
+                .Select(es => es.StartTime)
+                .FirstOrDefaultAsync();
+
+            if (scheduleStartTime == default)
+            {
+                // Nếu không tìm thấy bản ghi, trả về danh sách rỗng
+                return new List<ClassWithUser>();
+            }
+
+            // Lấy danh sách ClassWithUser
             var data = await (from c in _context.Classes
                               join u in _context.Users
                               on c.TeacherId equals u.Id into classUser
                               from cu in classUser.DefaultIfEmpty()
                               join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
                               from cs in classSubject.DefaultIfEmpty()
-                              where (c.SubjectId == idSubject && c.Status == 1 && !_context.ClassExamSchedules.Any(x=>x.ClassId==c.Id))
+                              where c.SubjectId == idSubject // Lọc theo SubjectId
+                                    && c.Status == 1 // Lớp học phải có trạng thái 1 (hoạt động)
+                                    !=_context.ClassExamSchedules.Any(x => x.ClassId == c.Id&&x.ExamScheduleId==scheduleId) // Lớp học phải có trong ClassExamSchedules
+                                    && _context.ExamSchedules.Any(es => es.SubjectId == idSubject)
+                                    && _context.ExamSchedules.Any(es => es.SubjectId == idSubject // Lịch thi thuộc SubjectId
+                                                                        && es.EndTime < scheduleStartTime && es.Id != scheduleId) // Điều kiện EndTime < StartTime
                               select new ClassWithUser
                               {
                                   Id = c.Id,
@@ -118,7 +133,7 @@ namespace Testify.DAL.Reposiroties
                                   SubjectId = c.SubjectId,
                                   SubjectName = cs.Name,
                                   Status = c.Status
-                              }).ToListAsync(); // Await the result here
+                              }).ToListAsync();
 
             return data;
         }
@@ -134,7 +149,7 @@ namespace Testify.DAL.Reposiroties
             return await _context.Classes.FirstOrDefaultAsync(x => x.ClassCode.ToLower().Equals(ClassCode.ToLower()));
         }
 
-        public async Task<Class> AddClass(Class classes) 
+        public async Task<Class> AddClass(Class classes)
         {
             try
             {
@@ -157,6 +172,7 @@ namespace Testify.DAL.Reposiroties
                 objUpdateClass.Capacity = classes.Capacity;
                 objUpdateClass.Description = classes.Description;
                 objUpdateClass.TeacherId = classes.TeacherId;
+                objUpdateClass.SubjectId = classes.SubjectId;
 
                 var updateClass = _context.Classes.Update(objUpdateClass).Entity;
                 await _context.SaveChangesAsync();

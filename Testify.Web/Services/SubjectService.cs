@@ -25,7 +25,7 @@ namespace Testify.Web.Services
 
         public async Task<bool> CreateSub(Subject subject)
         {
-            var status = await _httpClient.PostAsJsonAsync<Subject>("Subject/create-subject",subject);
+            var status = await _httpClient.PostAsJsonAsync<Subject>("Subject/create-subject", subject);
             if (status.IsSuccessStatusCode)
             {
                 return true;

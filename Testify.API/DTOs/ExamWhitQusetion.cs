@@ -3,7 +3,7 @@
     public class ExamWhitQusetion
     {
         public int Id { get; set; }
-        
+
         public string ExamName { get; set; }
         //public string? Title { get; set; }
         //public DateTime? StartTime { get; set; }
@@ -14,5 +14,6 @@
         public string? SubjectName { get; set; }
         public int? Duration { get; set; }
         public int? NumberOfQuestion { get; set; }
+        public int? NumberOfRepeat { get; set; }
     }
 }
