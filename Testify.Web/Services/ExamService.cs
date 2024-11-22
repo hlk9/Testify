@@ -73,7 +73,12 @@ namespace Testify.Web.Services
             return lst;
         }
 
-
+        public async Task<int> GetCountExamByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"Exam/Get-Count-Exam-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
 
     }
 }
