@@ -60,11 +60,6 @@ namespace Testify.API.Controllers
             return Ok(updateEx);
         }
 
-
-
-
-       
-
         [HttpGet("Get-InfoBasic")]
         public async Task<List<ExamWhitQusetion>> GetInfoBasic()
         {
@@ -95,7 +90,12 @@ namespace Testify.API.Controllers
 
         }
 
-        
+        [HttpGet("Get-Count-Exam-By-UserId")]
+        public async Task<ActionResult<int>> GetCountExamByUserId(Guid userId)
+        {
+            var count = await _respon.GetCountExamByUserId(userId);
+            return Ok(count);
+        }
 
 
     }

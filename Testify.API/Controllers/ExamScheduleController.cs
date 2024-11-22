@@ -143,6 +143,13 @@ namespace Testify.API.Controllers
             return listResult;
 
         }
+
+        [HttpGet("Get-ExamSchedule-By-UserId")]
+        public async Task<ActionResult<ExamSchedule>> GetAllExamScheduleByUserId(Guid userId)
+        {
+            var lst = await repos.GetAllExamScheduleByUserId(userId);
+            return Ok(lst);
+        }
     }
 
 

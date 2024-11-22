@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using System.Net.Http;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -189,5 +190,11 @@ namespace Testify.API.Controllers
 
         }
 
+        [HttpGet("Get-All-Count-Student-By-UserId")]
+        public async Task<int> GetCountStudent(Guid userId)
+        {
+            var count = await _repo.GetCountStudentByUserId(userId);
+            return count;
+        }
     }
 }

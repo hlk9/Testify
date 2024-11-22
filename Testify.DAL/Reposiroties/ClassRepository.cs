@@ -72,14 +72,14 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<ClassWithUser>> GetClassWithSubjectId(int idSubject)
         {
-           
+
             var data = await (from c in _context.Classes
                               join u in _context.Users
                               on c.TeacherId equals u.Id into classUser
                               from cu in classUser.DefaultIfEmpty()
                               join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
                               from cs in classSubject.DefaultIfEmpty()
-                              where (c.SubjectId==idSubject && c.Status==1) 
+                              where (c.SubjectId == idSubject && c.Status == 1)
                               select new ClassWithUser
                               {
                                   Id = c.Id,
@@ -107,7 +107,7 @@ namespace Testify.DAL.Reposiroties
                               from cu in classUser.DefaultIfEmpty()
                               join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
                               from cs in classSubject.DefaultIfEmpty()
-                              where (c.SubjectId == idSubject && c.Status == 1 && !_context.ClassExamSchedules.Any(x=>x.ClassId==c.Id))
+                              where (c.SubjectId == idSubject && c.Status == 1 && !_context.ClassExamSchedules.Any(x => x.ClassId == c.Id))
                               select new ClassWithUser
                               {
                                   Id = c.Id,
@@ -136,7 +136,7 @@ namespace Testify.DAL.Reposiroties
             return await _context.Classes.FirstOrDefaultAsync(x => x.ClassCode.ToLower().Equals(ClassCode.ToLower()));
         }
 
-        public async Task<Class> AddClass(Class classes) 
+        public async Task<Class> AddClass(Class classes)
         {
             try
             {
@@ -199,6 +199,31 @@ namespace Testify.DAL.Reposiroties
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        public async Task<int> GetAllClassByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var allClass = _context.Classes.ToList();
+                return allClass.Count;
+            }
+            else if (objUser.LevelId == 3)
+            {
+                var allClass = _context.Classes.Where(x => x.TeacherId == userId && x.Status == 1).ToList();
+                return allClass.Count;
+            }
+            else if (objUser.LevelId == 4)
+            {
+                var allClass = _context.ClassUsers.Where(x => x.UserId == userId && x.Status == 1).ToList();
+                return allClass.Count;
+            }
+            else
+            {
+                return -1;
             }
         }
     }

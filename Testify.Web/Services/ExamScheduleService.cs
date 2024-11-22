@@ -135,5 +135,12 @@ namespace Testify.Web.Services
             return obj;
         }
 
+        
+            public async Task<List<ExamSchedule>> GetAllExamScheduleByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"ExamSchedule/Get-ExamSchedule-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<List<ExamSchedule>>();
+            return response;
+        }
     }
 }
