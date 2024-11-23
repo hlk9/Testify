@@ -121,5 +121,26 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
+
+        public async Task<List<User>> GetUsersWithStatusOne(int classId, string? searchValue)
+        {
+            var usersWithStatusOne = await (from u in _context.Users
+                                            join cu in _context.ClassUsers on u.Id equals cu.UserId
+                                            where cu.Status == 1 && cu.ClassId == classId
+                                            && (string.IsNullOrEmpty(searchValue) || u.FullName.Contains(searchValue))
+                                            select u).ToListAsync();
+
+            return usersWithStatusOne;
+        }
+
+        public async Task<List<User>> GetUsersWithStatusTwo(int classId)
+        {
+            var usersWithStatusTwo = await (from u in _context.Users
+                                            join cu in _context.ClassUsers on u.Id equals cu.UserId
+                                            where cu.Status == 2 && cu.ClassId == classId
+                                            select u).ToListAsync();
+
+            return usersWithStatusTwo;
+        }
     }
 }

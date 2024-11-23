@@ -60,20 +60,20 @@ namespace Testify.API.Controllers
         [HttpGet("Get-InfoBasic")]
         public async Task<List<ExamScheduleDto>> GetInfoBasic()
         {
-            List<ExamScheduleDto> listResult= new List<ExamScheduleDto>();
+            List<ExamScheduleDto> listResult = new List<ExamScheduleDto>();
             SubjectRepository subjectRepository = new SubjectRepository();
-            
+
             var lstSchedule = await repos.GetSchedulesActive();
             var lstSubject = await subjectRepository.GetAllSubject(null, true);
             //var lstExam = 
 
-          foreach ( var item in lstSchedule )
+            foreach (var item in lstSchedule)
             {
 
-                listResult.Add(new ExamScheduleDto { Id = item.Id,Description = item.Description , EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x=>x.Id == item.SubjectId).Name, Title = item.Title});
+                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
 
-            }  
-           return listResult;
+            }
+            return listResult;
 
         }
 
@@ -92,15 +92,63 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-InTime")]
-        public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end)
+        public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end, int subjectId)
         {
-            return await repos.CheckIsContaintInTime(start, end);
+            return await repos.CheckIsContaintInTime(start, end, subjectId);
+        }
+
+        [HttpGet("Get-InTime-NoSubject")]
+        public async Task<ExamSchedule> GetInTimeNoSubject(DateTime start, DateTime end)
+        {
+            return await repos.CheckIsContaintInTimeWithoutSubject(start, end);
         }
 
         [HttpGet("Get-ById")]
         public async Task<ExamSchedule> GetById(int id)
         {
             return await repos.GetById(id);
+        }
+
+        [HttpGet("Get-ExamScheduleTimes-By-ClassUserIdAsync")]
+        public async Task<List<ExamSchedule>> GetExamScheduleTimesByClassUserIdAsync(Guid userId)
+        {
+            return await repos.GetExamScheduleTimesByClassUserIdAsync(userId);
+        }
+        [HttpGet("Get-All-Schedule-ByStudentId")]
+        public async Task<List<ExamScheduleDto>>GetAllScheduleOfStudentById(string studentId)
+        {
+            List<ExamScheduleDto> listResult = new List<ExamScheduleDto>();
+            SubjectRepository subjectRepository = new SubjectRepository();
+            UserRepository usrRepos = new UserRepository();
+            ClassExamScheduleRepository classExamScheduleRepository = new ClassExamScheduleRepository();
+            ClassUserReposiroty classUserReposiroty = new ClassUserReposiroty();
+            var lstClass = await classUserReposiroty.GetClassByStudentId(studentId, null, 1);
+
+
+            var lstSchedule = (from cu in lstClass
+                                     join classEx in classExamScheduleRepository.GetAllActive()
+                                     on cu.ClassId equals classEx.ClassId
+                                     join schedule in repos.GetAll()
+                                     on classEx.ExamScheduleId equals schedule.Id
+                                     select schedule).ToList();
+
+            var lstSubject = await subjectRepository.GetAllSubject(null, true);
+
+            foreach (var item in lstSchedule)
+            {
+
+                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = "Không", Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
+
+            }
+            return listResult;
+
+        }
+
+        [HttpGet("Get-ExamSchedule-By-UserId")]
+        public async Task<ActionResult<ExamSchedule>> GetAllExamScheduleByUserId(Guid userId)
+        {
+            var lst = await repos.GetAllExamScheduleByUserId(userId);
+            return Ok(lst);
         }
     }
 

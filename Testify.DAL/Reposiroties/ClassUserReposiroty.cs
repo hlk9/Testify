@@ -25,7 +25,7 @@ namespace Testify.DAL.Reposiroties
             {
                 return await _context.ClassUsers.Where(x => x.Status == 1).ToListAsync();
             }
-            else if(Status == 10)
+            else if (Status == 10)
             {
                 return await _context.ClassUsers.ToListAsync();
             }
@@ -39,7 +39,7 @@ namespace Testify.DAL.Reposiroties
         {
             var data = await (from clu in _context.ClassUsers.Where(x => x.UserId == Guid.Parse(studentId) && x.Status == Status)
                               join c in _context.Classes
-                              on clu.ClassId equals c.Id 
+                              on clu.ClassId equals c.Id
                               join u in _context.Users
                               on c.TeacherId equals u.Id
                               join s in _context.Subjects
@@ -66,6 +66,8 @@ namespace Testify.DAL.Reposiroties
             return data;
         }
 
+
+
         public async Task<ClassUser> Create(ClassUser classUser)
         {
             try
@@ -78,6 +80,47 @@ namespace Testify.DAL.Reposiroties
             {
                 throw;
             }
+        }
+
+        public async Task<ClassUser> UpdateStatusAsync(ClassUser classUser)
+        { 
+            var _classUser = await _context.ClassUsers.FirstOrDefaultAsync(cu => cu.UserId == classUser.UserId && cu.ClassId == classUser.ClassId);
+
+            _classUser.Status = 1;
+            var objUpdateStatus = _context.ClassUsers.Update(_classUser).Entity;
+            await _context.SaveChangesAsync();
+            return objUpdateStatus; 
+        }
+
+        //public async Task<ClassUser> RefuseUserAsync(ClassUser classUser)
+        //{
+        //    var _classUser = await _context.ClassUsers.FirstOrDefaultAsync(cu => cu.UserId == classUser.UserId && cu.ClassId == classUser.ClassId);
+
+        //    _classUser.Status = 0;
+        //    var objUpdateStatus = _context.ClassUsers.Update(_classUser).Entity;
+        //    await _context.SaveChangesAsync();
+        //    return objUpdateStatus;
+        //}
+
+        public async Task<ClassUser> DeleteUserInClass(Guid id, int classId)
+        {
+            try
+            {
+                var obj = await _context.ClassUsers.FirstOrDefaultAsync(x => x.UserId == id && x.ClassId == classId);
+
+                _context.ClassUsers.Remove(obj);
+                await _context.SaveChangesAsync();
+                return obj;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<ClassUser>> GetAllClassByUserId(Guid userId)
+        {
+            return _context.ClassUsers.Where(x => x.UserId == userId && x.Status == 1).ToList();
         }
     }
 }

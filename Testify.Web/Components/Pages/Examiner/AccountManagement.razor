@@ -34,13 +34,22 @@
     </MudPaper>
     <MudGrid Style="padding:20px 0 ">
         <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
-            <MudSelect Dense="true" T="int" Label="Danh sách tài khoản" Variant="Variant.Outlined">
+            @* <MudSelect Dense="true" T="int" Label="Danh sách tài khoản" Variant="Variant.Outlined">
                 <MudSelectItem Value="1">Admin</MudSelectItem>
                 <MudSelectItem Value="2">Khảo thí</MudSelectItem>
                 <MudSelectItem Value="3">Giáo viên</MudSelectItem>
                 <MudSelectItem Value="4">Sinh viên</MudSelectItem>
 
+            </MudSelect> *@
+
+            <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueLevel">
+                <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                @foreach (var item in _lstLevel)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
             </MudSelect>
+        
         </MudItem >
         <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
             <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Export</MudButton>
@@ -55,7 +64,7 @@
 
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
 
-        <MudTable Items="@_lstUser" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -114,8 +123,11 @@
     private string searchValue = "";
     private bool isLoading { get; set; } = true;
     private List<User>? _lstUser { get; set; }
+    private List<User>? _userList = new List<User>();
 
     private Level level { get; set; }
+    private int levelId =-1;
+    private List<Level> _lstLevel = new List<Level>();
 
     [Parameter]
     public Guid idUser { get; set; }
@@ -129,16 +141,24 @@
 
     }
 
+
+
     private async Task LoadData(string? textSearch)
     {
-        _lstUser = await _serLec.GetAllLecturer(textSearch,true);
+        _lstLevel = await _serLevel.GetAllLevel();
+      
+        _userList = await _serLevel.GetAllUserByLevelId(levelId);
         isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-
         await LoadData("");
+    }
+
+    private async Task ChangeValueLevel()
+    {
+        _userList = await _serLevel.GetAllUserByLevelId(levelId);
     }
 
 

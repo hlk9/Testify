@@ -3,6 +3,7 @@
 @layout AdminLayout
 @inject IDialogService DialogService
 @inject ExamService examService
+@inject ExamDetailService examdetailService
 
 <style>
     .add-button-end {
@@ -18,7 +19,7 @@
 
 </style>
 
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding:30px; height:calc(100vh - (100vh - 64px)); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">BÀI THI</MudText>
     </MudPaper>
@@ -27,6 +28,7 @@
         </MudItem>
         <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
             <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,"create"))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            
         </MudItem>
     </MudGrid>
 
@@ -51,6 +53,8 @@
                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Tên Môn</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thời gian" T="int">Thời gian làm bài</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số câu hỏi" T="int">Số câu hỏi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Số lần làm bài" T="int">Số lần làm bài</MudTableSortLabel></MudTh>
+
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
 
@@ -60,6 +64,8 @@
                 <MudTd DataLabel="Môn">@context.SubjectName </MudTd>
                 <MudTd DataLabel="Thời gian">@context.Duration </MudTd>
                 <MudTd DataLabel="Số câu hỏi">@context.NumberOfQuestion </MudTd>
+                <MudTd DataLabel="Số lần làm bài">@context.NumberOfRepeat </MudTd>
+
                 <MudTd DataLabel="Trạng thái">@context.Status </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
@@ -73,9 +79,9 @@
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xem đề thi">
-
                         
-                        <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end" Variant="Variant.Filled">Xem đề </MudButton>
+                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end" Variant="Variant.Filled">Xem đề </MudButton>
+
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
@@ -95,12 +101,16 @@
 </div>
 @code {
     private List<ExamWhitQusetion> _lst = new List<ExamWhitQusetion>();
+    private List<ExamDetail> lisDThi = new List<ExamDetail>();
     protected override async Task OnInitializedAsync()
     {
         _lst = await examService.GetInforBasic();
+
+
     }
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true };
+    [Inject] ISnackbar Snackbar { get; set; }
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
@@ -185,13 +195,26 @@
         {
               { "Id", Id }
         };
-        var dialog = await DialogService.ShowAsync<Dialog.DeThi.ListDeThi>("Options Dialog", parameters, options);
-        var result = await dialog.Result;
-        if (result == null || !result.Canceled)
+
+        lisDThi = await examdetailService.GetExamDetailByExamId(Id);
+        if (lisDThi.Count > 0)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            var dialog = await DialogService.ShowAsync<Dialog.DeThi.ListDeThi>("Options Dialog", parameters, options);
+            var result = await dialog.Result;
+            if (result == null || !result.Canceled)
+            {
+                _lst = await examService.GetInforBasic();
+            }
+            else
+            {
+
+            }
         }
+        else
+        {
+            Snackbar.Add("Bài thi chưa có đề nào!", Severity.Warning);
+        }
+
     }
 
 }

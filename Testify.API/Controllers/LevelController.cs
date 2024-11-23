@@ -27,5 +27,12 @@ namespace Testify.API.Controllers
         {
             return await _repo.GetAllLevels();
         }
+
+        [HttpGet("get-user-by-idlevel")]
+        public async  Task<ActionResult<List<User>>> GetUserById(int levelId)
+        {
+           var allUser = await _repo.GetUserByIdLevel(levelId);
+            return Ok(allUser);
+        }
     }
 }

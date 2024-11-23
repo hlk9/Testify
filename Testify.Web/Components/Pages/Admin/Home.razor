@@ -59,7 +59,15 @@
 
                     <MudItem xs="9" Style="text-align:  center">
                         <MudText Style="font-size: 18px; font-weight: bold">Tổng số lớp học</MudText>
-                        <MudText Style="font-size: 20px; font-weight: bold">12</MudText>
+                        @if ((_lstClass == null))
+                        {
+                            <MudText Style="font-size: 20px; font-weight: bold">0</MudText>
+                        }
+                        else
+                        {
+                            <MudText Style="font-size: 20px; font-weight: bold">@_lstClass.Count</MudText>
+                        }
+
                     </MudItem>
                 </MudGrid>
             </MudPaper>
@@ -76,7 +84,14 @@
 
                     <MudItem xs="9" Style="text-align:  center">
                         <MudText Style="font-size: 18px; font-weight: bold">Tổng số bài thi</MudText>
-                        <MudText Style="font-size: 20px; font-weight: bold">1000</MudText>
+                        @if ((totalExam == null))
+                        {
+                            <MudText Style="font-size: 20px; font-weight: bold">0</MudText>
+                        }
+                        else
+                        {
+                            <MudText Style="font-size: 20px; font-weight: bold">@totalExam</MudText>
+                        }
                     </MudItem>
                 </MudGrid>
             </MudPaper>
@@ -111,26 +126,27 @@
                     </MudItem>
                     <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
 
-                       
-                            @if(_lstUser == null)
 
-                            {
-                                <MudSelect T="string" Variant="Variant.Outlined" Text="Không giáo viên nào">
+                        @if (_lstUser == null)
 
-                                </MudSelect>
-                            }
-                            else{
+                        {
+                            <MudSelect T="string" Variant="Variant.Outlined" Text="Không giáo viên nào">
+
+                            </MudSelect>
+                        }
+                        else
+                        {
                             <MudSelect T="Guid" @bind-Value="teacherId" Variant="Variant.Outlined" SelectedValuesChanged="ChangeValueLecturer">
                                 @foreach (var item in _lstUser)
                                 {
                                     <MudSelectItem Value="item.Id">@item.FullName</MudSelectItem>
                                 }
                             </MudSelect>
-                            }
+                        }
 
 
-                           
-         
+
+
                     </MudItem>
                     <MudItem xl="3" lg="3" md="3" sm="6" xs="12">
                         @if (ClassList == null)
@@ -147,13 +163,13 @@
                                     <MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
                                 }
                             </MudSelect>
-                        } 
+                        }
 
-                    </MudItem>  
+                    </MudItem>
                     <MudItem xl="3" lg="3" md="3">
                     </MudItem>
                 </MudGrid>
-                                   
+
                 <MudGrid Style="margin-top: 2rem; align-items: center">
                     @if (isLoading)
                     {
@@ -234,7 +250,7 @@
                     {
                         if (isError)
                         {
-                            <MudItem xl="12" lg="12" md="12" sm="12" xs="12" >
+                            <MudItem xl="12" lg="12" md="12" sm="12" xs="12">
                                 <MudText Class="text-center">Không có dữ liệu</MudText>
                             </MudItem>
                         }
@@ -333,6 +349,7 @@
     private int select = -1;
     private bool isLoading = true;
     private int totalStudent = 0;
+    private int totalExam = 0;
 
     private int indexChooseDonut = 0;
     private int indexChooseBar = -1;
@@ -420,7 +437,7 @@
         else
         {
             isError = true;
-        }      
+        }
     }
 
     private async Task ChangeValueLecturer()
@@ -456,7 +473,7 @@
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             return;
         }
@@ -469,7 +486,8 @@
         _lstSV = await _serLec.GetAllStudent();
         _lstSubject = await _serSub.GetAllSub("", true);
         _lstClass = await _serClass.GetAllClass("", true);
-
+        _lstExam = await _serExam.GetAllActive();
+        totalExam = _lstExam.Count();
         _lstUser = await _serLec.GetAllTeacher();
         if (_lstSV.Count != 0 && _lstSubject.Count != 0 && _lstClass.Count != 0 && _lstUser.Count != 0)
         {
@@ -477,7 +495,7 @@
             {
 
                 classId = _lstClass[0];
-                subjectId = _lstSubject[1].Id;
+                subjectId = _lstSubject[0].Id;
                 _lstExam = await _serExam.GetListOfSubject(subjectId);
                 if (_lstExam != null && _lstExam.Count > 0)
                 {
@@ -494,19 +512,19 @@
         }
 
         ClassList = await _serClass.GetClassList("", true);
-        if(_lstUser.Count != 0 && ClassList.Count != 0)
+        if (_lstUser.Count != 0 && ClassList.Count != 0)
         {
 
-            
-            if(_lstUser.Any())
+
+            if (_lstUser.Any())
             {
                 ClassId = ClassList[0].Id;
                 teacherId = _lstUser[0].Id;
                 ClassList = await _serLec.GetListOfTeacher(teacherId);
 
-                if(ClassList.Count!= 0 && ClassList.Count  > 0)
+                if (ClassList.Count != 0 && ClassList.Count > 0)
                 {
-                ClassId = ClassList[0].Id;
+                    ClassId = ClassList[0].Id;
                     _lstScore2 = await _serLec.GetScore2(teacherId, ClassId);
                 }
                 else
@@ -516,7 +534,7 @@
             }
         }
 
-       
+
 
         await LoadDataChart();
     }

@@ -22,7 +22,7 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public async  Task<List<Exam>> GetAllExam(string? textSearch, bool isActive)
+        public async Task<List<Exam>> GetAllExam(string? textSearch, bool isActive)
         {
             var qr = _context.Exams.AsQueryable();
 
@@ -52,7 +52,7 @@ namespace Testify.DAL.Reposiroties
             var filteredExam = await GetAllExam(textSearch, isActive);
             var data = await (from _ex in _context.Exams
                               join _exdt in _context.ExamDetails
-                              on _ex.Id equals _exdt.ExamId 
+                              on _ex.Id equals _exdt.ExamId
                               join _exdtqs in _context.ExamDetailQuestions
                               on _exdt.Id equals _exdtqs.ExamDetailId
                               join _qs in _context.Questions
@@ -74,7 +74,7 @@ namespace Testify.DAL.Reposiroties
                                   UpdateDate = _exdt.UpdateDate,
                                   Point = _exdtqs.Point,
                                   Description = _ex.Description,
-                                  
+
                               }
                               ).ToListAsync();
             return data;
@@ -100,15 +100,16 @@ namespace Testify.DAL.Reposiroties
             {
                 var objUpdateExam = await _context.Exams.FindAsync(exam.Id);
 
-                
+
 
                 objUpdateExam.Name = exam.Name;
                 objUpdateExam.NumberOfQuestions = exam.NumberOfQuestions;
+                objUpdateExam.NumberOfRepeat = exam.NumberOfRepeat;
                 objUpdateExam.Status = exam.Status;
                 objUpdateExam.Duration = exam.Duration;
                 objUpdateExam.Description = exam.Description;
                 objUpdateExam.MaximmumMark = exam.MaximmumMark;
-                objUpdateExam.PassMark = exam.PassMark; 
+                objUpdateExam.PassMark = exam.PassMark;
                 objUpdateExam.SubjectId = exam.SubjectId;
 
                 var updateExam = _context.Exams.Update(objUpdateExam).Entity;
@@ -137,17 +138,43 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-       
+
 
         public async Task<List<Exam>> GetAllActicve()
         {
-            return _context.Exams.Where(x=>x.Status == 1).ToList();
+            return _context.Exams.Where(x => x.Status == 1).ToList();
         }
 
         public async Task<List<Exam>> GetAllActicveOfSubject(int subjectId)
         {
-            return _context.Exams.Where(x => x.Status == 1&&x.SubjectId==subjectId).ToList();
+            return _context.Exams.Where(x => x.Status == 1 && x.SubjectId == subjectId).ToList();
         }
-        
+
+        public async Task<int> GetCountExamByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var allClass = _context.ExamSchedules.Where(x => x.EndTime < DateTime.Now && x.Status == 1).ToList();
+                var allExam = allClass.Select(e => e.ExamId).Distinct().ToList();
+                return allExam.Count;
+            }
+            else if (objUser.LevelId == 3)
+            {
+                var data = (from cl in _context.Classes.Where(x => x.TeacherId == objUser.Id && x.Status == 1)
+                            join clexs in _context.ClassExamSchedules on cl.Id equals clexs.ClassId
+                            join exs in _context.ExamSchedules on clexs.ExamScheduleId equals exs.Id
+                            where (exs.EndTime < DateTime.Now && exs.Status == 1)
+                            select (exs.ExamId)
+                            ).Distinct().ToList();
+
+                return data.Count;
+            }
+            else
+            {
+                return -1;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -33,6 +34,28 @@ namespace Testify.Web.Services
             var reponse = await obj.Content.ReadFromJsonAsync<Submission>();
 
             return reponse;
+        }
+
+        public async Task<int> NumberSubmit(Guid userId, int examscheduleId)
+        {
+            var numberofsubmit = await _httpClient.GetAsync($"submission/Check-NumberOfSubmit?userId={userId}&examscheduleId={examscheduleId}");
+            var reponse = await numberofsubmit.Content.ReadFromJsonAsync<int>();
+
+            return reponse;
+        }
+
+        public async Task<List<SubmittedByUser>> GetAllSubmittedByUser(Guid userId)
+        {
+            var lst = await _httpClient.GetAsync($"submission/Submitted-By-User?userId={userId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<SubmittedByUser>>();
+            return response;
+        }
+
+        public async Task<List<Achievenment>> GetAllAchievenment(Guid userId)
+        {
+            var lst = await _httpClient.GetAsync($"submission/Achievenments?userId={userId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<Achievenment>>();
+            return response;
         }
     }
 }

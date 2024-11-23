@@ -16,6 +16,11 @@ namespace Testify.DAL.Reposiroties
         {
             _context = new TestifyDbContext();
         }
+
+        public List<ClassExamSchedule> GetAllActive()
+        {
+            return _context.ClassExamSchedules.ToList();
+        }
         public List<ClassWithUser> GetClassInSchedule(int scheduleId)
         {
             var data = (from c in _context.Classes
@@ -69,7 +74,7 @@ namespace Testify.DAL.Reposiroties
                 foreach (var c in data)
                 {
 
-                    var a = _context.ClassExamSchedules.Find(c.Id);
+                    var a = _context.ClassExamSchedules.FirstOrDefault(x => x.ClassId == c.Id);
 
                     if (a != null)
                     {

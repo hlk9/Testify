@@ -91,12 +91,12 @@ namespace Testify.Web.Services
             return lst;
         }
 
-        public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end)
+        public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end,int? subjectId)
         {
             var startStr = Uri.EscapeDataString(start.ToString("MM/dd/yyyy HH:mm:ss"));
             var endStr = Uri.EscapeDataString(end.ToString("MM/dd/yyyy HH:mm:ss"));
 
-            var response = await _httpClient.GetAsync($"ExamSchedule/Get-InTime?start={startStr}&end={endStr}");
+            var response = await _httpClient.GetAsync($"ExamSchedule/Get-InTime?start={startStr}&end={endStr}&subjectId={subjectId}");
 
             if (response.StatusCode == HttpStatusCode.NoContent) // 204 No Content
             {
@@ -123,5 +123,24 @@ namespace Testify.Web.Services
             return schedule;
         }
 
+        public async Task<List<ExamSchedule>> GetExamScheduleTimesByClassUserIdAsync(Guid userId)
+        {
+            var obj = await _httpClient.GetFromJsonAsync<List<ExamSchedule>>($"ExamSchedule/Get-ExamScheduleTimes-By-ClassUserIdAsync?userId={userId}");
+            return obj;
+        }
+
+        public async Task<List<ExamScheduleDto>> GetAllScheduleByStudentId(string studentId)
+        {
+            var obj = await _httpClient.GetFromJsonAsync<List<ExamScheduleDto>>($"ExamSchedule/Get-All-Schedule-ByStudentId?studentId={studentId}");
+            return obj;
+        }
+
+        
+            public async Task<List<ExamSchedule>> GetAllExamScheduleByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"ExamSchedule/Get-ExamSchedule-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<List<ExamSchedule>>();
+            return response;
+        }
     }
 }

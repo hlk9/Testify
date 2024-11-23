@@ -15,7 +15,7 @@ namespace Testify.DAL.Models
 
         [ForeignKey("ExamId")]
         public int ExamId { get; set; }
-        public virtual Exam Exam { get; set; }        
+        public virtual Exam? Exam { get; set; }        
         public string Code { get; set; }
         public byte? Status { get; set; }
         public DateTime CreateDate { get; set; }

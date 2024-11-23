@@ -27,23 +27,14 @@ namespace Testify.Web.Services
 
         public async Task<Exam> GetExamId(int id)
         {
-            var a = await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
             return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
         }
 
-        public async Task<bool> CreateExam(Exam e)
+        public async Task<Exam> CreateExam(Exam e)
         {
             var newExam = await _httpClient.PostAsJsonAsync("Exam/Add-Exam", e);
-            if (newExam.IsSuccessStatusCode) 
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-            //var reponse = await newExam.Content.ReadFromJsonAsync<Exam>();
-            //return reponse;
+            var reponse = await newExam.Content.ReadFromJsonAsync<Exam>();
+            return reponse;
         }
 
         public async Task<bool> UpdateExam(Exam e)
@@ -82,7 +73,12 @@ namespace Testify.Web.Services
             return lst;
         }
 
-       
+        public async Task<int> GetCountExamByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"Exam/Get-Count-Exam-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
 
     }
 }

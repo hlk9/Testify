@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -33,6 +34,24 @@ namespace Testify.API.Controllers
         {
             var obj = await _repo.Create(submission);
             return Ok(obj);
+        }
+
+        [HttpGet("Check-NumberOfSubmit")]
+        public async Task<ActionResult<int>> NumberOfSubmits(Guid userId,int examscheduleId)
+        {
+            return await _repo.CheckNumberOfSubmit(userId, examscheduleId);
+        }
+
+        [HttpGet("Submitted-By-User")]
+        public async Task<ActionResult<List<SubmittedByUser>>> GetSubmittedByUser(Guid userId)
+        {
+            return await _repo.GetAllSubmittedByUser(userId);
+        }
+
+        [HttpGet("Achievenments")]
+        public async Task<ActionResult<List<Achievenment>>> GetAllAchievenment(Guid userId)
+        {
+            return await _repo.GetAllAchievenment(userId);
         }
     }
 }

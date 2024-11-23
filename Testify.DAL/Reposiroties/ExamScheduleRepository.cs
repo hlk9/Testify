@@ -117,9 +117,9 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<ExamSchedule> CheckIsContaintInTime(DateTime startDate, DateTime endDate)
+        public async Task<ExamSchedule> CheckIsContaintInTime(DateTime startDate, DateTime endDate, int subjectId)
         {
-            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255);
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId==subjectId || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255 && x.SubjectId == subjectId);
 
             if(ojb!= null)
             {
@@ -129,8 +129,54 @@ namespace Testify.DAL.Reposiroties
             return null;
         }
 
+        public async Task<ExamSchedule> CheckIsContaintInTimeWithoutSubject(DateTime startDate, DateTime endDate)
+        {
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255) ;
 
+            if (ojb != null)
+            {
+                return ojb;
+            }
 
+            return null;
+        }
 
+        public Task<List<ExamSchedule>> GetExamScheduleTimesByClassUserIdAsync(Guid userId)
+        {
+            var result = (from cu in _context.ClassUsers
+                          join ces in _context.ClassExamSchedules
+                          on cu.ClassId equals ces.ClassId
+                          join es in _context.ExamSchedules
+                          on ces.ExamScheduleId equals es.Id
+                          where cu.UserId == userId && DateTime.Now >= es.StartTime && DateTime.Now <= es.EndTime
+                          select es).ToListAsync();
+            return result;
+        }
+
+        public async Task<List<ExamSchedule>> GetAllExamScheduleByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var lst = await _context.ExamSchedules.Where(x => x.StartTime >= DateTime.Now && x.Status == 1).ToListAsync();
+                return lst;
+            }
+            else if (objUser.LevelId == 3)
+            {
+                var data = await (from cl in _context.Classes.Where(x => x.TeacherId == userId && x.Status == 1)
+                            join clexs in _context.ClassExamSchedules on cl.Id equals clexs.ClassId
+                            join exs in _context.ExamSchedules on clexs.ExamScheduleId equals exs.Id
+                            where (exs.Status == 1 && exs.StartTime >= DateTime.Now)
+                            select exs
+                            ).ToListAsync();
+
+                return data;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
