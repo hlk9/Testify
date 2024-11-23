@@ -72,5 +72,12 @@ namespace Testify.Web.Services
             var listClass = await _httpClient.GetFromJsonAsync<List<ClassWithUser>>($"Class/Get-Classes-BySubjectIdExcludeInSchedule?subjectId=" + subjectId+ "&scheduleId="+scheduleId);
             return listClass;
         }
+
+        public async Task<int> GetCountClassByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"Class/Get-Count-Class-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
     }
 }

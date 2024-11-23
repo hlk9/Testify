@@ -77,5 +77,13 @@ namespace Testify.API.Controllers
             var updateStatus = await classRepository.UpdateStatusClass(classId, status);
             return Ok(updateStatus);
         }
+
+        [HttpGet("Get-Count-Class-By-UserId")]
+        public async Task<ActionResult<int>> GetCountClass(Guid userId)
+        {
+            var count = await classRepository.GetAllClassByUserId(userId);
+
+            return Ok(count);
+        }
     }
 }
