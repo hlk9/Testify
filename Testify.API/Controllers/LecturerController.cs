@@ -202,12 +202,6 @@ namespace Testify.API.Controllers
             return count;
         }
 
-        [HttpGet("Get-All-Count-Student-By-UserId")]
-        public async Task<int> GetCountStudent(Guid userId)
-        {
-            var count = await _repo.GetCountStudentByUserId(userId);
-            return count;
-        }
         [HttpGet("Confirm-Email")]
         public async Task<User> ConfirmEmail(string email)
         {
