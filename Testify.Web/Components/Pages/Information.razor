@@ -1,0 +1,73 @@
+﻿@page "/Information"
+@layout AdminLayout
+
+<MudPaper Style="width: 100%; height: calc(100svh - 64px); display: flex; justify-content: center; padding: 1.5rem" Elevation="0">
+    <MudGrid Style="width: 50svw; align-items: center">
+        <MudItem xs="12" sm="12" md="12" lg="12" Class="text-center">
+            <MudAvatar Class="mb-2" Style="height:8rem; width:8rem; font-size:2rem;" Color="Color.Primary">
+                <MudIcon Icon="@Icons.Material.Filled.Person" />
+            </MudAvatar>
+        </MudItem>
+
+        <MudItem xs="12" sm="12" md="12" lg="12">
+            <MudTextField T="string" Label="Họ và tên" Variant="Variant.Outlined" />
+        </MudItem>
+
+        <MudItem xs="12" sm="8" md="8" lg="8">
+           <MudDatePicker Class="w-100" Variant="Variant.Outlined" Placeholder="Ngày sinh"></MudDatePicker>
+        </MudItem>
+
+        <MudItem xs="12" sm="4" md="4" lg="4">
+            <MudRadioGroup T="bool" Class="w-100 text-end">
+                <MudRadio T="bool" Value="true">Nam</MudRadio>
+                <MudRadio T="bool" Value="false">Nữ</MudRadio>
+            </MudRadioGroup>
+        </MudItem>
+
+        <MudItem xs="12" sm="12" md="12" lg="12">
+            <MudTextField T="string" Label="Tên tài khoản" Variant="Variant.Outlined" Disabled=true />
+        </MudItem>
+
+        <MudItem xs="12" sm="12" md="12" lg="12">
+            <MudTextField T="string" Label="Email" Variant="Variant.Outlined" Disabled=true />
+        </MudItem>
+
+        <MudItem xs="12" sm="12" md="12" lg="12">
+            <MudTextField T="string" Label="Số điện thoại" Variant="Variant.Outlined" Disabled=true />
+        </MudItem>
+
+        <MudItem xs="7" sm="9" md="9" lg="9">
+            <MudTextField T="string" Placeholder="Mật khẩu" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" FullWidth="true"></MudTextField>
+        </MudItem>
+        <MudItem xs="5" sm="3" md="3" lg="3">
+            <MudButton Class="btn w-100 px-4 py-3" Style="color: #29a69a; border: 1px solid #29a69a; border-radius: 1rem">Đổi  mật khẩu</MudButton>
+        </MudItem>
+
+        <MudItem xs="12" sm="12" md="12" lg="12" Class="text-center">
+            <MudButton Variant="Variant.Outlined" Class="btn px-5 py-3" Style="color: #ffffff; background-color: #29a69a; border-radius: 1rem">Lưu thông tin</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    private bool isShow;
+
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ButtonTestclick()
+    {
+        if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+}
