@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Testify.DAL.Reposiroties;
+using Testify.API.DTOs;
 using Testify.API.TokenHelper;
 using Testify.DAL.Models;
-using Testify.API.DTOs;
+using Testify.DAL.Reposiroties;
 
 namespace Testify.API.Controllers
 {

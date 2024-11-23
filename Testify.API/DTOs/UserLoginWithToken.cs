@@ -7,7 +7,7 @@
         public string? FullName { get; set; }
         public string? Token { get; set; }
         public bool? IsLoginSucces { get; set; }
-        public int?  LevelId {  get; set; }
+        public int? LevelId { get; set; }
 
 
     }

@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Models;
 
 namespace Testify.DAL.Context
@@ -51,10 +46,12 @@ namespace Testify.DAL.Context
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<BlackListToken> BlackListTokens { get; set; }
         public DbSet<ClassExamSchedule> ClassExamSchedules { get; set; }
+        public DbSet<UserLog> UserLogs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserLog>().ToTable("UserLogs");
 
             modelBuilder.Entity<Class>()
                 .HasIndex(c => c.ClassCode).IsUnique();
@@ -121,18 +118,18 @@ namespace Testify.DAL.Context
                 new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van A", UserName = "nva", DateOfBirth = DateTime.Now, PhoneNumber = "0987654321", Email = "abcde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 4, Sex = false },
                 new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van B", UserName = "nvb", DateOfBirth = DateTime.Now, PhoneNumber = "0987654322", Email = "abscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 3, Sex = true },
                 new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van C", UserName = "nvc", DateOfBirth = DateTime.Now, PhoneNumber = "0987254322", Email = "aabscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 2, Sex = true },
-                new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van D", UserName = "nvd", DateOfBirth = DateTime.Now, PhoneNumber = "0287654322", Email = "absscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 1,Sex=true }
+                new User { Id = Guid.NewGuid(), Address = "A", FullName = "Nguyen Van D", UserName = "nvd", DateOfBirth = DateTime.Now, PhoneNumber = "0287654322", Email = "absscde@gmail.com", PasswordHash = "4297f44b13955235245b2497399d7a93", AvatarUrl = null, LastLogin = null, Status = 1, LevelId = 1, Sex = true }
                );
 
             modelBuilder.Entity<Subject>()
                 .HasData(
-                new Subject { Id=1, Description="None", Name="Ly", Status=1}
+                new Subject { Id = 1, Description = "None", Name = "Ly", Status = 1 }
                 );
 
             modelBuilder.Entity<Class>()
                 .HasData(
-                new Class { Id = 1, Name = "Class 1", Status = 1 , Capacity=30, Description="None", SubjectId=1, ClassCode="refdsw",TeacherId=Guid.NewGuid()}
-                );           
+                new Class { Id = 1, Name = "Class 1", Status = 1, Capacity = 30, Description = "None", SubjectId = 1, ClassCode = "refdsw", TeacherId = Guid.NewGuid() }
+                );
         }
     }
 }

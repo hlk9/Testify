@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.WebSockets;
+﻿using Microsoft.AspNetCore.Mvc;
 using Testify.API.DTOs;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
@@ -47,7 +45,7 @@ namespace Testify.API.Controllers
             var addExam = await _respon.AddExam(r);
             return Ok(addExam);
         }
-        [HttpDelete("Delete-Exam")]
+        [HttpPut("Delete-Exam")]    
         public async Task<ActionResult<Exam>> DeleteClass(int id)
         {
             var deleteEx = await _respon.DeleteExam(id);
@@ -69,7 +67,7 @@ namespace Testify.API.Controllers
             var lstExam = await _respon.GetAllActicve();
             var lstSub = await subjectRepository.GetAllSubject(null, true);
 
-            foreach (var item in lstExam) 
+            foreach (var item in lstExam)
             {
                 listResult.Add(new ExamWhitQusetion
                 {
@@ -78,11 +76,11 @@ namespace Testify.API.Controllers
                     ExamName = item.Name,
                     Status = item.Status,
                     SubjectId = item.SubjectId,
-                    SubjectName = lstSub.FirstOrDefault(x=> x.Id == item.SubjectId).Name,
+                    SubjectName = lstSub.FirstOrDefault(x => x.Id == item.SubjectId).Name,
                     Duration = item.Duration,
                     NumberOfQuestion = item.NumberOfQuestions,
                     NumberOfRepeat = item.NumberOfRepeat,
-                    
+
 
                 });
             }

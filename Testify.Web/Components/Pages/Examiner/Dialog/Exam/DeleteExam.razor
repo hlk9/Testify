@@ -30,7 +30,7 @@
         lisDThi = await examDetailService.GetExamDetailByExamId(Id);
         foreach (var item in lisDThi)
         {
-            await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(item.Id);
+            //await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(item.Id);
 
             await examDetailService.DeleteExamDetail(item.Id);
         }
@@ -48,6 +48,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        lisDThi = await examDetailService.GetExamDetailByExamId(Id);
+        //lisDThi = await examDetailService.GetExamDetailByExamId(Id);
+        lisDThi = (await examDetailService.GetExamDetailByExamId(Id))
+            .Where(x => x.Status != 255)
+            .ToList();
+
     }
 }

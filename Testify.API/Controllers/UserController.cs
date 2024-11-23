@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
-using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
-using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -40,6 +37,13 @@ namespace Testify.API.Controllers
             return Ok(lstUser);
         }
 
+        [HttpGet("Get-By-idUser")]
+        public async Task<ActionResult<List<User>>> GetByidUser(Guid id)
+        {
+            var idUser = await userRepos.GetByidUserSendMail(id);
+            return Ok(idUser);
+        }
+
         [HttpPost("create-user")]
         public async Task<ActionResult<User>> CreateAccount(User user)
         {
@@ -62,7 +66,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpPost("Import-Excel-User")]
-        public async Task<ActionResult<int>> UploadFile(IFormFile file,[FromForm] int levelId)
+        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int levelId)
         {
             if (file == null || file.Length == 0)
             {
@@ -96,22 +100,22 @@ namespace Testify.API.Controllers
                     userFailCount++;
                     continue;
                 }
-                else if (lstUser.Any(x => x.UserName.Trim().ToLower().Equals(worksheetsU.Cells[rowU,2].Value.ToString().Trim().ToLower())))
+                else if (lstUser.Any(x => x.UserName.Trim().ToLower().Equals(worksheetsU.Cells[rowU, 2].Value.ToString().Trim().ToLower())))
                 {
                     userFailCount++;
                     continue;
                 }
-                else if (lstUser.Any(x => x.PhoneNumber.Trim().Equals(worksheetsU.Cells[rowU,4].Value.ToString().Trim())))
+                else if (lstUser.Any(x => x.PhoneNumber.Trim().Equals(worksheetsU.Cells[rowU, 4].Value.ToString().Trim())))
                 {
                     userFailCount++;
                     continue;
                 }
-                else if (lstUser.Any(x => x.Email.Trim().Equals(worksheetsU.Cells[rowU,6].Value.ToString())))
+                else if (lstUser.Any(x => x.Email.Trim().Equals(worksheetsU.Cells[rowU, 6].Value.ToString())))
                 {
                     userFailCount++;
                     continue;
                 }
-            
+
                 //else if()
                 User u = new User();
                 u.FullName = worksheetsU.Cells[rowU, 1].Value.ToString();

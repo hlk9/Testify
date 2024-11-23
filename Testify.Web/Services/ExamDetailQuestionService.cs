@@ -1,4 +1,5 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -31,5 +32,49 @@ namespace Testify.Web.Services
             }
             return false;
         }
+
+        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync(int examDetailID)
+        {
+            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID?examdetailID={examDetailID}");
+            var response = await lst.Content.ReadFromJsonAsync<List<QuestionInExam>>();
+            return response;
+        }
+
+        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOT(int examDetailID)
+        {
+            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-Not?examdetailID={examDetailID}");
+            var response = await lst.Content.ReadFromJsonAsync<List<QuestionInExam>>();
+            return response;
+        }
+
+        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOTAndLevel(int examDetailID, int levelID)
+        {
+            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-NotAndLevel?examdetailID={examDetailID}&levelID={levelID}");
+            var response = await lst.Content.ReadFromJsonAsync<List<QuestionInExam>>();
+            return response;
+        }
+
+
+        public async Task<bool> AddListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
+        {
+            var a = await _httpClient.PostAsJsonAsync("ExamDetailQuestion/Add-ListQuestionToExam?idExamDetail=" + idExamDetail, data);
+            if (a.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> RemoveFromListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
+        {
+            var a = await _httpClient.PostAsJsonAsync("ExamDetailQuestion/Remove-ListQuestionToExam?idExamDetail=" + idExamDetail, data);
+            if (a.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+
     }
 }

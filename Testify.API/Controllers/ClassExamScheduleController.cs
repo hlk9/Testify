@@ -42,83 +42,62 @@ namespace Testify.API.Controllers
         [HttpPost("Checks-StudentExist-InSchedule")]
         public async Task<List<User>> GetStudentExist(CheckClassScheduleRequest req)
         {
-            int scheduleId = req.ScheduleId;
             ExamScheduleRepository examScheduleRepository = new ExamScheduleRepository();
             ClassUserReposiroty classUserReposiroty = new ClassUserReposiroty();
             ClassRepository repoClass = new ClassRepository();
-            List<ClassWithUser> data = new List<ClassWithUser>();
-            data = req.DataList;
-            var tesD = await repoClass.GetAllClass(null, true);
+            int scheduleId = req.ScheduleId;
 
-
+            // Lấy thông tin ExamSchedule hiện tại
             var oneSchedule = await scheduleRepo.GetById(scheduleId);
+            if (oneSchedule == null) return null;
 
-            var scheduleInTime = await 
-                examScheduleRepository.CheckIsContaintInTimeWithoutSubject(oneSchedule.StartTime, oneSchedule.EndTime);
-            if (scheduleInTime != null)
+            // Kiểm tra các lịch thi có trùng thời gian
+            var scheduleInTime = await examScheduleRepository.CheckIsContaintInTimeWithoutSubject(
+                oneSchedule.StartTime, oneSchedule.EndTime);
+            if (scheduleInTime == null) return null;
+
+            try
             {
-                try
-                {
-                    var listClwU = await classUserReposiroty.GetAll(1);
-                   
-                    var listStudentPrepare =
-                    (
-                     from classO in data
-                     join classU in listClwU
-                        on classO.Id equals classU.ClassId into classUsers
-                     from classUsr in classUsers
-                     join usr in await repoUser.GetAllUsers()
-                        on classUsr.UserId equals usr.Id
-                     where usr.Id == classUsr.UserId
-                     select usr
-                    ).ToList();
+                // Lấy danh sách sinh viên chuẩn bị (có trạng thái lớp là 1)
+                var listClwU = await classUserReposiroty.GetAll(1); // Class-User with status = 1
+                var listUsers = await repoUser.GetAllUsers();
+                var listStudentPrepare = req.DataList
+                    .Join(listClwU, classO => classO.Id, classU => classU.ClassId, (classO, classU) => classU)
+                    .Join(listUsers, classU => classU.UserId, usr => usr.Id, (classU, usr) => usr)
+                    .ToList();
 
+                var listClassExam =  repos.GetAllActive(); // Active ClassExamSchedules
+                var listStudent_ExistInSchedule = (
+                    from classExam in listClassExam
+                    join classO in await repoClass.GetAllClass(null, true)
+                        on classExam.ClassId equals classO.Id
+                    join classU in await classUserReposiroty.GetAll(1)
+                        on classO.Id equals classU.ClassId
+                    join usr in listUsers
+                        on classU.UserId equals usr.Id
+                    join examSchedule in  scheduleRepo.GetAll()
+                        on classExam.ExamScheduleId equals examSchedule.Id
+                    where
+                        // Điều kiện kiểm tra lịch thi trùng với khoảng thời gian của oneSchedule
+                        examSchedule.StartTime <= oneSchedule.EndTime &&
+                        examSchedule.EndTime >= oneSchedule.StartTime
+                    select usr
+                ).ToList();
 
+                // So sánh danh sách sinh viên
+                var commonStudents = listStudentPrepare
+                    .Where(s => listStudent_ExistInSchedule.Any(e => e.Id == s.Id))
+                    .ToList();
 
-                    var listSche = scheduleRepo.GetAll();
-                    var listClasE = repos.GetAllActive();
-
-                    var listClassExam = (from schedule in scheduleRepo.GetAll()
-                                         join classExam in repos.GetAllActive()
-                                             on schedule.Id equals classExam.ExamScheduleId
-                                         select classExam).ToList();
-
-
-
-                    var listStudent_ExistInSchedule =
-                         (from classE in listClassExam
-                          join classOrigin in await repoClass.GetAllClass(null, true)
-                      on classE.ClassId equals classOrigin.Id into classOrigins
-                          from classO in classOrigins.DefaultIfEmpty()
-                          join classU in await classUserReposiroty.GetAll(1)
-                      on classO.Id equals classU.ClassId into classUsers
-                          from classUsr in classUsers.DefaultIfEmpty()
-                          join usr in await repoUser.GetAllUsers()
-                      on classUsr.UserId equals usr.Id
-                          where usr.Id == classUsr.UserId
-                          select usr
-                        ).ToList();
-
-                    if (listStudentPrepare.Any(s => listStudent_ExistInSchedule.Contains(s)))
-                    {
-                        var commonStudents = (from s in listStudent_ExistInSchedule
-                                              where listStudentPrepare.Contains(s)
-                                              select s).ToList();
-                        return commonStudents;
-                    }
-                }
-
-                catch (Exception ex)
-                {
-                    return null;
-                }
-
-
-
-
+                return commonStudents;
             }
-            return null;
-
+            catch (Exception ex)
+            {
+                // Log lỗi thay vì trả về null
+                Console.WriteLine($"Error: {ex.Message}");
+                return null;
+            }
         }
+
     }
 }

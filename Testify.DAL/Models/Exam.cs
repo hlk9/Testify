@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Testify.DAL.Models
 {
@@ -14,8 +9,8 @@ namespace Testify.DAL.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        [ForeignKey("SubjectId")] 
-        public int SubjectId  { get; set; }
+        [ForeignKey("SubjectId")]
+        public int SubjectId { get; set; }
         public virtual Subject? Subject { get; set; }
         public int NumberOfQuestions { get; set; }
         public int NumberOfRepeat { get; set; } = 1;

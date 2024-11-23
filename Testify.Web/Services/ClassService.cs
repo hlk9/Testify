@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using Testify.DAL.Models;
+﻿using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -42,7 +40,7 @@ namespace Testify.Web.Services
             var newClass = await _httpClient.PostAsJsonAsync("Class/Add-Class", c);
             var reponse = await newClass.Content.ReadFromJsonAsync<Class>();
             return reponse;
-           
+
         }
 
         public async Task<Class> UpdateClass(Class c)
@@ -69,9 +67,9 @@ namespace Testify.Web.Services
             return false;
         }
 
-        public async Task<List<ClassWithUser>> GetClassBySubjectId(int? subjectId)
+        public async Task<List<ClassWithUser>> GetClassBySubjectId(int? subjectId,int scheduleId)
         {
-            var listClass = await _httpClient.GetFromJsonAsync<List<ClassWithUser>>($"Class/Get-Classes-BySubjectIdExcludeInSchedule?subjectId=" + subjectId);
+            var listClass = await _httpClient.GetFromJsonAsync<List<ClassWithUser>>($"Class/Get-Classes-BySubjectIdExcludeInSchedule?subjectId=" + subjectId+ "&scheduleId="+scheduleId);
             return listClass;
         }
 

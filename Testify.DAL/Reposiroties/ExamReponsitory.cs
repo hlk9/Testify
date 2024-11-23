@@ -1,13 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -127,8 +121,9 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 var objDeleteExam = await _context.Exams.FindAsync(id);
+                objDeleteExam.Status = 255;
 
-                _context.Exams.Remove(objDeleteExam);
+                _context.Exams.Update(objDeleteExam);
                 await _context.SaveChangesAsync();
                 return objDeleteExam;
             }

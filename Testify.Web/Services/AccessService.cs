@@ -30,9 +30,9 @@ namespace Testify.Web.Services
         }
 
         public async Task<UserLoginWithToken> Login(string username, string password)
-        {         
+        {
             var uLT = await _httpClient.GetFromJsonAsync<UserLoginWithToken>($"/Access/Login?username={username}&passwordHash={HashPassword(password)}");
-           
+
             if (uLT != null)
             {
                 return uLT;
@@ -42,17 +42,17 @@ namespace Testify.Web.Services
 
         }
 
-        public  async Task<UserLoginWithToken> CheckAccessStatusByToken(string token)
+        public async Task<UserLoginWithToken> CheckAccessStatusByToken(string token)
         {
 
             var accessDTO = await _httpClient.GetFromJsonAsync<UserLoginWithToken>($"/Access/CheckToken?token={token}");
 
             if (accessDTO != null)
-            {                
-                return  accessDTO;
+            {
+                return accessDTO;
             }
             return null;
-            
+
         }
     }
 }

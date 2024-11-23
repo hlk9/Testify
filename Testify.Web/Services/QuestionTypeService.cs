@@ -1,5 +1,4 @@
 ﻿using Testify.DAL.Models;
-using Testify.DAL.Reposiroties;
 
 namespace Testify.Web.Services
 {
@@ -25,7 +24,7 @@ namespace Testify.Web.Services
         public async Task<bool> CreateQuestionType(QuestionType questionType)
         {
             var statusCreate = await _httpClient.PostAsJsonAsync<QuestionType>("QuestionType/Create-Question-Type", questionType);
-            if(statusCreate.IsSuccessStatusCode)
+            if (statusCreate.IsSuccessStatusCode)
             {
                 return true;
             }

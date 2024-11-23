@@ -1,5 +1,4 @@
-﻿using Azure;
-using Testify.API.DTOs;
+﻿using Testify.API.DTOs;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
@@ -53,10 +52,11 @@ namespace Testify.Web.Services
 
                         return response;
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                     }
 
-                   
+
 
                 }
             }

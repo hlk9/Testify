@@ -33,7 +33,7 @@
         </MudItem>
     </MudGrid>
 
-    @if (ExamID > 0 && lisDThi.Count > 0)
+    @if (ExamID > 0 && lisDThi.Count > 0 )
     {
         <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="450px">
 
@@ -90,11 +90,11 @@
                 <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
-                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" OnClick="@(() => UpdateDethiDialog(_maxWidthUpdate,context.Id,ExamID))" aria-label="update"></MudIconButton>
                     </MudTooltip>
-                    <MudTooltip Text="Chi tiết">
-                        <MudIconButton Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    </MudTooltip>
+                    @* <MudTooltip Text="Chi tiết">
+                        <MudIconButton Icon="@Icons.Material.Filled.Notes" OnClick="@(() => UpdateDethiDialog(_maxWidth,context.Id))" aria-label="details"></MudIconButton>
+                    </MudTooltip> *@
                     <MudTooltip Text="Xoá">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteDeThiDialog(_maxWidth,context.Id))" aria-label="delete"></MudIconButton>
                     </MudTooltip>
@@ -119,7 +119,7 @@
 
 @code {
     private List<Exam> _lstExam = new List<Exam>();
-    private int ExamID = -1;
+    public int ExamID = -1;
     private int questionLevelId = -1;
     private int stt;
     private int SubjectId = -1;
@@ -129,16 +129,24 @@
     private Subject subjectCurrent = new Subject();
     private void Cancel() => MudDialog.Cancel();
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+    private readonly DialogOptions _maxWidthUpdate = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true, BackdropClick = false };
+
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private List<User> user = new List<User>();
 
 
     private async Task LoadData()
     {
-        lisDThi = await examdetailService.GetExamDetailByExamId(ExamID);
+        // lisDThi = await examdetailService.GetExamDetailByExamId(ExamID);
+        // var exam = await examService.GetExamId(ExamID);
+        // subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
+        // GetHashCode();
+        var allExamDetails = await examdetailService.GetExamDetailByExamId(ExamID);
+        lisDThi = allExamDetails.Where(x => x.Status != 255).ToList(); 
         var exam = await examService.GetExamId(ExamID);
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         GetHashCode();
+
 
     }
 
@@ -188,7 +196,7 @@
         var parameters = new DialogParameters
         {
               { "IdExamDetail", IdExamDetail }
-             
+
         };
         var dialog = await DialogService.ShowAsync<Dialog.DeThi.DeleteExamDetail>("Options Dialog", parameters, options);
         var result = await dialog.Result;
@@ -205,4 +213,23 @@
 
         public bool IsChecked { get; set; }
     }
+
+    private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID)
+    {
+        var parameters = new DialogParameters
+        {
+
+              { "ExamDetailID", ExamDetailID },
+              { "ExamID", ExamID}
+
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.DeThi.UpdateExamDetail>("Options Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (result == null || !result.Canceled)
+        {
+            await LoadData();
+        }
+    }
+    
+
 }

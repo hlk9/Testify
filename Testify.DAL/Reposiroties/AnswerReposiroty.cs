@@ -1,10 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 
@@ -42,7 +36,7 @@ namespace Testify.DAL.Reposiroties
                 await _context.SaveChangesAsync();
                 return create;
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -69,7 +63,8 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<Answer> UpdateStatusAnswer(int answerId, byte status) {
+        public async Task<Answer> UpdateStatusAnswer(int answerId, byte status)
+        {
             try
             {
                 var obj = await _context.Answers.FindAsync(answerId);

@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
-using Testify.API.DTOs;
 using Testify.DAL.Models;
-using Testify.Web.Components.Pages.Examiner;
 
 namespace Testify.Web.Services
 {
     public class UserService
     {
-           
+
 
         private readonly HttpClient _httpClient;
 
@@ -22,7 +20,7 @@ namespace Testify.Web.Services
 
 
 
-            if (uLT.IsSuccessStatusCode ==  true)
+            if (uLT.IsSuccessStatusCode == true)
             {
                 return true;
             }
@@ -65,6 +63,11 @@ namespace Testify.Web.Services
         public async Task<List<User>> GetUsersWithStatusTwo(int classId)
         {
             return await _httpClient.GetFromJsonAsync<List<User>>($"User/Get-Users-With-Status-Two?classId={classId}");
+        }
+
+        public async Task<User> GetByidUser(Guid id)
+        {
+            return await _httpClient.GetFromJsonAsync<User>($"User/Get-By-idUser?id={id}");
         }
     }
 }

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Testify.DAL.ViewModels
+﻿namespace Testify.DAL.ViewModels
 {
     public class ExamWhitExamDetail
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Description {  get; set; }
+        public string Description { get; set; }
         public int IdExamDetail { get; set; }
         public int IdExamDetailQues { get; set; }
         public int NumberOfQuestions { get; set; }
@@ -25,6 +19,6 @@ namespace Testify.DAL.ViewModels
         public Guid UpdateBy { get; set; }
 
         public double Point { get; set; }
-       
+
     }
 }
