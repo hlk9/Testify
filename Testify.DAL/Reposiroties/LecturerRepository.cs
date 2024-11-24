@@ -115,6 +115,25 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
+        public async Task<User> UpdateForgotPass(User user)
+        {
+            try
+            {
+                var updateLecturer = await _context.Users.FindAsync(user.Id);
+
+                updateLecturer.PasswordHash = user.PasswordHash;
+                updateLecturer.LastLogin = user.LastLogin;
+
+                var objLecturer = _context.Users.Update(updateLecturer).Entity;
+                await _context.SaveChangesAsync();
+                return objLecturer;
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+        }
 
         public async Task<User> DeleteLecturer(Guid id)
         {
@@ -217,6 +236,38 @@ namespace Testify.DAL.Reposiroties
             return data;
         }
 
+        public async Task<int> GetCountStudentByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
 
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var allStudent = _context.Users.Where(x => x.LevelId == 4 && x.Status == 1).ToList();
+                return allStudent.Count;
+            }
+            else if (objUser.LevelId == 3)
+            {
+                var data = (from cl in _context.Classes.Where(x => x.TeacherId == userId && x.Status == 1)
+                            join clus in _context.ClassUsers on cl.Id equals clus.ClassId
+                            where (clus.Status == 1)
+                            select(clus.UserId)
+                            ).ToList();
+                return data.Count;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        public async Task<User> ConfirmEmail(string email)
+        {
+            var confirm = _context.Users.Where(x => x.Email.Equals(email)).FirstOrDefault();    
+
+            if(confirm != null) {
+                return confirm;
+            }
+            return null;
+        }
     }
 }

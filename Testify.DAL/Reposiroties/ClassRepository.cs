@@ -221,5 +221,30 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
+
+        public async Task<int> GetAllClassByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var allClass = _context.Classes.ToList();
+                return allClass.Count;
+            }
+            else if (objUser.LevelId == 3)
+            {
+                var allClass = _context.Classes.Where(x => x.TeacherId == userId && x.Status == 1).ToList();
+                return allClass.Count;
+            }
+            else if (objUser.LevelId == 4)
+            {
+                var allClass = _context.ClassUsers.Where(x => x.UserId == userId && x.Status == 1).ToList();
+                return allClass.Count;
+            }
+            else
+            {
+                return -1;
+            }
+        }
     }
 }

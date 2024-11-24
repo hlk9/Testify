@@ -28,7 +28,7 @@
             return;
         }
 
-        var objClass = await _serClass.GetClassByCode(classCode);
+        var objClass = await _serClass.GetClassByCode(classCode.Trim());
         var lstClassUser = await _serClassUser.GetAllClassUser(10);
         if (lstClassUser.FirstOrDefault(x => x.ClassId == objClass.Id && x.UserId == userId) != null)
         {
