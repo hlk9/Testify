@@ -29,14 +29,15 @@
         </MudMenu>
         <MudSpacer />
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudMenu>
+        <MudMenu AnchorOrigin="Origin.BottomCenter">
             <ActivatorContent>
-                <MudAvatar Color="Color.Tertiary">L</MudAvatar>
+                <MudAvatar Color="Color.Tertiary">@_name</MudAvatar>
             </ActivatorContent>
             <ChildContent>
-                <MudMenuItem>Thông tin cá nhân</MudMenuItem>
-                <MudMenuItem OnClick="Logout">Đăng xuất</MudMenuItem>
-              
+                <MudMenuItem>
+                    <MudLink Class="text-decoration-none" Href="/Student-Information">Thông tin cá nhân</MudLink>
+                    </MudMenuItem>
+                <MudMenuItem Style="color: #29a69a" OnClick="Logout">Đăng xuất</MudMenuItem>
             </ChildContent>
         </MudMenu>
 
@@ -60,6 +61,7 @@
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
 
+    private string _name = "";
     protected override void OnInitialized()
     {
         base.OnInitialized();
@@ -79,6 +81,11 @@
     {
         if (firstRender && isLoading == true)
         {
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var objUser = await _serLec.GetLecturerById(Guid.Parse(userId.Value));
+            string nameUser = objUser.FullName;
+            string[] tu = nameUser.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            _name = tu[^1][0].ToString().ToUpper();
             isTokenValid = await CheckingToken();
             isLoading = false;
             StateHasChanged();

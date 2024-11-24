@@ -1,0 +1,185 @@
+﻿@page "/Student-Information"
+@layout StudentLayout
+@inject IDialogService DialogService
+
+@if (isLoading)
+{
+    <MudPaper Style="width: 100%; height: calc(100svh); display: flex; justify-content: center; align-items: center; background-color: transparent !important">
+        <Testify.Web.Shared.LoadingContext />
+    </MudPaper>
+}
+else
+{
+    <MudPaper Style="width: 100%; height: calc(100svh - 64px); padding: 1.5rem; display: flex; justify-content: center" Elevation="0">
+        <MudForm @ref="@form" Model="@_User" Style="width: 50svw;">
+            <MudGrid Class="w-100">
+                <MudItem xs="12" sm="12" md="12" lg="12" Class="text-center">
+                    <MudAvatar Class="mb-2" Style="height:6rem; width:6rem; font-size:2rem;" Color="Color.Primary">
+                        <MudIcon Icon="@Icons.Material.Filled.Person" />
+                    </MudAvatar>
+                </MudItem>
+
+                <MudItem xs="12" sm="12" md="12" lg="12">
+                    <MudTextField T="string" @bind-Value="@_User.FullName" Label="Họ và tên" Variant="Variant.Outlined" />
+                </MudItem>
+
+                <MudItem xs="12" sm="8" md="8" lg="8">
+                    <MudDatePicker Class="w-100" @bind-Date="@_SelectDate" Variant="Variant.Outlined" Placeholder="Ngày sinh" />
+                </MudItem>
+
+                <MudItem xs="12" sm="4" md="4" lg="4">
+                    <MudRadioGroup T="bool" @bind-Value="@_User.Sex" Class="w-100 text-end">
+                        <MudRadio T="bool" Value="true">Nam</MudRadio>
+                        <MudRadio T="bool" Value="false">Nữ</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
+
+                <MudItem xs="12" sm="12" md="12" lg="12">
+                    <MudTextField T="string" @bind-Value="@_User.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" Disabled=true />
+                </MudItem>
+
+                <MudItem xs="12" sm="12" md="12" lg="12">
+                    <MudTextField T="string" @bind-Value="@_User.Email" Label="Email" Variant="Variant.Outlined" Disabled=true />
+                </MudItem>
+
+                <MudItem xs="12" sm="12" md="12" lg="12">
+                    <MudTextField T="string" @bind-Value="@_User.PhoneNumber" Label="Số điện thoại" Variant="Variant.Outlined" Disabled=true />
+                </MudItem>
+
+                <MudItem xs="12" sm="12" md="12" lg="12">
+                    <MudTextField T="string" @bind-Value="@_User.Address" Label="Địa chỉ" Variant="Variant.Outlined" />
+                </MudItem>
+
+                <MudItem xs="6" sm="6" md="6" lg="6" Class="text-end">
+                    <MudButton Class="btn px-4 py-3" Style="color: #29a69a; border: 1px solid #29a69a; border-radius: 1rem" OnClick="OpenDialogChangePass">Đổi mật khẩu</MudButton>
+                </MudItem>
+
+                <MudItem xs="6" sm="6" md="6" lg="6" Class="text-start">
+                    <MudButton Variant="Variant.Outlined" Disabled="@(isLoading)" Class="btn px-5 py-3" Style="color: #ffffff; background-color: #29a69a; border-radius: 1rem" OnClick="OnSubmit">Lưu thông tin</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </MudPaper>
+}
+
+@code {
+    private bool isShow;
+    private bool isLoading = false;
+    private DateTime? _SelectDate { get; set; }
+
+    private User _User { get; set; } = new();
+
+    private string NameLayout = "";
+
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private MudForm form;
+
+    private readonly DialogOptions _maxWidth = new() { NoHeader = true, MaxWidth = MaxWidth.Medium };
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                isLoading = true;
+                StateHasChanged();
+                var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                _User = await _serLec.GetLecturerById(Guid.Parse(userId.Value));
+                _SelectDate = _User.DateOfBirth;
+            }
+            catch { }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    void ButtonTestclick()
+    {
+        if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(_User.FullName) || string.IsNullOrEmpty(_User.DateOfBirth.ToString()) || string.IsNullOrEmpty(_User.Address))
+            {
+                snackbar.Add("Vui lòng điển đủ thông!", Severity.Warning);
+                return;
+            }
+            if (_User.DateOfBirth >= DateTime.Now)
+            {
+                snackbar.Add("Ngày sinh không hợp lệ", Severity.Warning);
+                return;
+            }
+            if (_User.FullName.Trim().Length < 2)
+            {
+                snackbar.Add("Tên phải lớn hơn 2 kí tự", Severity.Warning);
+                return;
+            }
+
+            isLoading = true;
+            StateHasChanged();
+
+            _User.DateOfBirth = _SelectDate.Value;
+            var obj = await _serLec.UpdateLecturer(_User);
+            if (obj != null)
+            {
+                snackbar.Add("Lưu thành công", Severity.Success);
+                StateHasChanged();
+                return;
+            }
+            else
+            {
+                snackbar.Add("Lưu thất bại", Severity.Error);
+                StateHasChanged();
+                return;
+            }
+        }
+        catch { }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OpenDialogChangePass()
+    {
+        var parameters = new DialogParameters<Access.ChangePassword>
+                    {
+                        { x => x._UserId, _User.Id },
+                        { y => y._IsChange, true }
+                    };
+
+        var dialog = await DialogService.ShowAsync<Access.ChangePassword>("Options Dialog", parameters, _maxWidth);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            StateHasChanged();
+        }
+        return;
+    }
+}

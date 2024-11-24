@@ -5,7 +5,7 @@
 {
     <MudOverlay Visible="isLoading" Style="background-color:white; opacity:1;" LightBackground="true" LockScroll="true" Absolute="true">
         <MudProgressCircular Color="Color.Success" Size="Size.Large" Indeterminate="true" />
-        <MudText Color="Color.Secondary"  Align="Align.Center" >Đang xử lý</MudText>
+        <MudText Color="Color.Secondary" Align="Align.Center">Đang xử lý</MudText>
     </MudOverlay>
 }
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
@@ -13,25 +13,23 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 <MudLayout>
-
-   
-
     <MudDrawer @bind-Open="@_open" ClipMode="_clipMode" Elevation="1" Variant="@DrawerVariant.Responsive">
         <NavAdmin></NavAdmin>
     </MudDrawer>
     <MudMainContent>
         <MudAppBar Style="box-shadow: 1px 1px #d9d9d9; background-color: #fff" Dense="@_dense">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer"/>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
             <MudSpacer />
             <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
             <MudMenu>
                 <ActivatorContent>
-                    <MudAvatar Color="Color.Tertiary">L</MudAvatar>
+                    <MudAvatar Color="Color.Tertiary">@_name</MudAvatar>
                 </ActivatorContent>
                 <ChildContent>
-                    <MudMenuItem>Thông tin cá nhân</MudMenuItem>
-                    <MudMenuItem OnClick="Logout">Đăng xuất</MudMenuItem>
-
+                    <MudMenuItem>
+                        <MudLink Class="text-decoration-none" Href="/Admin-Information">Thông tin cá nhân</MudLink>
+                    </MudMenuItem>
+                    <MudMenuItem Style="color: #29a69a" OnClick="Logout">Đăng xuất</MudMenuItem>
                 </ChildContent>
             </MudMenu>
         </MudAppBar>
@@ -52,6 +50,7 @@
     private bool _open = false;
     private bool _dense = false;
     private DrawerClipMode _clipMode = DrawerClipMode.Never;
+    private string _name = "";
 
     private void ToggleDrawer()
     {
@@ -62,12 +61,12 @@
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
 
-
-
-    protected  override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
+        
+        
 
-        base.OnInitialized();
+        base.OnInitializedAsync();
 
         _theme = new()
             {
@@ -83,7 +82,12 @@
     {
         if (firstRender && isLoading == true)
         {
-            isTokenValid =  await CheckingToken();
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var objUser = await _serLec.GetLecturerById(Guid.Parse(userId.Value));
+            string nameUser = objUser.FullName;
+            string[] tu = nameUser.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            _name = tu[^1][0].ToString().ToUpper();
+            isTokenValid = await CheckingToken();
             isLoading = false;
             StateHasChanged();
             if (isTokenValid == false)
@@ -91,7 +95,6 @@
                 navigation.NavigateTo("/");
 
             }
-
         }
     }
     private async Task<bool> CheckingToken()
@@ -142,10 +145,6 @@
 
 
     // }
-
-
-
-
 
     private async void Logout()
     {
