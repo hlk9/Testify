@@ -100,8 +100,8 @@ namespace Testify.DAL.Reposiroties
                 updateLecturer.LastLogin = user.LastLogin;
                 updateLecturer.Email = user.Email;
                 updateLecturer.Status = user.Status;
-                updateLecturer.LevelId = 3;
-                //updateCandidate.Level = user.Level;
+                //updateLecturer.LevelId = 3;
+                updateLecturer.LevelId = user.LevelId;
 
 
                 var objLecturer = _context.Users.Update(updateLecturer).Entity;
