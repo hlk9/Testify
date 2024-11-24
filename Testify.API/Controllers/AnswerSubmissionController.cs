@@ -21,5 +21,12 @@ namespace Testify.API.Controllers
             var obj = await _repo.Create(newAnswerSubmission);
             return Ok(obj);
         }
+
+        [HttpGet("Get-AnswerById")]
+        public  List<AnswerSubmission> GetAnswerById(int id)
+        {
+            var obj =  _repo.GetAnswersByIdSubmission(id);
+            return obj;
+        }
     }
 }
