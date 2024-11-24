@@ -74,7 +74,9 @@ namespace Testify.DAL.Reposiroties
                                   ExamDate = submit.SubmitTime,
                                   SubjectName = sub.Name,
                                   Score = submit.TotalMark,
-                                  ClassName = cl.Name
+                                  ClassName = cl.Name,
+                                  ExamDetailId = submit.ExamDetailId,
+                                  SubmitTime = submit.SubmitTime
                               }
                               ).ToListAsync();
 
