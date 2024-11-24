@@ -64,6 +64,13 @@ namespace Testify.API.Controllers
             return Ok(updateLecturer);
         }
 
+        [HttpPut("Update-Forgot-Password")]
+        public async Task<ActionResult<User>> UpdateForgotPass(User user)
+        {
+            var updateLecturer = await _repo.UpdateForgotPass(user);
+            return Ok(updateLecturer);
+        }
+
         [HttpGet("Get-All-Teacher")]
         public async Task<ActionResult<List<User>>> GetlAllTeacher()
         {
@@ -193,6 +200,13 @@ namespace Testify.API.Controllers
         {
             var count = await _repo.GetCountStudentByUserId(userId);
             return count;
+        }
+
+        [HttpGet("Confirm-Email")]
+        public async Task<User> ConfirmEmail(string email)
+        {
+            var confirm = await _repo.ConfirmEmail(email);
+            return confirm;
         }
     }
 }

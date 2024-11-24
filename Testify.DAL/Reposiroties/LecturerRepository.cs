@@ -100,8 +100,8 @@ namespace Testify.DAL.Reposiroties
                 updateLecturer.LastLogin = user.LastLogin;
                 updateLecturer.Email = user.Email;
                 updateLecturer.Status = user.Status;
-                updateLecturer.LevelId = 3;
-                //updateCandidate.Level = user.Level;
+                //updateLecturer.LevelId = 3;
+                updateLecturer.LevelId = user.LevelId;
 
 
                 var objLecturer = _context.Users.Update(updateLecturer).Entity;
@@ -115,6 +115,25 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
+        public async Task<User> UpdateForgotPass(User user)
+        {
+            try
+            {
+                var updateLecturer = await _context.Users.FindAsync(user.Id);
+
+                updateLecturer.PasswordHash = user.PasswordHash;
+                updateLecturer.LastLogin = user.LastLogin;
+
+                var objLecturer = _context.Users.Update(updateLecturer).Entity;
+                await _context.SaveChangesAsync();
+                return objLecturer;
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+        }
 
         public async Task<User> DeleteLecturer(Guid id)
         {
@@ -239,6 +258,16 @@ namespace Testify.DAL.Reposiroties
             {
                 return -1;
             }
+        }
+
+        public async Task<User> ConfirmEmail(string email)
+        {
+            var confirm = _context.Users.Where(x => x.Email.Equals(email)).FirstOrDefault();    
+
+            if(confirm != null) {
+                return confirm;
+            }
+            return null;
         }
     }
 }

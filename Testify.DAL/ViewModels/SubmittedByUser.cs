@@ -17,5 +17,7 @@
         public double Score { get; set; }
 
         public string ClassName { get; set; }
+        public int ExamDetailId { get; set; }
+        public DateTime SubmitTime { get; set; }
     }
 }

@@ -81,6 +81,14 @@ namespace Testify.Web.Services
             return false;
         }
 
+        public async Task<User> UpdateForgotPass(User user)
+        {
+            var update = await _httpClient.PutAsJsonAsync("Lecturer/Update-Forgot-Password", user);
+            var reponse = await update.Content.ReadFromJsonAsync<User>();
+            return reponse;
+
+        }
+
         public async Task<bool> DeleteLecturer(Guid id)
         {
             var statusDelete = await _httpClient.DeleteAsync($"Lecturer/Delete-Lecturer?id={id}");
@@ -130,6 +138,13 @@ namespace Testify.Web.Services
         {
             var count = await _httpClient.GetAsync($"Lecturer/Get-All-Count-Student-By-UserId?userId={userId}");
             var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
+
+        public async Task<User> ConfirmEmail(string email)
+        {
+            var confirm = await _httpClient.GetAsync($"Lecturer/Confirm-Email?email={email}");
+            var response = await confirm.Content.ReadFromJsonAsync<User>();
             return response;
         }
     }

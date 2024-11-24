@@ -18,5 +18,10 @@ namespace Testify.Web.Services
 
             return reponse;
         }
+
+        public async Task<List<AnswerSubmission>> GetBySubmissionId(int id)
+        {
+            return await _httpClient.GetFromJsonAsync<List<AnswerSubmission>>($"AnswerSubmission/Get-AnswerById?id={id}");
+        }
     }
 }
