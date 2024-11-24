@@ -6,13 +6,13 @@
 @inject NavigationManager navigation
 <style>
     .hidden-scroll {
-        overflow-y: scroll;
-        scrollbar-width: none;
+    overflow-y: scroll;
+    scrollbar-width: none;
     }
 
-        .hidden-scroll::-webkit-scrollbar {
-            display: none;
-        }
+    .hidden-scroll::-webkit-scrollbar {
+    display: none;
+    }
 
 </style>
 
@@ -65,7 +65,7 @@ else
         <MudAppBar Elevation="2">
             <MudText>Thời gian còn lại: <b>@timeRemaining</b></MudText>
             <MudText>          Số lần làm bài: <b>@numberofsubmit/@limitofsubmit</b></MudText>
-           
+
 
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Class="d-lg-none d-block" Edge="Edge.End" OnClick="@ToggleDrawer" />
@@ -92,8 +92,8 @@ else
                                         {
                                             <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
                                                 <MudButton Class="py-3 w-100 text-truncate text-wrap h-100"
-                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2); background-color: rgba(0, 0, 0, 0.2)"
-                                                           OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2); background-color: rgba(0, 0, 0, 0.2)"
+                                                OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
                                                     <MudText Class="text-start w-100">@contentAnswer</MudText>
                                                 </MudButton>
                                             </MudItem>
@@ -102,8 +102,8 @@ else
                                         {
                                             <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
                                                 <MudButton Class="py-3 w-100 text-truncate text-wrap h-100"
-                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
-                                                           OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
                                                     <MudText Class="text-start w-100">@contentAnswer</MudText>
                                                 </MudButton>
                                             </MudItem>
@@ -113,8 +113,8 @@ else
                                     {
                                         <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
                                             <MudCheckBox T="bool" Label="@contentAnswer" @bind-Value="@isSelect" Class="py-1 text-start w-100 text-truncate text-wrap h-100"
-                                                         Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
-                                                         onclick="@(() => IsSelectAnswerMulti(q.Id, answer.Id))"></MudCheckBox>
+                                            Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                            onclick="@(() => IsSelectAnswerMulti(q.Id, answer.Id))"></MudCheckBox>
                                         </MudItem>
                                     }
                                 }
@@ -183,8 +183,8 @@ else
             try
             {
                 isLoading = true;
-                await LoadExam();
                 await LoadData();
+                await LoadExam();
                 StartCountdown();
                 _objectReference = DotNetObjectReference.Create(this);
                 await JS.InvokeVoidAsync("initVisibilityChangeHandler", _objectReference);
@@ -222,7 +222,7 @@ else
         var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
         _userId = Guid.Parse(userId.Value);
         user = await _serLec.GetLecturerById(_userId);
-       
+
     }
 
     private void CheckInput()   
@@ -243,6 +243,22 @@ else
         snackbar.Add(idExamDetailLocalStorage == null ? "chưa có" : idExamDetailLocalStorage);
         if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null)
         {
+            ExamActivityLog examActivityLog = new ExamActivityLog();
+            examActivityLog.ExamId = idExam;
+            examActivityLog.UserId = _userId;
+            examActivityLog.ExamDetailId = Convert.ToInt32(idExamDetailLocalStorage);
+            examActivityLog.ActionTime = DateTime.Now;
+            examActivityLog.ActionType="Mở bài thi";
+            var logStat =  await  _serExamActLog.Create(examActivityLog);
+
+            if(logStat==false)
+            {
+                snackbar.Add("Có lỗi, không ghi được log exam", Severity.Warning);
+
+                return;
+            }
+
+
             var lstQAndASelect = JsonSerializer.Deserialize<List<QuestionAndAnswerChoosen>>(await localStorage.GetItemAsync<string>("_lstQAndASelect"));
             idExamDetail = Convert.ToInt32(idExamDetailLocalStorage);
             if (idExamDetail == null || idExamDetail <= 0)
@@ -433,6 +449,22 @@ else
                         await _serAnS.CreateAnswerSubmission(AnS);
                     }
                 }
+
+                ExamActivityLog examActivityLog = new ExamActivityLog();
+                examActivityLog.ExamId = idExam;
+                examActivityLog.UserId = submission.UserId;
+                examActivityLog.ExamDetailId = submission.ExamDetailId;
+                examActivityLog.ActionTime = DateTime.Now;
+                examActivityLog.ActionType = "Nộp bài thi";
+                var logStat = await _serExamActLog.Create(examActivityLog);
+
+                if (logStat == false)
+                {
+                    snackbar.Add("Có lỗi, không ghi được log exam", Severity.Warning);
+
+                    return;
+                }
+
                 snackbar.Add("Nộp bài thành công", Severity.Success);
                 await localStorage.RemoveItemAsync("IdExam");
                 await localStorage.RemoveItemAsync("IdExamDetail");
