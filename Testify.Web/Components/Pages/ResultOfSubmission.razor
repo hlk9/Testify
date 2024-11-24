@@ -173,9 +173,9 @@ else
                                                 </div>
                                                 <div class="fw-bold">
                                                     @(lstAnswerSubmission
-                                                            .Where(x => _lstQuestionWithAnswers
-                                                            .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect)))
-                                                            .Count())
+                                                                                .Where(x => _lstQuestionWithAnswers
+                                                                                .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect)))
+                                                                                .Count())
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-row justify-content-between mt-3">
@@ -191,9 +191,9 @@ else
                                                 </div>
                                                 <div class="fw-bold">
                                                     @(lstAnswerSubmission
-                                                            .Where(x => _lstQuestionWithAnswers
-                                                            .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect == false)))
-                                                            .Count())
+                                                                                .Where(x => _lstQuestionWithAnswers
+                                                                                .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect == false)))
+                                                                                .Count())
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-row justify-content-between mt-3">
@@ -385,10 +385,12 @@ else
                     await JS.InvokeVoidAsync("alert", "Bạn không có quyền xem bài làm này");
                     return false;
                 }
+
             }
 
 
         }
+
         return true;
     }
 
@@ -402,8 +404,7 @@ else
         currentExam = await _serExam.GetExamId(eD.ExamId);
         string idSubmit = eDetail.ExamDetailId.ToString();
         var idExamDetailLocalStorage = idSubmit;
-        snackbar.Add(idExamDetailLocalStorage, Severity.Normal);
-        snackbar.Add(idExamDetailLocalStorage == null ? "chưa có" : idExamDetailLocalStorage);
+        var testList = await FillHistory();
         if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null)
         {
             var lstQAndASelect = new List<QuestionAndAnswerChoosen>();
@@ -470,6 +471,30 @@ else
         await localStorage.SetItemAsync("_lstQAndASelect", _lstQAndASelect);
 
 
+    }
+
+    private async Task<List<HistoryExamSubmission>> FillHistory()
+    {
+        var listFillHis = new List<HistoryExamSubmission>();
+        if (currentExam != null)
+        {
+
+            var lstTempSub = await _serSubmission.GetAllSubmittedByUser(eDetail.UserId);
+            var lstHistory = lstTempSub.Where(x =>x.ExamDetailId==eDetail.ExamDetailId && x.UserId == eDetail.UserId).ToList();
+            foreach (var item in lstHistory)
+            {
+                HistoryExamSubmission history = new HistoryExamSubmission()
+                {
+                        index = lstHistory.IndexOf(item),
+                    idSubmission = item.SubmissionId,
+                    SubmitTime = item.SubmitTime
+                };
+                listFillHis.Add(history);
+            }
+          
+
+        }
+        return listFillHis;
     }
 
     public class QuestionWithAnswerPoint
