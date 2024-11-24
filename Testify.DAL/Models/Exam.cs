@@ -17,6 +17,7 @@ namespace Testify.DAL.Models
         public byte Status { get; set; } = 1;
         public double MaximmumMark { get; set; }
         public double PassMark { get; set; }
+        public bool? AllowViewResult { get; set; } = true;
         public int Duration { get; set; }
         [ForeignKey("ScoreMethodId")]
         public int? ScoreMethodId { get; set; }
