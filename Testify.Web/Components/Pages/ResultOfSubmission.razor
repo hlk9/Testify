@@ -1,0 +1,493 @@
+﻿@page "/result-of-submission/{Id:int?}"
+@using Testify.DAL.ViewModels
+@using System.Text.Json
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime JS
+
+@if (_lstQuestionWithAnswers.Count <= 0)
+{
+    <div class="position-fixed vh-100 vw-100 d-flex justify-content-around align-items-center">
+        <Testify.Web.Shared.LoadingContext></Testify.Web.Shared.LoadingContext>
+    </div>
+}
+else
+{
+
+    <MudGrid>
+        <MudItem xs="12">
+
+        </MudItem>
+
+        <MudItem xs="12">
+
+            <MudGrid>
+
+                <MudItem xs="9">
+
+                    <div class="overflow-auto" id="div-displayExam" style="max-height:100vh">
+                        <MudPaper Elevation="0" Class="p-4">
+                            @if (_lstQuestionWithAnswers != null)
+                            {
+                                int currentIndex = 1;
+                                lstQuestionWithAnswerPoint.Clear();
+                                foreach (var q in _lstQuestionWithAnswers)
+                                {
+                                    QuestionWithAnswerPoint qnap = new QuestionWithAnswerPoint();
+
+                                    qnap.idQ = q.Id;
+                                    qnap.score = _lstexamDetailsQuestion.FirstOrDefault(x => x.QuestionId == qnap.idQ).Point;
+                                    stt = 1;
+
+                                    <MudPaper Elevation="0" Class="w-100 mb-5">
+                                        <MudPaper Elevation="2" Class="bg-transparent w-100">
+                                            <MudText Class="fw-bold text-white p-4 rounded-top rounded-3" Style="background-color: #29a69a;"><b>Câu @(stt++):</b> @q.Content</MudText>
+
+                                            <MudGrid Class="pb-4 m-0 w-100">
+                                                @for (int i = 0; i < q.Answers.Count; i++)
+                                                {
+                                                    string isChoice = "";
+                                                    bool textBoxchecked = false;
+                                                    var curentAn = lstAnswerSubmission.FirstOrDefault(x => x.QuestionId == q.Id && x.AnswerId == q.Answers[i].Id);
+
+                                                    var answer = q.Answers[i];
+                                                    string contentAnswer = (char)('A' + i) + $". {answer.Content}";
+                                                    if (curentAn != null)
+                                                    {
+                                                        qnap.idA = curentAn.AnswerId;
+                                                        qnap.selectAns = (char)('A' + i);
+                                                        if (q.Answers.FirstOrDefault(x => x.Id == curentAn.AnswerId).IsCorrect == true)
+                                                        {
+                                                            isChoice = "bg-primary text-white";
+                                                            textBoxchecked = true;
+                                                            qnap.isCorrect = true;
+                                                        }
+                                                        else
+                                                        {
+                                                            isChoice = "bg-danger text-white";
+                                                            qnap.isCorrect = false;
+                                                        }
+                                                    }
+                                                    if (q.Answers[i].IsCorrect == true)
+                                                    {
+                                                        qnap.correctAns = (char)('A' + i);
+                                                    }
+
+                                                    bool isSelect = _lstQAndASelect.Any(x => x.QuestionId == q.Id && x.Answers.Any(y => y.Id == answer.Id));
+                                                    int bindChecked = isSelect == true ? 1 : 0;
+                                                    @if (q.QuestionType == Convert.ToInt32(listQuestionTypes.SingleChoice) || q.QuestionType == Convert.ToInt32(listQuestionTypes.YesNo))
+                                                    {
+
+                                                        if (isSelect)
+                                                        {
+                                                            <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                                <MudButton ReadOnly="true"
+                                                                Class="@(($"py-3 w-100 text-truncate text-wrap h-100 {isChoice}"))"
+                                                                Style="border-radius: 10px; transition: 0.3s ease;
+                                                                            border: 1px solid rgba(0, 0, 0, 0.2);
+                                                                            background-color: rgba(0, 0, 0, 0.2);">
+                                                                    <MudText Class="text-start w-100">@contentAnswer</MudText>
+                                                                </MudButton>
+                                                            </MudItem>
+                                                        }
+                                                        else
+                                                        {
+                                                            <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                                <MudButton ReadOnly="true" Class="@(($"py-3 w-100 text-truncate text-wrap h-100 {isChoice}"))"
+                                                                Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)">
+                                                                    <MudText Class="text-start w-100">@contentAnswer</MudText>
+                                                                </MudButton>
+                                                            </MudItem>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
+                                                            <MudCheckBox ReadOnly="true" T="bool" Label="@contentAnswer" @bind-Value="@textBoxchecked" Class="@($"py-1 text-start w-100 text-truncate text-wrap h-100 {isChoice}")"
+                                                            Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"></MudCheckBox>
+                                                        </MudItem>
+                                                    }
+                                                }
+                                            </MudGrid>
+                                        </MudPaper>
+                                    </MudPaper>
+                                    qnap.index = currentIndex++;
+                                    lstQuestionWithAnswerPoint.Add(qnap);
+                                }
+                            }
+
+                        </MudPaper>
+                        <MudScrollToTop TopOffset="100"
+                        OnScroll="OnScroll"
+                        Selector="#div-displayExam"
+                        VisibleCssClass="visible absolute"
+                        HiddenCssClass="invisible">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color">Lên trên cùng</MudButton>
+                        </MudScrollToTop>
+
+                    </div>
+
+
+
+
+                </MudItem>
+
+                <MudItem xs="3">
+                    <div class="d-flex flex-column align-center justify-center mud-width-full">
+                        <div class="text-center p-2 border border-2 rounded w-50 m-2 ">
+                            @currentExam.Name
+                        </div>
+                        <div>
+                            <MudTabs Elevation="2" Rounded="true" PanelClass="shadow-none mt-4">
+                                <MudTabPanel Text="Kết quả" class="shadow-none">
+                                    <div class="d-flex flex-column">
+                                        <div>
+                                            <div class="d-flex justify-content-center align-items-center p-4 bg-primary rounded-top text-white">@(eDetail.TotalMark) điểm</div>
+                                        </div>
+                                        <div class="d-flex flex-column rounded-bottom border-2 border-top-0 p-2" style="border-color: #D9D9D9">
+                                            <div class="d-flex flex-row justify-content-between mt-3">
+                                                <div>
+                                                    Thời gian làm bài
+                                                </div>
+                                                <div class="fw-bold">
+                                                    @(eDetail.TimeTaken.Hours) giờ @(eDetail.TimeTaken.Minutes) phút @(eDetail.TimeTaken.Seconds) giây
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between mt-3">
+                                                <div>
+                                                    Nộp lúc
+                                                </div>
+                                                <div class="fw-bold">
+                                                    @(eDetail.SubmitTime)
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between mt-3">
+                                                <div class="d-flex">
+                                                    <div class="pe-1">
+                                                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <circle cx="7.5" cy="7.5" r="7.5" fill="#008000" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        Số câu đúng
+                                                    </div>
+                                                </div>
+                                                <div class="fw-bold">
+                                                    @(lstAnswerSubmission
+                                                            .Where(x => _lstQuestionWithAnswers
+                                                            .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect)))
+                                                            .Count())
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between mt-3">
+                                                <div class="d-flex">
+                                                    <div class="pe-1">
+                                                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <circle cx="7.5" cy="7.5" r="7.5" fill="#FF0000" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        Số câu sai
+                                                    </div>
+                                                </div>
+                                                <div class="fw-bold">
+                                                    @(lstAnswerSubmission
+                                                            .Where(x => _lstQuestionWithAnswers
+                                                            .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect == false)))
+                                                            .Count())
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-row justify-content-between mt-3">
+                                                <div class="d-flex">
+                                                    <div class="pe-1">
+                                                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <circle cx="7.5" cy="7.5" r="7.5" fill="#808080" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        Chưa làm
+                                                    </div>
+                                                </div>
+                                                <div class="fw-bold">
+                                                    @(eDetail.UnAnswered)
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="fw-bold d-flex justify-content-start mt-3 mb-3">
+                                            Phần bài làm
+                                        </div>
+                                        <div class="rounded border-2 p-2 " style="border-color: #D9D9D9">
+                                            <div style="max-height:40vh" class="overflow-auto">
+                                                <table class="table table-hover">
+                                                    <thead class="bg-light" style="position: sticky;top: 0">
+                                                        <tr>
+                                                            <th scope="col">Câu</th>
+                                                            <th scope="col">Chọn</th>
+                                                            <th scope="col">Đáp án đúng</th>
+                                                            <th scope="col">Điểm</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @{
+                                                            if (lstQuestionWithAnswerPoint.Count > 0)
+                                                            {
+                                                                foreach (var item in lstQuestionWithAnswerPoint)
+                                                                {
+                                                                    <tr>
+                                                                        <th scope="row">@item.index</th>
+                                                                        <td>@item.selectAns</td>
+                                                                        <td>@item.correctAns</td>
+                                                                        <td>@item.score</td>
+                                                                    </tr>
+                                                                }
+                                                            }
+
+                                                        }
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </MudTabPanel>
+                                <MudTabPanel Text="Lịch sử" class="shadow-none">
+                                    <MudText>Content Two</MudText>
+                                </MudTabPanel>
+                            </MudTabs>
+                        </div>
+
+                    </div>
+                </MudItem>
+
+            </MudGrid>
+
+        </MudItem>
+
+        <MudItem xs="12">
+
+        </MudItem>
+
+    </MudGrid>
+}
+
+@code {
+
+    [Inject]
+    private IDialogService _mudDialogServices { get; set; }
+    [Parameter]
+    public int idExam { get; set; }
+
+    private Exam exam { get; set; } = new();
+    private User user { get; set; } = new();
+    private int timeDoExam = 0;
+    private string timeRemaining = "";
+    private System.Timers.Timer timer;
+    private int countdownTime;
+    private bool isLoading = true;
+    private Guid _userId;
+    private int idExamDetail;
+    private int stt;
+    private int sttList;
+    private bool _open = true;
+    private int _tabCount = 0;
+    private int limitofsubmit;
+    private int numberofsubmit;
+    private int examscheduleId;
+
+    [Parameter]
+    public int Id { get; set; }
+    private List<QuestionWithAnswer> _lstQuestionWithAnswers = new List<QuestionWithAnswer>();
+    private List<ExamDetail> _lstexamDetails = new List<ExamDetail>();
+    private List<ExamDetailQuestion> _lstexamDetailsQuestion = new List<ExamDetailQuestion>();
+    private List<QuestionAndAnswerChoosen> _lstQAndASelect = new List<QuestionAndAnswerChoosen>();
+    private List<AnswerSubmission> lstAnswerSubmission = new List<AnswerSubmission>();
+    private List<QuestionWithAnswerPoint> lstQuestionWithAnswerPoint = new List<QuestionWithAnswerPoint>();
+    private Exam currentExam = new Exam();
+    Color Color = Color.Success;
+    private Submission eDetail = new Submission();
+    private void OnScroll(ScrollEventArgs e)
+    {
+        Color = (e.FirstChildBoundingClientRect.Top * -1) switch
+        {
+            var x when x < 500 => Color.Primary,
+            var x when x < 1500 => Color.Secondary,
+            var x when x < 2500 => Color.Tertiary,
+            _ => Color.Error
+        };
+    }
+
+    private void CheckAccess()
+    {
+
+    }
+    private bool isTokenValid = true;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isTokenValid = await CheckingToken();
+            isLoading = false;
+            StateHasChanged();
+            if (isTokenValid == false)
+            {
+                navigation.NavigateTo("/Login");
+                return;
+
+            }
+            await LoadExam();
+            StateHasChanged();
+        }
+
+    }
+
+    private async Task<bool> CheckingToken()
+    {
+        var token = await localStorage.GetItemAsStringAsync("token");
+        if (string.IsNullOrEmpty(token))
+        {
+            await JS.InvokeVoidAsync("alert", "Hãy đăng nhập để truy cập");
+            return false;
+        }
+        else
+        {
+            var modelLogin = await _serviceAccess.CheckAccessStatusByToken(token);
+            if (modelLogin.IsLoginSucces != true)
+            {
+                await JS.InvokeVoidAsync("alert", "Hãy đăng nhập để truy cập");
+                return false;
+            }
+            else if (modelLogin.LevelId != 1 || modelLogin.LevelId != 2)
+            {
+                var eDetail = await _serSubmission.GetById(Id);
+
+                if (modelLogin.LevelId == 3)
+                {
+                    List<ClassUser> listClassOfStudent = await _serClassUser.GetAllClassByUserId(eDetail.UserId);
+                    List<Class> classOfTeacher = await _serClass.GetClassByTeacherId(modelLogin.Id);
+
+                    var classAvaiable = (from classT in classOfTeacher
+                                         from classOfStudent in listClassOfStudent
+                                         where classT.Id == classOfStudent.ClassId
+                                         select classOfTeacher).FirstOrDefault();
+                    if (classAvaiable == null)
+                    {
+                        await JS.InvokeVoidAsync("alert", "Bài thi này không phải của sinh viên lớp bạn phụ trách");
+                        return false;
+                    }
+
+                    return true;
+
+
+
+                }
+                else if (eDetail == null || eDetail.UserId != modelLogin.Id && modelLogin.LevelId != 1)
+                {
+                    await JS.InvokeVoidAsync("alert", "Bạn không có quyền xem bài làm này");
+                    return false;
+                }
+            }
+
+
+        }
+        return true;
+    }
+
+    private async Task LoadExam()
+    {
+
+        Random rad = new Random();
+        snackbar.Add("Loading..." + Id, Severity.Normal);
+        eDetail = await _serSubmission.GetById(Id);
+        var eD = await _serExamDetail.GetExamDetailById(eDetail.ExamDetailId);
+        currentExam = await _serExam.GetExamId(eD.ExamId);
+        string idSubmit = eDetail.ExamDetailId.ToString();
+        var idExamDetailLocalStorage = idSubmit;
+        snackbar.Add(idExamDetailLocalStorage, Severity.Normal);
+        snackbar.Add(idExamDetailLocalStorage == null ? "chưa có" : idExamDetailLocalStorage);
+        if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null)
+        {
+            var lstQAndASelect = new List<QuestionAndAnswerChoosen>();
+            idExamDetail = Convert.ToInt32(idExamDetailLocalStorage);
+            if (idExamDetail == null || idExamDetail <= 0)
+            {
+                snackbar.Add("Có lỗi", Severity.Warning);
+                navigation.NavigateTo("/Admin/Home");
+                return;
+            }
+            _lstexamDetailsQuestion = await _serExamDetailQuestion.GetAllByExamDetailId(idExamDetail);
+            foreach (var item in _lstexamDetailsQuestion)
+            {
+                Question question = await _serQuestion.GetQuestionById(item.QuestionId);
+                List<Answer> shuffledAnswer = (await _serAnswer.GetAllByQuestionId(item.QuestionId)).OrderBy(x => rad.Next()).ToList();
+                QuestionWithAnswer questionWithAnswer = new QuestionWithAnswer()
+                    {
+                        Id = question.Id,
+                        Content = question.Content,
+                        QuestionType = question.QuestionTypeId,
+                        Answers = shuffledAnswer
+                    };
+
+                _lstQuestionWithAnswers.Add(questionWithAnswer);
+            }
+            if (_lstQuestionWithAnswers.Count > 0)
+                lstAnswerSubmission = await _serAnS.GetBySubmissionId(Id);
+            _lstQAndASelect = lstQAndASelect;
+            return;
+        }
+
+        _lstexamDetails = await _serExamDetail.GetExamDetailByExamId(idExam);
+        if (_lstexamDetails == null || _lstexamDetails.Count == 0)
+        {
+            snackbar.Add("Lỗi bài thi", Severity.Warning);
+            return;
+        }
+
+        var indexExamdetail = rad.Next(_lstexamDetails.Count);
+        idExamDetail = _lstexamDetails[indexExamdetail].Id;
+        if (idExamDetail == null || idExamDetail <= 0)
+        {
+            snackbar.Add("Có lỗi", Severity.Warning);
+            navigation.NavigateTo("/Admin/Home");
+            return;
+        }
+        _lstexamDetailsQuestion = await _serExamDetailQuestion.GetAllByExamDetailId(idExamDetail);
+        foreach (var item in _lstexamDetailsQuestion)
+        {
+            Question question = await _serQuestion.GetQuestionById(item.QuestionId);
+            List<Answer> shuffledAnswer = (await _serAnswer.GetAllByQuestionId(item.QuestionId)).OrderBy(x => rad.Next()).ToList();
+            QuestionWithAnswer questionWithAnswer = new QuestionWithAnswer()
+                {
+                    Id = question.Id,
+                    Content = question.Content,
+                    QuestionType = question.QuestionTypeId,
+                    Answers = shuffledAnswer
+                };
+
+            _lstQuestionWithAnswers.Add(questionWithAnswer);
+        }
+        await localStorage.SetItemAsync("IdExam", idExam);
+        await localStorage.SetItemAsync("IdExamDetail", idExamDetail);
+        await localStorage.SetItemAsync("_lstQAndASelect", _lstQAndASelect);
+
+
+    }
+
+    public class QuestionWithAnswerPoint
+    {
+        public int index { get; set; }
+        public int idQ { get; set; }
+        public int idA { get; set; }
+        public bool isCorrect { get; set; }
+        public double score { get; set; }
+        public char selectAns { get; set; }
+        public char correctAns { get; set; }
+    }
+
+    public class HistoryExamSubmission
+    {
+        public int index { get; set; }
+        public int idSubmission { get; set; }
+        public DateTime SubmitTime { get; set; }
+    }
+
+}
