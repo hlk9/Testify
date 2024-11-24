@@ -12,6 +12,13 @@ namespace Testify.DAL.Reposiroties
         {
             _context = new TestifyDbContext();
         }
+
+        public async Task<List<Class>> GetAllClassByTeacher(Guid id)
+
+        {
+            return await _context.Classes.Where(x => x.TeacherId == id).ToListAsync();
+        }
+
         public async Task<List<Class>> GetAllClass(string? textSearch, bool isActive)
         {
             var query = _context.Classes.AsQueryable();
