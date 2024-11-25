@@ -144,13 +144,42 @@
 
     private async Task SendEmail()
     {
-        List<EmailAddress> emails = new List<EmailAddress>();
-        emails.Add(new EmailAddress { Email = "hoanglong.cmb@gmail.com" });
-        string content = "haha";
-        await commonServices.sendEmail(emails, "TestList", content, null);
+
+        if (listClassSelectedInSchedule!=null)
+        {
+            List<EmailAddress> emails = new List<EmailAddress>();
+            List<User> lstUser = new List<User>();
+            foreach (var item in listClassSelectedInSchedule)
+            {
+                var lstU = await _serClass.GetUserInClass(item.Id);
+                lstUser.AddRange(lstU);
+            }
+
+            if(lstUser.Count > 0)
+            {
+                foreach (var item in lstUser)
+                {
+                    emails.Add(new EmailAddress { Email = item.Email });
+                    string content = "Lịch thi bắt đầu vào ngày " + currentSchedule.StartTime +" tới "+ currentSchedule.EndTime;
+                    await commonServices.sendEmail(emails, "Bạn đã được xếp vào lịch thi " + currentSchedule.Title + " - Môn: " + listClassSelectedInSchedule.First().SubjectName, content, null);
+                    snackbar.Add("Gửi Email Thành công tới "+ item.FullName, Severity.Success);
+                }
+            }
+            else
+            {
+                snackbar.Add("Không có sinh viên nào trong lớp đã chọn", Severity.Error);
+            }
+
+
+            
+           
+            
+        }
+        snackbar.Add("Bạn chưa chọn lớp nào", Severity.Error);
+
     }
 
-  
+
 
     private async Task AddClassToRight()
     {
@@ -237,7 +266,7 @@
             }
 
 
-          
+
         }
     }
 
