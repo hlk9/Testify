@@ -112,6 +112,7 @@
     public int Id { get; set; }
     [Parameter]
     public string titleSchedule { get; set; }
+
     public ExamSchedule currentSchedule { get; set; } = new ExamSchedule();
     public List<ClassWithUser> listClass { get; set; }
     public HashSet<ClassWithUser> listClassSelected { get; set; }
@@ -137,7 +138,7 @@
     private async Task ReloadData()
     {
         currentSchedule = await scheduleService.GetById(Id);
-        listClass = await _serClass.GetClassBySubjectId(currentSchedule.SubjectId, currentSchedule.Id); //exclude class in schedule, get class after schedule
+        listClass = await _serClass.GetClassBySubjectId(currentSchedule.SubjectId, currentSchedule.Id);
         listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);
     }
 
@@ -171,7 +172,7 @@
                 string mes = "";
                 foreach (var item in listStudentNotAble)
                 {
-                    mes += item.FullName + "\n";
+                    mes += item.FullName + ", ";
                 }
                 newClassToAdd.Clear();
                 Snackbar.Add("THẤT BẠI\n Thí sinh " + mes + " đã có trong đợt thi khác", Severity.Error);
