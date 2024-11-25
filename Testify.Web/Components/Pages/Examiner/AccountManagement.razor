@@ -33,7 +33,7 @@
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TÀI KHOẢN</MudText>
     </MudPaper>
     <MudGrid Style="padding:20px 0 ">
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             @* <MudSelect Dense="true" T="int" Label="Danh sách tài khoản" Variant="Variant.Outlined">
                 <MudSelectItem Value="1">Admin</MudSelectItem>
                 <MudSelectItem Value="2">Khảo thí</MudSelectItem>
@@ -51,13 +51,13 @@
             </MudSelect>
         
         </MudItem >
-        <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Export</MudButton>
         </MudItem>
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
+@*         <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
             <MudButton Class="button-import" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ImportExcel, Guid.Empty))">Import</MudButton>
-        </MudItem>
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
+        </MudItem> *@
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
@@ -93,11 +93,10 @@
                 <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
                 <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
                 <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
-
                 <MudTd Style="marign:3px" DataLabel="Thao tác">
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
 
                 </MudTd>
             </RowTemplate>
@@ -146,7 +145,7 @@
     private async Task LoadData(string? textSearch)
     {
         _lstLevel = await _serLevel.GetAllLevel();
-      
+       
         _userList = await _serLevel.GetAllUserByLevelId(levelId);
         isLoading = false;
     }
