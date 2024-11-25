@@ -91,5 +91,18 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
+
+        public async Task<int> GetCountSubjectByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var allSubject = _context.Subjects.ToList();
+                return allSubject.Count;
+            }
+
+            return -1;
+        }
     }
 }

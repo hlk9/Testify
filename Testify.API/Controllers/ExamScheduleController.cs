@@ -66,7 +66,7 @@ namespace Testify.API.Controllers
 
             var lstSchedule = await repos.GetSchedulesActive();
             var lstSubject = await subjectRepository.GetAllSubject(null, true);
-            var lstExams =  new ExamRepository().GetAllActive();
+            var lstExams = new ExamRepository().GetAllActive();
             //var lstExam = 
 
             foreach (var item in lstSchedule)
@@ -74,7 +74,7 @@ namespace Testify.API.Controllers
                 string name;
                 try
                 {
-                     name = lstExams.FirstOrDefault(x => x.Id == item.ExamId).Name;
+                    name = lstExams.FirstOrDefault(x => x.Id == item.ExamId).Name;
 
                 }
                 catch
@@ -162,8 +162,13 @@ namespace Testify.API.Controllers
             var lst = await repos.GetAllExamScheduleByUserId(userId);
             return Ok(lst);
         }
+
+        [HttpGet("Get-Count-By-UserId")]
+        public async Task<ActionResult<int>> GetCountByUserId(Guid userId)
+        {
+            var count = await repos.GetCountExamScheduleByUserId(userId);
+            return Ok(count);
+        }
     }
-
-
 }
 

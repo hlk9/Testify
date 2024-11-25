@@ -153,5 +153,12 @@ namespace Testify.Web.Services
             var response = await count.Content.ReadFromJsonAsync<List<ExamSchedule>>();
             return response;
         }
+
+        public async Task<int> GetCountByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"ExamSchedule/Get-Count-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
     }
 }

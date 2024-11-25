@@ -49,5 +49,11 @@ namespace Testify.API.Controllers
             return Ok(deleteSubject);
         }
 
+        [HttpGet("Get-Count-By-UserId")]
+        public async Task<ActionResult<int>> GetCountByUserId(Guid userId)
+        {
+            var count = await _repo.GetCountSubjectByUserId(userId);
+            return Ok(count);
+        }
     }
 }

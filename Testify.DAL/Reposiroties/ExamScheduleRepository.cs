@@ -173,5 +173,17 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
+
+        public async Task<int> GetCountExamScheduleByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var lst = await _context.ExamSchedules.Where(x => x.EndTime <= DateTime.Now && x.Status == 1).ToListAsync();
+                return lst.Count;
+            }
+            return -1;
+        }
     }
 }
