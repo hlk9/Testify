@@ -32,7 +32,7 @@
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TÀI KHOẢN</MudText>
     </MudPaper>
-    <MudGrid Style="padding: 20px 0; align-item: center">
+    <MudGrid Style="padding: 20px 0; align-items: center">
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueLevel">
                 <MudSelectItem Value="-1">Tất cả</MudSelectItem>
@@ -54,7 +54,7 @@
 
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
 
-        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
