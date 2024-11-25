@@ -43,7 +43,7 @@ else
                 </MudForm>
                     <MudPaper Elevation="0" Class="pt-3 text-end">
                         <MudButton OnClick="Cancel">Đóng</MudButton>
-                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Lưu câu hỏi</MudButton>
+                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Lưu</MudButton>
                     </MudPaper>
                 </MudTabPanel>
                 <MudTabPanel Text="Thêm bằng excel">
@@ -76,8 +76,8 @@ else
 
 
                     <MudPaper Elevation="0" Class="pt-3 text-end">
-                        <MudButton OnClick="Cancel">Cancel</MudButton>
-                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Thêm mới</MudButton>
+                        <MudButton OnClick="Cancel">Đóng</MudButton>
+                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Lưu</MudButton>
                     </MudPaper>
                 </MudTabPanel>
                         
@@ -272,7 +272,6 @@ else
                 return;
             }
 
-            var checkValidation = ValidateForm();
             if (!checkValidation)
             {
                 users.Status = 1;
