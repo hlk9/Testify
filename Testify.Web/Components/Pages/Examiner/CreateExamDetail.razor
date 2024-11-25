@@ -90,7 +90,7 @@
                 <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
-                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" OnClick="@(() => UpdateDethiDialog(_maxWidthUpdate,context.Id,ExamID))" aria-label="update"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" OnClick="@(() => UpdateDethiDialog(_maxWidthUpdate,context.Id,ExamID, subjectCurrent.Id))" aria-label="update"></MudIconButton>
                     </MudTooltip>
                     @* <MudTooltip Text="Chi tiết">
                         <MudIconButton Icon="@Icons.Material.Filled.Notes" OnClick="@(() => UpdateDethiDialog(_maxWidth,context.Id))" aria-label="details"></MudIconButton>
@@ -214,13 +214,14 @@
         public bool IsChecked { get; set; }
     }
 
-    private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID)
+    private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID, int Sub_id)
     {
         var parameters = new DialogParameters
         {
 
               { "ExamDetailID", ExamDetailID },
-              { "ExamID", ExamID}
+              { "ExamID", ExamID},
+              {"SubjectId",Sub_id }
 
         };
         var dialog = await DialogService.ShowAsync<Dialog.DeThi.UpdateExamDetail>("Options Dialog", parameters, options);

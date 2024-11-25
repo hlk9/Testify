@@ -40,16 +40,16 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOT(int examDetailID)
+        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOT(int examDetailID, int SubjectId)
         {
-            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-Not?examdetailID={examDetailID}");
+            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-Not?examdetailID={examDetailID}&SubjectId={SubjectId}");
             var response = await lst.Content.ReadFromJsonAsync<List<QuestionInExam>>();
             return response;
         }
 
-        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOTAndLevel(int examDetailID, int levelID)
+        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOTAndLevel(int examDetailID, int levelID, int SubjectId)
         {
-            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-NotAndLevel?examdetailID={examDetailID}&levelID={levelID}");
+            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-NotAndLevel?examdetailID={examDetailID}&levelID={levelID}&SubjectId={SubjectId}");
             var response = await lst.Content.ReadFromJsonAsync<List<QuestionInExam>>();
             return response;
         }

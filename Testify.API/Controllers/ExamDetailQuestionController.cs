@@ -44,16 +44,16 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Question-By-ExamDetailID-Not")]
-        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID)
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID, int SubjectId)
         {
-            var objGetAll = await _respon.GetQuestionByExamDetailID_NOT(examdetailID);
+            var objGetAll = await _respon.GetQuestionByExamDetailID_NOT(examdetailID,  SubjectId);
             return Ok(objGetAll);
         }
 
         [HttpGet("Get-Question-By-ExamDetailID-NotAndLevel")]
-        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID)
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID, int SubjectId)
         {
-            var objGetAll = await _respon.GetQuestionByExamDetailID_NOTAndLevel(examdetailID, levelID);
+            var objGetAll = await _respon.GetQuestionByExamDetailID_NOTAndLevel(examdetailID, levelID ,  SubjectId);
             return Ok(objGetAll);
         }
 
