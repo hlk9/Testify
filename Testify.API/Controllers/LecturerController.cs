@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using System.Net.Http;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -60,6 +61,13 @@ namespace Testify.API.Controllers
         public async Task<ActionResult<User>> Update(User user)
         {
             var updateLecturer = await _repo.UpdateLecturer(user);
+            return Ok(updateLecturer);
+        }
+
+        [HttpPut("Update-Forgot-Password")]
+        public async Task<ActionResult<User>> UpdateForgotPass(User user)
+        {
+            var updateLecturer = await _repo.UpdateForgotPass(user);
             return Ok(updateLecturer);
         }
 
@@ -187,5 +195,18 @@ namespace Testify.API.Controllers
 
         }
 
+        [HttpGet("Get-All-Count-Student-By-UserId")]
+        public async Task<int> GetCountStudent(Guid userId)
+        {
+            var count = await _repo.GetCountStudentByUserId(userId);
+            return count;
+        }
+
+        [HttpGet("Confirm-Email")]
+        public async Task<User> ConfirmEmail(string email)
+        {
+            var confirm = await _repo.ConfirmEmail(email);
+            return confirm;
+        }
     }
 }

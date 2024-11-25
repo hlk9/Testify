@@ -42,6 +42,13 @@ namespace Testify.API.Controllers
             return Ok(objClasses);
         }
 
+        [HttpGet("get-classes-by-TeacherID")]
+        public async Task<ActionResult<Class>> GetByTeacherID(Guid id)
+        {
+            var objClasses = await classRepository.GetAllClassByTeacher(id);
+            return Ok(objClasses);
+        }
+
         [HttpGet("Get-Class-By-ClassCode")]
         public async Task<ActionResult<Class>> GetClassByCode(string ClassCode)
         {
@@ -76,6 +83,14 @@ namespace Testify.API.Controllers
         {
             var updateStatus = await classRepository.UpdateStatusClass(classId, status);
             return Ok(updateStatus);
+        }
+
+        [HttpGet("Get-Count-Class-By-UserId")]
+        public async Task<ActionResult<int>> GetCountClass(Guid userId)
+        {
+            var count = await classRepository.GetAllClassByUserId(userId);
+
+            return Ok(count);
         }
     }
 }

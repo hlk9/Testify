@@ -25,5 +25,17 @@ namespace Testify.DAL.Reposiroties
                 throw;
             }
         }
+
+        public List<AnswerSubmission> GetAnswersByIdSubmission(int id)
+        {
+            try
+            {
+                return _context.AnswerSubmissions.Where(x=>x.SubmissionId==id).ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

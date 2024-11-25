@@ -145,5 +145,31 @@ namespace Testify.DAL.Reposiroties
             return _context.Exams.Where(x => x.Status == 1 && x.SubjectId == subjectId).ToList();
         }
 
+        public async Task<int> GetCountExamByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var allClass = _context.ExamSchedules.Where(x => x.EndTime < DateTime.Now && x.Status == 1).ToList();
+                var allExam = allClass.Select(e => e.ExamId).Distinct().ToList();
+                return allExam.Count;
+            }
+            else if (objUser.LevelId == 3)
+            {
+                var data = (from cl in _context.Classes.Where(x => x.TeacherId == objUser.Id && x.Status == 1)
+                            join clexs in _context.ClassExamSchedules on cl.Id equals clexs.ClassId
+                            join exs in _context.ExamSchedules on clexs.ExamScheduleId equals exs.Id
+                            where (exs.EndTime < DateTime.Now && exs.Status == 1)
+                            select (exs.ExamId)
+                            ).Distinct().ToList();
+
+                return data.Count;
+            }
+            else
+            {
+                return -1;
+            }
+        }
     }
 }
