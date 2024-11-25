@@ -67,15 +67,17 @@
                     <MudTooltip Text="Xếp lịch">
                         <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
                     </MudTooltip>
-
+                    <MudTooltip Text="Danh sách lớp">
+                        <MudIconButton OnClick="@(()=> ShowClassAndStudentDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.People" aria-label="listClass"></MudIconButton>
+                    </MudTooltip>
                     <MudTooltip Text="Sửa"> 
-                        <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Chi tiết">
                         <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xoá">
-                        <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
@@ -118,6 +120,16 @@
     private readonly DialogOptions _maxWidthLager = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
 
 
+    private async Task ShowClassAndStudentDialog(DialogOptions options, int Id, string title)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id },
+                {"titleSchedule",title }
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.ClassAndStudentSchedule>("Options Dialog", parameters, options);
+        
+    }
 
 
     private async Task ShowDistributeDialog(DialogOptions options, int Id, string title)
