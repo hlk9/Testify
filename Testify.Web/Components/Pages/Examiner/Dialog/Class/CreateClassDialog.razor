@@ -112,11 +112,6 @@
             snackbar.Add("Nội dung trống", Severity.Error);
             count += 1;
         }
-        if (classes.Description == null || classes.Description.Trim().Length == 0)
-        {
-            snackbar.Add("Nội dung trống", Severity.Error);
-            count += 1;
-        }
         if (classes.Capacity < 10)
         {
             snackbar.Add("Số lượng tối thiểu 10", Severity.Error);

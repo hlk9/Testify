@@ -151,5 +151,12 @@ namespace Testify.API.Controllers
             var usersWithStatusTwo = await userRepos.GetUsersWithStatusTwo(classId);
             return usersWithStatusTwo;
         }
+
+        [HttpPost("Check-Email-Or-Phone")]
+        public async Task<ActionResult> CheckEmailOrPhone(string email, string phoneNumber, string userName)
+        {
+            bool result = await userRepos.CheckEmailOrPhone(email, phoneNumber, userName);
+            return Ok(result);
+        }
     }
 }
