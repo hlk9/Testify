@@ -1,4 +1,5 @@
 ﻿@using Testify.DAL.Models
+@using Testify.Web.Shared
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6">
@@ -7,26 +8,39 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Spacing="3" Model="@users">
-@*         <MudTextField T="Guid" @bind-Value="@users.Id" Label="Mã tài khoản" /> *@
-            <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" />
-            <MudDatePicker @bind-Value="@users.DateOfBirth" Label="Ngày sinh"  />
-            <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" />
-            <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ"  />
-      @*       <MudTextField T="int" @bind-Value="@users.LevelId" Label="Level"  /> *@
-            <MudSelect T="int" @bind-Value="@users.LevelId" Label="Level">
-                <MudSelectItem Value="1">Admin</MudSelectItem>
-                <MudSelectItem Value="2">Khảo thí</MudSelectItem>
-                <MudSelectItem Value="3">Giáo viên</MudSelectItem>
-                <MudSelectItem Value="4">Sinh viên</MudSelectItem>
-            </MudSelect>
-            <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản"  />
-            <MudTextField T="string" @bind-Value="@users.Email" Label="Email"  />
-            <MudTextField T="string" @bind-Value="@users.PasswordHash" Label="PasswordHash"  />
-@*             <MudTextField T="DateTime?" @bind-Value="@users.LastLogin" Label="Lần cuối đăng nhập" /> *@
-            @* <MudTextField T="byte" @bind-Value="@users.Status" Label="Trạng thái" /> *@
-        </MudForm>
-
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudForm Spacing="4" Model="@users" @ref="@form">
+                <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" />
+                <MudDatePicker @bind-Value="@users.DateOfBirth" Label="Ngày sinh" /> 
+                <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" />
+                <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" />
+                <MudRadioGroup T="bool" @bind-Value="@users.Sex" Label="Giới tính">
+                    <MudRadio T="bool" Value="true">Nam</MudRadio>
+                    <MudRadio T="bool" Value="false">Nữ</MudRadio>
+                </MudRadioGroup>
+                <MudSelect T="int" @bind-Value="levelId" Label="Cấp độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (levelId == -1)
+                    {
+                        <MudSelectItem Value="-1">Không có cấp độ nào!</MudSelectItem>
+                    }
+                    else
+                    {
+                        @foreach (var itemName in _lstLevel)
+                        {
+                            <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+                <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" />
+                <MudTextField T="string" @bind-Value="@users.Email" Label="Email" />
+                <MudTextField T="string" @bind-Value="@users.PasswordHash" Label="PasswordHash" />
+            </MudForm>
+        }
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
@@ -34,46 +48,87 @@
     </DialogActions>
 </MudDialog>
 @code {
+    MudForm form;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Parameter]
     public Guid UserId { get; set; }
     private User users { get; set; } = new();
+    private List<Level> _lstLevel;
+    private int levelId = -1;
+    private bool isLoading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Loaddata("");
+    }
+
+    private async Task Loaddata(string? textSearch)
+    {
+        _lstLevel = await _serLevel.GetAllLevel();
+        if (_lstLevel.Any())
+        {
+            levelId = _lstLevel[0].Id;
+        }
+        else
+        {
+            levelId = -1;
+        }
+        isLoading = false;
+    }
 
     private bool ValidateForm()
     {
         int count = 0;
-        if(users.FullName == null || users.FullName.Trim().Length == 0)
+        var vietnamPhoneRegex = @"^(03|05|07|08|09)\d{8}$";
+        var customEmailRegex = @".*?@?[^@]*\.+.*";
+
+        if (users.FullName == null || users.FullName.Trim().Length == 0)
         {
             snackbar.Add("Họ và tên không được để trống!", Severity.Error);
             count += 1;
         }
         if (users.UserName == null || users.UserName.Trim().Length == 0)
         {
-            snackbar.Add("Họ và tên không được để trống!", Severity.Error);
+            snackbar.Add("tên tài khoản không được để trống!", Severity.Error);
             count += 1;
         }
-        if(users.DateOfBirth == null)
+        if (users.DateOfBirth == null)
         {
             snackbar.Add("Ngày sinh không được để trống!", Severity.Error);
             count += 1;
         }
-        if(users.Address == null || users.Address.Trim().Length == 0)
+        else if (users.DateOfBirth >= DateTime.Now)
+        {
+            snackbar.Add("Ngày sinh không hợp lệ! Không được lớn hơn ngày hiện tại.", Severity.Error);
+            count += 1;
+        }
+        if (users.PhoneNumber == null || !System.Text.RegularExpressions.Regex.IsMatch(users.PhoneNumber, vietnamPhoneRegex))
+        {
+            snackbar.Add("Số điện thoại không hợp lệ!", Severity.Error);
+            count += 1;
+        }
+        if (users.Address == null || users.Address.Trim().Length == 0)
         {
             snackbar.Add("Địa chỉ không được để trống!", Severity.Error);
             count += 1;
         }
-        if(users.Email ==null|| users.Email.Trim().Length == 0)
+        if (users.Email == null || users.Email.Trim().Length == 0)
         {
             snackbar.Add("Email không được để trống!", Severity.Error);
             count += 1;
         }
-        if(users.PasswordHash == null)
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(users.Email, customEmailRegex))
+        {
+            snackbar.Add("Email không đúng định dạng!", Severity.Error);
+            count += 1;
+        }
+        if (users.PasswordHash == null)
         {
             snackbar.Add("Mật khẩu không được để trống!", Severity.Error);
             count += 1;
         }
-        if(count > 0)
+        if (count > 0)
         {
             return true;
         }
@@ -85,11 +140,23 @@
 
     private async Task Submit()
     {
+        var email = users.Email;
+        var phoneNumber = users.PhoneNumber;
+        var userName = users.UserName;
+
+        var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName);
+
+        if (existing)
+        {
+            snackbar.Add("Email hoặc số điện thoại hoặc tên tài khoản đã tồn tại", Severity.Error);
+            return;
+        }
+
         var checkValidation = ValidateForm();
         if (!checkValidation)
         {
             users.Status = 1;
-            
+
             var check = await _serLec.CreateLecturer(users);
             if (check == true)
             {
@@ -102,7 +169,6 @@
                 snackbar.Add("Thêm thất bại", Severity.Error);
             }
         }
-       
     }
 
     private void Cancel() => MudDialog.Cancel();
