@@ -33,9 +33,6 @@ namespace Testify.DAL.Reposiroties
                     return avaiableUser;
                 }
             }
-
-
-
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -142,6 +139,11 @@ namespace Testify.DAL.Reposiroties
                                             select u).ToListAsync();
 
             return usersWithStatusTwo;
+        }
+
+        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName)
+        {
+            return await _context.Users.AnyAsync(a => a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName);
         }
     }
 }

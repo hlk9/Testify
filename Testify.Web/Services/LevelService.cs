@@ -24,9 +24,9 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<List<User>> GetAllUserByLevelId(int levelId)
+        public async Task<List<User>> GetAllUserByLevelId(int levelId, string? textSearch)
         {
-            var lstUser = await _httpClient.GetAsync($"Level/get-user-by-idlevel?levelId={levelId}");
+            var lstUser = await _httpClient.GetAsync($"Level/get-user-by-idlevel?levelId={levelId}&textSearch={textSearch}");
             var response = await lstUser.Content.ReadFromJsonAsync<List<User>>();
             return response;
         }
