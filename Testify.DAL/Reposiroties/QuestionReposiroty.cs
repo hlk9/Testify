@@ -197,5 +197,18 @@ namespace Testify.DAL.Reposiroties
 
             return groupAnswer;
         }
+
+        public async Task<int> GetCountQuestionByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var allQuestion = _context.Questions.ToList();
+                return allQuestion.Count;
+            }
+
+            return -1;
+        }
     }
 }

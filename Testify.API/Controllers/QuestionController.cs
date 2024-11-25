@@ -606,6 +606,11 @@ namespace Testify.API.Controllers
             return Ok(lstQuestion);
         }
 
-
+        [HttpGet("Get-Count-By-UserId")]
+        public async Task<ActionResult<int>> GetCountByUserId(Guid userId)
+        {
+            var count = await _repoQuestion.GetCountQuestionByUserId(userId);
+            return Ok(count);
+        }
     }
 }
