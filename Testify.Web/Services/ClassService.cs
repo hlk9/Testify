@@ -81,5 +81,11 @@ namespace Testify.Web.Services
             var response = await count.Content.ReadFromJsonAsync<int>();
             return response;
         }
+
+        public async Task<List<User>> GetUserInClass(int classId)
+        {
+            var listClass = await _httpClient.GetFromJsonAsync<List<User>>($"Class/Get-Users-In-Class?classId=" + classId);
+            return listClass;
+        }
     }
 }

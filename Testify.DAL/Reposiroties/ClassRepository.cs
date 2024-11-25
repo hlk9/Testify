@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -122,12 +123,12 @@ namespace Testify.DAL.Reposiroties
                               from cu in classUser.DefaultIfEmpty()
                               join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
                               from cs in classSubject.DefaultIfEmpty()
-                              where c.SubjectId == idSubject // Lọc theo SubjectId
-                                    && c.Status == 1 // Lớp học phải có trạng thái 1 (hoạt động)
-                                    !=_context.ClassExamSchedules.Any(x => x.ClassId == c.Id&&x.ExamScheduleId==scheduleId) // Lớp học phải có trong ClassExamSchedules
+                              where c.SubjectId == idSubject
+                                    && c.Status == 1 
+                                    !=_context.ClassExamSchedules.Any(x => x.ClassId == c.Id&&x.ExamScheduleId==scheduleId)
                                     && _context.ExamSchedules.Any(es => es.SubjectId == idSubject)
-                                    && _context.ExamSchedules.Any(es => es.SubjectId == idSubject // Lịch thi thuộc SubjectId
-                                                                        && es.EndTime < scheduleStartTime && es.Id != scheduleId) // Điều kiện EndTime < StartTime
+                                    && _context.ExamSchedules.Any(es => es.SubjectId == idSubject
+                                                                        && es.EndTime < scheduleStartTime && es.Id != scheduleId)
                               select new ClassWithUser
                               {
                                   Id = c.Id,
@@ -145,7 +146,22 @@ namespace Testify.DAL.Reposiroties
             return data;
         }
 
+        public List<User> GetUserInClass(int id)
+        {
+            var listUser= (from classUser in _context.ClassUsers
+             join user in _context.Users
+             on classUser.UserId equals user.Id
+             where classUser.ClassId == id
+             select user
+             ).ToList();
 
+            if (listUser == null)
+            {
+                return null;
+            }
+
+            return listUser;
+        }
         public async Task<Class> GetByIdClass(int id)
         {
             return await _context.Classes.FindAsync(id);

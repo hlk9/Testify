@@ -31,7 +31,7 @@ else
                             <div class="w-100 d-flex justify-content-between align-items-center">
                                 @if (DateTime.Now >= item.ExamScheduleStartTime && DateTime.Now <= item.ExamScheduleEndTime)
                                 {
-                                    <MudChip T="string" Style="width:100px; color: limegreen">Vào thi</MudChip>
+                                    <MudChip T="string" Style="width:100px; color: limegreen">Đang diễn ra</MudChip>
 
                                 }
                                 else if (DateTime.Now < item.ExamScheduleStartTime)

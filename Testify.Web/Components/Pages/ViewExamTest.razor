@@ -419,9 +419,6 @@ else
             {
                 isPassed = false;
             }
-
-
-
             submission.UserId = _userId;
             submission.ExamDetailId = idExamDetail;
             submission.ExamScheduleId = 1;
@@ -461,7 +458,6 @@ else
                 if (logStat == false)
                 {
                     snackbar.Add("Có lỗi, không ghi được log exam", Severity.Warning);
-
                     return;
                 }
 
@@ -577,7 +573,7 @@ else
         var confirm = await _mudDialogServices.ShowMessageBox
             (
                 "Thông báo",
-                "Bạn chắc chắn muốn cút khỏi đây?",
+                "Bạn chắc chắn muốn thoát?",
                 "Xác nhận",
                 null,
                 cancelText: "Cancel",
