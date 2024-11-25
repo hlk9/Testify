@@ -47,6 +47,7 @@ namespace Testify.DAL.Context
         public DbSet<BlackListToken> BlackListTokens { get; set; }
         public DbSet<ClassExamSchedule> ClassExamSchedules { get; set; }
         public DbSet<UserLog> UserLogs { get; set; }
+        public DbSet<ExamActivityLog> ExamActivityLogs { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
