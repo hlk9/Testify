@@ -92,5 +92,11 @@ namespace Testify.API.Controllers
 
             return Ok(count);
         }
+        [HttpGet("Get-Users-In-Class")]
+        public async Task<List<User>> GetUsersInClassById(int classId)
+        {
+             
+            return classRepository.GetUserInClass(classId);
+        }
     }
 }
