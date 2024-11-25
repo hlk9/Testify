@@ -1,0 +1,104 @@
+﻿@using Testify.DAL.ViewModels
+@inject ExamScheduleService scheduleService
+@inject ClassExamScheduleService classExamScheduleService
+<MudDialog>
+    <TitleContent>
+        Danh sách lớp của lịch thi @(titleSchedule)
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudItem xs="12" md="12" lg="12">
+                    <MudTable Items="@listClassInSchedule" Hover="true" OnRowClick="((TableRowClickEventArgs<ClassWithUser> e) => ClickToClass(e))" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true">
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6">Danh sách lớp được xếp</MudText>
+                            <MudSpacer />
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Tên Lớp</MudTh>
+                            <MudTh>Mã lớp</MudTh>
+                            <MudTh>Số lượng</MudTh>
+                            <MudTh>Môn</MudTh>
+                            <MudTh>Phụ trách</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Tên Lớp">@context.Name</MudTd>
+                            <MudTd DataLabel="Mã lớp">@context.ClassCode</MudTd>
+                            <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                            <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                            <MudTd DataLabel="Phụ trách">@context.FullName</MudTd>
+                        </RowTemplate>
+
+                    </MudTable>
+                </MudItem>
+            </MudItem>
+            <MudItem xs="6">
+                <MudItem xs="12" md="12" lg="12">
+                    <MudTable Items="@usersInClassSelected" Dense="true" Hover="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" Striped="true">
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6" Color="Color.Success">Sinh viên của lớp đang chọn</MudText>
+                            <MudSpacer />
+
+                        </ToolBarContent>
+                        <HeaderContent>
+                            <MudTh>Họ Tên</MudTh>
+                            <MudTh>Tên tài khoản</MudTh>
+                            <MudTh>Ngày sinh</MudTh>
+                            <MudTh>Email</MudTh>
+                            <MudTh>Giới tính</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Họ Tên">@context.FullName</MudTd>
+                            <MudTd DataLabel="Tên tài khoản">@context.UserName</MudTd>
+                            <MudTd DataLabel="Ngày sinh">@context.DateOfBirth.ToString("dd/MM/yyyy")</MudTd>
+                            <MudTd DataLabel="Email">@context.Email</MudTd>
+                            <MudTd DataLabel="Giới tính">@(context.Sex?"Nữ" : "Nam")</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string titleSchedule { get; set; }
+    public ExamSchedule currentSchedule { get; set; } = new ExamSchedule();
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    public List<ClassWithUser> listClassInSchedule { get; set; }
+    public List<User> usersInClassSelected { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            await LoadData();
+        }
+       
+    }
+
+    private async Task LoadData()
+    {
+        currentSchedule = await scheduleService.GetById(Id);
+        listClassInSchedule = await classExamScheduleService.GetClassInSchedule(currentSchedule.Id);
+        StateHasChanged();
+    }
+
+    private async void ClickToClass(TableRowClickEventArgs<ClassWithUser> tableRowClickEventArgs)
+    {
+        usersInClassSelected = await _serClass.GetUserInClass(tableRowClickEventArgs.Item.Id);
+        StateHasChanged();
+
+    }
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}
