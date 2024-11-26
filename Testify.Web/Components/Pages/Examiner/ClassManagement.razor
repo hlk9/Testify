@@ -1,5 +1,5 @@
 @page "/Examiner/ClassManagement"
-@layout AdminLayout
+@layout ExaminerLayout
 @using Testify.DAL.ViewModels
 @using Testify.Web.Data.Commons
 @using Testify.Web.Shared
@@ -169,14 +169,18 @@
         _lstSubject = await _serSub.GetAllSub(textSearch, true);
         classWithUsers = await _serClass.GetAllClass(textSearch, true);
         isLoading = false;
-
-        StateHasChanged();
     }
 
-    protected override async Task OnInitializedAsync()
+   protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadData("");
+        if (firstRender)
+        {
+            await LoadData("");
+            StateHasChanged();
+        }
     }
+
+   
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
