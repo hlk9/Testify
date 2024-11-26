@@ -75,7 +75,6 @@
                 PaletteDark = _darkPalette,
                 LayoutProperties = new LayoutProperties()
             };
-        isLoading = false;
     }
 
 
@@ -127,12 +126,13 @@
             {
                 return false;
             }
-            if (modelLogin.IsLoginSucces == true && modelLogin.LevelId != 3)
+            if (modelLogin.IsLoginSucces == true && modelLogin.LevelId == 3 || modelLogin.IsLoginSucces == true && modelLogin.LevelId == 2 || modelLogin.IsLoginSucces == true && modelLogin.LevelId == 1)
             {
-                return false;
+                return true;
             }
+            return false;
         }
-        return true;
+       
     }
 
     private readonly PaletteLight _lightPalette = new()
