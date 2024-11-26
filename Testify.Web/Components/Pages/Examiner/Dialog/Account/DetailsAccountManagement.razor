@@ -1,15 +1,14 @@
 ﻿@using Testify.DAL.Models
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
-            Chi tiết tài khoản
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Chi tiết tài khoản</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="3" Model="@users">
 
-            <MudTextField T="Guid" @bind-Value="@users.Id" Label="Mã tài khoản"  ReadOnly=true/>
+            @* <MudTextField T="Guid" @bind-Value="@users.Id" Label="Mã tài khoản"  ReadOnly=true/> *@
             <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" ReadOnly=true />
             <MudTextField T="DateTime" @bind-Value="@users.DateOfBirth" Label="Ngày sinh" ReadOnly=true />
             <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" ReadOnly=true />
@@ -17,6 +16,8 @@
             <MudTextField T="int" @bind-Value="@users.LevelId" Label="Level" ReadOnly=true />
             <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" ReadOnly=true />
             <MudTextField T="string" @bind-Value="@users.Email" Label="Email" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@users.PasswordHash" Label="Mật khẩu" ReadOnly=true />
+            <MudTextField T="bool" @bind-Value="@users.Sex" Label="Giới tính" ReadOnly=true />
 @*             <MudTextField T="DateTime?" @bind-Value="@users.LastLogin" Label="Lần cuối đăng nhập" ReadOnly=true />
             <MudTextField T="byte" @bind-Value="@users.Status" Label="Trạng thái" ReadOnly=true /> *@
         </MudForm>
@@ -24,7 +25,7 @@
 
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Quay lại</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Quay lại</MudButton>
      
     </DialogActions>
 </MudDialog>

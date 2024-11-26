@@ -14,7 +14,7 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h5">Sửa đề thi </MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa đề thi</MudText>
     </TitleContent>
     <DialogContent>
 
@@ -48,6 +48,7 @@
                         </MudItem>
                         <MudItem xs="6" Class="d-flex justify-content-end">
                             <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a; text-align:center;">Kho câu hỏi</MudText>
+                           
                         </MudItem>
 
                     </MudItem>
@@ -153,7 +154,7 @@
     private int stt;
     private int NumberOfQuestion = 0;
     private ExamDetail examDetail = new ExamDetail();
-
+    private string searchValue = "";
 
     private Exam exam { get; set; } = new();
 
@@ -196,11 +197,11 @@
 
         if (questionLevelId > -1)
         {
-            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOTAndLevel(ExamDetailID, questionLevelId);
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOTAndLevel(ExamDetailID, questionLevelId, SubjectId);
         }
         else
         {
-            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOT(ExamDetailID);
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOT(ExamDetailID, SubjectId);
 
         }
 
@@ -220,6 +221,11 @@
 
     }
 
+    private async Task onChangeSearch()
+    {
+
+        //await LoadData(searchValue);
+    }
     protected async override Task OnInitializedAsync()
     {
         await LoadData();

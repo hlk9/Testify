@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Testify.DAL.Models;
 
 namespace Testify.Web.Services
@@ -68,6 +70,18 @@ namespace Testify.Web.Services
         public async Task<User> GetByidUser(Guid id)
         {
             return await _httpClient.GetFromJsonAsync<User>($"User/Get-By-idUser?id={id}");
+        }
+
+        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName)
+        {
+            var response = await _httpClient.PostAsJsonAsync<object>($"User/Check-Email-Or-Phone?email={email}&phoneNumber={phoneNumber}&userName={userName}", null);
+
+            if (response.IsSuccessStatusCode == true)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

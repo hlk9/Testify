@@ -13,7 +13,7 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h5">Danh sách câu hỏi </MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Danh sách câu hỏi</MudText>
     </TitleContent>
     <DialogContent>
         <MudTextField Class="w-100 mb-3" T="string" @bind-Value="@examDetail.Code" Placeholder="Nhập tên đề thi" Label="Tên đề thi" />
@@ -109,7 +109,7 @@
                 <MudNumericField Class="w-100" T="int" @bind-Value="NumberOfQuestion" Placeholder="Nhập số câu hỏi" />
             </MudItem>
             <MudItem xl="2" lg="2" md="3" xs="12">
-                <MudButton Class="w-100 btn btn-success" OnClick="AutoGenQuestion">Thêm câu hỏi</MudButton>
+                <MudButton Class="w-100" Color="Color.Primary" Variant="Variant.Filled" OnClick="AutoGenQuestion">Thêm câu hỏi</MudButton>
             </MudItem>
         </MudGrid>
 
@@ -168,8 +168,8 @@
         </MudTable>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
-        <MudButton OnClick="Submit">Tạo đề thi</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Tạo</MudButton>
     </DialogActions>
 </MudDialog>
 @code {

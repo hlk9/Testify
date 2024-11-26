@@ -28,20 +28,12 @@
             width: 100%;
         }
 </style>
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding:20px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TÀI KHOẢN</MudText>
     </MudPaper>
-    <MudGrid Style="padding:20px 0 ">
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
-            @* <MudSelect Dense="true" T="int" Label="Danh sách tài khoản" Variant="Variant.Outlined">
-                <MudSelectItem Value="1">Admin</MudSelectItem>
-                <MudSelectItem Value="2">Khảo thí</MudSelectItem>
-                <MudSelectItem Value="3">Giáo viên</MudSelectItem>
-                <MudSelectItem Value="4">Sinh viên</MudSelectItem>
-
-            </MudSelect> *@
-
+    <MudGrid Style="padding: 20px 0; align-items: center">
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueLevel">
                 <MudSelectItem Value="-1">Tất cả</MudSelectItem>
                 @foreach (var item in _lstLevel)
@@ -51,20 +43,18 @@
             </MudSelect>
         
         </MudItem >
-        <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Export</MudButton>
         </MudItem>
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
-            <MudButton Class="button-import" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ImportExcel, Guid.Empty))">Import</MudButton>
-        </MudItem>
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
+
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
 
-        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -73,8 +63,6 @@
 
                     </MudItem>
                     <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                       @*  <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField> *@
                         <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
                                       AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
                     </MudItem>
@@ -85,6 +73,7 @@
                 <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string">Họ và tên</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Ngày sinh" T="DateOnly">Ngày sinh</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Giới tính</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
             </HeaderContent>
@@ -92,12 +81,30 @@
                 <MudTd DataLabel="Họ và tên">@context.FullName</MudTd>
                 <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
                 <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
-
+                <MudTd DataLabel="Giới tính">
+                    @if (@context.Sex == true)
+                    {
+                        <span>Nam</span>
+                    }
+                    else
+                    {
+                        <span>Nữ</span>
+                    }
+                </MudTd>
+                <MudTd DataLabel="Trạng thái">
+                    @if (@context.Status == Convert.ToByte(StatusType.isActive))
+                    {
+                        <span>Hoạt động</span>
+                    }
+                    else
+                    {
+                        <span>Không hoạt động</span>
+                    }
+                </MudTd>
                 <MudTd Style="marign:3px" DataLabel="Thao tác">
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
 
                 </MudTd>
             </RowTemplate>
@@ -119,13 +126,10 @@
 
 </div>
 @code {
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
     private string searchValue = "";
     private bool isLoading { get; set; } = true;
-    private List<User>? _lstUser { get; set; }
-    private List<User>? _userList = new List<User>();
-
-    private Level level { get; set; }
+    private List<User> _userList = new List<User>();
+    private string? textSearch;
     private int levelId =-1;
     private List<Level> _lstLevel = new List<Level>();
 
@@ -136,18 +140,13 @@
 
     private async Task onChangeSearch()
     {
-
         await LoadData(searchValue);
-
     }
-
-
 
     private async Task LoadData(string? textSearch)
     {
         _lstLevel = await _serLevel.GetAllLevel();
-      
-        _userList = await _serLevel.GetAllUserByLevelId(levelId);
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
         isLoading = false;
     }
 
@@ -158,7 +157,7 @@
 
     private async Task ChangeValueLevel()
     {
-        _userList = await _serLevel.GetAllUserByLevelId(levelId);
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
     }
 
 

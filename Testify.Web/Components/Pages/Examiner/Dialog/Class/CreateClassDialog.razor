@@ -3,10 +3,9 @@
 @using Testify.Web.Shared
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
-            Thêm mới lớp học
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới lớp học</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         @if(isLoading)
@@ -59,8 +58,8 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
-        <MudButton Color="Color.Primary" Variant="@Variant.Filled" OnClick="Submit">Tạo</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Tạo</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -108,11 +107,6 @@
     {
         int count = 0;
         if (classes.Name == null || classes.Name.Trim().Length == 0)
-        {
-            snackbar.Add("Nội dung trống", Severity.Error);
-            count += 1;
-        }
-        if (classes.Description == null || classes.Description.Trim().Length == 0)
         {
             snackbar.Add("Nội dung trống", Severity.Error);
             count += 1;

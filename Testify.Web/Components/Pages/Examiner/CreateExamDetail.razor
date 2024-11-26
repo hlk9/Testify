@@ -9,7 +9,7 @@
 
 
 
-<div style="font-family:Roboto; padding:30px; height: calc(100vh - 64px); background-color:#fafafa">
+<div style="font-family:Roboto; padding:20px; height: calc(100vh - 64px); background-color:#fafafa">
 
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TẠO ĐỀ THI</MudText>
@@ -25,11 +25,11 @@
             <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
         }
     </MudSelect>
-    <MudGrid Style="padding:20px 0 ">
+    <MudGrid Style="padding:20px 0;">
         <MudItem xl="10" lg="10" md="8" sm="6" xs="12">
         </MudItem>
         <MudItem xl="2" lg="2" md="4" sm="6" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth))" Class="w-100 btn btn-success" Variant="Variant.Filled">Thêm đề mới </MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth))" Color="Color.Primary" Variant="Variant.Filled" Class="w-100">Thêm đề mới </MudButton>
         </MudItem>
     </MudGrid>
 
@@ -90,7 +90,7 @@
                 <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
-                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" OnClick="@(() => UpdateDethiDialog(_maxWidthUpdate,context.Id,ExamID))" aria-label="update"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" OnClick="@(() => UpdateDethiDialog(_maxWidthUpdate,context.Id,ExamID, subjectCurrent.Id))" aria-label="update"></MudIconButton>
                     </MudTooltip>
                     @* <MudTooltip Text="Chi tiết">
                         <MudIconButton Icon="@Icons.Material.Filled.Notes" OnClick="@(() => UpdateDethiDialog(_maxWidth,context.Id))" aria-label="details"></MudIconButton>
@@ -214,13 +214,14 @@
         public bool IsChecked { get; set; }
     }
 
-    private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID)
+    private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID, int Sub_id)
     {
         var parameters = new DialogParameters
         {
 
               { "ExamDetailID", ExamDetailID },
-              { "ExamID", ExamID}
+              { "ExamID", ExamID},
+              {"SubjectId",Sub_id }
 
         };
         var dialog = await DialogService.ShowAsync<Dialog.DeThi.UpdateExamDetail>("Options Dialog", parameters, options);

@@ -5,7 +5,7 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">Tạo bài thi mới</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo bài thi mới</MudText>
     </TitleContent>
     <DialogContent>
         <EditForm Model="@exam" OnInvalidSubmit="SubmitValid">
@@ -92,7 +92,7 @@
         </MudPaper> *@
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
         <MudButton Color="Color.Primary" OnClick="SubmitValid">Tạo</MudButton>
     </DialogActions>
 </MudDialog>

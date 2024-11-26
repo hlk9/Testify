@@ -17,7 +17,7 @@
         }
 
 </style>
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding:20px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">MÔN HỌC</MudText>
     </MudPaper>
@@ -32,7 +32,7 @@
 
     <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
 
-        <MudTable Items="@subject" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+        <MudTable Items="@subject" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470px">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -48,7 +48,7 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Mã môn học" T="string">Mã môn học</MudTableSortLabel></MudTh>
+                @* <MudTh><MudTableSortLabel SortLabel="Mã môn học" T="string">Mã môn học</MudTableSortLabel></MudTh> *@
                 <MudTh><MudTableSortLabel SortLabel="Tên môn học" T="string">Tên môn học</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Mô tả</MudTableSortLabel></MudTh>
                 @* <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh> *@
@@ -62,14 +62,14 @@
                 }
                 else
                 {
-                    <MudTd DataLabel="Mã môn học">@context.Id</MudTd>
+                    @* <MudTd DataLabel="Mã môn học">@context.Id</MudTd> *@
                     <MudTd DataLabel="Tên môn học">@context.Name</MudTd>
                     <MudTd DataLabel="Mô tả">@context.Description</MudTd>
                     @*  <MudTd DataLabel="Trạng thái">@context.Status</MudTd> *@
                     <MudTd Class="py-3 text-center" DataLabel="Thao tác">
-                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
-                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTd>
                 }
             </RowTemplate>
