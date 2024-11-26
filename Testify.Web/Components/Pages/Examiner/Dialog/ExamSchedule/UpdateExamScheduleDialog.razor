@@ -3,10 +3,9 @@
 @inject SubjectService subjectService
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-
-            Sửa lịch thi
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa lịch thi</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         <EditForm Model="@currentSchedule" OnInvalidSubmit="SubmitValid">
@@ -53,7 +52,7 @@
 
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick=" Cancel">Quay lại</MudButton>
+        <MudButton Color="Color.Surface" OnClick=" Cancel">Đóng</MudButton>
         <MudButton Color="@Color.Warning" OnClick="SubmitValid">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
