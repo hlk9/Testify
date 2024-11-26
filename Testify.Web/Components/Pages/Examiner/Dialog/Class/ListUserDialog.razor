@@ -9,10 +9,9 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Class="" />
-            Thêm mới sinh viên vào lớp
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới sinh viên vào lớp</MudText>
+    </TitleContent>
     </TitleContent>
 
     <DialogContent>
@@ -40,10 +39,10 @@
                             <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
                             <MudTd DataLabel="Email">@context.Email</MudTd>
                             <MudTd>
-                                <MudButton Color="Color.Surface" Variant="Variant.Filled" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))">
+                                <MudButton Color="Color.Surface" OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))">
                                     Chi Tiết
                                 </MudButton>
-                                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(context.Id))">
+                                <MudButton Color="Color.Primary" OnClick="@(() => DeleteUser(context.Id))">
                                     Xoá
                                 </MudButton>
                             </MudTd>
@@ -70,8 +69,8 @@
                             <MudTextField @bind-Value="email" Label="Email sinh viên" Variant="Variant.Outlined" />
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Variant="Variant.Filled" Color="Color.Default" Class="ml-auto me-2" OnClick="Cancel">Close</MudButton>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await Submit()">Thêm sinh viên</MudButton>
+                            <MudButton Color="Color.Default" Class="ml-auto me-2" OnClick="Cancel">Đóng</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="async () => await Submit()">Thêm sinh viên</MudButton>
                         </MudCardActions>
                     </MudCard>
                 </MudContainer>
@@ -95,10 +94,10 @@
                             <MudTd DataLabel="Sex">@(context.Sex == false ? "Nam" : "Nữ")</MudTd>
                             <MudTd DataLabel="Email">@context.Email</MudTd>
                             <MudTd>
-                                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ConfirmUser(context.Id))">
+                                <MudButton Color="Color.Primary" OnClick="@(() => ConfirmUser(context.Id))">
                                     Xác Nhận
                                 </MudButton>
-                                <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(() => RefuseUser(context.Id))">
+                                <MudButton Color="Color.Error" OnClick="@(() => RefuseUser(context.Id))">
                                     Từ Chối
                                 </MudButton>
                             </MudTd>

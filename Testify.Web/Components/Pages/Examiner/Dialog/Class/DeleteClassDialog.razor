@@ -2,14 +2,14 @@
 @using Testify.Web.Data.Commons
 <MudDialog>
     <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Vô hiệu hoá lớp</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Vô hiệu hóa lớp học</MudText>
     </TitleContent>
     <DialogContent>
         <MudText>Bạn chắc chắn muốn vô hiệu hóa lớp <span Style="font-weight: bold"> @classes?.Name</span> không?</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="@Color.Error" Variant="Variant.Filled" OnClick="Submit">Xóa</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="@Color.Error"  OnClick="Submit">Xóa</MudButton>
     </DialogActions>
 </MudDialog>
 

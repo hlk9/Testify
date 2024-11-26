@@ -1,16 +1,16 @@
 ﻿@using Testify.DAL.Models
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            Xóa môn học
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa môn học</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         <MudText>Bạn có muốn xóa không?</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="Variant.Filled" OnClick="Cancel">Đóng</MudButton>
-        <MudButton Color="@Color.Error" Variant="Variant.Filled" OnClick="Delete">Xóa</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="@Color.Error" OnClick="Delete">Xóa</MudButton>
     </DialogActions>
 </MudDialog>
 
