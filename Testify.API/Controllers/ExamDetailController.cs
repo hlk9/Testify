@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -52,6 +53,5 @@ namespace Testify.API.Controllers
             }
             return NotFound(); 
         }
-
     }
 }

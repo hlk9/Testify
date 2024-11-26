@@ -1,0 +1,124 @@
+﻿@page "/ScoreDistribution"
+@layout AdminLayout
+@using Testify.DAL.ViewModels
+
+@if (isLoading)
+{
+
+}
+else
+{
+    <MudPaper Elevation="0" style="font-family:Roboto; padding:30px; height:calc(100svh - 64px); background-color:#fafafa">
+        <MudPaper Style="padding:20px">
+            <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">PHỔ ĐIỂM THEO BÀI THI</MudText>
+        </MudPaper>
+        <MudPaper Elevation="0" Style="width: 100%; margin: 1.25rem 0rem;">
+            <MudSelect T="int" @bind-Value="@_ExamId" SelectedValuesChanged="handleChangeExam" Variant="Variant.Outlined">
+                @if(_ExamId == -1)
+                {
+                    <MudSelectItem Value="-1">Chọn bài thi</MudSelectItem>
+                }
+                @foreach (var item in _lstExam)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudPaper>
+        
+        <MudPaper Class="p-3 w-100">
+            <MudGrid Class="p-0 m-0 w-full">
+                <MudItem xl="8" Class="p-0">
+                    @if (_ExamId > -1)
+                    {
+                        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="520px" ChartOptions="ChartOption"></MudChart>
+                    }
+                </MudItem>
+                <MudItem xl="4" Class="p-0">
+                    @if (_ExamId > -1)
+                    {
+                        <MudChart ChartType="ChartType.Donut" @bind-SelectedIndex="Index" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts"></MudChart>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudPaper>
+}
+
+@code {
+    private List<Exam> _lstExam = new List<Exam>();
+    private List<ScoreDistributionByExam> _lstScoreDistribution = new List<ScoreDistributionByExam>();
+    private List<double> _lstAccountScore = new List<double>();
+    private List<double> _lstDataDonutCharts = new List<double>();
+    public List<ChartSeries> Series;
+
+    private int Index = -1;
+    private Guid _UserId = Guid.Empty;
+    private bool isLoading = false;
+    private int _ExamId = -1;
+
+    public string[] XAxisLabels;
+    private string[] LabelDonutCharts = { "Phần trăm đạt", "Phần trăm trượt" };
+    public ChartOptions ChartOption { get; set; } = new ChartOptions();
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                isLoading = true;
+                StateHasChanged();
+                var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                _UserId = Guid.Parse(userId.Value);
+                await LoadData();
+                await LoadDataChart();
+            }
+            catch { }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task LoadData()
+    {
+        _lstExam = await _serExam.GetExamsByUserId(_UserId);
+        _ExamId = _lstExam[0].Id;
+    }
+
+    private async Task handleChangeExam()
+    {
+        await LoadDataChart();
+    }
+
+    private async Task LoadDataChart()
+    {
+        _lstDataDonutCharts.Clear();
+        _lstScoreDistribution = await _serExam.ScoreDistributionByExam(_ExamId);
+        _lstAccountScore = _lstScoreDistribution.Select(x => (double)x.AccountScore).ToList();
+
+        double isPass = _lstScoreDistribution.Where(x => x.Score >= 5).Sum(x => x.AccountScore);
+        double isFail = _lstScoreDistribution.Where(x => x.Score < 5).Sum(x => x.AccountScore);
+        double percenIsPass = (isPass / _lstScoreDistribution.Sum(x => x.AccountScore)) * 100;
+        double percenIsFail = ((_lstScoreDistribution.Sum(x => x.AccountScore) - isPass) / _lstScoreDistribution.Sum(x => x.AccountScore)) * 100;
+
+        _lstDataDonutCharts.Add(percenIsPass);
+        _lstDataDonutCharts.Add(percenIsFail);
+
+        XAxisLabels = _lstScoreDistribution.Select(x => x.Score.ToString()).ToList().ToArray();
+
+        Series = new List<ChartSeries>()
+        {
+            new ChartSeries() {Name = "Tổng số bài thi đạt điểm tương ứng", Data = _lstAccountScore.ToArray() },
+        };
+
+        ChartOption = new ChartOptions()
+            {
+                YAxisTicks = 1
+            };
+
+        isLoading = false;
+    }
+}
