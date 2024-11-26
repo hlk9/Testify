@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Xml;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -170,6 +172,70 @@ namespace Testify.DAL.Reposiroties
             {
                 return -1;
             }
+        }
+
+        public async Task<List<Exam>> GetExamsByUserId(Guid UserId)
+        {
+            List<Exam> lstEmpty = new List<Exam>();
+            var objUser = await _context.Users.FindAsync(UserId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                lstEmpty = _context.Exams.Where(x => x.Status == 1).ToList();
+                return lstEmpty;
+            }
+            else if (objUser.LevelId == 3 || objUser.LevelId == 4)
+            {
+                lstEmpty = await (from cu in _context.ClassUsers
+                                  join c in _context.Classes on cu.ClassId equals c.Id
+                                  join ces in _context.ClassExamSchedules on c.Id equals ces.ClassId
+                                  join es in _context.ExamSchedules on ces.ExamScheduleId equals es.Id
+                                  join e in _context.Exams on es.ExamId equals e.Id
+                                  where (cu.UserId == UserId && c.Status == 1 && es.Status == 1 && e.Status == 1)
+                                  select e
+                                  ).ToListAsync();
+                return lstEmpty;
+            }
+            return lstEmpty;
+        }
+
+        public async Task<List<ScoreDistributionByExam>> ScoreDistributionByExam(int ExamId)
+        {
+            var data = await (from submission in _context.Submissions
+                              join examschedule in _context.ExamSchedules on submission.ExamScheduleId equals examschedule.Id
+                              join exam in _context.Exams on examschedule.ExamId equals exam.Id
+                              where (exam.Id == ExamId && submission.Status == true && exam.Status == 1 && examschedule.Status == 1)
+                              select new
+                              {
+                                  Score = submission.TotalMark
+                              }).ToListAsync();
+
+            var scoreDistribution = data
+                            .GroupBy(x => x.Score)
+                            .Select(g => new ScoreDistributionByExam
+                            {
+                                Score = g.Key,
+                                AccountScore = g.Count()
+                            })
+                            .OrderBy(sd => sd.Score)
+                            .ToList();
+
+            var scores = Enumerable.Range(0, 11)
+                            .Select(x => (double)x)         
+                            .Union(scoreDistribution.Select(sd => sd.Score)) 
+                            .Distinct()                      
+                            .OrderBy(x => x)                 
+                            .ToList();
+
+            var result = scores
+                .Select(score => new ScoreDistributionByExam
+                {
+                    Score = score,
+                    AccountScore = scoreDistribution.FirstOrDefault(sd => Math.Floor(sd.Score) == Math.Floor(score))?.AccountScore ?? 0
+                })
+                .ToList();
+
+            return result;
         }
     }
 }
