@@ -3,7 +3,7 @@
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa tài khoản</MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Bạn có muốn xóa không?</MudText>
+        <MudText>Bạn có chắc chắn muốn xóa tài khoản <span Style="font-weight: bold">@users?.FullName</span> không?</MudText>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface"  OnClick="Cancel">Đóng</MudButton>
@@ -12,12 +12,18 @@
 </MudDialog>
 
 @code {
+    private User users { get; set; }
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
     [Parameter]
     public Guid UserId { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        users = await _serLec.GetLecturerById(UserId);
+    }
 
     private async Task Submit()
     {
