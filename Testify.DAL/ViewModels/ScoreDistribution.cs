@@ -20,8 +20,8 @@ namespace Testify.DAL.ViewModels
 
     public class SummaryData
     {
-        public int TotalPass { get; set; }
-        public int TotalFail { get; set; }
+        public double PercentPass { get; set; }
+        public double PercentFail { get; set; }
     }
 
     public class ScoreDistribution

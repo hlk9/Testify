@@ -335,13 +335,24 @@ namespace Testify.DAL.Reposiroties
                 CountScore = scores.Count(s => s == score)
             }).ToList();
 
+            var totalCountScore = totalPass + totalFail;
+
+            double percentPass = 0;
+            double percentFail = 0;
+            if (totalCountScore != 0)
+            {
+                percentPass = (totalPass / totalCountScore) * 100;
+
+                percentFail = (totalFail / totalCountScore) * 100;
+            }
+
             return new ScoreDistribution
             {
                 Data = result,
                 Summary = new SummaryData
                 {
-                    TotalPass = totalPass,
-                    TotalFail = totalFail,
+                    PercentPass = Math.Round(percentPass, 2),
+                    PercentFail = Math.Round(percentFail, 2),
                 }
             };
         }
