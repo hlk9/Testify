@@ -46,7 +46,7 @@ else
 
 @code {
     private List<Class> _lstClass = new List<Class>();
-    private List<ScoreDistributionByExam> _lstScoreDistribution = new List<ScoreDistributionByExam>();
+    private ScoreDistribution _scoreDistribution = new ScoreDistribution();
     private List<double> _lstAccountScore = new List<double>();
     private List<double> _lstDataDonutCharts = new List<double>();
     public List<ChartSeries> Series;
@@ -96,18 +96,16 @@ else
     private async Task LoadDataChart()
     {
         _lstDataDonutCharts.Clear();
-        _lstScoreDistribution = await _serClass.ScoreDistributionByClass(_ClassId);
-        _lstAccountScore = _lstScoreDistribution.Select(x => (double)x.AccountScore).ToList();
+        _scoreDistribution = await _serClass.ScoreDistributionByClass(_ClassId);
+        _lstAccountScore = _scoreDistribution.Data.Select(x => (double)x.CountScore).ToList();
 
-        double isPass = _lstScoreDistribution.Where(x => x.Score >= 5).Sum(x => x.AccountScore);
-        double isFail = _lstScoreDistribution.Where(x => x.Score < 5).Sum(x => x.AccountScore);
-        double percenIsPass = (isPass / _lstScoreDistribution.Sum(x => x.AccountScore)) * 100;
-        double percenIsFail = ((_lstScoreDistribution.Sum(x => x.AccountScore) - isPass) / _lstScoreDistribution.Sum(x => x.AccountScore)) * 100;
+        var percenIsPass = _scoreDistribution.Summary.TotalPass;
+        var percenIsFail = _scoreDistribution.Summary.TotalFail;
 
         _lstDataDonutCharts.Add(percenIsPass);
         _lstDataDonutCharts.Add(percenIsFail);
 
-        XAxisLabels = _lstScoreDistribution.Select(x => x.Score.ToString()).ToList().ToArray();
+        XAxisLabels = _scoreDistribution.Data.Select(x => x.Score.ToString()).ToList().ToArray();
 
         Series = new List<ChartSeries>()
         {

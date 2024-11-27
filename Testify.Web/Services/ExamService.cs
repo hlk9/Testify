@@ -88,10 +88,10 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<List<ScoreDistributionByExam>> ScoreDistributionByExam(int ExamId)
+        public async Task<List<ScoreDistributionBy>> ScoreDistributionByExam(int ExamId)
         {
             var lst = await _httpClient.GetAsync($"Exam/Score-Distribution-By-Exam?ExamId={ExamId}");
-            var response = await lst.Content.ReadFromJsonAsync<List<ScoreDistributionByExam>>();
+            var response = await lst.Content.ReadFromJsonAsync<List<ScoreDistributionBy>>();
             return response;
         }
     }

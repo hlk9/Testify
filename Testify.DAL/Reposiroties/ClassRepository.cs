@@ -284,7 +284,7 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<List<ScoreDistributionByExam>> ScoreDistributionByClass(int ClassId)
+        public async Task<ScoreDistribution> ScoreDistributionByClass(int ClassId)
         {
             var data = await (from sub in _context.Submissions
                         join es in _context.ExamSchedules on sub.ExamScheduleId equals es.Id
@@ -296,17 +296,30 @@ namespace Testify.DAL.Reposiroties
                         {
                             Score = sub.TotalMark,
                             MaxScore = e.MaximmumMark,
+                            IsPass = sub.IsPassed,
                         }
                         ).ToListAsync();
 
             var scores = new List<double>();
+            var totalPass = 0;
+            var totalFail = 0;
+
             foreach (var item in data)
             {
                 double normalizedScore = item.MaxScore != 10
                     ? (item.Score / item.MaxScore) * 10
                     : item.Score;
 
-                scores.Add(Math.Round(normalizedScore, 2)); 
+                scores.Add(Math.Round(normalizedScore, 2));
+
+                if (item.IsPass)
+                {
+                    totalPass++;
+                }
+                else
+                {
+                    totalFail++;
+                }
             }
 
             var fixedScoreList = Enumerable.Range(0, 11)
@@ -316,13 +329,21 @@ namespace Testify.DAL.Reposiroties
                         .OrderBy(score => score) 
                         .ToList();
 
-            var result = fixedScoreList.Select(score => new ScoreDistributionByExam
+            var result = fixedScoreList.Select(score => new ScoreData
             {
                 Score = score, 
-                AccountScore = scores.Count(s => s == score)
+                CountScore = scores.Count(s => s == score)
             }).ToList();
 
-            return result;
+            return new ScoreDistribution
+            {
+                Data = result,
+                Summary = new SummaryData
+                {
+                    TotalPass = totalPass,
+                    TotalFail = totalFail,
+                }
+            };
         }
     }
 }

@@ -108,7 +108,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Score-Distribution-By-Class")]
-        public async Task<ActionResult<List<ScoreDistributionByExam>>> ScoreDistributionByClass(int classId)
+        public async Task<ActionResult<ScoreDistribution>> ScoreDistributionByClass(int classId)
         {
             var lst = await classRepository.ScoreDistributionByClass(classId);
             return Ok(lst);

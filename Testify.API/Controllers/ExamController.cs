@@ -103,7 +103,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Score-Distribution-By-Exam")]
-        public async Task<ActionResult<List<ScoreDistributionByExam>>> ScoreDistributionByExam(int ExamId)
+        public async Task<ActionResult<List<ScoreDistribution>>> ScoreDistributionByExam(int ExamId)
         {
             var lst = await _respon.ScoreDistributionByExam(ExamId);
             return Ok(lst);
