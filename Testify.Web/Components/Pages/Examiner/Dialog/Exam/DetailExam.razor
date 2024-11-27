@@ -3,7 +3,7 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">Chi tiết bài thi</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Chi tiết bài thi</MudText>
     </TitleContent>
     <DialogContent>
         <EditForm Model="@exam" >
@@ -52,8 +52,11 @@
                     <MudItem xs="6">
                         <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài"></MudTextField>
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="4">
                         <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudCheckBox @bind-Value="exam.AllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary"></MudCheckBox>
                     </MudItem>
                 </MudGrid>
             </MudItem>
@@ -61,7 +64,7 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
         
     </DialogActions>
 </MudDialog>

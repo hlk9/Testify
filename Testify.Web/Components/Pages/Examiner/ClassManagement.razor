@@ -1,5 +1,5 @@
 @page "/Examiner/ClassManagement"
-@layout AdminLayout
+@layout ExaminerLayout
 @using Testify.DAL.ViewModels
 @using Testify.Web.Data.Commons
 @using Testify.Web.Shared
@@ -32,7 +32,7 @@
     }
 
 </style>
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding:20px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">LỚP HỌC</MudText>
     </MudPaper>
@@ -52,7 +52,7 @@
         }
         else
         {
-            <MudTable Items="@classWithUsers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+            <MudTable Items="@classWithUsers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470px">
                 <ToolBarContent>
                     <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
                         <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
@@ -169,14 +169,18 @@
         _lstSubject = await _serSub.GetAllSub(textSearch, true);
         classWithUsers = await _serClass.GetAllClass(textSearch, true);
         isLoading = false;
-
-        StateHasChanged();
     }
 
-    protected override async Task OnInitializedAsync()
+   protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadData("");
+        if (firstRender)
+        {
+            await LoadData("");
+            StateHasChanged();
+        }
     }
+
+   
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Testify.DAL;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -92,11 +93,25 @@ namespace Testify.API.Controllers
 
             return Ok(count);
         }
+
         [HttpGet("Get-Users-In-Class")]
         public async Task<List<User>> GetUsersInClassById(int classId)
         {
-             
             return classRepository.GetUserInClass(classId);
+        }
+
+        [HttpGet("Get-Classes-By-UserId")]
+        public async Task<ActionResult<List<Class>>> GetClassesByUserId(Guid userId)
+        {
+            var lst = await classRepository.GetClassesByUserId(userId);
+            return Ok(lst);
+        }
+
+        [HttpGet("Score-Distribution-By-Class")]
+        public async Task<ActionResult<ScoreDistribution>> ScoreDistributionByClass(int classId)
+        {
+            var lst = await classRepository.ScoreDistributionByClass(classId);
+            return Ok(lst);
         }
     }
 }

@@ -95,6 +95,18 @@ namespace Testify.API.Controllers
             return Ok(count);
         }
 
+        [HttpGet("Get-Exams-By-UserId")]
+        public async Task<ActionResult<List<Exam>>> GetExamsByUserId(Guid UserId)
+        {
+            var lst = await _respon.GetExamsByUserId(UserId);
+            return Ok(lst);
+        }
 
+        [HttpGet("Score-Distribution-By-Exam")]
+        public async Task<ActionResult<ScoreDistribution>> ScoreDistributionByExam(int ExamId)
+        {
+            var lst = await _respon.ScoreDistributionByExam(ExamId);
+            return Ok(lst);
+        }
     }
 }

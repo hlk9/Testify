@@ -108,7 +108,7 @@
                                     </Columns>
                                 </MudDataGrid>
 
-                                <MudButton Class="btn p-2 text-white" Style="background-color: #29a69a" OnClick="IsShowAddAnswer">Thêm đáp án</MudButton>
+                                <MudButton Variant="Variant.Filled"  Color="Color.Primary" OnClick="IsShowAddAnswer">Thêm đáp án</MudButton>
 
                                 @if (isShowAddAnswer)
                                 {
@@ -117,7 +117,7 @@
                                             <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" />
                                             <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
                                         </MudForm>
-                                        <MudButton Class="btn p-2" Color="Color.Primary" OnClick="SaveAnswerInQuestion">Lưu đáp án</MudButton>
+                                        <MudButton Color="Color.Primary" OnClick="SaveAnswerInQuestion">Tạo</MudButton>
                                     </MudPaper>
                                 }
                             }
@@ -125,7 +125,7 @@
 
                         <MudPaper Elevation="0" Class="pt-3 text-end">
                             <MudButton OnClick="Cancel">Đóng</MudButton>
-                            <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Lưu câu hỏi</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Tạo</MudButton>
                         </MudPaper>
                     }
                 </MudTabPanel>
@@ -159,8 +159,8 @@
 
 
                     <MudPaper Elevation="0" Class="pt-3 text-end">
-                        <MudButton OnClick="Cancel">Cancel</MudButton>
-                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Thêm mới</MudButton>
+                        <MudButton OnClick="Cancel">Đóng</MudButton>
+                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Tạo</MudButton>
                     </MudPaper>
                 </MudTabPanel>
             </MudTabs>

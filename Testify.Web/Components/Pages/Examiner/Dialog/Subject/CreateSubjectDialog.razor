@@ -3,9 +3,9 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            Thêm mới môn học
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới môn học</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         @if (isLoading)
@@ -25,7 +25,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" OnClick=" Cancel">Đóng</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddNew">Tạo</MudButton>
+        <MudButton Color="Color.Primary" OnClick="AddNew">Tạo</MudButton>
     </DialogActions>
 </MudDialog>
 @code {

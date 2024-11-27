@@ -87,5 +87,19 @@ namespace Testify.Web.Services
             var listClass = await _httpClient.GetFromJsonAsync<List<User>>($"Class/Get-Users-In-Class?classId=" + classId);
             return listClass;
         }
+
+        public async Task<List<Class>> GetClassesByUserId(Guid userId)
+        {
+            var lst = await _httpClient.GetAsync($"Class/Get-Classes-By-UserId?userId={userId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<Class>>();
+            return response;
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionByClass(int classId)
+        {
+            var lst = await _httpClient.GetAsync($"Class/Score-Distribution-By-Class?classId={classId}");
+            var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
+            return response;
+        }
     }
 }

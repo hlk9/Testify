@@ -1,10 +1,9 @@
 ﻿@using Testify.DAL.Models
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
-            Chi Tiết Học Sinh
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Chi tiết học sinh</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="3" Model="@users">
@@ -19,7 +18,7 @@
 
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Quay lại</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
 
     </DialogActions>
 </MudDialog>

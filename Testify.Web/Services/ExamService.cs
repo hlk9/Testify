@@ -1,5 +1,6 @@
 ﻿using Testify.API.DTOs;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -80,5 +81,18 @@ namespace Testify.Web.Services
             return response;
         }
 
+        public async Task<List<Exam>> GetExamsByUserId(Guid UserId)
+        {
+            var count = await _httpClient.GetAsync($"Exam/Get-Exams-By-UserId?UserId={UserId}");
+            var response = await count.Content.ReadFromJsonAsync<List<Exam>>();
+            return response;
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionByExam(int ExamId)
+        {
+            var lst = await _httpClient.GetAsync($"Exam/Score-Distribution-By-Exam?ExamId={ExamId}");
+            var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
+            return response;
+        }
     }
 }

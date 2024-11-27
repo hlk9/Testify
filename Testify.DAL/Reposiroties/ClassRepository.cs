@@ -262,5 +262,99 @@ namespace Testify.DAL.Reposiroties
                 return -1;
             }
         }
+
+        public async Task<List<Class>> GetClassesByUserId(Guid userId)
+        {
+            List<Class> lst = new List<Class>();
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                lst = _context.Classes.Where(x => x.Status == 1).ToList();
+                return lst;
+            }
+            else if (objUser.LevelId == 3)
+            {
+                lst = _context.Classes.Where(x => x.TeacherId == userId && x.Status == 1).ToList();
+                return lst;
+            }
+            else
+            {
+                return lst;
+            }
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionByClass(int ClassId)
+        {
+            var data = await (from sub in _context.Submissions
+                        join es in _context.ExamSchedules on sub.ExamScheduleId equals es.Id
+                        join e in _context.Exams on es.ExamId equals e.Id
+                        join cles in _context.ClassExamSchedules on es.Id equals cles.ExamScheduleId
+                        join clu in _context.ClassUsers on cles.ClassId equals clu.ClassId
+                        where (cles.ClassId == ClassId && es.Status == 1 && sub.UserId == clu.UserId)
+                        select new
+                        {
+                            Score = sub.TotalMark,
+                            MaxScore = e.MaximmumMark,
+                            IsPass = sub.IsPassed,
+                        }
+                        ).ToListAsync();
+
+            var scores = new List<double>();
+            var totalPass = 0;
+            var totalFail = 0;
+
+            foreach (var item in data)
+            {
+                double normalizedScore = item.MaxScore != 10
+                    ? (item.Score / item.MaxScore) * 10
+                    : item.Score;
+
+                scores.Add(Math.Round(normalizedScore, 2));
+
+                if (item.IsPass)
+                {
+                    totalPass++;
+                }
+                else
+                {
+                    totalFail++;
+                }
+            }
+
+            var fixedScoreList = Enumerable.Range(0, 11)
+                        .Select(i => (double)i)
+                        .Union(scores.Distinct().Where(score => score % 1 != 0))
+                        .Distinct()
+                        .OrderBy(score => score) 
+                        .ToList();
+
+            var result = fixedScoreList.Select(score => new ScoreData
+            {
+                Score = score, 
+                CountScore = scores.Count(s => s == score)
+            }).ToList();
+
+            var totalCountScore = totalPass + totalFail;
+
+            double percentPass = 0;
+            double percentFail = 0;
+            if (totalCountScore != 0)
+            {
+                percentPass = (totalPass / totalCountScore) * 100;
+
+                percentFail = (totalFail / totalCountScore) * 100;
+            }
+
+            return new ScoreDistribution
+            {
+                Data = result,
+                Summary = new SummaryData
+                {
+                    PercentPass = Math.Round(percentPass, 2),
+                    PercentFail = Math.Round(percentFail, 2),
+                }
+            };
+        }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Xml;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -97,6 +99,7 @@ namespace Testify.DAL.Reposiroties
 
 
                 objUpdateExam.Name = exam.Name;
+                objUpdateExam.AllowViewResult = exam.AllowViewResult;
                 objUpdateExam.NumberOfQuestions = exam.NumberOfQuestions;
                 objUpdateExam.NumberOfRepeat = exam.NumberOfRepeat;
                 objUpdateExam.Status = exam.Status;
@@ -170,6 +173,100 @@ namespace Testify.DAL.Reposiroties
             {
                 return -1;
             }
+        }
+
+        public async Task<List<Exam>> GetExamsByUserId(Guid UserId)
+        {
+            List<Exam> lstEmpty = new List<Exam>();
+            var objUser = await _context.Users.FindAsync(UserId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                lstEmpty = _context.Exams.Where(x => x.Status == 1).ToList();
+                return lstEmpty;
+            }
+            else if (objUser.LevelId == 3 || objUser.LevelId == 4)
+            {
+                lstEmpty = await (from cu in _context.ClassUsers
+                                  join c in _context.Classes on cu.ClassId equals c.Id
+                                  join ces in _context.ClassExamSchedules on c.Id equals ces.ClassId
+                                  join es in _context.ExamSchedules on ces.ExamScheduleId equals es.Id
+                                  join e in _context.Exams on es.ExamId equals e.Id
+                                  where (cu.UserId == UserId && c.Status == 1 && es.Status == 1 && e.Status == 1)
+                                  select e
+                                  ).ToListAsync();
+                return lstEmpty;
+            }
+            return lstEmpty;
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionByExam(int ExamId)
+        {
+            var data = await (from submission in _context.Submissions
+                              join examschedule in _context.ExamSchedules on submission.ExamScheduleId equals examschedule.Id
+                              join exam in _context.Exams on examschedule.ExamId equals exam.Id
+                              where (exam.Id == ExamId && submission.Status == true && exam.Status == 1 && examschedule.Status == 1)
+                              select new
+                              {
+                                  Score = submission.TotalMark,
+                                  MaxScore = exam.MaximmumMark,
+                                  IsPass = submission.IsPassed,
+                              }).ToListAsync();
+
+            var scores = new List<double>();
+            var totalPass = 0;
+            var totalFail = 0;
+
+            foreach (var item in data)
+            {
+                double normalizedScore = item.MaxScore != 10
+                    ? (item.Score / item.MaxScore) * 10
+                    : item.Score;
+
+                scores.Add(Math.Round(normalizedScore, 2));
+
+                if (item.IsPass)
+                {
+                    totalPass++;
+                }
+                else
+                {
+                    totalFail++;
+                }
+            }
+
+            var fixedScoreList = Enumerable.Range(0, 11)
+                        .Select(i => (double)i)
+                        .Union(scores.Distinct().Where(score => score % 1 != 0))
+                        .Distinct()
+                        .OrderBy(score => score)
+                        .ToList();
+
+            var result = fixedScoreList.Select(score => new ScoreData
+            {
+                Score = score,
+                CountScore = scores.Count(s => s == score)
+            }).ToList();
+
+            var totalCountScore = totalPass + totalFail;
+            double percentPass = 0;
+            double percentFail = 0;
+            if (totalCountScore != 0)
+            {
+                percentPass = (totalPass / totalCountScore) * 100;
+
+                percentFail = (totalFail / totalCountScore) * 100;
+            }
+            
+            return new ScoreDistribution
+            {
+                Data = result,
+                Summary = new SummaryData
+                {
+                    PercentPass = Math.Round(percentPass, 2),
+                    PercentFail = Math.Round(percentFail, 2),
+                }
+            };
         }
     }
 }

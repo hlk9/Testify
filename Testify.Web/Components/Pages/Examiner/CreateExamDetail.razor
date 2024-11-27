@@ -9,7 +9,7 @@
 
 
 
-<div style="font-family:Roboto; padding:30px; height: calc(100vh - 64px); background-color:#fafafa">
+<div style="font-family:Roboto; padding:20px; height: calc(100vh - 64px); background-color:#fafafa">
 
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TẠO ĐỀ THI</MudText>
@@ -25,11 +25,11 @@
             <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
         }
     </MudSelect>
-    <MudGrid Style="padding:20px 0 ">
+    <MudGrid Style="padding:20px 0;">
         <MudItem xl="10" lg="10" md="8" sm="6" xs="12">
         </MudItem>
         <MudItem xl="2" lg="2" md="4" sm="6" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth))" Class="w-100 btn btn-success" Variant="Variant.Filled">Thêm đề mới </MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth))" Color="Color.Primary" Variant="Variant.Filled" Class="w-100">Thêm đề mới </MudButton>
         </MudItem>
     </MudGrid>
 
