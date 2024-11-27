@@ -199,7 +199,7 @@ namespace Testify.DAL.Reposiroties
             return lstEmpty;
         }
 
-        public async Task<List<ScoreDistributionBy>> ScoreDistributionByExam(int ExamId)
+        public async Task<ScoreDistribution> ScoreDistributionByExam(int ExamId)
         {
             var data = await (from submission in _context.Submissions
                               join examschedule in _context.ExamSchedules on submission.ExamScheduleId equals examschedule.Id
@@ -207,35 +207,65 @@ namespace Testify.DAL.Reposiroties
                               where (exam.Id == ExamId && submission.Status == true && exam.Status == 1 && examschedule.Status == 1)
                               select new
                               {
-                                  Score = submission.TotalMark
+                                  Score = submission.TotalMark,
+                                  MaxScore = exam.MaximmumMark,
+                                  IsPass = submission.IsPassed,
                               }).ToListAsync();
 
-            var scoreDistribution = data
-                            .GroupBy(x => x.Score)
-                            .Select(g => new ScoreDistributionBy
-                            {
-                                Score = g.Key,
-                                AccountScore = g.Count()
-                            })
-                            .OrderBy(sd => sd.Score)
-                            .ToList();
+            var scores = new List<double>();
+            var totalPass = 0;
+            var totalFail = 0;
 
-            var scores = Enumerable.Range(0, 11)
-                            .Select(x => (double)x)         
-                            .Union(scoreDistribution.Select(sd => sd.Score)) 
-                            .Distinct()                      
-                            .OrderBy(x => x)                 
-                            .ToList();
+            foreach (var item in data)
+            {
+                double normalizedScore = item.MaxScore != 10
+                    ? (item.Score / item.MaxScore) * 10
+                    : item.Score;
 
-            var result = scores
-                .Select(score => new ScoreDistributionBy
+                scores.Add(Math.Round(normalizedScore, 2));
+
+                if (item.IsPass)
                 {
-                    Score = score,
-                    AccountScore = scoreDistribution.FirstOrDefault(sd => Math.Floor(sd.Score) == Math.Floor(score))?.AccountScore ?? 0
-                })
-                .ToList();
+                    totalPass++;
+                }
+                else
+                {
+                    totalFail++;
+                }
+            }
 
-            return result;
+            var fixedScoreList = Enumerable.Range(0, 11)
+                        .Select(i => (double)i)
+                        .Union(scores.Distinct().Where(score => score % 1 != 0))
+                        .Distinct()
+                        .OrderBy(score => score)
+                        .ToList();
+
+            var result = fixedScoreList.Select(score => new ScoreData
+            {
+                Score = score,
+                CountScore = scores.Count(s => s == score)
+            }).ToList();
+
+            var totalCountScore = totalPass + totalFail;
+            double percentPass = 0;
+            double percentFail = 0;
+            if (totalCountScore != 0)
+            {
+                percentPass = (totalPass / totalCountScore) * 100;
+
+                percentFail = (totalFail / totalCountScore) * 100;
+            }
+            
+            return new ScoreDistribution
+            {
+                Data = result,
+                Summary = new SummaryData
+                {
+                    PercentPass = Math.Round(percentPass, 2),
+                    PercentFail = Math.Round(percentFail, 2),
+                }
+            };
         }
     }
 }

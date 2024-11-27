@@ -46,7 +46,11 @@ else
                     <MudItem xl="4" Class="p-0">
                         @if (_ExamId > -1)
                         {
-                            <MudChart ChartType="ChartType.Donut" @bind-SelectedIndex="Index" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts"></MudChart>
+                            <MudChart ChartType="ChartType.Donut" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts"  SelectedIndexChanged="handleShowValue">
+                                <CustomGraphics>
+                                    <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">@labelDetailChartDonut</text>
+                                </CustomGraphics>
+                            </MudChart>
                         }
                     </MudItem>
                 </MudGrid>
@@ -57,19 +61,19 @@ else
 
 @code {
     private List<Exam> _lstExam = new List<Exam>();
-    private List<ScoreDistributionBy> _lstScoreDistribution = new List<ScoreDistributionBy>();
+    private ScoreDistribution _scoreDistribution = new ScoreDistribution();
     private List<double> _lstAccountScore = new List<double>();
     private List<double> _lstDataDonutCharts = new List<double>();
     public List<ChartSeries> Series;
 
-    private int Index = -1;
     private Guid _UserId = Guid.Empty;
+    private string labelDetailChartDonut = "";
     private bool isLoading = false;
     private bool isLoadingChart = false;
     private int _ExamId = -1;
 
     public string[] XAxisLabels;
-    private string[] LabelDonutCharts = { "Phần trăm đạt", "Phần trăm trượt" };
+    private string[] LabelDonutCharts = { "Đạt", "Trượt" };
     public ChartOptions ChartOption { get; set; } = new ChartOptions();
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
@@ -100,6 +104,14 @@ else
         _ExamId = _lstExam[0].Id;
     }
 
+    private async Task handleShowValue(int index)
+    {
+
+        labelDetailChartDonut = "";
+        labelDetailChartDonut = $"{LabelDonutCharts[index]}: {_lstDataDonutCharts[index]}%";
+
+    }
+
     private async Task handleChangeExam()
     {
         await LoadDataChart();
@@ -113,18 +125,15 @@ else
             StateHasChanged();
 
             _lstDataDonutCharts.Clear();
-            _lstScoreDistribution = await _serExam.ScoreDistributionByExam(_ExamId);
-            _lstAccountScore = _lstScoreDistribution.Select(x => (double)x.AccountScore).ToList();
+            _scoreDistribution = await _serExam.ScoreDistributionByExam(_ExamId);
+            _lstAccountScore = _scoreDistribution.Data.Select(x => (double)x.CountScore).ToList();
 
-            double isPass = _lstScoreDistribution.Where(x => x.Score >= 5).Sum(x => x.AccountScore);
-            double isFail = _lstScoreDistribution.Where(x => x.Score < 5).Sum(x => x.AccountScore);
-            double percenIsPass = (isPass / _lstScoreDistribution.Sum(x => x.AccountScore)) * 100;
-            double percenIsFail = ((_lstScoreDistribution.Sum(x => x.AccountScore) - isPass) / _lstScoreDistribution.Sum(x => x.AccountScore)) * 100;
+            _lstDataDonutCharts.Add(_scoreDistribution.Summary.PercentPass);
+            _lstDataDonutCharts.Add(_scoreDistribution.Summary.PercentFail);
 
-            _lstDataDonutCharts.Add(percenIsPass);
-            _lstDataDonutCharts.Add(percenIsFail);
+            labelDetailChartDonut = $"{LabelDonutCharts[0]}: {_lstDataDonutCharts[0]}%";
 
-            XAxisLabels = _lstScoreDistribution.Select(x => x.Score.ToString()).ToList().ToArray();
+            XAxisLabels = _scoreDistribution.Data.Select(x => x.Score.ToString()).ToList().ToArray();
 
             Series = new List<ChartSeries>()
         {
