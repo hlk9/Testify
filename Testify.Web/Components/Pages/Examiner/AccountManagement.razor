@@ -41,10 +41,9 @@
                     <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
                 }
             </MudSelect>
-        
         </MudItem >
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Export</MudButton>
+            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ExportExcel, Guid.Empty))">Export</MudButton>
         </MudItem>
 
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
@@ -70,7 +69,7 @@
 
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string">Họ và tên</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string" >Họ và tên</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Ngày sinh" T="DateOnly">Ngày sinh</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Giới tính</MudTableSortLabel></MudTh>
@@ -79,7 +78,7 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Họ và tên">@context.FullName</MudTd>
-                <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
+                <MudTd DataLabel="Ngày sinh">@context.DateOfBirth.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
                 <MudTd DataLabel="Giới tính">
                     @if (@context.Sex == true)
@@ -161,7 +160,7 @@
     }
 
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
     private async Task OpenDialogAsync(DialogOptions options, string name, Guid id)
     {
@@ -181,8 +180,10 @@
             {x => x.UserId, id}
         };
 
-
-
+        var dialogParametersUser = new DialogParameters<Dialog.Account.ExportExcelDialog>
+        {
+            {x => x.UserId, id}
+        };
 
         if (name.Equals(OpenDialogType.Create))
         {
@@ -202,22 +203,21 @@
             {
                 await LoadData("");
             }
-
-        }
-        else if (name.Equals(OpenDialogType.ImportExcel))
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.Account.ImportFileExcelDialog>("Options Dialog", options);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await LoadData("");
-            }
         }
         else if (name.Equals(OpenDialogType.Detail))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.DetailsAccountManagement>("Options Dialog", dialogParametersUserId, options);
             var result = await dialog.Result;
             if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+        else if (name.Equals(OpenDialogType.ExportExcel))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Account.ExportExcelDialog>("Options Dialog", dialogParametersUser, options);
+            var result = await dialog.Result;
+            if(!result.Canceled)
             {
                 await LoadData("");
             }
@@ -230,9 +230,17 @@
             {
                 await LoadData("");
             }
-         
         }
     }
 }
-
+<script>
+    function downloadFile(fileName, contentType, content) {
+        const blob = new Blob([content], { type: contentType });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+</script>
         

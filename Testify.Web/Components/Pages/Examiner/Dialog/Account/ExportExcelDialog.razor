@@ -1,0 +1,70 @@
+﻿@inject IJSRuntime jsruntime;
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tải danh sách Account</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
+            <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                @foreach (var item in _lstLevel)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="Submit">Tải</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid UserId { get; set; }
+    private bool isAnswer = false;
+    private int levelId = -1;
+    private string? textSearch;
+    private List<Level> _lstLevel = new List<Level>();
+    private List<User> _userList = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lstLevel = await _serLevel.GetAllLevel();
+    }
+
+    private async Task ChangeValueLevel()
+    {
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
+        StateHasChanged();
+    }
+
+    private async Task Submit()
+    {
+        if (levelId <= 0)
+        {
+            snackbar.Add("Chưa chọn chức vụ", Severity.Warning);
+            return;
+        }
+        var response = await _serUser.ExportAccountByLevelId(levelId);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var fileContent = await response.Content.ReadAsByteArrayAsync();
+            var fileName = $"Danh_Sach_Tai_Khoan.xlsx";
+
+            // Tạo một URL Blob từ nội dung của file Excel
+            var fileUrl = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{Convert.ToBase64String(fileContent)}";
+
+            // Sử dụng JavaScript để tạo link tải file
+            await jsruntime.InvokeVoidAsync("downloadFile", fileUrl, fileName);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
