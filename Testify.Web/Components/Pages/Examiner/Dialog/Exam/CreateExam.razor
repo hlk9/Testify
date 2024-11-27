@@ -15,14 +15,14 @@
 
 
             <MudAutocomplete Class="py-4" T="Subject"
-                             @bind-Value="subjectCurrent"
-                             SearchFunc="@SearchSubject"
-                             Variant="Variant.Outlined"
-                             Label="Môn"
-                             Placeholder="Chọn môn"
-                             Clearable="true"
-                             ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                             OnFocus="SubjectChanged" />
+            @bind-Value="subjectCurrent"
+            SearchFunc="@SearchSubject"
+            Variant="Variant.Outlined"
+            Label="Môn"
+            Placeholder="Chọn môn"
+            Clearable="true"
+            ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+            OnFocus="SubjectChanged" />
 
 
 
@@ -48,16 +48,19 @@
                     <MudItem xs="6">
                         <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài"></MudTextField>
                     </MudItem>
-                    <MudItem xs="6">
+                    <MudItem xs="4">
                         <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="2">
+                        <MudCheckBox @bind-Value="examAllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary"></MudCheckBox>
                     </MudItem>
                 </MudGrid>
             </MudItem>
-            
+
         </EditForm>
-       @*  <MudPaper Elevation="0" Class="my-4">
+        @*  <MudPaper Elevation="0" Class="my-4">
             <MudText Style="font-size: 16px; font-weight: bold">Đề:</MudText>
-            
+
                 <MudDataGrid Items="@lisDThi" Class="my-3">
                     <Columns>
                         <PropertyColumn Property="x => x.Code" Title="Code"></PropertyColumn>
@@ -82,13 +85,13 @@
                             <MudTextField T="string" Style="padding: 0" Label="Code" @bind-Value="examdetail.Code"></MudTextField>
                             <MudTextField T="string" @bind-Value="examdetail.Code"/>
 
-                          
+
                     </MudForm>
                     <MudButton Class="btn p-2" Color="Color.Primary" OnClick="SaveExamDetailInExam">Lưu đề</MudButton>
                 </MudPaper>
 
                 }
-            
+
         </MudPaper> *@
     </DialogContent>
     <DialogActions>
@@ -111,6 +114,7 @@
     private Subject subjectCurrent;
     private int ExamId = -1;
     MudForm form;
+    private bool examAllowViewResult { get; set; } = true;
 
     private bool isShowAddExam = false;
     private ExamDetail examdetail { get; set; } = new();
