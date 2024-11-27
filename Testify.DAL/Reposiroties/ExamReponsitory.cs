@@ -99,6 +99,7 @@ namespace Testify.DAL.Reposiroties
 
 
                 objUpdateExam.Name = exam.Name;
+                objUpdateExam.AllowViewResult = exam.AllowViewResult;
                 objUpdateExam.NumberOfQuestions = exam.NumberOfQuestions;
                 objUpdateExam.NumberOfRepeat = exam.NumberOfRepeat;
                 objUpdateExam.Status = exam.Status;

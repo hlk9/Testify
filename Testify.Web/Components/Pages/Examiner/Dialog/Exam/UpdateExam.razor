@@ -14,16 +14,19 @@
                         <MudItem xs="6">
                             <MudTextField T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này"></MudTextField>
                         </MudItem>
-                        <MudItem xs="6">
+                        <MudItem xs="4">
                             <MudAutocomplete T="Subject"
-                                             @bind-Value="subjectCurrent"
-                                             SearchFunc="@SearchSubject"
-                                             Variant="Variant.Outlined"
-                                             Label="Môn"
-                                             Placeholder="Chọn môn"
-                                             Clearable="true"
-                                             ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                             OnFocus="SubjectChanged" />
+                            @bind-Value="subjectCurrent"
+                            SearchFunc="@SearchSubject"
+                            Variant="Variant.Outlined"
+                            Label="Môn"
+                            Placeholder="Chọn môn"
+                            Clearable="true"
+                            ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                            OnFocus="SubjectChanged" />
+                        </MudItem>
+                        <MudItem xs="2">
+                            <MudCheckBox @bind-Value="examAllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary"></MudCheckBox>
                         </MudItem>
                     </MudGrid>
 
@@ -78,6 +81,7 @@
     private List<Subject> listSubject;
     private Exam examCurrent;
     private Subject subjectCurrent;
+    private bool examAllowViewResult { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,6 +155,7 @@
             
             exam.ScoreMethodId = null;
             exam.SubjectId = subjectCurrent.Id;
+            exam.AllowViewResult = examAllowViewResult;
             bool stats = await examService.UpdateExam(exam);
             if (stats == true)
             {
