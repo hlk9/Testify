@@ -9,6 +9,6 @@
         public static string List = "List";
         public static string ShowAnswer = "ShowAnswer";
         public static string ShowDialogAddNewAnswer = "ShowDialogAddNewAnswer";
-        public static string ImportExcel = "Import";
+        public static string ExportExcel = "Export";
     }
 }

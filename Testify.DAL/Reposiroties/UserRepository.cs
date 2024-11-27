@@ -145,5 +145,12 @@ namespace Testify.DAL.Reposiroties
         {
             return await _context.Users.AnyAsync(a => a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName);
         }
+
+        public async Task<List<User>> GetUsersByLevelId(int levelId)
+        {
+            return await _context.Users
+                                 .Where(user => user.LevelId == levelId)
+                                 .ToListAsync();
+        }
     }
 }

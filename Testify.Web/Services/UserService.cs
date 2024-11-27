@@ -74,14 +74,13 @@ namespace Testify.Web.Services
 
         public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName)
         {
-            var response = await _httpClient.PostAsJsonAsync<object>($"User/Check-Email-Or-Phone?email={email}&phoneNumber={phoneNumber}&userName={userName}", null);
+            return await _httpClient.GetFromJsonAsync<bool>($"User/Check-Email-Or-Phone?email={email}&phoneNumber={phoneNumber}&userName={userName}");
+        }
 
-            if (response.IsSuccessStatusCode == true)
-            {
-                return true;
-            }
-
-            return false;
+        public async Task<HttpResponseMessage> ExportAccountByLevelId(int levelId)
+        {
+            return await _httpClient.GetAsync($"User/Export-Account-By-LevelId?levelId={levelId}");
         }
     }
 }
+

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -10,9 +12,11 @@ namespace Testify.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserRepository userRepos;
+        private readonly LevelRepository levelRepos;
         public UserController()
         {
             userRepos = new UserRepository();
+            levelRepos = new LevelRepository();
         }
 
         [HttpPost("Register-Student")]
@@ -152,11 +156,81 @@ namespace Testify.API.Controllers
             return usersWithStatusTwo;
         }
 
-        [HttpPost("Check-Email-Or-Phone")]
+        [HttpGet("Check-Email-Or-Phone")]
         public async Task<ActionResult> CheckEmailOrPhone(string email, string phoneNumber, string userName)
         {
             bool result = await userRepos.CheckEmailOrPhone(email, phoneNumber, userName);
             return Ok(result);
+        }
+
+        [HttpGet("Export-Account-By-LevelId")]
+        public async Task<ActionResult> ExportAccountByLevelId(int levelId)
+        {
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            var package = new ExcelPackage();
+
+            if (levelId != 0 && levelId != null)
+            {
+                var users = await userRepos.GetUsersByLevelId(levelId);
+
+                var worksheet = package.Workbook.Worksheets.Add("Tài khoản");
+
+                worksheet.Cells.Style.Font.Name = "Times New Roman";
+                System.Drawing.Color customColor = System.Drawing.Color.FromArgb(41, 166, 154);
+
+                worksheet.Column(1).Width = 20;
+                worksheet.Column(2).Width = 25;
+                worksheet.Column(3).Width = 25;
+                worksheet.Column(4).Width = 15;
+                worksheet.Column(5).Width = 25;
+                worksheet.Column(6).Width = 25;
+                worksheet.Column(7).Width = 25;
+                worksheet.Column(8).Width = 25;
+
+                worksheet.Row(1).Height = 30;
+                worksheet.Cells[1, 1].Value = "Full Name";
+                worksheet.Cells[1, 2].Value = "Username";
+                worksheet.Cells[1, 3].Value = "Username";
+                worksheet.Cells[1, 4].Value = "Date of Birth";
+                worksheet.Cells[1, 5].Value = "Phone Number";
+                worksheet.Cells[1, 6].Value = "Address";
+                worksheet.Cells[1, 7].Value = "Email";
+                worksheet.Cells[1, 8].Value = "Sex";
+
+                for (int i = 1; i <= 8; i++)
+                {
+                    worksheet.Cells[1, i].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[1, i].Style.Fill.BackgroundColor.SetColor(customColor);
+                    worksheet.Cells[1, i].Style.WrapText = true;
+                    worksheet.Cells[1, i].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    worksheet.Cells[1, i].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    worksheet.Cells[1, i].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                    worksheet.Cells[1, i].Style.Font.Bold = true;
+                    worksheet.Cells[1, i].Style.Font.Size = 12;
+                }
+
+                for (int i = 0; i < users.Count; i++)
+                {
+                    var user = users[i];
+
+                    worksheet.Cells[i + 2, 1].Value = user.FullName;
+                    worksheet.Cells[i + 2, 2].Value = user.UserName;
+                    worksheet.Cells[i + 2, 3].Value = user.PasswordHash;
+                    worksheet.Cells[i + 2, 4].Value = user.DateOfBirth.ToString("yyyy-MM-dd");
+                    worksheet.Cells[i + 2, 5].Value = user.PhoneNumber;
+                    worksheet.Cells[i + 2, 6].Value = user.Address;
+                    worksheet.Cells[i + 2, 7].Value = user.Email;
+                    worksheet.Cells[i + 2, 8].Value = user.Sex ? "Male" : "Female";
+                }
+
+                var excelByBytes = package.GetAsByteArray();
+
+                return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Danh_Sach_Tai_Khoan.xlsx");
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

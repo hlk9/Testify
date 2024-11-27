@@ -2,7 +2,7 @@
 @using Testify.DAL.Models
 @using Testify.Web.Shared
 
- @if (isLoading)
+@if (isLoading)
 {
     <LoadingContext />
 }
@@ -15,32 +15,32 @@ else
         <DialogContent>
             <MudTabs ApplyEffectsToContainer="true">
                 <MudTabPanel Text="Thêm mới">
-                    <MudForm Spacing="4" Model="@users" @ref="@form">
-                    <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" />
-                    <MudDatePicker @bind-Value="@users.DateOfBirth" Label="Ngày sinh" /> 
-                    <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" />
-                    <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" />
-                    <MudRadioGroup T="bool" @bind-Value="@users.Sex" Label="Giới tính">
-                        <MudRadio T="bool" Value="true">Nam</MudRadio>
-                        <MudRadio T="bool" Value="false">Nữ</MudRadio>
-                    </MudRadioGroup>
-                    <MudSelect T="int" @bind-Value="levelId" Label="Cấp độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                        @if (levelId == -1)
-                        {
-                            <MudSelectItem Value="-1">Không có cấp độ nào!</MudSelectItem>
-                        }
-                        else
-                        {
-                            @foreach (var itemName in _lstLevel)
+                    <MudForm Spacing="2" Model="@users" @ref="@form">
+                        <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" Variant="Variant.Outlined" />
+                        <MudDatePicker Editable="true" @bind-Date="_date" DateFormat="dd/MM/yyyy" Label="Ngày sinh" Variant="Variant.Outlined" />
+                        <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" Variant="Variant.Outlined" />
+                        <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" Variant="Variant.Outlined" />
+                        <MudRadioGroup T="bool" @bind-Value="@users.Sex" Label="Giới tính">
+                            <MudRadio T="bool" Value="true">Nam</MudRadio>
+                            <MudRadio T="bool" Value="false">Nữ</MudRadio>
+                        </MudRadioGroup>
+                        <MudSelect T="int" @bind-Value="levelId" Label="Chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @if (levelId == -1)
                             {
-                                <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
+                                <MudSelectItem Value="-1">Không có chưcs vụ nào!</MudSelectItem>
                             }
-                        }
-                    </MudSelect>
-                    <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" />
-                    <MudTextField T="string" @bind-Value="@users.Email" Label="Email" />
-                    <MudTextField T="string" @bind-Value="@users.PasswordHash" Label="PasswordHash" />
-                </MudForm>
+                            else
+                            {
+                                @foreach (var itemName in _lstLevel)
+                                {
+                                    <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
+                                }
+                            }
+                        </MudSelect>
+                        <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" />
+                        <MudTextField T="string" @bind-Value="@users.Email" Label="Email" Variant="Variant.Outlined" />
+                        <MudTextField T="string" @bind-Value="@users.PasswordHash" Label="PasswordHash" Variant="Variant.Outlined" />
+                    </MudForm>
                     <MudPaper Elevation="0" Class="pt-3 text-end">
                         <MudButton OnClick="Cancel">Đóng</MudButton>
                         <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Lưu</MudButton>
@@ -62,7 +62,7 @@ else
                     </MudPaper>
 
                     <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
-                        <MudTextField T="string" @bind-Value="@nameFileCurrent"></MudTextField>
+                        <MudTextField T="string" @bind-Value="@nameFileCurrent" Variant="Variant.Outlined"></MudTextField>
                         <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadFileExcel">
                             <ActivatorContent>
                                 <MudFab StartIcon="@Icons.Material.Filled.FileUpload"
@@ -80,8 +80,6 @@ else
                         <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Lưu</MudButton>
                     </MudPaper>
                 </MudTabPanel>
-                        
-
             </MudTabs>
         </DialogContent>
     </MudDialog>
@@ -106,6 +104,8 @@ else
     private bool isLoading { get; set; } = true;
     private int levelId = -1;
 
+    private DateTime? _date;
+
     [Inject]
     private IDialogService _mudDialogServices { get; set; }
 
@@ -128,7 +128,7 @@ else
         nameFileCurrent = file.Name;
         selectFileCurrent = file;
     }
-    
+
     protected override async Task OnInitializedAsync()
     {
         await Loaddata("");
@@ -264,6 +264,8 @@ else
             var phoneNumber = users.PhoneNumber;
             var userName = users.UserName;
 
+            users.DateOfBirth = _date.GetValueOrDefault(DateTime.Now);
+
             var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName);
 
             if (existing)
@@ -277,23 +279,7 @@ else
                 users.Status = 1;
 
                 var check = await _serLec.CreateLecturer(users);
-                if (check == true)
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Thêm thành công", Severity.Success);
-                }
-                else
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Thêm thất bại", Severity.Error);
-                }
-            }
-            if (!checkValidation)
-            {
-                users.Status = 1;
-
-                var check = await _serLec.CreateLecturer(users);
-                if (check == true)
+                if (check != null)
                 {
                     MudDialog.Close(DialogResult.Ok(true));
                     snackbar.Add("Thêm thành công", Severity.Success);
