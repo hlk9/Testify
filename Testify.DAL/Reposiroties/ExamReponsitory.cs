@@ -200,7 +200,7 @@ namespace Testify.DAL.Reposiroties
             return lstEmpty;
         }
 
-        public async Task<List<ScoreDistributionByExam>> ScoreDistributionByExam(int ExamId)
+        public async Task<List<ScoreDistributionBy>> ScoreDistributionByExam(int ExamId)
         {
             var data = await (from submission in _context.Submissions
                               join examschedule in _context.ExamSchedules on submission.ExamScheduleId equals examschedule.Id
@@ -213,7 +213,7 @@ namespace Testify.DAL.Reposiroties
 
             var scoreDistribution = data
                             .GroupBy(x => x.Score)
-                            .Select(g => new ScoreDistributionByExam
+                            .Select(g => new ScoreDistributionBy
                             {
                                 Score = g.Key,
                                 AccountScore = g.Count()
@@ -229,7 +229,7 @@ namespace Testify.DAL.Reposiroties
                             .ToList();
 
             var result = scores
-                .Select(score => new ScoreDistributionByExam
+                .Select(score => new ScoreDistributionBy
                 {
                     Score = score,
                     AccountScore = scoreDistribution.FirstOrDefault(sd => Math.Floor(sd.Score) == Math.Floor(score))?.AccountScore ?? 0
