@@ -69,7 +69,7 @@ namespace Testify.DAL.Reposiroties
                             CreatedDate = b.CreatedDate,
                             Status = b.Status,
                             SubjectId = b.SubjectId,
-                            Code = e.Code,
+                            //Code = e.Code,
                         }).ToList();
 
             return data;

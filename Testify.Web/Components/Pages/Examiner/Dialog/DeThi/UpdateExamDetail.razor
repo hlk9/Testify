@@ -261,10 +261,10 @@
                     if (status)
                     {
 
-                        Snackbar.Add("Thêm " + newListToAdd.Count + "câu hỏi thành công", Severity.Info);
+                        Snackbar.Add("Thêm " + newListToAdd.Count + " câu hỏi thành công", Severity.Info);
                         newListToAdd.Clear();
                         listQuestionSelected.Clear();
-                        listQuestionSelectedInList.Clear();
+                        //listQuestionSelectedInList.Clear();
 
                         foreach (var item in listQuestionSelected)
                         {
@@ -276,6 +276,9 @@
                     else
                     {
                         Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
+                        newListToAdd.Clear();
+                        listQuestionSelected.Clear();
+                        //listQuestionSelectedInList.Clear();
 
                         await LoadData();
                     }
