@@ -57,11 +57,14 @@ namespace Testify.API.Controllers
             return Ok(objGetAll);
         }
 
-        [HttpPost("Add-ListQuestionToExam")]
+        [HttpPost("AddListQuestionToExam_New")]
         public bool AddListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
         {
             return _respon.AddListQuestionToExam(data, idExamDetail);
         }
+
+       
+
 
         [HttpPost("Remove-ListQuestionToExam")]
         public bool RemoveFromListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
