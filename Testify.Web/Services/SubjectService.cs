@@ -1,4 +1,5 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -59,5 +60,15 @@ namespace Testify.Web.Services
             var response = await count.Content.ReadFromJsonAsync<int>();
             return response;
         }
+
+        public async Task<ScoreDistribution> ScoreDistributionBySubject(int subjectId)
+        {
+            var lst = await _httpClient.GetAsync($"Subject/Score-Distribution-By-Subject?subjectId={subjectId}");
+            var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
+            return response;
+        }
+
+
+
     }
 }

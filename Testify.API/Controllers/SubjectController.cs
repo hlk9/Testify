@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -55,5 +56,15 @@ namespace Testify.API.Controllers
             var count = await _repo.GetCountSubjectByUserId(userId);
             return Ok(count);
         }
+
+        [HttpGet("Score-Distribution-By-Subject")]
+        public async Task<ActionResult<ScoreDistributionBy>> ScoreDistributionBySubject(int subjectId)
+        {
+            var lst = await _repo.ScoreDistributionBySubject(subjectId);
+            return Ok(lst);
+        }
+
+
+
     }
 }
