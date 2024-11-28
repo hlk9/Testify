@@ -214,8 +214,8 @@ namespace Testify.DAL.Reposiroties
                               }).ToListAsync();
 
             var scores = new List<double>();
-            var totalPass = 0;
-            var totalFail = 0;
+            double totalPass = 0;
+            double totalFail = 0;
 
             foreach (var item in data)
             {
@@ -248,7 +248,7 @@ namespace Testify.DAL.Reposiroties
                 CountScore = scores.Count(s => s == score)
             }).ToList();
 
-            var totalCountScore = totalPass + totalFail;
+            double totalCountScore = totalPass + totalFail;
             double percentPass = 0;
             double percentFail = 0;
             if (totalCountScore != 0)
