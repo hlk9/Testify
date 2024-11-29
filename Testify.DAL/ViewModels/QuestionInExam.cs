@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public string Content { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string Code { get; set; }
+        //public string Code { get; set; }
         public byte? Status { get; set; }
         public int SubjectId { get; set; }
         public string? SubjectName { get; set; }

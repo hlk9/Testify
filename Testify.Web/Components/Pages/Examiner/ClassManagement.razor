@@ -33,117 +33,122 @@
 
 </style>
 <div style="font-family:Roboto; padding:20px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
-    <MudPaper Style="padding:15px;">
-        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">LỚP HỌC</MudText>
-    </MudPaper>
-    <MudGrid Style="padding:20px 0 ">
-        <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
 
-        </MudItem>
-        <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create, -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
-        </MudItem>
-    </MudGrid>
+  
+        <MudPaper Style="padding:15px;">
+            <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">LỚP HỌC</MudText>
+        </MudPaper>
+        <MudGrid Style="padding:20px 0 ">
+            <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
 
-    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
-        @if (isLoading)
-        {
-            <LoadingContext />
-        }
-        else
-        {
-            <MudTable Items="@classWithUsers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470px">
-                <ToolBarContent>
-                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách lớp học</MudText>
+            </MudItem>
+            <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
+                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create, -1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            </MudItem>
+        </MudGrid>
 
-                        </MudItem>
-                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
-                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
-                        </MudItem>
-                    </MudGrid>
-                </ToolBarContent>
-                <HeaderContent>
-                    <MudTh><MudTableSortLabel SortLabel="Tên lớp học" T="string">Tên lớp học</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Giáo viên quản lý" T="string">Giáo viên quản lý</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Môn Học" T="string">Môn Học</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Số lượng Học Sinh" T="string">Số lượng Học Sinh</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    @if (context.Status == Convert.ToByte(StatusType.isActive))
-                    {
-                        <MudTd DataLabel="Tên lớp học">@context.Name</MudTd>
-                        <MudTd DataLabel="Giáo viên quản lý">
-                            @if (_lstUser != null)
-                            {
-                                foreach (var item in _lstUser)
+        <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+            @if (isLoading)
+            {
+                <LoadingContext />
+            }
+            else
+            {
+                <MudTable Items="@classWithUsers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470px">
+                    <ToolBarContent>
+                        <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                            <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                          
+                                <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách lớp học</MudText>
+
+                            </MudItem>
+                            <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                                <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
+                            </MudItem>
+                        </MudGrid>
+                    </ToolBarContent>
+                    <HeaderContent>
+                        <MudTh><MudTableSortLabel SortLabel="Tên lớp học" T="string">Tên lớp học</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Giáo viên quản lý" T="string">Giáo viên quản lý</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Môn Học" T="string">Môn Học</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Số lượng Học Sinh" T="string">Số lượng Học Sinh</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                        <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        @if (context.Status == Convert.ToByte(StatusType.isActive))
+                        {
+                            <MudTd DataLabel="Tên lớp học">@context.Name</MudTd>
+                            <MudTd DataLabel="Giáo viên quản lý">
+                                @if (_lstUser != null)
                                 {
-                                    if (item.Id == context.TeacherId)
+                                    foreach (var item in _lstUser)
                                     {
-                                        @item.FullName
-                                        ;
-                                        break;
+                                        if (item.Id == context.TeacherId)
+                                        {
+                                            @item.FullName
+                                            ;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                        </MudTd>
-                        <MudTd DataLabel="Môn Học">
-                            @if (_lstSubject != null)
-                            {
-                                foreach (var item in _lstSubject)
+                            </MudTd>
+                            <MudTd DataLabel="Môn Học">
+                                @if (_lstSubject != null)
                                 {
-                                    if (item.Id == context.SubjectId)
+                                    foreach (var item in _lstSubject)
                                     {
-                                        @item.Name
-                                        ;
-                                        break;
+                                        if (item.Id == context.SubjectId)
+                                        {
+                                            @item.Name
+                                            ;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                        </MudTd>
-                        <MudTd style="cursor: pointer" DataLabel="Số lượng Học Sinh" onclick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.List, context.Id))">
-                            @context.CountUser/@context.Capacity
-                            <MudBadge Content="@context.CountConfirm" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
-                                <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Default" />
-                            </MudBadge>
-                        </MudTd>
-                        <MudTd DataLabel="Trạng thái">
-                            @if (context.Status == Convert.ToByte(StatusType.isActive))
-                            {
-                                <span>Hoạt động</span>
-                            }
-                            else
-                            {
-                                <span>Không hoạt động</span>
-                            }
-                        </MudTd>
+                            </MudTd>
+                            <MudTd style="cursor: pointer" DataLabel="Số lượng Học Sinh" onclick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.List, context.Id))">
+                                @context.CountUser/@context.Capacity
+                                <MudBadge Content="@context.CountConfirm" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
+                                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Default" />
+                                </MudBadge>
+                            </MudTd>
+                            <MudTd DataLabel="Trạng thái">
+                                @if (context.Status == Convert.ToByte(StatusType.isActive))
+                                {
+                                    <span>Hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span>Không hoạt động</span>
+                                }
+                            </MudTd>
 
-                        <MudTd DataLabel="Thao tác">
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                            <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                        </MudTd>
-                    }
+                            <MudTd DataLabel="Thao tác">
+                                <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                                <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                                <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                            </MudTd>
+                        }
 
-                </RowTemplate>
+                    </RowTemplate>
 
-                <NoRecordsContent>
-                    <MudText>Không có lớp nào</MudText>
-                </NoRecordsContent>
-                <LoadingContent>
-                    <MudText>Loading...</MudText>
-                </LoadingContent>
-                <PagerContent>
-                    <MudTablePager />
-                </PagerContent>
-            </MudTable>
-        }
+                    <NoRecordsContent>
+                        <MudText>Không có lớp nào</MudText>
+                    </NoRecordsContent>
+                    <LoadingContent>
+                        <MudText>Loading...</MudText>
+                    </LoadingContent>
+                    <PagerContent>
+                        <MudTablePager />
+                    </PagerContent>
+                </MudTable>
+            }
 
-    </div>
+        </div>
+   
+
 
 </div>
 @code {
@@ -155,6 +160,10 @@
     private string searchValue = "";
     private int countUser = 0;
     private int countConfirm = 0;
+    private List<User> user = new List<User>();
+    private int ID_Level = 0;
+    private string Name_Teacher = "";
+
 
     private List<ClassUser> _lstClassUser = new List<ClassUser>();
 
@@ -165,10 +174,32 @@
 
     private async Task LoadData(string? textSearch)
     {
-        _lstUser = await _serLec.GetAllTeacher();
-        _lstSubject = await _serSub.GetAllSub(textSearch, true);
-        classWithUsers = await _serClass.GetAllClass(textSearch, true);
-        isLoading = false;
+        //Hop chinhr sauwr 29-11
+        user = await _serUser.GetUsers();
+        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        var userId = Guid.Parse(a.Value);
+        var RoleUserView = user.Where(x => x.Id == userId).FirstOrDefault();
+        ID_Level = RoleUserView.LevelId;
+        Name_Teacher = RoleUserView.FullName;
+
+        if (ID_Level == 1 || ID_Level == 2)
+        {
+            _lstUser = await _serLec.GetAllTeacher();
+            _lstSubject = await _serSub.GetAllSub(textSearch, true);
+            classWithUsers = await _serClass.GetAllClass(textSearch, true);
+            isLoading = false;
+        }else if (ID_Level == 3)
+        {
+            _lstUser = await _serLec.GetAllTeacher();
+            _lstSubject = await _serSub.GetAllSub(textSearch, true);
+            classWithUsers = await _serClass.GetAllClass_OfTeacher(textSearch, true, userId);
+            isLoading = false;
+        }else
+        {
+            
+        }
+
+        
     }
 
    protected override async Task OnAfterRenderAsync(bool firstRender)

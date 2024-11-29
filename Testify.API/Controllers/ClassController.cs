@@ -113,5 +113,13 @@ namespace Testify.API.Controllers
             var lst = await classRepository.ScoreDistributionByClass(classId);
             return Ok(lst);
         }
+
+        //29_11hcx
+        [HttpGet("Get-Classes-OfTeacher")]
+        public async Task<ActionResult<List<ClassWithUser>>> GetAllClass_OfTeacher(string? keyword, bool isActive, Guid? teacherID)
+        {
+            var lstClass = await classRepository.GetClassWithUser_OfTeacher(keyword, isActive, teacherID);
+            return Ok(lstClass);
+        }
     }
 }

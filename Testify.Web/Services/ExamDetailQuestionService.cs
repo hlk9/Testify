@@ -57,7 +57,7 @@ namespace Testify.Web.Services
 
         public async Task<bool> AddListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
         {
-            var a = await _httpClient.PostAsJsonAsync("ExamDetailQuestion/Add-ListQuestionToExam?idExamDetail=" + idExamDetail, data);
+            var a = await _httpClient.PostAsJsonAsync("ExamDetailQuestion/AddListQuestionToExam_New?idExamDetail=" + idExamDetail, data);
             if (a.IsSuccessStatusCode)
             {
                 return true;
