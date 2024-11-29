@@ -17,10 +17,7 @@
                 <MudTextField T="int" @bind-Value="@classes.Capacity" Label="Số Lượng" ReadOnly="true" />
                 <MudTextField T="string" @bind-Value="@classes.Description" Label="Tên lớp học" ReadOnly="true" />
                 <MudTextField T="string" @bind-Value="@classes.ClassCode" Label="Tên lớp học" ReadOnly="true" />
-                <MudAutocomplete T="Guid"
-                                 @bind-Value="teacherId"
-                                 Variant="Variant.Outlined"
-                                 Label="Giáo viên quản lý"
+                <MudAutocomplete T="Guid" @bind-Value="teacherId" Variant="Variant.Outlined" Label="Giáo viên quản lý"
                                  ToStringFunc="@(e => _lstTeacher.FirstOrDefault(t => t.Id == e)?.FullName ?? "Không có giảng viên nào!")"
                                  Items="@_lstTeacher.Select(t => t.Id)"
                                  ResetValueOnEmptyText="true" />
