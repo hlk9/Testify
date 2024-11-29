@@ -356,5 +356,41 @@ namespace Testify.DAL.Reposiroties
                 }
             };
         }
+
+
+        //Là giáo viên thì chỉ hiện những lớp giáo viên này quản lí 
+        public async Task<List<ClassWithUser>> GetClassWithUser_OfTeacher(string? textSearch, bool isActive, Guid? teacherID)
+        {
+            var filteredClasses = await GetAllClass(textSearch, isActive);
+
+            var data = await (from c in _context.Classes
+                              join u in _context.Users
+                              on c.TeacherId equals u.Id into classUser
+                              from cu in classUser.DefaultIfEmpty()
+                              join s in _context.Subjects on c.SubjectId equals s.Id into classSubject
+                              from cs in classSubject.DefaultIfEmpty()
+                              where (string.IsNullOrEmpty(textSearch) ||
+                                     c.Name.ToLower().Contains(textSearch.Trim().ToLower()) ||
+                                     cu.FullName.ToLower().Contains(textSearch.Trim().ToLower())) &&
+                                     (!isActive || c.Status == 1 || c.Status == 255) 
+                                     && (c.TeacherId == teacherID)
+                              select new ClassWithUser
+                              {
+                                  Id = c.Id,
+                                  Name = c.Name,
+                                  ClassCode = c.ClassCode,
+                                  Description = c.Description,
+                                  Capacity = c.Capacity,
+                                  TeacherId = c.TeacherId,
+                                  FullName = cu.FullName,
+                                  SubjectId = c.SubjectId,
+                                  SubjectName = cs.Name,
+                                  Status = c.Status,
+                                  CountUser = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 1).Count(),
+                                  CountConfirm = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 2).Count(),
+                              }).ToListAsync();
+
+            return data;
+        }
     }
 }

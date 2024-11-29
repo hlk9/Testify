@@ -101,5 +101,14 @@ namespace Testify.Web.Services
             var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
             return response;
         }
+
+
+        //2911HCX
+        public async Task<List<ClassWithUser>> GetAllClass_OfTeacher(string? textSearch, bool isActive, Guid? teacherID)
+        {
+            var allClass = await _httpClient.GetAsync($"Class/Get-Classes-OfTeacher?KeyWord={textSearch}&isActive={isActive}&teacherID={teacherID}");
+            var response = await allClass.Content.ReadFromJsonAsync<List<ClassWithUser>>();
+            return response;
+        }
     }
 }
