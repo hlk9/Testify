@@ -12,9 +12,9 @@
                 <MudItem Class="w-100">
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudTextField T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này"></MudTextField>
+                            <MudTextField T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
-                        <MudItem xs="4">
+                        <MudItem xs="3">
                             <MudAutocomplete T="Subject"
                             @bind-Value="subjectCurrent"
                             SearchFunc="@SearchSubject"
@@ -25,7 +25,7 @@
                             ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
                             OnFocus="SubjectChanged" />
                         </MudItem>
-                        <MudItem xs="2">
+                        <MudItem xs="3">
                             <MudCheckBox @bind-Value="examAllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary"></MudCheckBox>
                         </MudItem>
                     </MudGrid>
@@ -35,16 +35,16 @@
                 <MudItem Class="w-100">
                     <MudGrid>
                         <MudItem xs="3">
-                            <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Label="Điểm tối đa"></MudTextField>
+                            <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Label="Điểm tối đa" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt"></MudTextField>
+                            <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Label="Tổng số câu"></MudTextField>
+                            <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Label="Tổng số câu" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian"></MudTextField>
+                            <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
@@ -53,10 +53,10 @@
             <MudItem Class="w-100">
                 <MudGrid>
                     <MudItem xs="6">
-                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài"></MudTextField>
+                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                 </MudGrid>
             </MudItem>

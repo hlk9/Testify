@@ -11,88 +11,41 @@
         <EditForm Model="@exam" OnInvalidSubmit="SubmitValid">
             <DataAnnotationsValidator />
 
-            <MudTextField  T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này"></MudTextField>
+            <MudTextField T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này" Variant="Variant.Outlined"></MudTextField>
 
-
-            <MudAutocomplete Class="py-4" T="Subject"
-            @bind-Value="subjectCurrent"
-            SearchFunc="@SearchSubject"
-            Variant="Variant.Outlined"
-            Label="Môn"
-            Placeholder="Chọn môn"
-            Clearable="true"
-            ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-            OnFocus="SubjectChanged" />
-
-
+            <MudAutocomplete Class="py-4" T="Subject" @bind-Value="subjectCurrent" SearchFunc="@SearchSubject" Variant="Variant.Outlined" Label="Môn" Placeholder="Chọn môn" 
+            Clearable="true" ToStringFunc="@(e=> e==null?null : $"{e.Name}")" OnFocus="SubjectChanged" />
 
             <MudGrid>
                 <MudItem xs="3">
-                    <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Label="Điểm tối đa"></MudTextField>
+                    <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Label="Điểm tối đa" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
                 <MudItem xs="3">
-                    <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt"></MudTextField>
+                    <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
                 <MudItem xs="3">
-                    <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Label="Tổng số câu"></MudTextField>
+                    <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Label="Tổng số câu" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
                 <MudItem xs="3">
-                    <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian"></MudTextField>
+                    <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian" Variant="Variant.Outlined"></MudTextField>
                 </MudItem>
             </MudGrid>
-
-
 
             <MudItem Class="w-100">
                 <MudGrid>
                     <MudItem xs="6">
-                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài"></MudTextField>
+                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
-                    <MudItem xs="4">
-                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                    <MudItem xs="3">
+                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
-                    <MudItem xs="2">
-                        <MudCheckBox @bind-Value="examAllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary"></MudCheckBox>
+                    <MudItem xs="3">
+                        <MudCheckBox @bind-Value="examAllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary" Variant="Variant.Outlined"></MudCheckBox>
                     </MudItem>
                 </MudGrid>
             </MudItem>
 
         </EditForm>
-        @*  <MudPaper Elevation="0" Class="my-4">
-            <MudText Style="font-size: 16px; font-weight: bold">Đề:</MudText>
-
-                <MudDataGrid Items="@lisDThi" Class="my-3">
-                    <Columns>
-                        <PropertyColumn Property="x => x.Code" Title="Code"></PropertyColumn>
-                        <PropertyColumn Property="x => x.Status" Title="Trạng thái đề"></PropertyColumn>
-                        <PropertyColumn Property="x => x.CreateDate" Title="Ngày tạo"></PropertyColumn>
-                        <PropertyColumn Property="x => x.CreateBy" Title="Tạo bởi"></PropertyColumn>
-                        <PropertyColumn Property="x => x.UpdateDate" Title="Ngày cập nhật"></PropertyColumn>
-                        <PropertyColumn Property="x => x.UpdateBy" Title="Cập nhật bởi"></PropertyColumn>
-                        <TemplateColumn CellClass="d-flex justify-end">
-                            <CellTemplate>
-                                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => RemoveExamDetail(context.Item.Id))" />
-                            </CellTemplate>
-                        </TemplateColumn>
-                    </Columns>
-                </MudDataGrid>
-                <MudButton Class="btn p-2 text-white my-4" Style="background-color: #29a69a" OnClick="IsShowAddExam">Thêm Đề</MudButton>
-
-                @if (isShowAddExam)
-                {
-                <MudPaper Elevation="3" Class="w-100 py-3 px-2 mt-3">
-                    <MudForm Model="@examdetail" Spacing="4">
-                            <MudTextField T="string" Style="padding: 0" Label="Code" @bind-Value="examdetail.Code"></MudTextField>
-                            <MudTextField T="string" @bind-Value="examdetail.Code"/>
-
-
-                    </MudForm>
-                    <MudButton Class="btn p-2" Color="Color.Primary" OnClick="SaveExamDetailInExam">Lưu đề</MudButton>
-                </MudPaper>
-
-                }
-
-        </MudPaper> *@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Đóng</MudButton>

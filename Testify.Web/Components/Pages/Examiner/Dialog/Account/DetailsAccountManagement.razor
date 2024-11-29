@@ -1,46 +1,75 @@
 ﻿@using Testify.DAL.Models
-<MudDialog>
-    <TitleContent>
-    <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Chi tiết tài khoản</MudText>
-    </TitleContent>
-    </TitleContent>
-    <DialogContent>
-        <MudForm Spacing="3" Model="@users">
-            <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" ReadOnly=true Variant="Variant.Outlined" />
-            <MudTextField T="DateTime" @bind-Value="@users.DateOfBirth" Label="Ngày sinh" ReadOnly=true Variant="Variant.Outlined" />
-            <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" ReadOnly=true Variant="Variant.Outlined" />
-            <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" ReadOnly=true Variant="Variant.Outlined" />
-            <MudTextField T="int" @bind-Value="@users.LevelId" Label="Level" ReadOnly=true Variant="Variant.Outlined" />
-            <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" ReadOnly=true Variant="Variant.Outlined" />
-            <MudTextField T="string" @bind-Value="@users.Email" Label="Email" ReadOnly=true Variant="Variant.Outlined" />
-            <MudRadioGroup T="bool" @bind-Value="@users.Sex" Label="Giới tính">
-                <MudRadio T="bool" Value="true">Nam</MudRadio>
-                <MudRadio T="bool" Value="false">Nữ</MudRadio>
-            </MudRadioGroup>
-        </MudForm>
-        
+@using Testify.Web.Shared
 
-    </DialogContent>
-    <DialogActions>
-        <MudButton Color="Color.Surface" OnClick="Cancel">Quay lại</MudButton>
-     
-    </DialogActions>
-</MudDialog>
+@if(isLoading)
+{
+    <LoadingContext />
+}
+else
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Chi tiết tài khoản</MudText>
+        </TitleContent>
+
+        <DialogContent>
+            <MudForm Spacing="2" Model="@users" @ref="@form">
+                <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" Variant="Variant.Outlined" ReadOnly="true" />
+                <MudDatePicker @bind-Date="@_date" DateFormat="dd/MM/yyyy" Label="Ngày sinh" Variant="Variant.Outlined" ReadOnly="true" />
+                <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" Variant="Variant.Outlined" ReadOnly="true" />
+                <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" Variant="Variant.Outlined" ReadOnly="true" />
+                <MudRadioGroup T="bool" @bind-Value="@users.Sex" ReadOnly="true">
+                    <MudRadio T="bool" Value="true">Nam</MudRadio>
+                    <MudRadio T="bool" Value="false">Nữ</MudRadio>
+                </MudRadioGroup>
+                <MudAutocomplete T="int" @bind-Value="levelId" Variant="Variant.Outlined" Label="Giáo viên quản lý"
+                                 ToStringFunc="@(e => _lstLevel.FirstOrDefault(t => t.Id == e)?.Name ?? "Không có chức vụ nào!")"
+                                 Items="@_lstLevel.Select(t => t.Id)"
+                                 ResetValueOnEmptyText="true" />
+                <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" ReadOnly="true" />
+                <MudTextField T="string" @bind-Value="@users.Email" Label="Email" Variant="Variant.Outlined" ReadOnly="true" />
+            </MudForm>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Surface" OnClick="Cancel">Quay lại</MudButton>
+
+        </DialogActions>
+    </MudDialog>
+}
+
 @code {
+    MudForm form;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
     [Parameter]
     public Guid UserId { get; set; }
-
+    private DateTime? _date = new DateTime();
     private User users { get; set; } = new();
+    private int levelId = -1;
+    private List<Level> _lstLevel = new List<Level>();
+    private bool isLoading { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
         users = await _serLec.GetLecturerById(UserId);
+        await Loaddata();
     }
 
+    private async Task Loaddata()
+    {
+        _lstLevel = await _serLevel.GetAllLevel();
+        if (users.LevelId != null)
+        {
+            levelId = users.LevelId;
+        }
+        else
+        {
+            levelId = -1;
+        }
+        _date = users.DateOfBirth;
+        isLoading = false;
+    }
 
     private void Cancel() => MudDialog.Cancel();
 }

@@ -1,17 +1,22 @@
 ﻿@inject IJSRuntime jsruntime;
 <MudDialog>
     <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tải danh sách Account</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tải danh sách tài khoản</MudText>
     </TitleContent>
     <DialogContent>
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="-1">Tất cả</MudSelectItem>
-                @foreach (var item in _lstLevel)
-                {
-                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                }
-            </MudSelect>
+            <MudPaper Class="my-3" Elevation="0">
+                <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Style="width: 100%;">
+                    @if (levelId == -1)
+                    {
+                        <MudSelectItem Value="-1">Chọn chức vụ</MudSelectItem>
+                    }
+                    @foreach (var item in _lstLevel)
+                    {
+                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudPaper>
         </MudItem>
     </DialogContent>
     <DialogActions>

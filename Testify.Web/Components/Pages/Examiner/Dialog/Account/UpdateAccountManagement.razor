@@ -1,41 +1,51 @@
 ﻿@using Testify.DAL.Models
-<MudDialog>
-    <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa tài khoản</MudText>
-    </TitleContent>
+@using Testify.Web.Shared
 
-    <DialogContent>
-    <MudForm Spacing="2" Model="@user" @ref="@form">
-        <MudTextField T="string" @bind-Value="@user.FullName" Label="Họ và tên" Variant="Variant.Outlined" />
-        <MudDatePicker @bind-Date="@_date" DateFormat="dd/MM/yyyy" Label="Ngày sinh" Variant="Variant.Outlined" />
-        <MudTextField T="string" @bind-Value="@user.PhoneNumber" Label="Số điện thoại" Variant="Variant.Outlined" />
-        <MudTextField T="string" @bind-Value="@user.Address" Label="Địa chỉ" Variant="Variant.Outlined" />
-        <MudRadioGroup T="bool" @bind-Value="@user.Sex" Label="Giới tính">
-            <MudRadio T="bool" Value="true">Nam</MudRadio>
-            <MudRadio T="bool" Value="false">Nữ</MudRadio>
-        </MudRadioGroup>
-        <MudSelect T="int" @bind-Value="levelId" Label="Chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-            @if (levelId == -1)
-            {
-                <MudSelectItem Value="-1">Không có chưcs vụ nào!</MudSelectItem>
-            }
-            else
-            {
-                @foreach (var itemName in _lstLevel)
-                {
-                    <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
-                }
-            }
-        </MudSelect>
-        <MudTextField T="string" @bind-Value="@user.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" />
-        <MudTextField T="string" @bind-Value="@user.Email" Label="Email" Variant="Variant.Outlined" />
-    </MudForm>
-</DialogContent>
-    <DialogActions>
-        <MudButton Color="Color.Surface"  OnClick="Cancel">Đóng</MudButton>
-        <MudButton Color="Color.Warning"  OnClick="Submit">Sửa</MudButton>
-    </DialogActions>
-</MudDialog>
+@if (isLoading)
+{
+    <LoadingContext />
+}
+else
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa tài khoản</MudText>
+        </TitleContent>
+
+        <DialogContent>
+            <MudForm Spacing="2" Model="@user" @ref="@form">
+                <MudTextField T="string" @bind-Value="@user.FullName" Label="Họ và tên" Variant="Variant.Outlined" />
+                <MudDatePicker @bind-Date="@_date" DateFormat="dd/MM/yyyy" Label="Ngày sinh" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@user.PhoneNumber" Label="Số điện thoại" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@user.Address" Label="Địa chỉ" Variant="Variant.Outlined" />
+                <MudRadioGroup T="bool" @bind-Value="@user.Sex" Label="Giới tính">
+                    <MudRadio T="bool" Value="true">Nam</MudRadio>
+                    <MudRadio T="bool" Value="false">Nữ</MudRadio>
+                </MudRadioGroup>
+                <MudSelect T="int" @bind-Value="levelId" Label="Chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @if (levelId == -1)
+                    {
+                        <MudSelectItem Value="-1">Không có chưcs vụ nào!</MudSelectItem>
+                    }
+                    else
+                    {
+                        @foreach (var itemName in _lstLevel)
+                        {
+                            <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+                <MudTextField T="string" @bind-Value="@user.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@user.Email" Label="Email" Variant="Variant.Outlined" />
+            </MudForm>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+            <MudButton Color="Color.Warning" OnClick="Submit">Sửa</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
 @code {
     MudForm form;
     [CascadingParameter]
@@ -53,10 +63,10 @@
     protected override async Task OnInitializedAsync()
     {
         user = await _serLec.GetLecturerById(UserId);
-        await Loaddata("");
+        await Loaddata();
     }
 
-    private async Task Loaddata(string? textSearch)
+    private async Task Loaddata()
     {
         _lstLevel = await _serLevel.GetAllLevel();
         if (user.LevelId != null)
