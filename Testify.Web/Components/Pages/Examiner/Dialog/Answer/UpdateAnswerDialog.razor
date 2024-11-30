@@ -7,7 +7,7 @@
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="4" Model="@answer" @ref="@form">
-            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" ReadOnly=@checkContentAnswer/>
+            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" ReadOnly=@checkContentAnswer Variant="Variant.Outlined" />
             <MudRadioGroup T="bool" @bind-Value="@valueIsCorrect">
                 <MudRadio Value="true">Đúng</MudRadio>
                 <MudRadio Value="false">Sai</MudRadio>

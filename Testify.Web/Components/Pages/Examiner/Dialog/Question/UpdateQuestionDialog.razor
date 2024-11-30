@@ -13,9 +13,9 @@
         else
         {
             <MudForm Spacing="5" Model="@question" @ref="@form">
-                <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" />
+                <MudTextField @bind-Value="question.Content" For="@(() => question.Content)" Style="padding: 0" T="string" Label="Tên Câu Hỏi" Variant="Variant.Outlined" />
                 <div class="d-flex justify-content-between align-items-center gap-2">
-                    <MudTextField @bind-Value="currentFileImage" Style="padding: 0" T="string" ReadOnly=true />
+                    <MudTextField @bind-Value="currentFileImage" Style="padding: 0" T="string" ReadOnly=true Variant="Variant.Outlined" />
                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Accept=".png, .jpg, .mp3">
                         <ActivatorContent>
                             <MudFab StartIcon="@Icons.Material.Filled.Image"

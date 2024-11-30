@@ -6,8 +6,8 @@
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="5" Model="@questionType" @ref="@form">
-            <MudTextField @bind-Value="questionType.Name" For="@(() => questionType.Name)" Style="padding: 0" T="string" Label="Tên Loại Câu Hỏi" />
-            <MudTextField @bind-Value="questionType.Description" For="@(() => questionType.Description)" Style="padding: 0" T="string" Label="Mô Tả" />
+            <MudTextField @bind-Value="questionType.Name" For="@(() => questionType.Name)" Style="padding: 0" T="string" Label="Tên Loại Câu Hỏi" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="questionType.Description" For="@(() => questionType.Description)" Style="padding: 0" T="string" Label="Mô Tả" Variant="Variant.Outlined" />
             <MudRadioGroup @bind-Value="StatusQuestionType">
                 <MudRadio Dense="true" Value="@(true)">Hoạt động</MudRadio>
                 <MudRadio Value="@(false)">Không hoạt động</MudRadio>
