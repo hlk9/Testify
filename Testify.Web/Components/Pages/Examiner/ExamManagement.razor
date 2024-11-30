@@ -42,10 +42,10 @@
                         <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách bài thi</MudText>
 
                     </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </MudItem>
+                    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                                  Class="mt-0" ValueChanged="OnSearchChanged" Immediate="true">
+                    </MudTextField>
                 </MudGrid>
             </ToolBarContent>
             <HeaderContent>
@@ -54,10 +54,8 @@
                 <MudTh><MudTableSortLabel SortLabel="Thời gian" T="int">Thời gian làm bài</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số câu hỏi" T="int">Số câu hỏi</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số lần làm bài" T="int">Số lần làm bài</MudTableSortLabel></MudTh>
-
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Tên bài thi">@context.ExamName </MudTd>
@@ -65,8 +63,16 @@
                 <MudTd DataLabel="Thời gian">@context.Duration </MudTd>
                 <MudTd DataLabel="Số câu hỏi">@context.NumberOfQuestion </MudTd>
                 <MudTd DataLabel="Số lần làm bài">@context.NumberOfRepeat </MudTd>
-
-                <MudTd DataLabel="Trạng thái">@context.Status </MudTd>
+                <MudTd DataLabel="Trạng thái">
+                    @if (@context.Status == 1)
+                    {
+                        <span>Công khai</span>
+                    }
+                    else
+                    {
+                        <span>Chỉ mình tôi</span>
+                    }
+                </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
                         <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
@@ -79,9 +85,7 @@
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xem đề thi">
-                        
                             <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end">Xem đề </MudButton>
-
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
@@ -104,15 +108,17 @@
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     protected override async Task OnInitializedAsync()
     {
-        //_lst = await examService.GetInforBasic();
-        _lst = (await examService.GetInforBasic()).Where(x => x.Status != 255).ToList();
-
-
+        _lst = (await examService.GetInforBasic(null)).Where(x => x.Status != 255).ToList();
     }
 
     [Inject] ISnackbar Snackbar { get; set; }
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
+    private async Task OnSearchChanged(string searchText)
+    {
+        _lst = (await examService.GetInforBasic(searchText)).Where(x => x.Status != 255).ToList();
+        StateHasChanged();
+    }
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
     {
@@ -124,8 +130,7 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            _lst = await examService.GetInforBasic(null);
         }
     }
 
@@ -139,8 +144,7 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            _lst = await examService.GetInforBasic(null);
         }
     }
 
@@ -154,8 +158,7 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            _lst = await examService.GetInforBasic(null);
         }
     }
 
@@ -168,9 +171,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                // listSchedule = await scheduleService.GetInforBasic();
-                _lst = await examService.GetInforBasic();
-
+                _lst = await examService.GetInforBasic(null);
             }
 
         }
@@ -204,7 +205,7 @@
             var result = await dialog.Result;
             if (result == null || !result.Canceled)
             {
-                _lst = await examService.GetInforBasic();
+                _lst = await examService.GetInforBasic(null);
             }
             else
             {

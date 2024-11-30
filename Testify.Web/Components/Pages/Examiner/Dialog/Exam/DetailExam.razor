@@ -48,7 +48,7 @@
                         <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả" Variant="Variant.Outlined" ReadOnly="true"></MudTextField>
                     </MudItem>
                     <MudItem xs="3">
-                        <MudCheckBox @bind-Value="exam.AllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary"></MudCheckBox>
+                        <MudCheckBox @bind-Value="exam.AllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary" ReadOnly="true"></MudCheckBox>
                     </MudItem>
                 </MudGrid>
             </MudItem>
