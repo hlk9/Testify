@@ -25,6 +25,7 @@ else
                 <MudAutocomplete T="int" @bind-Value="levelId" Variant="Variant.Outlined" Label="Giáo viên quản lý"
                                  ToStringFunc="@(e => _lstLevel.FirstOrDefault(t => t.Id == e)?.Name ?? "Không có chức vụ nào!")"
                                  Items="@_lstLevel.Select(t => t.Id)"
+                                 ReadOnly="true"
                                  ResetValueOnEmptyText="true" />
                 <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" ReadOnly="true" />
                 <MudTextField T="string" @bind-Value="@users.Email" Label="Email" Variant="Variant.Outlined" ReadOnly="true" />

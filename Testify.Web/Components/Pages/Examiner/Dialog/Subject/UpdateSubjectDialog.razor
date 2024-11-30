@@ -1,9 +1,9 @@
 ﻿@using Testify.DAL.Models
 <MudDialog>
     <TitleContent>
-    <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa môn học</MudText>
-    </TitleContent>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa môn học</MudText>
+        </TitleContent>
     </TitleContent>
     <DialogContent>
         @if (isLoading)
@@ -13,12 +13,9 @@
         else
         {
             <MudForm Model="@subject" @ref="@form" Spacing="3">
-                @* <MudTextField T="int" @bind-Value="@subject.Id" Disabled Label="Mã môn học" /> *@
-                <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" />
-                <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" />
+                <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" Variant="Variant.Outlined" />
             </MudForm>
-
-            @*   <MudTextField T="byte?" @bind-Value="@subject.Status" Label="Trạng thái"  /> *@
         }
     </DialogContent>
     <DialogActions>

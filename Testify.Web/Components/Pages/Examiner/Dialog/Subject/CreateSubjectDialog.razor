@@ -1,11 +1,10 @@
 ﻿@using Testify.DAL.Models
 
-
 <MudDialog>
     <TitleContent>
-    <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới môn học</MudText>
-    </TitleContent>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới môn học</MudText>
+        </TitleContent>
     </TitleContent>
     <DialogContent>
         @if (isLoading)
@@ -15,11 +14,8 @@
         else
         {
             <MudForm Spacing="3" Model="@subject" @ref="@form">
-
-                @* <MudTextField @bind-Value="@subject.Id" For="@(()=> subject.Id)" T="int" Label="Mã môn học" /> *@
-                <MudTextField @bind-Value="@subject.Name" For="@(()=> subject.Name)" T="string" Label="Tên môn học" />
-                <MudTextField @bind-Value="@subject.Description" For="@(()=> subject.Description)" T="string" Label="Mô tả" />
-               @*  <MudTextField @bind-Value="@subject.Status" For="@(()=> subject.Status)" T="byte?" Label="Trạng thái" /> *@
+                <MudTextField @bind-Value="@subject.Name" For="@(()=> subject.Name)" T="string" Label="Tên môn học" Variant="Variant.Outlined" />
+                <MudTextField @bind-Value="@subject.Description" For="@(()=> subject.Description)" T="string" Label="Mô tả" Variant="Variant.Outlined" />
             </MudForm>
         }
     </DialogContent>
@@ -51,7 +47,7 @@
     private async Task AddNew()
     {
         var checkValidation = ValidateForm();
-        if(!checkValidation)
+        if (!checkValidation)
         {
             subject.Status = 1;
             var check = await _serSub.CreateSub(subject);
@@ -67,7 +63,7 @@
                 snackbar.Add("Thêm thất bại", Severity.Error);
             }
         }
-        
+
     }
 
     private bool ValidateForm()

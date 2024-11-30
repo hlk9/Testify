@@ -13,13 +13,14 @@
         else
         {
             <MudForm Model="@classes" @ref="@form" Spacing="3">
-                <MudTextField T="string" @bind-Value="@classes.Name" Label="Tên lớp học" ReadOnly="true" />
-                <MudTextField T="int" @bind-Value="@classes.Capacity" Label="Số Lượng" ReadOnly="true" />
-                <MudTextField T="string" @bind-Value="@classes.Description" Label="Tên lớp học" ReadOnly="true" />
-                <MudTextField T="string" @bind-Value="@classes.ClassCode" Label="Tên lớp học" ReadOnly="true" />
+                <MudTextField T="string" @bind-Value="@classes.Name" Label="Tên lớp học" ReadOnly="true" Variant="Variant.Outlined" />
+                <MudTextField T="int" @bind-Value="@classes.Capacity" Label="Số Lượng" ReadOnly="true" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@classes.Description" Label="Tên lớp học" ReadOnly="true" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@classes.ClassCode" Label="Tên lớp học" ReadOnly="true" Variant="Variant.Outlined" />
                 <MudAutocomplete T="Guid" @bind-Value="teacherId" Variant="Variant.Outlined" Label="Giáo viên quản lý"
                                  ToStringFunc="@(e => _lstTeacher.FirstOrDefault(t => t.Id == e)?.FullName ?? "Không có giảng viên nào!")"
                                  Items="@_lstTeacher.Select(t => t.Id)"
+                                 ReadOnly="true"
                                  ResetValueOnEmptyText="true" />
                 <MudAutocomplete T="int"
                                  @bind-Value="subjectId"
@@ -27,6 +28,7 @@
                                  Label="Môn Học"
                                  ToStringFunc="@(e => _lstSubject.FirstOrDefault(t => t.Id == e)?.Name ?? "Không có môn nào!")"
                                  Items="@_lstSubject.Select(t => t.Id)"
+                                 ReadOnly="true"
                                  ResetValueOnEmptyText="true" />
             </MudForm>
         }
