@@ -171,8 +171,8 @@
     private List<IsCheckQuestion> _lstIsCheck = new List<IsCheckQuestion>();
     private List<Question> _lstQues = new List<Question>();
 
-    public HashSet<QuestionInExam> listQuestionSelected { get; set; }
-    public HashSet<QuestionInExam> listQuestionSelectedInList { get; set; }
+    public HashSet<QuestionInExam> listQuestionSelected { get; set; } = new HashSet<QuestionInExam>();
+    public HashSet<QuestionInExam> listQuestionSelectedInList { get; set; } = new HashSet<QuestionInExam>();
     public List<QuestionInExam> newListToAdd { get; set; } = new List<QuestionInExam>();
 
     private readonly DialogOptions _dialogOptions = new DialogOptions()
@@ -202,7 +202,6 @@
         else
         {
             _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOT(ExamDetailID, SubjectId);
-
         }
 
     }
@@ -223,9 +222,9 @@
 
     private async Task onChangeSearch()
     {
-
         //await LoadData(searchValue);
     }
+
     protected async override Task OnInitializedAsync()
     {
         await LoadData();
@@ -252,8 +251,10 @@
                 Snackbar.Add("Số câu hỏi thêm không được vượt quá câu hỏi của đề", Severity.Warning);
             }else
             {
+                double pointInOne = exam.MaximmumMark / (double)exam.NumberOfQuestions;
                 foreach (var item in listQuestionSelected)
                 {
+                    item.Point = pointInOne;
                     newListToAdd.Add(item);
                 }
 
@@ -264,7 +265,7 @@
                         Snackbar.Add("Thêm " + newListToAdd.Count + " câu hỏi thành công", Severity.Info);
                         newListToAdd.Clear();
                         listQuestionSelected.Clear();
-                        //listQuestionSelectedInList.Clear();
+                        listQuestionSelectedInList.Clear();
 
                         foreach (var item in listQuestionSelected)
                         {
@@ -278,15 +279,10 @@
                         Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
                         newListToAdd.Clear();
                         listQuestionSelected.Clear();
-                        //listQuestionSelectedInList.Clear();
-
+                        listQuestionSelectedInList.Clear();
                         await LoadData();
                     }
             }
-
-            
-
-
         }
 
         StateHasChanged();
@@ -302,6 +298,7 @@
         {
             try
             {
+
                 var status = await examdetailQuestionService.RemoveFromListQuestionToExam(listQuestionSelectedInList.ToList(), examDetail.Id);
                 if (status)
                 {
@@ -313,6 +310,7 @@
                 {
                     Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
                 }
+                listQuestionSelected.Clear();
                 await LoadData();
             }
             catch 

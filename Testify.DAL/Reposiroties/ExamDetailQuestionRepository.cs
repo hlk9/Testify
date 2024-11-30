@@ -69,7 +69,7 @@ namespace Testify.DAL.Reposiroties
                             CreatedDate = b.CreatedDate,
                             Status = b.Status,
                             SubjectId = b.SubjectId,
-                            //Code = e.Code,
+                            Point = a.Point,
                         }).ToList();
 
             return data;
@@ -182,7 +182,7 @@ namespace Testify.DAL.Reposiroties
             {
                 foreach (var h in data)
                 {
-                    _context.ExamDetailQuestions.Add(new ExamDetailQuestion { QuestionId = h.Id, ExamDetailId = idExamDetail });
+                    _context.ExamDetailQuestions.Add(new ExamDetailQuestion { QuestionId = h.Id, ExamDetailId = idExamDetail, Point = h.Point });
                 }
                 _context.SaveChanges();
                 return true;
