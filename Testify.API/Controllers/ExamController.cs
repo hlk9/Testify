@@ -59,7 +59,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-InfoBasic")]
-        public async Task<List<ExamWhitQusetion>> GetInfoBasic()
+        public async Task<List<ExamWhitQusetion>> GetInfoBasic(string? textSearch)
         {
             List<ExamWhitQusetion> listResult = new List<ExamWhitQusetion>();
             SubjectRepository subjectRepository = new SubjectRepository();
@@ -80,13 +80,18 @@ namespace Testify.API.Controllers
                     Duration = item.Duration,
                     NumberOfQuestion = item.NumberOfQuestions,
                     NumberOfRepeat = item.NumberOfRepeat,
-
-
                 });
             }
-            return listResult;
 
+            if (!string.IsNullOrWhiteSpace(textSearch))
+            {
+                listResult = listResult
+                    .Where(x => x.ExamName.Contains(textSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            return listResult;
         }
+
 
         [HttpGet("Get-Count-Exam-By-UserId")]
         public async Task<ActionResult<int>> GetCountExamByUserId(Guid userId)

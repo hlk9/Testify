@@ -68,9 +68,9 @@ namespace Testify.Web.Services
             return lst;
         }
 
-        public async Task<List<ExamWhitQusetion>> GetInforBasic()
+        public async Task<List<ExamWhitQusetion>> GetInforBasic(string? textSearch)
         {
-            var lst = await _httpClient.GetFromJsonAsync<List<ExamWhitQusetion>>("Exam/Get-InfoBasic");
+            var lst = await _httpClient.GetFromJsonAsync<List<ExamWhitQusetion>>($"Exam/Get-InfoBasic?textSearch={textSearch}");
             return lst;
         }
 

@@ -96,8 +96,6 @@ namespace Testify.DAL.Reposiroties
             {
                 var objUpdateExam = await _context.Exams.FindAsync(exam.Id);
 
-
-
                 objUpdateExam.Name = exam.Name;
                 objUpdateExam.AllowViewResult = exam.AllowViewResult;
                 objUpdateExam.NumberOfQuestions = exam.NumberOfQuestions;

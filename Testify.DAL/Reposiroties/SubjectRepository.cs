@@ -15,7 +15,6 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<Subject>> GetAllSubject(string? textSearch, bool isActive)
         {
-            //return await _context.Subjects.ToListAsync();
             if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == false)
             {
                 return await _context.Subjects.ToListAsync();
@@ -32,8 +31,6 @@ namespace Testify.DAL.Reposiroties
             {
                 return await _context.Subjects.Where(x => x.Name.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
             }
-
-
         }
 
         public async Task<Subject> GetSubjectById(int id)

@@ -1,4 +1,5 @@
-﻿@inject ExamService examService
+﻿@using Testify.API.DTOs
+@inject ExamService examService
 @inject ExamDetailService examDetailService
 @inject ExamDetailQuestionService examDetailQuestionService
 <MudDialog>
@@ -8,7 +9,7 @@
     </TitleContent>
     </TitleContent>
     <DialogContent>
-        <MudText>Bài thi này có @lisDThi.Count đề thi, bạn có muốn xóa bài thi này không?</MudText>
+        Bạn có chắc chắn muốn xoá bài thi <span Style="font-weight: bold"> @NameLL</span> không? [<span Style="font-weight: bold">Bài thi này có @lisDThi.Count đề thi</span>]
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
@@ -17,6 +18,7 @@
 </MudDialog>
 
 @code {
+    private List<ExamWhitQusetion> _lst = new List<ExamWhitQusetion>();
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Parameter]
@@ -24,6 +26,7 @@
     [Inject] ISnackbar Snackbar { get; set; }
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private void Cancel() => MudDialog.Cancel();
+    private string NameLL = "";
 
     private async Task DeleteExcute()
     {
@@ -48,10 +51,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //lisDThi = await examDetailService.GetExamDetailByExamId(Id);
         lisDThi = (await examDetailService.GetExamDetailByExamId(Id))
             .Where(x => x.Status != 255)
             .ToList();
-
+        _lst = await examService.GetInforBasic(null);
+        var nameL = _lst.FirstOrDefault(x => x.Id == Id);
+        NameLL = nameL.ExamName;
     }
 }
