@@ -15,7 +15,7 @@
         {
             <MudForm Spacing="5" @ref="form">
                 <MudForm Model="answer" @ref="form" Spacing="4">
-                    <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" />
+                    <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" Variant="Variant.Outlined" />
                     <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
                 </MudForm>
             </MudForm>

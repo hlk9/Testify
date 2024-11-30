@@ -71,11 +71,11 @@
                                 </MudGrid>
 
                                 <div>
-                                    <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Nội dung câu hỏi" @bind-Value="question.Content" />
+                                    <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Nội dung câu hỏi" @bind-Value="question.Content" Variant="Variant.Outlined" />
                                 </div>
 
                                 <div class="d-flex justify-content-between align-items-center gap-2">
-                                    <MudTextField @bind-Value="@nameFileImageCurrent" Style="padding: 0" T="string" ReadOnly=true />
+                                    <MudTextField @bind-Value="@nameFileImageCurrent" Style="padding: 0" T="string" ReadOnly=true Variant="Variant.Outlined"    />
                                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFileImage" Accept=".jpg, .png, .mp3">
                                         <ActivatorContent>
                                             <MudFab StartIcon="@Icons.Material.Filled.Image"
@@ -114,7 +114,7 @@
                                 {
                                     <MudPaper Elevation="3" Class="w-100 py-3 px-2 my-3">
                                         <MudForm Model="answer" @ref="form" Spacing="4">
-                                            <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" />
+                                            <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" Variant="Variant.Outlined" />
                                             <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
                                         </MudForm>
                                         <MudButton Color="Color.Primary" OnClick="SaveAnswerInQuestion">Tạo</MudButton>
@@ -145,7 +145,7 @@
                     </MudPaper>
 
                     <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
-                        <MudTextField T="string" @bind-Value="@nameFileExcelCurrent"></MudTextField>
+                        <MudTextField T="string" @bind-Value="@nameFileExcelCurrent" Variant="Variant.Outlined"/>
                         <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadFileExcel">
                             <ActivatorContent>
                                 <MudFab StartIcon="@Icons.Material.Filled.FileUpload"
@@ -283,6 +283,11 @@
         if (question.Content == null || question.Content.Trim().Length == 0)
         {
             snackbar.Add("Nội dung trống!", Severity.Error);
+            count += 1;
+        }
+        if (subjectId == -1 || subjectId == null)
+        {
+            snackbar.Add("Chưa chọn môn học!", Severity.Error);
             count += 1;
         }
         if (question.QuestionTypeId == -1 || question.QuestionTypeId == null)
@@ -431,6 +436,7 @@
                 snackbar.Add("Chưa có đáp án", Severity.Warning);
                 return;
             }
+
 
             if (lstAnswers.Count <= 1 && lstAnswers != null)
             {

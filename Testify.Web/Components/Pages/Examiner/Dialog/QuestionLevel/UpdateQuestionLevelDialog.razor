@@ -11,9 +11,9 @@
         }
         else
         {
-        <MudForm Spacing="5" Model="@questionLevel" @ref="@form">
-            <MudTextField @bind-Value="questionLevel.Name" For="@(() => questionLevel.Name)" Style="padding: 0" T="string" Label="Tên Mức Độ Câu Hỏi" />
-            <MudTextField @bind-Value="questionLevel.Description" For="@(() => questionLevel.Description)" Style="padding: 0" T="string" Label="Mô Tả" />
+        <MudForm Spacing="3" Model="@questionLevel" @ref="@form">
+                <MudTextField @bind-Value="questionLevel.Name" For="@(() => questionLevel.Name)" Style="padding: 0" T="string" Label="Tên Mức Độ Câu Hỏi" Variant="Variant.Outlined" />
+                <MudTextField @bind-Value="questionLevel.Description" For="@(() => questionLevel.Description)" Style="padding: 0" T="string" Label="Mô Tả" Variant="Variant.Outlined" />
         </MudForm>
         }
     </DialogContent>
