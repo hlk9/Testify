@@ -48,8 +48,8 @@
 
                     </MudItem>
                     <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
                     </MudItem>
                 </MudGrid>
 
@@ -90,18 +90,21 @@
     </div>
 
 
-    @code {
+@code {
     private List<QuestionLevel> _lstQuestionLevels;
     private const string V = "Không Hoạt Động";
+    private string searchValue = "";
 
-    private async Task loadData()
+    private async Task onChangeSearch() => await loadData(searchValue);
+
+    private async Task loadData(string? textSearch)
     {
-        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await loadData();
+        await loadData("");
     }
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
@@ -124,7 +127,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await loadData();
+                await loadData("");
             }
         }
         else if (name.Equals("update"))
@@ -133,7 +136,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await loadData();
+                await loadData("");
             }
         }
         else
@@ -142,7 +145,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                await loadData();
+                await loadData("");
             }
         }
 

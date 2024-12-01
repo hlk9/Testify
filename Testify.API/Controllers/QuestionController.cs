@@ -85,9 +85,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Export-Excel-Template-Question")]
-        public async Task<ActionResult> ExportExcel()
+        public async Task<ActionResult> ExportExcel(string? textSearch)
         {
-            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
+            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels(textSearch);
             var lstQuestionType = await _repoQuestionType.GetAllTypes();
 
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
@@ -312,7 +312,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpPost("Import-Excel-Question")]
-        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int subjectId)
+        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int subjectId, string? textSearch)
         {
             if (file == null || file.Length == 0)
             {
@@ -326,7 +326,7 @@ namespace Testify.API.Controllers
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             var package = new ExcelPackage(stream);
 
-            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
+            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels(textSearch);
             var lstQuestionType = await _repoQuestionType.GetAllTypes();
             var lstQuestion = await _repoQuestion.GetAllQuestions("", true);
 

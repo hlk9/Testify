@@ -11,10 +11,11 @@ namespace Testify.Web.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<QuestionLevel>> GetAllQuestionLevels()
+        public async Task<List<QuestionLevel>> GetAllQuestionLevels(string? textSearch)
         {
-            return await _httpClient.GetFromJsonAsync<List<QuestionLevel>>("QuestionLevel/Get-All-Question-Level");
+            return await _httpClient.GetFromJsonAsync<List<QuestionLevel>>($"QuestionLevel/Get-All-Question-Level?KeyWord={textSearch}");
         }
+
 
         public async Task<QuestionLevel> GetQuestionLevelById(int id)
         {

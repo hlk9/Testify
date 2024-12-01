@@ -18,83 +18,6 @@
     <DialogContent>
         <MudTextField Class="w-100 mb-3" T="string" @bind-Value="@examDetail.Code" Placeholder="Nhập tên đề thi" Label="Tên đề thi" />
 
-        @* <MudGrid>
-        <MudItem xl="5" md="6" xs="12">
-        <MudTable Elevation="0" Items="@_lstQuestion" T="QuestionInExam" Class="w-100" Dense="true" FixedHeader="true" FixedFooter="true" HorizontalScrollbar="true" Height="450px"
-        OnRowClick="@RowQuestionClick">
-        <ToolBarContent>
-        <MudSelect Class="w-100" T="int" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Value="@questionLevelId" ValueChanged="@OnQuestionLevelChanged" >
-        <MudSelectItem Value="-1">Chọn mức độ câu hỏi</MudSelectItem>
-        @foreach (var itemLevel in _lstQuestionLevel)
-        {
-        <MudSelectItem Value="@itemLevel.Id">@itemLevel.Name</MudSelectItem>
-        }
-        </MudSelect>
-        </ToolBarContent>
-        <HeaderContent>
-        <MudTh></MudTh>
-        <MudTh hidden>Id</MudTh>
-        <MudTh>Nội dung</MudTh>
-        <MudTh>Mức độ</MudTh>
-        </HeaderContent>
-        <RowTemplate >
-        <MudTd>
-        <MudCheckBox Disabled="true" T="bool" @bind-Value="context.IsChoosen"/>
-        </MudTd>
-        <MudTd DataLabel="Id" hidden>@context.Id</MudTd>
-        <MudTd DataLabel="Nội dung">@context.Content</MudTd>
-        <MudTd DataLabel="Mức độ">
-        @if (context.QuestionLevelId == null)
-        {
-        <MudText Style="font-size: 14px">Không có</MudText>
-        }
-        else
-        {
-        foreach (var item in _lstQuestionLevel)
-        {
-        if (item.Id == context.QuestionLevelId)
-        {
-        @item.Name
-        ;
-        break;
-        }
-        }
-        }
-        </MudTd>
-        </RowTemplate>
-        </MudTable>
-        </MudItem>
-        <MudItem xl="7" md="6" xs="12">
-        <MudPaper Elevation="0" Style="width: 100%; height: 450px; overflow: auto">
-        <MudText>Danh sách câu hỏi đã chọn: @_lstChoice.Count</MudText>
-        @foreach (var item in _lstChoice)
-        {
-        stt = 1;
-        <MudPaper Elevation="0" Class="w-100 mb-5">
-        <MudPaper Elevation="4" Class="bg-transparent w-100">
-        <MudText Class="fw-bold text-white p-4 rounded-top rounded-3" Style="background-color: #29a69a;"><b>Câu @(stt++):</b> @item.Content</MudText>
-        <MudGrid Class="pb-4 m-0 w-100">
-        @for (int i = 0; i < _lstAnswer.Count; i++)
-        {
-        if (item.Id == _lstAnswer[i].QuestionId)
-        {
-        var content = _lstAnswer[i].Content;
-        <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
-        <MudButton Class="py-3 w-100 text-truncate text-wrap h-100"
-        Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)">
-        <MudText Class="text-start w-100">@content</MudText>
-        </MudButton>
-        </MudItem>
-        }
-        }
-        </MudGrid>
-        </MudPaper>
-        </MudPaper>
-        }
-        </MudPaper>
-        </MudItem>
-        </MudGrid> *@
-
         <MudGrid Class="align-items-center">
             <MudItem xl="5" lg="5" md="4" xs="12">
                 <MudSelect Class="w-100" T="int" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Value="@questionLevelId" ValueChanged="@OnQuestionLevelChanged">
@@ -205,13 +128,13 @@
     private async void OnQuestionLevelChanged(int newValue)
     {
         questionLevelId = newValue;
-        await LoadData();
+        await LoadData("");
         StateHasChanged();
     }
 
-    private async Task LoadData()
+    private async Task LoadData(string? textSearch)
     {
-        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
         _lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
         exam = await _serExam.GetExamId(ExamID);
         if (questionLevelId > -1)
@@ -381,7 +304,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData("");
     }
 
     private class IsCheckQuestion

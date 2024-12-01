@@ -183,15 +183,15 @@
     {
         questionLevelId = newValue;
         newListToAdd.Clear();
-        await LoadData();
+        await LoadData("");
         StateHasChanged();
     }
 
-    private async Task LoadData()
+    private async Task LoadData(string? textSearch)
     {
         exam = await _serExam.GetExamId(ExamID);
         _lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
-        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
         examDetail = await examdetailService.GetExamDetailById(ExamDetailID);
         _lstChoice = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync(ExamDetailID);
 
@@ -227,7 +227,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData("");
     }
 
     private class IsCheckQuestion
@@ -237,7 +237,6 @@
         public bool IsChecked { get; set; }
     }
 
-    ///=========================================================
     private async Task AddQuestionToRight()
     {
         if (listQuestionSelected == null || listQuestionSelected.Count == 0)
@@ -271,7 +270,7 @@
                         {
                             _lstChoice.Remove(item);
                         }
-                        await LoadData();
+                        await LoadData("");
                         return;
                     }
                     else
@@ -280,7 +279,7 @@
                         newListToAdd.Clear();
                         listQuestionSelected.Clear();
                         listQuestionSelectedInList.Clear();
-                        await LoadData();
+                        await LoadData("");
                     }
             }
         }
@@ -311,7 +310,7 @@
                     Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
                 }
                 listQuestionSelected.Clear();
-                await LoadData();
+                await LoadData("");
             }
             catch 
             {
