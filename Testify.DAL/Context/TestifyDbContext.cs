@@ -12,6 +12,7 @@ namespace Testify.DAL.Context
 
         public TestifyDbContext(DbContextOptions options) : base(options)
         {
+
         }
 
 
@@ -22,7 +23,6 @@ namespace Testify.DAL.Context
 
         public DbSet<Answer> Answers { get; set; }
         public DbSet<AnswerSubmission> AnswerSubmissions { get; set; }
-        //public DbSet<Organization> Organizations { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionAnswer> QuestionAnswers { get; set; }
         public DbSet<QuestionLevel> QuestionLevels { get; set; }
@@ -57,8 +57,14 @@ namespace Testify.DAL.Context
             modelBuilder.Entity<Class>()
                 .HasIndex(c => c.ClassCode).IsUnique();
 
-            modelBuilder.Entity<Organization>()
-                .HasIndex(c => c.OrganizationCode).IsUnique();
+            modelBuilder.Entity<User>()
+             .HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<User>()
+           .HasIndex(u => u.PhoneNumber).IsUnique();
+
+            modelBuilder.Entity<User>()
+          .HasIndex(u => u.UserName).IsUnique();
 
             modelBuilder.Entity<Submission>()
             .HasOne(s => s.User)
