@@ -185,7 +185,7 @@
     protected override async Task OnInitializedAsync()
     {
         _lstSubjects = await _serSub.GetAllSub(null, true);
-        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels(searchValue);
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
         await LoadData("");
     }

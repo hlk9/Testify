@@ -29,9 +29,11 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
+    private string searchValue = "";
+
     protected override async Task OnInitializedAsync()
     {
-        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels(searchValue);
     }
 
     private async void Submit()

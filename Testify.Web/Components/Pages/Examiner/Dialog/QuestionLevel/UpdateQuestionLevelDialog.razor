@@ -39,9 +39,11 @@
 
     private List<QuestionLevel> _lstQuestionLevel = new List<QuestionLevel>();
 
+    private string searchValue = "";
+
     protected override async Task OnInitializedAsync()
     {
-        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels(searchValue);
         if (QuestionLevelId != null)
         {
             questionLevel = await _serQuestionLevel.GetQuestionLevelById(QuestionLevelId);

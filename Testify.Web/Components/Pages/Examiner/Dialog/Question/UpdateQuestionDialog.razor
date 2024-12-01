@@ -68,9 +68,9 @@
     private string[] allowFileUpload = { ".jpg", ".png", ".mp3" };
 
 
-    private async Task LoadData()
+    private async Task LoadData(string? textSearch)
     {
-        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
 
         _lstSubjects = await _serSub.GetAllSub(null, true);
 
@@ -85,7 +85,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData("");
     }
 
     private bool ValidationForm()

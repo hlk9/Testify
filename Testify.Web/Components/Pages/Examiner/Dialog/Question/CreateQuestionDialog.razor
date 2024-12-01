@@ -208,9 +208,9 @@
     private IDialogService _mudDialogServices { get; set; }
     MudForm form;
 
-    private async Task LoadData()
+    private async Task LoadData(string? textSearch)
     {
-        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
 
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
 
@@ -223,7 +223,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData("");
     }
 
     private void changeValueType()

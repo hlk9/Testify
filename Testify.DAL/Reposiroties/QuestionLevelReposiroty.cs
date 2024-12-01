@@ -13,10 +13,13 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public async Task<List<QuestionLevel>> GetAllLevels()
+        public async Task<List<QuestionLevel>> GetAllLevels(string? textSearch)
         {
-            return await _context.QuestionLevels.ToListAsync();
+            return await _context.QuestionLevels
+                .Where(x => string.IsNullOrEmpty(textSearch) || x.Name.ToLower().Contains(textSearch.Trim().ToLower()))
+                .ToListAsync();
         }
+
 
         public async Task<QuestionLevel> GetLevelById(int id)
         {
