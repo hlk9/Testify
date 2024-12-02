@@ -41,6 +41,12 @@ namespace Testify.API.Controllers
             return await _repo.CheckNumberOfSubmit(userId, examscheduleId);
         }
 
+        [HttpGet("Get-SubmitHistory")]
+        public async Task<List<Submission>> GetHistory(Guid userId, int examscheduleId)
+        {
+            return await _repo.GetHistory(userId, examscheduleId);
+        }
+
         [HttpGet("Submitted-By-User")]
         public async Task<ActionResult<List<SubmittedByUser>>> GetSubmittedByUser(Guid userId)
         {
