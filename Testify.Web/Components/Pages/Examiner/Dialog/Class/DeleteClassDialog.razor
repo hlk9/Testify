@@ -31,16 +31,25 @@
 
     private async Task Submit()
     {
-        var check = await _serClass.UpdateStatus(ClassId, Convert.ToByte(StatusType.unActive));
-        if(check != null)
+        var check = await _serClass.DeleteClass(ClassId);
+        
+        if (check.Success)
         {
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Vô hiệu hoá thành công", Severity.Success);
+            snackbar.Add("Xóa hóa thành công", Severity.Success);
+
         }
         else
         {
+            if (check.ErrorCode == "PERMISSION_DENIED")
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Không thể xóa", Severity.Warning);
+                return;
+            }
+
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Vô hiệu hoá thất bại", Severity.Error);
+            snackbar.Add("Xóa không thành công", Severity.Error);
         }
     }
 

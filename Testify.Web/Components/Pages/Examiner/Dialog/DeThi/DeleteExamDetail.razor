@@ -2,9 +2,7 @@
 @inject ExamDetailQuestionService examDetailQuestionService
 <MudDialog>
     <TitleContent>
-    <TitleContent>
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa đề thi</MudText>
-    </TitleContent>
     </TitleContent>
     <DialogContent>
         <MudText>Bạn có muốn xóa đề thi này không?</MudText>
@@ -29,16 +27,25 @@
 
     private async Task DeleteExcute()
     {
-        //bool stats = await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(IdExamDetail);
-        bool stats_1 = await examDetailService.DeleteExamDetail(IdExamDetail);
-        if ( stats_1)
+        var stats = await examDetailService.DeleteExamDetail(IdExamDetail);
+       
+        if (stats.Success)
         {
-            Snackbar.Add("Xoá thành công!", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa hóa thành công", Severity.Success);
+
         }
         else
         {
-            Snackbar.Add("Xoá thất bại", Severity.Error);
+            if (stats.ErrorCode == "PERMISSION_DENIED")
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Không thể xóa", Severity.Warning);
+                return;
+            }
+
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa không thành công", Severity.Error);
         }
     }
 }

@@ -66,10 +66,20 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("Delete-Class")]
-        public async Task<ActionResult<Class>> DeleteClass(int id)
+        public async Task<ActionResult> DeleteClass(int id)
         {
             var deleteClass = await classRepository.DeleteClass(id);
-            return Ok(deleteClass);
+
+            if (deleteClass.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteClass.ErrorCode,
+                Message = deleteClass.Message
+            });
         }
 
         [HttpPut("Update-Class")]

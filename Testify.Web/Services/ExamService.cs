@@ -53,14 +53,22 @@ namespace Testify.Web.Services
             }
         }
 
-        public async Task<bool> DeleteExam(int id)
+        public async Task<ErrorResponse> DeleteExam(int id)
         {
             var status = await _httpClient.PutAsync($"Exam/Delete-Exam?id={id}", null);
+
             if (status.IsSuccessStatusCode)
             {
-                return true;
+                return new ErrorResponse { Success = true };
             }
-            return false;
+
+            var error = await status.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
         }
         public async Task<List<Exam>> GetListOfSubject(int id)
         {

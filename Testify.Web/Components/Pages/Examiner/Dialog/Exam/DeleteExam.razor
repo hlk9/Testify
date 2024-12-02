@@ -4,12 +4,10 @@
 @inject ExamDetailQuestionService examDetailQuestionService
 <MudDialog>
     <TitleContent>
-    <TitleContent>
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa bài thi</MudText>
     </TitleContent>
-    </TitleContent>
     <DialogContent>
-        Bạn có chắc chắn muốn xoá bài thi <span Style="font-weight: bold"> @NameLL</span> không? [<span Style="font-weight: bold">Bài thi này có @lisDThi.Count đề thi</span>]
+        Bạn có chắc chắn muốn xoá bài thi <span Style="font-weight: bold"> @NameLL</span> không?
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
@@ -30,22 +28,25 @@
 
     private async Task DeleteExcute()
     {
-        lisDThi = await examDetailService.GetExamDetailByExamId(Id);
-        foreach (var item in lisDThi)
-        {
-            //await examDetailQuestionService.DeleteExamDetailQuestionsByExamDetailId(item.Id);
+        var stats = await examService.DeleteExam(Id);
 
-            await examDetailService.DeleteExamDetail(item.Id);
-        }
-        bool stats = await examService.DeleteExam(Id);
-        if (stats)
+        if (stats.Success)
         {
-            Snackbar.Add("Xoá thành công!", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa hóa thành công", Severity.Success);
+
         }
         else
         {
-            Snackbar.Add("Xoá thất bại", Severity.Error);
+            if (stats.ErrorCode == "PERMISSION_DENIED")
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Không thể xóa", Severity.Warning);
+                return;
+            }
+
+            MudDialog.Close(DialogResult.Ok(true));
+            snackbar.Add("Xóa không thành công", Severity.Error);
         }
     }
 

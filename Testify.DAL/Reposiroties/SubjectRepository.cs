@@ -73,20 +73,29 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<Subject> DeleteSubject(int id)
+        public async Task<ErrorResponse> DeleteSubject(int id)
         {
             try
             {
                 var deleteSubject = _context.Subjects.Find(id);
 
-                var objSubject = _context.Subjects.Remove(deleteSubject).Entity;
-                await _context.SaveChangesAsync();
-                return objSubject;
-            }
-            catch (Exception)
-            {
+                var isExam = await _context.Exams.AnyAsync(x => x.SubjectId == id);
+                var isExamSchedule = await _context.ExamSchedules.AnyAsync(x => x.SubjectId == id);
+                var isClass = await _context.Classes.AnyAsync(x => x.SubjectId == id);
+                var isQuestion = await _context.Questions.AnyAsync(x => x.SubjectId == id);
 
-                return null;
+                if (isExam || isExamSchedule || isClass || isQuestion)
+                {
+                    return new ErrorResponse { Success = false, ErrorCode = "PERMISSION_DENIED", Message = "permission_denied" };
+                }
+                deleteSubject.Status = 255;
+                var objSubject = _context.Subjects.Update(deleteSubject);
+                await _context.SaveChangesAsync();
+                return new ErrorResponse { Success = true };
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
 

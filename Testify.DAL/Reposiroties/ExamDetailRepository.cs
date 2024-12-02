@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -41,24 +42,35 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<ExamDetail> DeleteExamDetail(int id)
+        public async Task<ErrorResponse> DeleteExamDetail(int id)
         {
             try
             {
+                var isNotDel = await (from exd in _context.ExamDetails
+                                  join e in _context.Exams on exd.ExamId equals e.Id
+                                  join es in _context.ExamSchedules on e.Id equals es.ExamId
+                                  where (exd.Id == id && 
+                                  (
+                                  (es.StartTime < DateTime.Now && es.EndTime > DateTime.Now) ||
+                                  es.StartTime > DateTime.Now
+                                  )
+                                  ) select exd).AnyAsync();
+
                 var objDelete = await _context.ExamDetails.FindAsync(id);
-                if (objDelete == null)
+
+                if (isNotDel)
                 {
-                    return null;
+                    return new ErrorResponse { Success = false, ErrorCode = "PERMISSION_DENIED", Message = "permission_denied" };
                 }
 
                 objDelete.Status = 255;
                 _context.ExamDetails.Update(objDelete);
                 await _context.SaveChangesAsync();
-                return objDelete;
+                return new ErrorResponse { Success = true };
             }
-            catch
+            catch (Exception ex) 
             {
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
 

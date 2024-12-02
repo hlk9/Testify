@@ -135,20 +135,20 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<User> DeleteLecturer(Guid id)
+        public async Task<ErrorResponse> DeleteLecturer(Guid id)
         {
             try
             {
                 var objLecturer = await _context.Users.FindAsync(id);
 
-                _context.Users.Remove(objLecturer);
+                objLecturer.Status = 255;
+                _context.Users.Update(objLecturer);
                 await _context.SaveChangesAsync();
-                return objLecturer;
+                return new ErrorResponse { Success = true };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
 
