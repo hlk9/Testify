@@ -1,4 +1,5 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -36,16 +37,21 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<bool> DeleteExamDetail(int id)
+        public async Task<ErrorResponse> DeleteExamDetail(int id)
         {
-            var response = await _httpClient.PutAsync($"ExamDetail/Delete-ExamDetail?id={id}", null);
+            var response = await _httpClient.DeleteAsync($"ExamDetail/Delete-ExamDetail?id={id}");
+
             if (response.IsSuccessStatusCode)
             {
-                return true;
+                return new ErrorResponse { Success = true };
             }
-            else
+
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
             {
-                return false;
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
             };
         }
 

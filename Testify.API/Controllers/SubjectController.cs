@@ -44,10 +44,20 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("delete-subject")]
-        public async Task<ActionResult<Subject>> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var deleteSubject = await _repo.DeleteSubject(id);
-            return Ok(deleteSubject);
+
+            if (deleteSubject.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteSubject.ErrorCode,
+                Message = deleteSubject.Message
+            });
         }
 
         [HttpGet("Get-Count-By-UserId")]

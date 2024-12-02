@@ -205,19 +205,36 @@ namespace Testify.DAL.Reposiroties
                 return null;
             }
         }
-        public async Task<Class> DeleteClass(int id)
+        public async Task<ErrorResponse> DeleteClass(int id)
         {
             try
             {
                 var objDeleteClass = await _context.Classes.FindAsync(id);
 
-                _context.Classes.Remove(objDeleteClass);
+                var hasExam = await _context.ClassExamSchedules.AnyAsync(x => x.ClassId == id);
+
+                if(hasExam)
+                {
+                    return new ErrorResponse { Success = false, ErrorCode = "PERMISSION_DENIED", Message = "permission_denied" };
+                }
+
+                objDeleteClass.Status = 255;
+                _context.Classes.Update(objDeleteClass);
+
+                var lstUserInClass = await _context.ClassUsers.Where(x => x.ClassId == id).ToListAsync();
+
+                foreach (var item in lstUserInClass)
+                {
+                    item.Status = 255;
+                    _context.ClassUsers.Update(item);
+                }
+
                 await _context.SaveChangesAsync();
-                return objDeleteClass;
+                return new ErrorResponse { Success = true };
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
         public async Task<Class> UpdateStatusClass(int classId, byte status)

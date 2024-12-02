@@ -120,11 +120,22 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<Question> DeleteQuestion(int id)
+        public async Task<ErrorResponse> DeleteQuestion(int id)
         {
             var deleteQuestion = await _httpClient.DeleteAsync($"Question/Delete-Question?id={id}");
-            var reponse = await deleteQuestion.Content.ReadFromJsonAsync<Question>();
-            return reponse;
+
+            if (deleteQuestion.IsSuccessStatusCode)
+            {
+                return new ErrorResponse { Success = true };
+            }
+
+            var error = await deleteQuestion.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
         }
 
         public async Task<AnswerAndQuestion> GetTrueAnswerOfQuesiton(int questionId, int examdetailId)

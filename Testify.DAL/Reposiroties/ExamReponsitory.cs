@@ -117,20 +117,37 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<Exam> DeleteExam(int id)
+        public async Task<ErrorResponse> DeleteExam(int id)
         {
             try
             {
                 var objDeleteExam = await _context.Exams.FindAsync(id);
+
+                var hasExamSchedule = await _context.ExamSchedules.AnyAsync(x => x.ExamId == id);
+
+                if(hasExamSchedule)
+                {
+                    return new ErrorResponse { Success = false, ErrorCode = "PERMISSION_DENIED", Message = "permission_denied" };
+                }    
+
                 objDeleteExam.Status = 255;
 
                 _context.Exams.Update(objDeleteExam);
+
+                var lstExamDetail = await _context.ExamDetails.Where(x => x.ExamId == id).ToListAsync();
+
+                foreach (var item in lstExamDetail)
+                {
+                    item.Status = 255;
+                    _context.ExamDetails.Update(item);
+                }
+
                 await _context.SaveChangesAsync();
-                return objDeleteExam;
+                return new ErrorResponse { Success = true };
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
 

@@ -28,15 +28,17 @@
     private async Task Submit()
     {
         var check = await _serLec.DeleteLecturer(UserId);
-        if(check == true)
+       
+        if (check.Success)
         {
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thành công", Severity.Success);
+            snackbar.Add("Xóa hóa thành công", Severity.Success);
+
         }
         else
         {
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thất bại", Severity.Error);
+            snackbar.Add("Xóa không thành công", Severity.Error);
         }
     }
 

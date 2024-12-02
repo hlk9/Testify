@@ -1,9 +1,9 @@
 ﻿@using Testify.DAL.Models
 <MudDialog>
     <TitleContent>
-    <TitleContent>
-        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa môn học</MudText>
-    </TitleContent>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa môn học</MudText>
+        </TitleContent>
     </TitleContent>
     <DialogContent>
         <MudText>Bạn có chắc chắn muốn xóa môn <span Style="font-weight: bold"> @subject?.Name</span> không?</MudText>
@@ -32,7 +32,7 @@
     private async Task Delete()
     {
         var check = await _serSub.DeleteSub(idSubject);
-        if(check == true)
+        if (check.Success)
         {
             MudDialog.Close(DialogResult.Ok(true));
             snackbar.Add("Xóa hóa thành công", Severity.Success);
@@ -40,8 +40,15 @@
         }
         else
         {
+            if (check.ErrorCode == "PERMISSION_DENIED")
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Không thể xóa", Severity.Warning);
+                return;
+            }
+
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thất bại", Severity.Error);
+            snackbar.Add("Xóa không thành công", Severity.Error);
         }
     }
 

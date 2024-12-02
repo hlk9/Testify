@@ -44,14 +44,22 @@ namespace Testify.Web.Services
             return false;
         }
 
-        public async Task<bool> DeleteSub(int id)
+        public async Task<ErrorResponse> DeleteSub(int id)
         {
             var status = await _httpClient.DeleteAsync($"Subject/delete-subject?id={id}");
+
             if (status.IsSuccessStatusCode)
             {
-                return true;
+                return new ErrorResponse { Success = true };
             }
-            return false;
+
+            var error = await status.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
         }
 
         public async Task<int> GetCountByUserId(Guid userId)

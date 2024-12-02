@@ -96,10 +96,20 @@ namespace Testify.API.Controllers
 
 
         [HttpDelete("Delete-Lecturer")]
-        public async Task<ActionResult<User>> Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             var deleteLecturer = await _repo.DeleteLecturer(id);
-            return Ok(deleteLecturer);
+
+            if (deleteLecturer.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteLecturer.ErrorCode,
+                Message = deleteLecturer.Message
+            });
         }
 
 
