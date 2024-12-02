@@ -9,7 +9,7 @@
 
 
 
-<div style="font-family:Roboto; padding:20px; height: calc(100vh - 64px); background-color:#fafafa">
+<div style="font-family:Roboto; padding:30px; height: calc(100svh - 64px); background-color:#fafafa">
 
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TẠO ĐỀ THI</MudText>
@@ -35,7 +35,7 @@
 
     @if (ExamID > 0 && lisDThi.Count > 0 )
     {
-        <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="450px">
+        <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 467px)">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -44,8 +44,7 @@
 
                     </MudItem>
                     <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        
                     </MudItem>
                 </MudGrid>
             </ToolBarContent>
