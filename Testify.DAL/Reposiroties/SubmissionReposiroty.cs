@@ -40,6 +40,12 @@ namespace Testify.DAL.Reposiroties
 
 
         }
+
+        public async Task <List<Submission>>GetHistory(Guid userId,int examscheduleId)
+        {
+            var data = await _context.Submissions.Where(x => x.UserId == userId && x.ExamScheduleId == examscheduleId).ToListAsync();
+            return data;
+        }
         public async Task<int> CheckNumberOfSubmit(Guid userId, int examscheduleId)
         {
             try
