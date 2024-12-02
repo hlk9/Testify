@@ -57,5 +57,12 @@ namespace Testify.Web.Services
             var response = await lst.Content.ReadFromJsonAsync<List<Achievenment>>();
             return response;
         }
+
+        public async Task<List<Submission>> GetHistory(Guid userId, int examscheduleId)
+        {
+            var lst = await _httpClient.GetAsync($"submission/Get-SubmitHistory?userId={userId}&examscheduleId={examscheduleId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<Submission>>();
+            return response;
+        }
     }
 }
