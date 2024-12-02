@@ -16,6 +16,8 @@ namespace Testify.DAL.Models
         public int ExamId { get; set; }
         [ForeignKey("ExamDetailId")]
         public int? ExamDetailId { get; set; }
+        [ForeignKey("ExamScheduleId")]
+        public int? ExamScheduleId { get; set; }
         [ForeignKey("UserId")]
         public Guid UserId { get; set; }
         public DateTime ActionTime { get; set; }

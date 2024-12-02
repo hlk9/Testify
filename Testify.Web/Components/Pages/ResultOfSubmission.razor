@@ -251,7 +251,41 @@ else
                                     </div>
                                 </MudTabPanel>
                                 <MudTabPanel Text="Lịch sử" class="shadow-none">
-                                    <MudText>Content Two</MudText>
+                                    @if (lstHistory.Count>=2)
+                                    {
+                                        <table class="table table-hover">
+                                            <thead class="bg-light" style="position: sticky;top: 0">
+                                                <tr>
+                                                    <th scope="col">Lần</th>
+                                                    <th scope="col">Thời gian</th>
+                                                    <th scope="col">Điểm</th>
+                                                    <th scope="col">Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @for (int i = 0; i < lstHistory.Count; i++)
+                                                {
+                                                    <tr>
+                                                        <td>@(i + 1)</td>
+                                                        <td>@lstHistory[i].SubmitTime</td>
+                                                        <td>@lstHistory[i].TotalMark</td>
+                                                        <td>
+                                                            <MudButton class="btn btn-primary btn-outline" OnClick="() => ClickView(lstHistory[i-1].Id)">Xem</MudButton>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                              
+
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            Không có lịch sử
+                                        </div>
+                                    }
                                 </MudTabPanel>
                             </MudTabs>
                         </div>
@@ -305,6 +339,8 @@ else
     private Exam currentExam = new Exam();
     Color Color = Color.Success;
     private Submission eDetail = new Submission();
+
+    private List<Submission> lstHistory = new List<Submission>();
     private void OnScroll(ScrollEventArgs e)
     {
         Color = (e.FirstChildBoundingClientRect.Top * -1) switch
@@ -334,10 +370,17 @@ else
                 return;
 
             }
+           
+
+
             await LoadExam();
             StateHasChanged();
         }
 
+    }
+    private void ClickView(int id)
+    {
+        navigation.NavigateTo("/result-of-submission/" + id, forceLoad: true);
     }
 
     private async Task<bool> CheckingToken()
@@ -358,8 +401,14 @@ else
             }
             else if (modelLogin.LevelId != 1 || modelLogin.LevelId != 2)
             {
-                var eDetail = await _serSubmission.GetById(Id);
-
+                _userId = Guid.Parse(modelLogin.Id.ToString());
+                eDetail = await _serSubmission.GetById(Id);
+                if (eDetail == null)
+                {
+                    await JS.InvokeVoidAsync("alert", "Không tìm thấy bài thi");
+                    navigation.NavigateTo("/");
+                    return false;
+                }
                 if (modelLogin.LevelId == 3)
                 {
                     List<ClassUser> listClassOfStudent = await _serClassUser.GetAllClassByUserId(eDetail.UserId);
@@ -396,7 +445,9 @@ else
 
     private async Task LoadExam()
     {
+       
 
+      
         Random rad = new Random();
         snackbar.Add("Loading..." + Id, Severity.Normal);
         eDetail = await _serSubmission.GetById(Id);
@@ -405,6 +456,7 @@ else
         string idSubmit = eDetail.ExamDetailId.ToString();
         var idExamDetailLocalStorage = idSubmit;
         var testList = await FillHistory();
+        lstHistory = await _serSubmission.GetHistory(_userId, eDetail.ExamScheduleId);
         if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null)
         {
             var lstQAndASelect = new List<QuestionAndAnswerChoosen>();

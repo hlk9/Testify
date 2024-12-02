@@ -66,11 +66,11 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public List<ExamActivityLog> GetAllByUserIdAndExamId( Guid uId, int examId)
+        public List<ExamActivityLog> GetAllByUserIdAndExamIdSheduleId( Guid uId, int examId, int examScheduleId)
         {
             try
             {
-                return _context.ExamActivityLogs.Where(x => x.ExamId == examId&&x.UserId == uId).OrderByDescending(x => x.ActionTime).ToList();
+                return _context.ExamActivityLogs.Where(x => x.ExamId == examId&&x.UserId == uId && x.ExamScheduleId == examScheduleId).OrderByDescending(x => x.ActionTime).ToList();
             }
             catch
             {

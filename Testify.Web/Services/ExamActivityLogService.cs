@@ -21,9 +21,9 @@ namespace Testify.Web.Services
             return await httpClient.GetFromJsonAsync<List<ExamActivityLog>>("ExamActivityLog/GetAllByExamId?id=" + id);
         }
 
-        public async Task<List<ExamActivityLog>> GetAllByUserAndExamId(Guid uId, int eId)
+        public async Task<List<ExamActivityLog>> GetAllByUserAndExamIdAndScheduleId(Guid uId, int eId,int examScheduleId)
         {
-            return await httpClient.GetFromJsonAsync<List<ExamActivityLog>>("ExamActivityLog/GetAllByUidAndEid?Uid=" + uId + "&Eid=" + eId);
+            return await httpClient.GetFromJsonAsync<List<ExamActivityLog>>("ExamActivityLog/GetAllByUidAndEid?Uid=" + uId + "&Eid=" + eId+ "&examScheduleId="+examScheduleId);
         }
 
         public async Task<bool> Create(ExamActivityLog log)

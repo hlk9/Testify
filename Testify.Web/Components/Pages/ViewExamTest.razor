@@ -239,16 +239,18 @@ else
     {
         Random rad = new Random();
         var idExamDetailLocalStorage = await localStorage.GetItemAsync<string>("IdExamDetail");
+        var idExamSchedule = await localStorage.GetItemAsync<string>("ExamScheduleId");
 
         snackbar.Add(idExamDetailLocalStorage == null ? "chưa có" : idExamDetailLocalStorage);
-        if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null)
+        if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null && idExamSchedule!=null)
         {
             ExamActivityLog examActivityLog = new ExamActivityLog();
             examActivityLog.ExamId = idExam;
             examActivityLog.UserId = _userId;
             examActivityLog.ExamDetailId = Convert.ToInt32(idExamDetailLocalStorage);
             examActivityLog.ActionTime = DateTime.Now;
-            examActivityLog.ActionType="Mở bài thi";
+            examActivityLog.ActionType = "Mở bài thi";
+            examActivityLog.ExamScheduleId = Convert.ToInt32(idExamSchedule);
             var logStat =  await  _serExamActLog.Create(examActivityLog);
 
             if(logStat==false)
