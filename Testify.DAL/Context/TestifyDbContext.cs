@@ -38,6 +38,7 @@ namespace Testify.DAL.Context
         public DbSet<ExamDetail> ExamDetails { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
+        public DbSet<DoingExam> DoingExams { get; set; }
         //public DbSet<OrganizationUser> OrganizationUsers { get; set; }
         public DbSet<ScoreMethod> ScoreMethods { get; set; }
         public DbSet<ClassExamSchedule> UserExamSchedules { get; set; }
