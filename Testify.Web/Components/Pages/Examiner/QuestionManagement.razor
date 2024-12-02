@@ -4,6 +4,7 @@
 @using Testify.Web.Shared
 @layout AdminLayout
 @inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
 
 <style>
     .input-search-end {
@@ -40,7 +41,7 @@
 
 </style>
 
-<div style="font-family:Roboto; padding:30px; background-color:#fafafa">
+<div style="font-family:Roboto; padding:30px; background-color:#fafafa; height: calc( 100svh - 64px)">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">CÂU HỎI VÀ ĐÁP ÁN</MudText>
     </MudPaper>
@@ -55,14 +56,14 @@
         </MudItem>
     </MudGrid>
 
-    <div class="bg-white rounded-3 mb-4" style="width:100%;">
+    <div class="bg-white rounded-3" style="width:100%;">
         @if (isLoading)
         {
             <LoadingContext />
         }
         else
         {
-            <MudTable Items="@_lstQuestions" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470px">
+            <MudTable Items="@_lstQuestions" Dense="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc( 100svh - 384px )">
 
                 <ToolBarContent>
                     <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">

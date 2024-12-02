@@ -10,7 +10,7 @@
 else
 {
     <MudPaper Elevation="0" style="font-family:Roboto; padding:30px; height:calc(100svh - 64px); background-color:#fafafa">
-        <MudPaper Style="padding:20px">
+        <MudPaper Style="padding:15px">
             <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">PHỔ ĐIỂM THEO MÔN HỌC</MudText>
         </MudPaper>
         <MudPaper Elevation="0" Style="width: 100%; margin: 1.25rem 0rem;">
@@ -30,13 +30,13 @@ else
 
         <MudPaper Class="p-3 w-100">
             <MudGrid Class="p-0 m-0 w-full">
-                <MudItem xl="8" Class="p-0">
+                <MudItem xl="8" lg="8" md="7" sm="12" xs="12" Class="p-0">
                     @if (_SubjectId > -1)
                     {
-                        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="520px" ChartOptions="ChartOption"></MudChart>
+                        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="calc(100svh - 385px)" ChartOptions="ChartOption"></MudChart>
                     }
                 </MudItem>
-                <MudItem xl="4" Class="p-0">
+                <MudItem xl="4" lg="4" md="5" sm="12" xs="12" Class="p-0">
                     @if (_SubjectId > -1)
                     {
                         <MudChart ChartType="ChartType.Donut" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts" SelectedIndexChanged="handleShowValue">

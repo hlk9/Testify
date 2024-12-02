@@ -32,7 +32,7 @@
     }
 
 </style>
-<div style="font-family:Roboto; padding:20px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding:30px; height:calc(100svh - 64px); background-color:#fafafa">
 
   
         <MudPaper Style="padding:15px;">
@@ -47,14 +47,14 @@
             </MudItem>
         </MudGrid>
 
-        <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+        <div class="bg-white rounded-3" style="width:100%;">
             @if (isLoading)
             {
                 <LoadingContext />
             }
             else
             {
-                <MudTable Items="@classWithUsers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="470px">
+                <MudTable Items="@classWithUsers" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
                     <ToolBarContent>
                         <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
                             <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
