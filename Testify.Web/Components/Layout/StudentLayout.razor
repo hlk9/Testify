@@ -22,11 +22,9 @@
         <MudButton Href="/ExamList">
             Bài thi
         </MudButton>
-        <MudMenu Label="Lịch thi">
-            <MudMenuItem>Lịch thi của tôi</MudMenuItem>
-            <MudMenuItem Href="/Student/Calendar">Lịch thi sắp tới</MudMenuItem>
-            <MudMenuItem>Armory</MudMenuItem>
-        </MudMenu>
+        <MudButton Href="/Student/Calendar">
+            Lịch thi sắp tới
+        </MudButton>
         <MudSpacer />
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
         <MudMenu AnchorOrigin="Origin.BottomCenter">
