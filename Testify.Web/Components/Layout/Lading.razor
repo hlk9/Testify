@@ -5410,5 +5410,32 @@
 </MudPaper>
 
 @code {
+	[Inject] NavigationManager Navigation { get; set; }
+	protected override async void OnAfterRender(bool firstRender)
+	{
+		if (firstRender)
+		await CheckToken();
+	}
+
+	private async Task CheckToken()
+	{
+		var token = await localStorage.GetItemAsync<string>("token");
+		if (!string.IsNullOrEmpty(token))
+		{
+			var currentUser = await _serviceAccess.CheckAccessStatusByToken(token);
+			if (currentUser.IsLoginSucces == true && currentUser.Id != null)
+			{
+				await ProtectedSessionStore.SetAsync("userLogin", currentUser.Id);
+				if (currentUser.LevelId == 1)
+				{
+				Navigation.NavigateTo("/Admin/Home");
+				}
+				else if (currentUser.LevelId == 2)
+					Navigation.NavigateTo("/Examiner/Home");
+				else if (currentUser.LevelId == 4)
+					Navigation.NavigateTo("/Student/Home");
+			}
+		}
+	}
 
 }
