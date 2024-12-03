@@ -409,6 +409,9 @@ else
                     navigation.NavigateTo("/");
                     return false;
                 }
+                else
+                {
+                }
                 if (modelLogin.LevelId == 3)
                 {
                     List<ClassUser> listClassOfStudent = await _serClassUser.GetAllClassByUserId(eDetail.UserId);
@@ -453,6 +456,12 @@ else
         eDetail = await _serSubmission.GetById(Id);
         var eD = await _serExamDetail.GetExamDetailById(eDetail.ExamDetailId);
         currentExam = await _serExam.GetExamId(eD.ExamId);
+        if (currentExam.AllowViewResult == false)
+        {
+            await JS.InvokeVoidAsync("alert", "Bài thi này chưa cho phép xem kết quả, hãy kiểm tra lại sau");
+            navigation.NavigateTo("/",forceLoad:true);
+            return;
+        }
         string idSubmit = eDetail.ExamDetailId.ToString();
         var idExamDetailLocalStorage = idSubmit;
         var testList = await FillHistory();
