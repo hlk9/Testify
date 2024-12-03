@@ -44,16 +44,28 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Question-By-ExamDetailID-Not")]
-        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID, int SubjectId)
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID, int SubjectId, string? textSearch)
         {
             var objGetAll = await _respon.GetQuestionByExamDetailID_NOT(examdetailID,  SubjectId);
+
+            if (!string.IsNullOrWhiteSpace(textSearch))
+            {
+                objGetAll = objGetAll
+                    .Where(x => x.Content.Contains(textSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
             return Ok(objGetAll);
         }
 
         [HttpGet("Get-Question-By-ExamDetailID-NotAndLevel")]
-        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID, int SubjectId)
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID, int SubjectId, string? textSearch)
         {
             var objGetAll = await _respon.GetQuestionByExamDetailID_NOTAndLevel(examdetailID, levelID ,  SubjectId);
+            if (!string.IsNullOrWhiteSpace(textSearch))
+            {
+                objGetAll = objGetAll
+                    .Where(x => x.Content.Contains(textSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
             return Ok(objGetAll);
         }
 
