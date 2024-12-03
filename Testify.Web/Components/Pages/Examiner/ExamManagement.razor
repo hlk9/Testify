@@ -160,6 +160,8 @@
         {
             _lst = await examService.GetInforBasic(null);
         }
+
+        StateHasChanged();
     }
 
     private async Task OpenDialogAsync(DialogOptions options, string name)

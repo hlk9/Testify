@@ -101,6 +101,32 @@ namespace Testify.Web.Services
             return null;
 
         }
+        
+        public async Task<ExamSchedule> GetInTimeRangeExclude(DateTime start, DateTime end, int? subjectId,int currentScheduleId)
+        {
+            var startStr = Uri.EscapeDataString(start.ToString("MM/dd/yyyy HH:mm:ss"));
+            var endStr = Uri.EscapeDataString(end.ToString("MM/dd/yyyy HH:mm:ss"));
+
+            var response = await _httpClient.GetAsync($"ExamSchedule/Get-InTime-ExcludeId?start={startStr}&end={endStr}&subjectId={subjectId}&currentScheduleId={currentScheduleId}");
+
+            if (response.StatusCode == HttpStatusCode.NoContent) // 204 No Content
+            {
+
+                return null;
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+
+                var schedule = JsonConvert.DeserializeObject<ExamSchedule>(content);
+                return schedule;
+
+            }
+
+
+
+        }
 
         public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end, int? subjectId)
         {

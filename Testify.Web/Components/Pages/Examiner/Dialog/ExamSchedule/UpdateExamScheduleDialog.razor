@@ -111,7 +111,7 @@
             }
 
 
-            var ojb = await scheduleService.GetInTimeRange(startDateTime, endDateTime, subjectCurrent.Id);
+            var ojb = await scheduleService.GetInTimeRangeExclude(startDateTime, endDateTime, subjectCurrent.Id,Id);
 
             if (ojb != null && ojb.Id == currentSchedule.Id)
             {
