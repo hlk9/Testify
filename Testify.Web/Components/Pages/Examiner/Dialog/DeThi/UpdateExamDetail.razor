@@ -46,10 +46,7 @@
                                 <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.ArrowRightAlt" Label="Xếp câu hỏi" OnClick="AddQuestionToRight" />
                             </MudTooltip>
                         </MudItem>
-                        <MudItem xs="6" Class="d-flex justify-content-end">
-                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a; text-align:center;">Kho câu hỏi</MudText>
-                           
-                        </MudItem>
+                        <MudItem xs="6" Class="d-flex justify-content-end"></MudItem>
 
                     </MudItem>
                 </MudItem>
@@ -59,18 +56,19 @@
                             <MudFab Color="Color.Warning" StartIcon="@Icons.Material.Filled.Clear" Label="Loại bỏ" OnClick="RemoveFromListExam" />
                         </MudTooltip>
                     </MudItem>
-                    <MudItem xs="6" Class="d-flex ">
-                        
-                                <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a;">Danh sách câu hỏi trong đề</MudText>
-                           
-                    </MudItem>
+                    <MudItem xs="6" Class="d-flex "></MudItem>
                 </MudItem>
                 <MudItem xs="6">
                     <MudItem xs="12" md="12" lg="12">
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                                      Class="mt-0 mb-2" ValueChanged="OnSearchChanged" Immediate="true">
+                        </MudTextField>
                         <MudTable Items="@_lstChoice_Select" MultiSelection="true" Context="_lstChoiceSelect" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="400px" @bind-SelectedItems="listQuestionSelected" Striped="true">
                             <ToolBarContent>
-                                
+                                <MudText Style="font-size: 22px; font-weight: bold; color: #29a69a; display: flex; justify-content: center; width: 100%;">Kho câu hỏi</MudText>
                             </ToolBarContent>
+
                             <HeaderContent>
                                 <MudTh hidden><MudTableSortLabel SortLabel="ID" T="string">Mã câu hỏi</MudTableSortLabel></MudTh>
                                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Nội dung câu hỏi</MudTableSortLabel></MudTh>
@@ -93,11 +91,16 @@
                     </MudItem>
                 </MudItem>
                 <MudItem xs="6">
+                 
+                    <MudTextField T="string" >
+
+                    </MudTextField>
                     <MudItem xs="12" md="12" lg="12">
                         <MudTable Items="@_lstChoice" MultiSelection="true" Context="_lstChoiceContext" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="400px" @bind-SelectedItems="listQuestionSelectedInList">
                             <ToolBarContent>
-                               
+                                <MudText Style="font-size: 22px; font-weight: bold; color: #29a69a; display: flex; justify-content: center; width: 100%;">Danh sách câu hỏi trong đề</MudText>
                             </ToolBarContent>
+
                             <HeaderContent>
                                 <MudTh hidden><MudTableSortLabel SortLabel="ID" T="string">Mã câu hỏi</MudTableSortLabel></MudTh>
                                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Nội dung câu hỏi</MudTableSortLabel></MudTh>
@@ -146,6 +149,7 @@
     [Inject] ISnackbar Snackbar { get; set; }
 
     private void Cancel() => MudDialog.Cancel();
+    
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
     // Radio
@@ -197,13 +201,26 @@
 
         if (questionLevelId > -1)
         {
-            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOTAndLevel(ExamDetailID, questionLevelId, SubjectId);
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOTAndLevel(ExamDetailID, questionLevelId, SubjectId, null);
         }
         else
         {
-            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOT(ExamDetailID, SubjectId);
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOT(ExamDetailID, SubjectId, null);
         }
 
+    }
+
+    private async Task OnSearchChanged(string? searchText)
+    {
+        if (questionLevelId > -1)
+        {
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOTAndLevel(ExamDetailID, questionLevelId, SubjectId, searchText);
+        }
+        else
+        {
+            _lstChoice_Select = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync_NOT(ExamDetailID, SubjectId, searchText);
+        }
+        StateHasChanged();
     }
 
 
