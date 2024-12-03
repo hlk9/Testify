@@ -108,6 +108,12 @@ namespace Testify.API.Controllers
         {
             return await repos.CheckIsContaintInTime(start, end, subjectId);
         }
+        
+        [HttpGet("Get-InTime-ExcludeId")]
+        public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end, int subjectId, int currentScheduleId)
+        {
+            return await repos.CheckIsContaintInTimeExclude(start, end, subjectId, currentScheduleId);
+        }
 
         [HttpGet("Get-InTime-NoSubject")]
         public async Task<ExamSchedule> GetInTimeNoSubject(DateTime start, DateTime end)
