@@ -45,7 +45,7 @@ namespace Testify.DAL.Context
         public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ExamDetailQuestion> ExamDetailQuestions { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<BlackListToken> BlackListTokens { get; set; }
+        //public DbSet<BlackListToken> BlackListTokens { get; set; }
         public DbSet<ClassExamSchedule> ClassExamSchedules { get; set; }
         public DbSet<UserLog> UserLogs { get; set; }
         public DbSet<ExamActivityLog> ExamActivityLogs { get; set; }

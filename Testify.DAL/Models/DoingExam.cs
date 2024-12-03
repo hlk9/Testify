@@ -13,6 +13,9 @@ namespace Testify.DAL.Models
         public int Id { get; set; }
         public Guid UserId { get; set; }
         public int ExamId { get; set; }
+        public int? ExamDetailId { get; set; }
+        public bool? InProgress { get; set; } = false;
+        public DateTime StartTime { get; set; } = DateTime.Now;
         public int ExamScheduleId { get; set; }
         public string? Content { get; set; }  
     }
