@@ -134,6 +134,7 @@
                 var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
                 exam.ScoreMethodId = null;
                 exam.SubjectId = subjectCurrent.Id;
+                exam.Status = 2;
                 var stats = await examService.CreateExam(exam);
                 if (stats != null)
                 {

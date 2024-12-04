@@ -64,13 +64,13 @@
                 <MudTd DataLabel="Số câu hỏi">@context.NumberOfQuestion </MudTd>
                 <MudTd DataLabel="Số lần làm bài">@context.NumberOfRepeat </MudTd>
                 <MudTd DataLabel="Trạng thái">
-                    @if (@context.Status == 1)
+                    @if (context.Status == 1)
                     {
                         <span>Công khai</span>
                     }
                     else
                     {
-                        <span>Chỉ mình tôi</span>
+                        <span>Chưa công khai</span>
                     }
                 </MudTd>
                 <MudTd DataLabel="Thao tác">
@@ -85,7 +85,7 @@
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xem đề thi">
-                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end">Xem đề </MudButton>
+                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end" Disabled="@(context.Status == 2 ? true : false)">Xem đề</MudButton>
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
@@ -108,7 +108,7 @@
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     protected override async Task OnInitializedAsync()
     {
-        _lst = (await examService.GetInforBasic(null)).Where(x => x.Status != 255).ToList();
+        _lst = (await examService.GetInforBasic(null)).Where(x => x.Status == 1 || x.Status == 2).ToList();
     }
     
     [Inject] ISnackbar Snackbar { get; set; }
@@ -116,7 +116,7 @@
 
     private async Task OnSearchChanged(string searchText)
     {
-        _lst = (await examService.GetInforBasic(searchText)).Where(x => x.Status != 255).ToList();
+        _lst = (await examService.GetInforBasic(searchText)).Where(x => x.Status == 1 || x.Status == 2).ToList();
         StateHasChanged();
     }
 
