@@ -106,6 +106,7 @@ namespace Testify.DAL.Reposiroties
                 objUpdateExam.MaximmumMark = exam.MaximmumMark;
                 objUpdateExam.PassMark = exam.PassMark;
                 objUpdateExam.SubjectId = exam.SubjectId;
+                objUpdateExam.Status = exam.Status;
 
                 var updateExam = _context.Exams.Update(objUpdateExam).Entity;
                 await _context.SaveChangesAsync();
@@ -155,7 +156,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<Exam>> GetAllActicve()
         {
-            return _context.Exams.Where(x => x.Status == 1).ToList();
+            return _context.Exams.Where(x => x.Status == 1 || x.Status == 2).ToList();
         }
 
         public async Task<List<Exam>> GetAllActicveOfSubject(int subjectId)

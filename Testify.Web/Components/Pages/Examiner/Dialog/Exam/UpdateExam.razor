@@ -60,6 +60,18 @@
                     </MudItem>
                 </MudGrid>
             </MudItem>
+
+
+            <MudPaper Elevation="0">
+                <MudRadioGroup T="byte" @bind-value="@status">
+                    <MudRadio T="byte" Value="1">
+                        Công khai
+                    </MudRadio>
+                    <MudRadio T="byte" Value="2">
+                        Chưa công khai
+                    </MudRadio>
+                </MudRadioGroup>
+                </MudPaper>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -81,11 +93,13 @@
     private List<Subject> listSubject;
     private Exam examCurrent;
     private Subject subjectCurrent;
+    private byte status = 1;
     private bool examAllowViewResult { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
         exam = await examService.GetExamId(Id);
+        status = exam.Status;
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         listSubject = await subjectService.GetAllSub(null, true);
     }
@@ -122,6 +136,13 @@
         }
         else
         {
+            var lstExamDetail = await _serExamDetail.GetExamDetailByExamId(exam.Id);
+            var lstExamDetailFormat = lstExamDetail.Where(x => x.Status != 255).ToList();
+            if (!lstExamDetailFormat.Any())
+            {
+                snackbar.Add("Thất bại, Không có đề thi nên không thể công khai", Severity.Warning);
+                return;
+            }
             if (exam.MaximmumMark <= 0)
             {
                 Snackbar.Add("Thất bại, Điểm tối đa không được nhỏ hơn 0", Severity.Error);
@@ -152,10 +173,11 @@
                 Snackbar.Add("Thất bại, Số lần làm bài thi không được nhỏ hơn 0", Severity.Error);
                 return;
             }
-            
+
             exam.ScoreMethodId = null;
             exam.SubjectId = subjectCurrent.Id;
             exam.AllowViewResult = examAllowViewResult;
+            exam.Status = status;
             bool stats = await examService.UpdateExam(exam);
             if (stats == true)
             {
