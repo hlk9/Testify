@@ -5,13 +5,13 @@
 
 <style>
     .hidden-scroll {
-        overflow-y: scroll;
-        scrollbar-width: none;
+    overflow-y: scroll;
+    scrollbar-width: none;
     }
 
-        .hidden-scroll::-webkit-scrollbar {
-            display: none;
-        }
+    .hidden-scroll::-webkit-scrollbar {
+    display: none;
+    }
 
 </style>
 
@@ -33,7 +33,7 @@
         <MudGrid Class="p-0 m-0 w-100 align-items-center">
             <MudItem lg="10" md="9" sm="8" xs="12" Class="ps-0 pe-0 pe-md-3">
                 <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Variant="Variant.Outlined" @bind-Value="@Search"
-                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" TextChanged="ChangeSearch" Immediate=true></MudTextField>
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" TextChanged="ChangeSearch" Immediate=true></MudTextField>
             </MudItem>
             <MudItem lg="2" md="3" sm="4" xs="12" Class="ps-0 ps-md-3">
                 <MudButton Class="w-100 h-100 py-3" StartIcon="@Icons.Material.Filled.Add" Style="width: 100%; background-color: #1ec8a5; color: #ffffff" OnClick="@(() => OpenDialogAsync(_maxWidth))">Thêm Lớp Học</MudButton>
@@ -82,7 +82,7 @@
     private int classParticipated = 0;
     private string Search = "";
     private byte Status = 1;
-
+    string id = "";
     protected async override Task OnInitializedAsync()
     {
 
@@ -92,16 +92,22 @@
     {
         if(firstRender)
         {
-            await LoadData(Search);
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            if(a.Value!=null)
+            {
+                id = a.Value;
+                await LoadData(Search);
+
+            }
         }
     }
 
     private async Task LoadData(string search)
     {
-        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
-        _lstCwU = await _serClassUser.GetAll(a.Value, search, Status);
-        var lstIsWaiting = await _serClassUser.GetAll(a.Value, Search, (byte)2);
-        var lstIsParticipated = await _serClassUser.GetAll(a.Value, Search, (byte)1);
+      
+        _lstCwU = await _serClassUser.GetAll(id, search, Status);
+        var lstIsWaiting = await _serClassUser.GetAll(id, Search, (byte)2);
+        var lstIsParticipated = await _serClassUser.GetAll(id, Search, (byte)1);
         classIsWaiting = lstIsWaiting.Count;
         classParticipated = lstIsParticipated.Count;
         StateHasChanged();
@@ -109,7 +115,16 @@
 
     private async Task ChangeSearch()
     {
+        try
+        {
+
+        }
+        catch
+        {
+
+
         await LoadData(Search);
+        }
     }
 
     private async Task ChangeStatusClass(byte status)

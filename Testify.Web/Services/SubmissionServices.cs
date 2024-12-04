@@ -44,10 +44,10 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<List<SubmittedByUser>> GetAllSubmittedByUser(Guid userId)
+        public async Task<List<SubmissionWithName>> GetAllSubmittedByUser(Guid userId)
         {
             var lst = await _httpClient.GetAsync($"submission/Submitted-By-User?userId={userId}");
-            var response = await lst.Content.ReadFromJsonAsync<List<SubmittedByUser>>();
+            var response = await lst.Content.ReadFromJsonAsync<List<SubmissionWithName>>();
             return response;
         }
 
