@@ -82,15 +82,15 @@ namespace Testify.DAL.Reposiroties
 
             if (levelId >= 0)
             {
-                query = query.Where(x => x.LevelId == levelId);
+                query = query.Where(x => x.LevelId == levelId && x.Status == 1);
             }
 
             if (!string.IsNullOrWhiteSpace(textSearch))
             {
-                query = query.Where(x => x.FullName.Contains(textSearch) || x.Email.Contains(textSearch) || x.PhoneNumber.Contains(textSearch) || x.UserName.Contains(textSearch));
+                query = query.Where(x => x.FullName.Contains(textSearch) || x.Email.Contains(textSearch) || x.PhoneNumber.Contains(textSearch) || x.UserName.Contains(textSearch) && x.Status == 1);
             }
 
-            return await query.ToListAsync();
+            return await query.Where(x => x.Status == 1).ToListAsync();
         }
     }
 
