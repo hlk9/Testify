@@ -381,6 +381,7 @@ else
         try
         {
             isLoading = true;
+            StateHasChanged();
             timer.Stop();
             Submission submission = new Submission();
             double score = 0;
@@ -484,6 +485,7 @@ else
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
 
     }

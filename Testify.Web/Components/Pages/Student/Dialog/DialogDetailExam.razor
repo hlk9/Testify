@@ -33,10 +33,13 @@ else
                         </MudItem>
                     </MudItem>
                 </MudGrid>
-                @if (DateTime.Now >= _ListExamsOfStudent.ExamScheduleStartTime && DateTime.Now <= _ListExamsOfStudent.ExamScheduleEndTime)
+                @if(numberofsubmit >= limitofsubmit)
+                {
+                    <MudButton OnClick="Open" Disabled Color="Color.Surface" Style="width:100%; color: #fff ;margin-top:20px;">Hết số lần làm bài</MudButton>
+                }
+                else if (DateTime.Now >= _ListExamsOfStudent.ExamScheduleStartTime && DateTime.Now <= _ListExamsOfStudent.ExamScheduleEndTime)
                 {
                     <MudButton OnClick="Open" Style="background-color: #29a69a;width:100%; color: #fff ;margin-top:20px;">Vào thi</MudButton>
-
                 }
                 else if (DateTime.Now < _ListExamsOfStudent.ExamScheduleStartTime)
                 {
@@ -47,17 +50,8 @@ else
                 {
                     <MudButton OnClick="Open" Disabled Color="Color.Surface" Style="width:100%; color: #fff ;margin-top:20px;">Đã kết thúc bài thi</MudButton>
                 }
-                @if(numberofsubmit == limitofsubmit)
-                {
-                    <MudButton OnClick="Open" Disabled Color="Color.Surface" Style="width:100%; color: #fff ;margin-top:20px;">Hết số lần làm bài</MudButton>
-                }
-              
-
-
 
             </div>
-
-
         </DialogContent>
     </MudDialog>
 }
@@ -66,30 +60,34 @@ else
 @code {
     [Parameter]
     public int ExamScheduleId { get; set; }
-    private List<ListExamsOfStudent> _list = new List<ListExamsOfStudent>();
-    private ListExamsOfStudent _ListExamsOfStudent = new ListExamsOfStudent();
-    private Guid userId = Guid.NewGuid();
-    bool Active;
-    private bool isLoading = true;
-
-    private int limitofsubmit;
-    private int numberofsubmit;
-    private int examscheduleId;
-    public Exam exam { get; set; }
 
     [Parameter]
     public int idExam { get; set; }
+
+    private List<ListExamsOfStudent> _list = new List<ListExamsOfStudent>();
+    private ListExamsOfStudent _ListExamsOfStudent = new ListExamsOfStudent();
+
+    public Exam exam { get; set; }
+
+    private Guid userId = Guid.NewGuid();
+    private bool isLoading = true;
+    private int limitofsubmit;
+    private int numberofsubmit;
+    private int examscheduleId;
 
     protected async override Task OnInitializedAsync()
     {
         try
         {
             isLoading = true;
+            StateHasChanged();
             var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
             userId = Guid.Parse(a.Value);
             _list = await _serLec.GetListExam(userId);
             exam = await _serExam.GetExamId(idExam);
             _ListExamsOfStudent = _list.FirstOrDefault(x => x.ExamScheduleId == ExamScheduleId);
+            numberofsubmit = await _serSubmission.NumberSubmit(userId, ExamScheduleId);
+            limitofsubmit = exam.NumberOfRepeat;
         }
         catch
         {
@@ -98,10 +96,9 @@ else
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
 
-        numberofsubmit = await _serSubmission.NumberSubmit(userId, examscheduleId);
-        limitofsubmit = exam.NumberOfRepeat;
     }
    
     private async void Open()
@@ -115,22 +112,5 @@ else
         }
         await localStorage.SetItemAsync("ExamScheduleId", ExamScheduleId);
         navigation.NavigateTo($"/ExamTest/{_ListExamsOfStudent.ExamId}");
-    }
-
-    private bool ValidationForm()
-    {
-
-        if(DateTime.Now >= _ListExamsOfStudent.ExamScheduleStartTime && DateTime.Now <= _ListExamsOfStudent.ExamScheduleEndTime)
-        {
-            Active = true;
-            return true;
-        }
-        else
-        {
-            Active = false;
-            return false;
-        }
-
-       
     }
 }

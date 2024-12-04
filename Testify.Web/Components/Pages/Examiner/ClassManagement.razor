@@ -171,7 +171,7 @@
     {
         await LoadData(searchValue);
     }
-    
+
     private async Task<bool> CheckAllowdelete()
     {
         var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
@@ -213,13 +213,13 @@
             isLoading = false;
         }else
         {
-            
+
         }
 
-        
+
     }
 
-   protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -228,7 +228,7 @@
         }
     }
 
-   
+
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
@@ -261,6 +261,7 @@
             if (!result.Canceled)
             {
                 await LoadData("");
+                StateHasChanged();
             }
         }
         else if (name.Equals(OpenDialogType.Update))
@@ -270,6 +271,7 @@
             if (!result.Canceled)
             {
                 await LoadData("");
+                StateHasChanged();
             }
         }
         else if (name.Equals(OpenDialogType.Detail))
@@ -279,6 +281,7 @@
             if (!result.Canceled)
             {
                 await LoadData("");
+                StateHasChanged();
             }
         }
         else if (name.Equals(OpenDialogType.List))
@@ -288,6 +291,7 @@
             if (!result.Canceled)
             {
                 await LoadData("");
+                StateHasChanged();
             }
         }
         else

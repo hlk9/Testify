@@ -36,9 +36,6 @@ namespace Testify.DAL.Reposiroties
             {
                 return null;
             }
-
-
-
         }
 
         public async Task <List<Submission>>GetHistory(Guid userId,int examscheduleId)
@@ -71,6 +68,7 @@ namespace Testify.DAL.Reposiroties
                               on exD.ExamId equals ex.Id
                               join sub in _context.Subjects
                               on ex.SubjectId equals sub.Id
+                              where submit.UserId == userId
                               select new SubmissionWithName
                               {
                                   Id = submit.Id,
