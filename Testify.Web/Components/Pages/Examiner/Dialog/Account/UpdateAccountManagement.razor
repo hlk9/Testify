@@ -41,7 +41,7 @@ else
         </DialogContent>
         <DialogActions>
             <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
-            <MudButton Color="Color.Warning" OnClick="@(() =>Submit(true))">Sửa</MudButton>
+            <MudButton Color="Color.Warning" OnClick="Submit">Sửa</MudButton>
         </DialogActions>
     </MudDialog>
 }
@@ -57,7 +57,6 @@ else
     private int levelId = -1;
     private List<Level> _lstLevel = new List<Level>();
     private bool isLoading { get; set; } = true;
-
     private User users { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
@@ -142,75 +141,38 @@ else
         }
     }
 
-    private async Task Submit(bool isType)
+    private async Task Submit()
     {
-        if (isType)
-        {
-            try
-            {
-                isLoading = true;
+        var checkValidation = ValidateForm();
+        var email = users.Email;
+        var phoneNumber = users.PhoneNumber;
+        var userName = users.UserName;
 
-                if (levelId == null || levelId <= 0)
-                {
-                    snackbar.Add("Chưa chọn chức vụ", Severity.Warning);
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                snackbar.Add($"Đã xảy ra lỗi: {ex.Message}", Severity.Error);
-            }
-            finally
-            {
-                isLoading = false;
-            }
+        users.DateOfBirth = _date.GetValueOrDefault(DateTime.Now);
+
+        var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName);
+
+        if (existing)
+        {
+            snackbar.Add("Email hoặc số điện thoại hoặc tên tài khoản đã tồn tại", Severity.Error);
+            return;
         }
-        else
+
+        if (!checkValidation)
         {
-            var checkValidation = ValidateForm();
-            var email = users.Email;
-            var phoneNumber = users.PhoneNumber;
-            var userName = users.UserName;
+            users.DateOfBirth = _date.Value;
+            var checka = await _serLec.UpdateLecturer(users);
 
-            users.DateOfBirth = _date.GetValueOrDefault(DateTime.Now);
-
-            var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName);
-
-            if (existing)
+            if (checka == true)
             {
-                snackbar.Add("Email hoặc số điện thoại hoặc tên tài khoản đã tồn tại", Severity.Error);
-                return;
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Sửa thành công", Severity.Success);
             }
-
-            if (!checkValidation)
+            else
             {
-                users.DateOfBirth = _date.Value;
-                var checka = await _serLec.UpdateLecturer(users);
-
-                if (checka == true)
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Sửa thành công", Severity.Success);
-                }
-                else
-                {
-                    MudDialog.Close(DialogResult.Ok(true));
-                    snackbar.Add("Sửa thất bại", Severity.Error);
-                }
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Sửa thất bại", Severity.Error);
             }
-        }
-        users.DateOfBirth = _date.Value;
-        var check = await _serLec.UpdateLecturer(users);
-
-        if (check == true)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Sửa thành công", Severity.Success);
-        }
-        else
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thất bại", Severity.Error);
         }
     }
 
