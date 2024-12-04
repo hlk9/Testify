@@ -277,6 +277,7 @@ else
             if (!checkValidation)
             {
                 users.Status = 1;
+                users.LevelId = levelId;
 
                 var check = await _serLec.CreateLecturer(users);
                 if (check != null)

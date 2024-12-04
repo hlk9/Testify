@@ -13,19 +13,19 @@ else
         </TitleContent>
 
         <DialogContent>
-            <MudForm Spacing="2" Model="@user" @ref="@form">
-                <MudTextField T="string" @bind-Value="@user.FullName" Label="Họ và tên" Variant="Variant.Outlined" />
+            <MudForm Spacing="2" Model="@users" @ref="@form">
+                <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" Variant="Variant.Outlined" />
                 <MudDatePicker @bind-Date="@_date" DateFormat="dd/MM/yyyy" Label="Ngày sinh" Variant="Variant.Outlined" />
-                <MudTextField T="string" @bind-Value="@user.PhoneNumber" Label="Số điện thoại" Variant="Variant.Outlined" />
-                <MudTextField T="string" @bind-Value="@user.Address" Label="Địa chỉ" Variant="Variant.Outlined" />
-                <MudRadioGroup T="bool" @bind-Value="@user.Sex" Label="Giới tính">
+                <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" Variant="Variant.Outlined" />
+                <MudRadioGroup T="bool" @bind-Value="@users.Sex" Label="Giới tính">
                     <MudRadio T="bool" Value="true">Nam</MudRadio>
                     <MudRadio T="bool" Value="false">Nữ</MudRadio>
                 </MudRadioGroup>
-                <MudSelect T="int" @bind-Value="levelId" Label="Chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect T="int" @bind-Value="levelId" Label="Chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Disabled>
                     @if (levelId == -1)
                     {
-                        <MudSelectItem Value="-1">Không có chưcs vụ nào!</MudSelectItem>
+                        <MudSelectItem Value="-1">Không có chức vụ nào!</MudSelectItem>
                     }
                     else
                     {
@@ -35,13 +35,13 @@ else
                         }
                     }
                 </MudSelect>
-                <MudTextField T="string" @bind-Value="@user.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" />
-                <MudTextField T="string" @bind-Value="@user.Email" Label="Email" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" Variant="Variant.Outlined" Disabled />
+                <MudTextField T="string" @bind-Value="@users.Email" Label="Email" Variant="Variant.Outlined" />
             </MudForm>
         </DialogContent>
         <DialogActions>
             <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
-            <MudButton Color="Color.Warning" OnClick="Submit">Sửa</MudButton>
+            <MudButton Color="Color.Warning" OnClick="@(() =>Submit(true))">Sửa</MudButton>
         </DialogActions>
     </MudDialog>
 }
@@ -58,33 +58,149 @@ else
     private List<Level> _lstLevel = new List<Level>();
     private bool isLoading { get; set; } = true;
 
-    private User user { get; set; } = new();
+    private User users { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        user = await _serLec.GetLecturerById(UserId);
+        users = await _serLec.GetLecturerById(UserId);
         await Loaddata();
     }
 
     private async Task Loaddata()
     {
         _lstLevel = await _serLevel.GetAllLevel();
-        if (user.LevelId != null)
+        if (users.LevelId != null)
         {
-            levelId = user.LevelId;
+            levelId = users.LevelId;
         }
         else
         {
             levelId = -1;
         }
-        _date = user.DateOfBirth;
+        _date = users.DateOfBirth;
         isLoading = false;
     }
 
-    private async Task Submit()
+    private bool ValidateForm()
     {
-        user.DateOfBirth = _date.Value;
-        var check = await _serLec.UpdateLecturer(user);
+        int count = 0;
+        var vietnamPhoneRegex = @"^(03|05|07|08|09)\d{8}$";
+        var customEmailRegex = @".*?@?[^@]*\.+.*";
+
+        if (users.FullName == null || users.FullName.Trim().Length == 0)
+        {
+            snackbar.Add("Họ và tên không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if (users.UserName == null || users.UserName.Trim().Length == 0)
+        {
+            snackbar.Add("tên tài khoản không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if (users.DateOfBirth == null)
+        {
+            snackbar.Add("Ngày sinh không được để trống!", Severity.Error);
+            count += 1;
+        }
+        else if (users.DateOfBirth >= DateTime.Now)
+        {
+            snackbar.Add("Ngày sinh không hợp lệ! Không được lớn hơn ngày hiện tại.", Severity.Error);
+            count += 1;
+        }
+        if (users.PhoneNumber == null || !System.Text.RegularExpressions.Regex.IsMatch(users.PhoneNumber, vietnamPhoneRegex))
+        {
+            snackbar.Add("Số điện thoại không hợp lệ!", Severity.Error);
+            count += 1;
+        }
+        if (users.Address == null || users.Address.Trim().Length == 0)
+        {
+            snackbar.Add("Địa chỉ không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if (users.Email == null || users.Email.Trim().Length == 0)
+        {
+            snackbar.Add("Email không được để trống!", Severity.Error);
+            count += 1;
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(users.Email, customEmailRegex))
+        {
+            snackbar.Add("Email không đúng định dạng!", Severity.Error);
+            count += 1;
+        }
+        if (users.PasswordHash == null)
+        {
+            snackbar.Add("Mật khẩu không được để trống!", Severity.Error);
+            count += 1;
+        }
+        if (count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private async Task Submit(bool isType)
+    {
+        if (isType)
+        {
+            try
+            {
+                isLoading = true;
+
+                if (levelId == null || levelId <= 0)
+                {
+                    snackbar.Add("Chưa chọn chức vụ", Severity.Warning);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                snackbar.Add($"Đã xảy ra lỗi: {ex.Message}", Severity.Error);
+            }
+            finally
+            {
+                isLoading = false;
+            }
+        }
+        else
+        {
+            var checkValidation = ValidateForm();
+            var email = users.Email;
+            var phoneNumber = users.PhoneNumber;
+            var userName = users.UserName;
+
+            users.DateOfBirth = _date.GetValueOrDefault(DateTime.Now);
+
+            var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName);
+
+            if (existing)
+            {
+                snackbar.Add("Email hoặc số điện thoại hoặc tên tài khoản đã tồn tại", Severity.Error);
+                return;
+            }
+
+            if (!checkValidation)
+            {
+                users.DateOfBirth = _date.Value;
+                var checka = await _serLec.UpdateLecturer(users);
+
+                if (checka == true)
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thành công", Severity.Success);
+                }
+                else
+                {
+                    MudDialog.Close(DialogResult.Ok(true));
+                    snackbar.Add("Sửa thất bại", Severity.Error);
+                }
+            }
+        }
+        users.DateOfBirth = _date.Value;
+        var check = await _serLec.UpdateLecturer(users);
 
         if (check == true)
         {
