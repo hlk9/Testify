@@ -34,4 +34,9 @@
   <ItemGroup>
     <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="Components\Pages\Examiner\PermissionManagement.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
 </Project>

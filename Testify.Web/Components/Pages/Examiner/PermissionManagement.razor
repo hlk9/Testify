@@ -1,4 +1,4 @@
-﻿ @page "/Examiner/AccountManagement" 
+﻿ @page "/Examiner/PermissionManagement" 
 @using Testify.DAL.Models
 @using Testify.Web.Data.Commons
 @layout ExaminerLayout
@@ -30,17 +30,11 @@
 </style>
 <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
-        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TÀI KHOẢN</MudText>
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">Phân quyền tài khoản giảng viên</MudText>
     </MudPaper>
     <MudGrid Style="padding: 20px 0; align-items: center">
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueLevel">
-                <MudSelectItem Value="-1">Tất cả</MudSelectItem>
-                @foreach (var item in _lstLevel)
-                {
-                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                }
-            </MudSelect>
+      
         </MudItem >
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ExportExcel, Guid.Empty))">Export</MudButton>
@@ -101,9 +95,8 @@
                     }
                 </MudTd>
                 <MudTd Style="marign:3px" DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.Sync" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.ResetTv" aria-label="details"></MudIconButton>
 
                 </MudTd>
             </RowTemplate>
@@ -156,7 +149,7 @@
 
     private async Task ChangeValueLevel()
     {
-        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
+        _userList = await _serLevel.GetAllUserByLevelId(3, textSearch);
     }
 
 
@@ -165,7 +158,7 @@
     private async Task OpenDialogAsync(DialogOptions options, string name, Guid id)
     {
 
-        var dialogParametersUpdate = new DialogParameters<Dialog.Account.UpdateAccountManagement>
+        var dialogParametersUpdate = new DialogParameters<Dialog.Permission.ModifyPermission>
         {
             {x => x.UserId, id}
         };
@@ -197,7 +190,7 @@
         }
         else if (name.Equals(OpenDialogType.Update))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
+            var dialog = await DialogService.ShowAsync<Dialog.Permission.ModifyPermission>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
