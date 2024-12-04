@@ -421,9 +421,10 @@ else
             {
                 isPassed = false;
             }
+            var exSchedule = await localStorage.GetItemAsync<string>("ExamScheduleId");
             submission.UserId = _userId;
             submission.ExamDetailId = idExamDetail;
-            submission.ExamScheduleId = 1;
+            submission.ExamScheduleId = Convert.ToInt32(exSchedule); ;
             submission.SubmitTime = DateTime.Now;
             submission.TimeTaken = TimeSpan.FromSeconds(timeDoExam);
             submission.TotalMark = Math.Round(score, 2);
