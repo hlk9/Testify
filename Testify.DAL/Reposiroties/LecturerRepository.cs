@@ -56,7 +56,7 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
-                user.LevelId = 3;
+                //user.LevelId = 3;
                 var addLecturer = _context.Users.Add(user).Entity;
                 await _context.SaveChangesAsync();
                 return addLecturer;
@@ -72,7 +72,7 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
-                user.LevelId = 4;
+            //    user.LevelId = 4;
                 var addStudent = _context.Users.Add(user).Entity;
                 await _context.SaveChangesAsync();
                 return addStudent;
@@ -100,9 +100,8 @@ namespace Testify.DAL.Reposiroties
                 updateLecturer.LastLogin = user.LastLogin;
                 updateLecturer.Email = user.Email;
                 updateLecturer.Status = user.Status;
-                //updateLecturer.LevelId = 3;
+                updateLecturer.Sex = user.Sex;
                 updateLecturer.LevelId = user.LevelId;
-
 
                 var objLecturer = _context.Users.Update(updateLecturer).Entity;
                 await _context.SaveChangesAsync();
