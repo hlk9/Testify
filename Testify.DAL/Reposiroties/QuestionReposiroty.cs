@@ -24,11 +24,11 @@ namespace Testify.DAL.Reposiroties
             }
             else if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == true)
             {
-                return await _context.Questions.Where(x => x.Status == 1 || x.Status == 255).ToListAsync();
+                return await _context.Questions.Where(x => x.Status == 1).ToListAsync();
             }
             else if ((textSearch != null || textSearch != "") && isActive == true)
             {
-                return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1 || x.Status == 255).ToListAsync();
+                return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1).ToListAsync();
             }
             else
             {

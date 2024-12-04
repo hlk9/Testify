@@ -1,0 +1,109 @@
+﻿@page "/Examiner/ViewDetailExam"
+@using Testify.DAL.ViewModels
+@layout AdminLayout
+
+<div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">DANH SÁCH BÀI THI ĐÃ LÀM</MudText>
+    </MudPaper>
+
+    <MudSelect T="int" Class="w-100 mt-4" Label="Chọn bài thi để thêm" @bind-Value="@subjectId" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="SelectValueChanged">
+        <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+        @foreach (var item in _lstSubject)
+        {
+            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+        }
+    </MudSelect>
+
+    <div class="bg-white rounded-3" style="width:100%">
+
+        <MudTable Items="@_lstSubmission" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 410px)">
+            <ToolBarContent>
+                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách tài khoản</MudText>
+                    </MudItem>
+                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
+                    </MudItem>
+                </MudGrid>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="Tên" T="string">Tên Bài Thi</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thời gian nộp" T="string">Thời gian nộp</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Trạng Thái" T="bool">Trạng Thái</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Tên">@context.ExamName</MudTd>
+                <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                <MudTd DataLabel="Thời gian nộp">@context.SubmitTime.ToString("dd/MM/yyyy HH:mm")</MudTd>
+                <MudTd DataLabel="Trạng Thái">
+                    @if (context.Status)
+                    {
+                        <MudText Color="Color.Success">Đã nộp</MudText>
+                    }
+                    else
+                    {
+                        <MudText Color="Color.Error">Chưa nộp</MudText>
+                    }
+                </MudTd>
+                <MudTd DataLabel="Thao tác">
+                    <MudTooltip Text="Chi tiết">
+                        <MudIconButton Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                    </MudTooltip>
+                    <MudTooltip Text="Hành động">
+                        <MudIconButton Icon="@Icons.Material.Filled.Girl" aria-label="hd"></MudIconButton>
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>Không có dữ liệu</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </div>
+</div>
+
+@code {
+    private int subjectId = -1;
+    private List<Subject> _lstSubject = new List<Subject>();
+    private List<SubmissionViewModel> _lstSubmission = new List<SubmissionViewModel>();
+    private string? textSearch;
+    private string searchValue = "";
+
+    private async Task onChangeSearch()
+    {
+        await LoadData(searchValue);
+    }
+
+    private async Task LoadData(string? textSearch)
+    {
+        _lstSubject = await _serSub.GetAllSub(textSearch, true);
+        _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, textSearch);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData("");
+    }
+
+    private async Task SelectValueChanged()
+    {
+        if (subjectId == -1)
+        {
+            _lstSubmission = await _serSub.GetAllBySubjectId(null, searchValue);
+        }
+        else
+        {
+            _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue);
+        }
+    }
+}

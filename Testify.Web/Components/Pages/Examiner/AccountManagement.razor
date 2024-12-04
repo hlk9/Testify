@@ -104,7 +104,6 @@
                     <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
                     <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
                     <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-
                 </MudTd>
             </RowTemplate>
 
@@ -118,11 +117,7 @@
                 <MudTablePager />
             </PagerContent>
         </MudTable>
-
     </div>
-
-
-
 </div>
 @code {
     private string searchValue = "";
