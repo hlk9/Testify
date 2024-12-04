@@ -48,7 +48,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Submitted-By-User")]
-        public async Task<ActionResult<List<SubmittedByUser>>> GetSubmittedByUser(Guid userId)
+        public async Task<ActionResult<List<SubmissionWithName>>> GetSubmittedByUser(Guid userId)
         {
             return await _repo.GetAllSubmittedByUser(userId);
         }

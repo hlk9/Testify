@@ -150,19 +150,21 @@ else
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh><MudTableSortLabel SortLabel="nr_field" T="string">Tên bài thi</MudTableSortLabel></MudTh>
-                            <MudTh><MudTableSortLabel SortLabel="sign_field" T="string">Ngày thi</MudTableSortLabel></MudTh>
+                            <MudTh><MudTableSortLabel SortLabel="sign_field" T="string">Ngày nộp</MudTableSortLabel></MudTh>
                             <MudTh><MudTableSortLabel SortLabel="name_field" T="string">Môn</MudTableSortLabel></MudTh>
                             <MudTh><MudTableSortLabel SortLabel="position_field" T="string">Điểm</MudTableSortLabel></MudTh>
-                            <MudTh><MudTableSortLabel SortLabel="mass_field" T="string">Lớp</MudTableSortLabel></MudTh>
+                            <MudTh><MudTableSortLabel SortLabel="position_field" T="string">Đạt</MudTableSortLabel></MudTh>
+                            <MudTh><MudTableSortLabel SortLabel="position_field" T="string">Ghi chú</MudTableSortLabel></MudTh>
                             <MudTh><MudTableSortLabel SortLabel="mass_field" T="string">Thao tác</MudTableSortLabel></MudTh>
                         </HeaderContent>
                         <RowTemplate>
-                            <MudTd DataLabel="Nr">@context.NameExam</MudTd>
-                            <MudTd DataLabel="Sign">@context.ExamDate</MudTd>
+                            <MudTd DataLabel="Nr">@context.Name</MudTd>
+                            <MudTd DataLabel="Sign">@context.SubmitTime</MudTd>
                             <MudTd DataLabel="Name">@context.SubjectName</MudTd>
-                            <MudTd DataLabel="Position">@context.Score</MudTd>
-                            <MudTd DataLabel="Molar mass">@context.ClassName</MudTd>
-                            <MudTd DataLabel="Molar mass"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Chi tiết</MudButton></MudTd>
+                            <MudTd DataLabel="Position">@context.TotalMark</MudTd>
+                            <MudTd DataLabel="Molar mass">@(context.IsPassed?"Đạt":"Chưa đạt")</MudTd>
+                            <MudTd DataLabel="Position">@context.Note</MudTd>
+                            <MudTd DataLabel="Molar mass"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Xem</MudButton></MudTd>
                         </RowTemplate>
                         <NoRecordsContent>
                             <MudText>Chưa có bài đã thi</MudText>
@@ -186,7 +188,7 @@ else
     private int _totalSubmitted = 0;
     private int _totalClassed = 0;
     private List<ListExamsOfStudent> _lstExam = new List<ListExamsOfStudent>();
-    private List<SubmittedByUser> _lstSubmitted = new List<SubmittedByUser>();
+    private List<SubmissionWithName> _lstSubmitted = new List<SubmissionWithName>();
     private List<Achievenment> _lstAchivenment = new List<Achievenment>();
 
     private async Task LoadData()
@@ -196,7 +198,7 @@ else
         var lstExam = await _serLec.GetListExam(_userId);
         _lstExam = lstExam.Where(x => x.ExamScheduleStartTime >= DateTime.Now).ToList();
         _lstSubmitted = await _serSubmission.GetAllSubmittedByUser(_userId);
-        _totalSubmitted = _lstSubmitted.GroupBy(x => x.ExamScheduleId).Select(group => group.First()).ToList().Count();
+        _totalSubmitted = _lstSubmitted.Count();
         var lstClassByUserId = await _serClassUser.GetAllClassByUserId(_userId);
         _totalClassed = lstClassByUserId.Count();
         _lstAchivenment = await _serSubmission.GetAllAchievenment(_userId);

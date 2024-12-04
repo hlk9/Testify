@@ -124,10 +124,7 @@ namespace Testify.DAL.Reposiroties
                               from cs in classSubject.DefaultIfEmpty()
                               where c.SubjectId == idSubject
                                     && c.Status == 1 
-                                    !=_context.ClassExamSchedules.Any(x => x.ClassId == c.Id&&x.ExamScheduleId==scheduleId)
-                                    && _context.ExamSchedules.Any(es => es.SubjectId == idSubject)
-                                    && _context.ExamSchedules.Any(es => es.SubjectId == idSubject
-                                                                        && es.EndTime < scheduleStartTime && es.Id != scheduleId)
+                                    
                               select new ClassWithUser
                               {
                                   Id = c.Id,

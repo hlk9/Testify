@@ -60,31 +60,33 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<List<SubmittedByUser>> GetAllSubmittedByUser(Guid userId)
+        public async Task<List<SubmissionWithName>> GetAllSubmittedByUser(Guid userId)
         {
-            var check = await _context.Submissions.FirstOrDefaultAsync(x => x.UserId == userId);
-            var check2 = await _context.ExamSchedules.Where(x => x.Id == check.ExamScheduleId).FirstOrDefaultAsync();
-            var check3 = await _context.ClassExamSchedules.FirstOrDefaultAsync(x => x.ExamScheduleId == check2.Id);
-
-            var data = await (from submit in _context.Submissions.Where(x => x.UserId == userId)
-                              join exs in _context.ExamSchedules on submit.ExamScheduleId equals exs.Id
-                              join clex in _context.ClassExamSchedules on exs.Id equals clex.ExamScheduleId
-                              join cl in _context.Classes on clex.ClassId equals cl.Id
-                              join sub in _context.Subjects on cl.SubjectId equals sub.Id
-                              select new SubmittedByUser
+            var data = await (from submit in _context.Submissions
+                              join u in _context.Users
+                              on submit.UserId equals u.Id
+                              join exD in _context.ExamDetails
+                              on submit.ExamDetailId equals exD.Id
+                              join ex in _context.Exams
+                              on exD.ExamId equals ex.Id
+                              join sub in _context.Subjects
+                              on ex.SubjectId equals sub.Id
+                              select new SubmissionWithName
                               {
-                                  UserId = submit.UserId,
-                                  SubmissionId = submit.Id,
-                                  ExamScheduleId = submit.ExamScheduleId,
-                                  NameExam = exs.Title,
-                                  ExamDate = submit.SubmitTime,
+                                  Id = submit.Id,
+                                  Name = ex.Name,
                                   SubjectName = sub.Name,
-                                  Score = submit.TotalMark,
-                                  ClassName = cl.Name,
-                                  ExamDetailId = submit.ExamDetailId,
-                                  SubmitTime = submit.SubmitTime
-                              }
-                              ).ToListAsync();
+                                  UserId = userId,
+                                  SubmitTime = submit.SubmitTime,
+                                  TimeTaken = submit.TimeTaken,
+                                  TotalMark = submit.TotalMark,
+                                  IsPassed = submit.IsPassed,
+                                  Note = submit.Note,
+                                  SubmissionId = submit.Id,
+                                  ExamDetailId = exD.Id
+
+
+                              }).ToListAsync();
 
             return data;
         }
