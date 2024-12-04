@@ -63,6 +63,7 @@ builder.Services.AddScoped<ClassExamScheduleService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<ExamActivityLogService>();
+builder.Services.AddScoped<UserPermissionService>();
 
 // Add response compression services
 builder.Services.AddResponseCompression(options =>
