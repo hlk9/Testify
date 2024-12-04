@@ -32,6 +32,9 @@
     <None Include="wwwroot\*" />
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="Components\Pages\ViewDetailExam.razor" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
   <ItemGroup>

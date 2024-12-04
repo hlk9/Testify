@@ -22,7 +22,7 @@ else
                     <MudRadio T="bool" Value="true">Nam</MudRadio>
                     <MudRadio T="bool" Value="false">Nữ</MudRadio>
                 </MudRadioGroup>
-                <MudAutocomplete T="int" @bind-Value="levelId" Variant="Variant.Outlined" Label="Giáo viên quản lý"
+                <MudAutocomplete T="int" @bind-Value="levelId" Variant="Variant.Outlined" Label="Chức vụ"
                                  ToStringFunc="@(e => _lstLevel.FirstOrDefault(t => t.Id == e)?.Name ?? "Không có chức vụ nào!")"
                                  Items="@_lstLevel.Select(t => t.Id)"
                                  ReadOnly="true"

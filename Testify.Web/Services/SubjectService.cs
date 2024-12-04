@@ -1,5 +1,6 @@
 ﻿using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using Testify.Web.Components.Layout;
 
 namespace Testify.Web.Services
 {
@@ -76,6 +77,12 @@ namespace Testify.Web.Services
             return response;
         }
 
+        public async Task<List<SubmissionViewModel>> GetAllBySubjectId(int? subjectId, string? textSearch)
+        {
+            var lstUser = await _httpClient.GetAsync($"Subject/get-all-by-subjectId?subjectId={subjectId}&textSearch{textSearch}");
+            var response = await lstUser.Content.ReadFromJsonAsync<List<SubmissionViewModel>>();
+            return response;
+        }
 
 
     }

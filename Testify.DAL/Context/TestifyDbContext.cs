@@ -133,11 +133,6 @@ namespace Testify.DAL.Context
                 .HasData(
                 new Subject { Id = 1, Description = "None", Name = "Ly", Status = 1 }
                 );
-
-            modelBuilder.Entity<Class>()
-                .HasData(
-                new Class { Id = 1, Name = "Class 1", Status = 1, Capacity = 30, Description = "None", SubjectId = 1, ClassCode = "refdsw", TeacherId = Guid.NewGuid() }
-                );
         }
     }
 }

@@ -181,7 +181,25 @@ namespace Testify.DAL.Reposiroties
                     PercentFail = Math.Round(percentFail, 2),
                 }
             };
+        }
 
+        public async Task<List<SubmissionViewModel>> GetSubmissionDetails(int? subjectId, string? textSearch)
+        {
+            return await _context.Submissions
+                .Include(s => s.ExamDetail)
+                    .ThenInclude(ed => ed.Exam)
+                        .ThenInclude(e => e.Subject)
+                .Where(s => (!subjectId.HasValue || s.ExamDetail.Exam.SubjectId == subjectId.Value) 
+                        && (string.IsNullOrEmpty(textSearch) || s.ExamDetail.Exam.Name.Contains(textSearch) || 
+                        s.ExamDetail.Exam.Subject.Name.Contains(textSearch)))
+                .Select(s => new SubmissionViewModel
+                {
+                    ExamName = s.ExamDetail.Exam.Name,
+                    SubjectName = s.ExamDetail.Exam.Subject.Name,
+                    SubmitTime = s.SubmitTime,
+                    Status = s.Status ?? false
+                })
+                .ToListAsync();
         }
 
     }
