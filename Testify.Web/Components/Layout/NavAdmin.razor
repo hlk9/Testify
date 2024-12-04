@@ -1,4 +1,5 @@
-﻿<MudPaper Width="100%" Class="d-inline-flex py-3" Elevation="0">
+﻿@using Testify.Web.Shared
+<MudPaper Width="100%" Class="d-inline-flex py-3" Elevation="0">
     <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered="true">
         <MudText Typo="Typo.h6" Class="px-4">Testify</MudText>
         <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">@roleTitle</MudText>
@@ -15,9 +16,8 @@
             <MudNavLink Href="/Examiner/ExamManagement" Icon="@Icons.Material.Filled.FilterNone">Bài Thi</MudNavLink>
             <MudNavLink Href="/Examiner/CreateExamDetail" Icon="@Icons.Material.Filled.Iso">Đề thi</MudNavLink>
         </MudNavGroup>
-
         <MudNavLink hidden="@showSubject" Href="/Examiner/SubjectManagement" Icon="@Icons.Material.Filled.Subject">Quản Lý Môn Học</MudNavLink>
-        <MudNavGroup hidden="@showQuestionManagement" Title="Quản lý câu hỏi" Icon="@Icons.Material.Filled.AutoStories" Expanded="true">
+        <MudNavGroup hidden="@showQuestionAndAnswerManagement" Title="Quản lý câu hỏi" Icon="@Icons.Material.Filled.AutoStories" Expanded="true">
             <MudNavLink Href="/Examiner/QuestionManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Câu Hỏi Và Đáp Án</MudNavLink>
             <MudNavLink Href="/Examiner/QuestionLevelManagement" Icon="@Icons.Material.Filled.Calculate">Mức độ câu hỏi</MudNavLink>
         </MudNavGroup>
@@ -26,6 +26,7 @@
             <MudNavLink Href="/ScoreDistribution-Class" Icon="@Icons.Material.Filled.MeetingRoom">Lớp</MudNavLink>
             <MudNavLink Href="/ScoreDistribution-Subject" Icon="@Icons.Material.Filled.MenuBook">Môn</MudNavLink>
         </MudNavGroup>
+        <MudNavLink hidden="@showPermission" Href="/Examiner/PermissionManagement" Icon="@Icons.Material.Filled.FrontHand">Phân quyền</MudNavLink>
     </MudNavMenu>
 </MudPaper>
 @code
@@ -37,34 +38,34 @@
     private bool showClass = false;
     private bool showAccount = false;
     private bool showSubject = false;
-    private bool showQuestionManagement = false;
+    private bool showQuestionAndAnswerManagement = false;
     private bool showQuestionLevel = false;
     private bool showChart = false;
     private bool showExamManagement = false;
+    private bool showPermission = false;
     private string roleTitle = "Quản trị";
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-
-        var sessionResult = await ProtectedSessionStore.GetAsync<string>("userLogin");
-        if (sessionResult.Success && sessionResult.Value != null)
+        if (firstRender)
         {
-
-            user = await _serUser.GetByidUser(Guid.Parse(sessionResult.Value.ToString()));
-            if (user == null)
+            var sessionResult = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            if (sessionResult.Success && sessionResult.Value != null)
             {
-                navigation.NavigateTo("/");
-            }
-            else
-            {
-                HideElement();
-                StateHasChanged();
-            }
-        }        
 
-
+                user = await _serUser.GetByidUser(Guid.Parse(sessionResult.Value.ToString()));
+                if (user == null)
+                {
+                    navigation.NavigateTo("/");
+                }
+                else
+                {
+                    HideElement();
+                    StateHasChanged();
+                }
+            }
+        }
     }
 
     protected override async void OnInitialized()
@@ -73,17 +74,23 @@
 
     }
 
-    private void HideElement()
+    private async Task HideElement()
     {
         if (user.LevelId == 3)
         {
-            roleTitle = "Giảng viên";
             showAccount = true;
             showChart = true;
-            showSchedule = true;
             showDashboard = true;
-            showExamManagement = true;
-            showQuestionManagement = true;
+            showPermission = true;
+            roleTitle = "Giảng viên";
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageExam))
+                showExamManagement = true;
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageQuestionAndAnswer))
+                showQuestionAndAnswerManagement = true;
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageSchedule))
+                showSchedule = true;
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageSubject))
+                showSubject = true;
             StateHasChanged();
         }
         else if (user.LevelId == 2)

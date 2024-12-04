@@ -1,6 +1,6 @@
 ﻿@page "/Examiner/ExamManagement"
 @using Testify.API.DTOs
-@layout AdminLayout
+@layout ExaminerLayout
 @inject IDialogService DialogService
 @inject ExamService examService
 @inject ExamDetailService examdetailService
@@ -110,7 +110,7 @@
     {
         _lst = (await examService.GetInforBasic(null)).Where(x => x.Status != 255).ToList();
     }
-
+    
     [Inject] ISnackbar Snackbar { get; set; }
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
@@ -120,8 +120,30 @@
         StateHasChanged();
     }
 
+    private async Task<bool> CheckAllowdelete()
+    {
+        var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        if (!userId.Success || userId.Value == null)
+        {
+            return false;
+        }
+        else
+        {
+            var u = await _serUser.GetByidUser(Guid.Parse(userId.Value));
+            if (u.LevelId != 1 || u.LevelId != 2)
+                return false;
+        }
+
+        return true;
+    }
+
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
     {
+        if (! await CheckAllowdelete())
+        {
+            await JS.InvokeVoidAsync("alert", "Bạn không có quyền xóa, hãy liên hệ cấp trên");
+            return;
+        }
         var parameters = new DialogParameters
         {
               { "Id", Id }

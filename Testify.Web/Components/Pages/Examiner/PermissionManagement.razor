@@ -95,8 +95,8 @@
                     }
                 </MudTd>
                 <MudTd Style="marign:3px" DataLabel="Thao tác">
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.Update" aria-label="update"></MudIconButton>
-                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Restore" aria-label="details"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.Sync" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.ResetTv" aria-label="details"></MudIconButton>
 
                 </MudTd>
             </RowTemplate>
@@ -158,7 +158,7 @@
     private async Task OpenDialogAsync(DialogOptions options, string name, Guid id)
     {
 
-        var dialogParametersUpdate = new DialogParameters<Dialog.Account.UpdateAccountManagement>
+        var dialogParametersUpdate = new DialogParameters<Dialog.Permission.ModifyPermission>
         {
             {x => x.UserId, id}
         };
@@ -190,7 +190,7 @@
         }
         else if (name.Equals(OpenDialogType.Update))
         {
-            var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
+            var dialog = await DialogService.ShowAsync<Dialog.Permission.ModifyPermission>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {

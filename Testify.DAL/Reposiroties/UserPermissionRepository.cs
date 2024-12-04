@@ -21,6 +21,27 @@ namespace Testify.DAL.Reposiroties
             return listUP;
         }
 
+        public bool AddListUserPermission(List<UserPermission> userPermission)
+        {
+            foreach (var item in userPermission)
+            {
+                _context.UserPermissions.Add(item);
+            }
+            return  _context.SaveChanges() >= userPermission.Count;
+            
+        }
+
+        public bool RemoveListUserPermission(List<int> ids)
+        {
+            foreach (var item in ids)
+            {
+                var up= _context.UserPermissions.Find(item);
+                if(up != null)
+                    _context.UserPermissions.Remove(up);
+            }
+            return  _context.SaveChanges() >0;
+        }
+
         public bool AddUserPermission(UserPermission userPermission)
         {
             _context.UserPermissions.Add(userPermission);

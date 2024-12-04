@@ -10,6 +10,27 @@ namespace Testify.Web.Services
             _httpClient = httpClient;
         }
 
+
+
+        public async Task<bool> AddListUserPermission(List<UserPermission> listUp)
+        {
+            var stat = await _httpClient.PostAsJsonAsync<List<UserPermission>>($"UserPermission/Add-ListUserPermission", listUp);
+            return stat.IsSuccessStatusCode;
+        }
+        
+        public async Task<bool> RemoveListPermissions(List<int> ids)
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri("UserPermission/Delete-ListUserPermission", UriKind.Relative),
+                Content = JsonContent.Create(ids)
+            };
+
+            var response = await _httpClient.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+
         public async Task<List<UserPermission>> GetAllByUserId(Guid id)
         {
             return await _httpClient.GetFromJsonAsync<List<UserPermission>>("UserPermission/Get-PermissionByUserId?id="+id);

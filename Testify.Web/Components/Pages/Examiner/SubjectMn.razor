@@ -2,7 +2,7 @@
 @using Testify.DAL.Models
 @using Testify.Web.Data.Commons
 @using Testify.Web.Shared
-@layout AdminLayout
+@layout ExaminerLayout
 @inject IDialogService DialogService
 <style>
 
@@ -105,6 +105,22 @@ else
     {
         await LoadData("");
     }
+    private async Task<bool> CheckAllowdelete()
+    {
+        var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        if (!userId.Success || userId.Value == null)
+        {
+            return false;
+        }
+        else
+        {
+            var u = await _serUser.GetByidUser(Guid.Parse(userId.Value));
+            if (u.LevelId != 1 || u.LevelId != 2)
+                return false;
+        }
+
+        return true;
+    }
 
     [Parameter]
     public int idSubject { get; set; }
@@ -161,6 +177,11 @@ else
         }
         else
         {
+            if (! await CheckAllowdelete())
+            {
+                await JS.InvokeVoidAsync("alert", "Bạn không có quyền xóa, hãy liên hệ cấp trên");
+                return;
+            }
             var dialog = await DialogService.ShowAsync<Dialog.Subject.DeleteSubjectDialog>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)

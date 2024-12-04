@@ -92,6 +92,11 @@
                 isLoading = true;
                 StateHasChanged();
                 var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                if (!userId.Success || userId.Value == null)
+                {
+                    navigation.NavigateTo("/");
+                    return;
+                }
                 var objUser = await _serLec.GetLecturerById(Guid.Parse(userId.Value));
                 string nameUser = objUser.FullName;
                 string[] tu = nameUser.Split(' ', StringSplitOptions.RemoveEmptyEntries);

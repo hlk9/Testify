@@ -171,6 +171,23 @@
     {
         await LoadData(searchValue);
     }
+    
+    private async Task<bool> CheckAllowdelete()
+    {
+        var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        if (!userId.Success || userId.Value == null)
+        {
+            return false;
+        }
+        else
+        {
+            var u = await _serUser.GetByidUser(Guid.Parse(userId.Value));
+            if (u.LevelId != 1 || u.LevelId != 2)
+                return false;
+        }
+
+        return true;
+    }
 
     private async Task LoadData(string? textSearch)
     {
@@ -275,6 +292,11 @@
         }
         else
         {
+            if (! await CheckAllowdelete())
+            {
+                await JS.InvokeVoidAsync("alert", "Bạn không có quyền xóa, hãy liên hệ cấp trên");
+                return;
+            }
             var dialog = await DialogService.ShowAsync<Dialog.Class.DeleteClassDialog>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)

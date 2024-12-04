@@ -22,6 +22,13 @@ namespace Testify.API.Controllers
             return obj;
         }
 
+        [HttpDelete("Delete-ListUserPermission")]
+        public async Task<bool> RemoveListUP([FromBody] List<int> ids)
+        {
+            var stats =  userPermissionRepository.RemoveListUserPermission(ids);
+            return stats;
+        }
+
         [HttpDelete("Delete-UserPermission")]
         public async Task<bool> Delete(int id)
         {
@@ -39,6 +46,13 @@ namespace Testify.API.Controllers
         public async Task<bool> CheckPermission(Guid userId, string permission)
         {
             return await userPermissionRepository.HasPermissionAsync(userId, permission);
+        }
+
+        [HttpPost("Add-ListUserPermission")]
+        public bool AddListUserPermission(List<UserPermission> listUp)
+        {
+            var stats =   userPermissionRepository.AddListUserPermission(listUp);
+            return stats;
         }
     }
 }
