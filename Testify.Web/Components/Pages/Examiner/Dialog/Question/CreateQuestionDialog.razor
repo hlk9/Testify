@@ -395,6 +395,7 @@
             try
             {
                 isLoading = true;
+                StateHasChanged();
 
                 if (subjectId == null || subjectId <= 0)
                 {
@@ -418,11 +419,19 @@
             finally
             {
                 isLoading = false;
+                StateHasChanged();
             }
         }
         else
         {
             var checkValidation = ValidationForm();
+
+            var hasQuestion = await _serQuestion.Checkvalidate(question.Content, questionTypeId, subjectId, null);
+            if(hasQuestion)
+            {
+                snackbar.Add("Đã tồn tại câu hỏi này!", Severity.Warning);
+                return;
+            }
 
             if (questionTypeId == (int)listQuestionTypes.YesNo)
             {
@@ -483,6 +492,7 @@
                 {
                     MudDialog.Close(DialogResult.Ok(true));
                     snackbar.Add("Thêm thất bại", Severity.Error);
+                    lstAnswers.Clear();
                 }
             }
         }

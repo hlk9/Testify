@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -51,10 +52,43 @@ namespace Testify.DAL.Reposiroties
             return await _context.Questions.Where(x => x.SubjectId == subjectId && x.QuestionLevelId == levelId && x.Status == 1).ToListAsync();
         }
 
-        //public async Task<List<QuestionInExam>> GetQuesBySub_Level_CHosen(int subID, int levelId, bool choosen)
-        //{
-        //    return await _context.Questions
-        //}
+        public async Task<bool> CheckValidate(string content, int questionTypeId, int subjectId, int? questionId)
+        {
+                bool hasQuestion;
+                if (questionId != null)
+                {
+                    hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Id != questionId);
+                }
+                else
+                {
+                    hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId);
+                }
+
+                if (hasQuestion)
+                {
+                    return true;
+                }
+                return false;
+        }
+
+        public async Task<bool> CheckUpdateIsExamSchedule(int questionId)
+        {
+            var currentDateTime = DateTime.Now;
+
+            var isExist = await (from es in _context.ExamSchedules
+                                 join e in _context.Exams on es.ExamId equals e.Id
+                                 join ed in _context.ExamDetails on e.Id equals ed.ExamId
+                                 join edq in _context.ExamDetailQuestions on ed.Id equals edq.ExamDetailId
+                                 join qs in _context.Questions on edq.QuestionId equals qs.Id
+                                 where qs.Id == questionId &&
+                                       (
+                                           (es.StartTime <= currentDateTime && es.EndTime >= currentDateTime) ||
+                                           es.StartTime > currentDateTime
+                                       )
+                                 select qs.Id).AnyAsync();
+
+            return isExist;
+        }
 
         public async Task<Question> CreateQuestion(Question question)
         {

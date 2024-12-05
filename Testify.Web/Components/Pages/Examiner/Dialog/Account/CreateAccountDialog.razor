@@ -266,7 +266,7 @@ else
 
             users.DateOfBirth = _date.GetValueOrDefault(DateTime.Now);
 
-            var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName);
+            var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName, null);
 
             if (existing)
             {

@@ -52,6 +52,7 @@
 
 @code {
     private Question question { get; set; } = new();
+    private Question questionMock { get; set; } = new();
     private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
     private List<Subject> _lstSubjects = new List<Subject>();
     private bool isLoading { get; set; } = true;
@@ -75,6 +76,8 @@
         _lstSubjects = await _serSub.GetAllSub(null, true);
 
         question = await _serQuestion.GetQuestionById(QuestionId);
+
+        questionMock = question;
 
         questionLevelId = question.QuestionLevelId ?? -1;
 
@@ -150,7 +153,22 @@
 
     private async Task Submit()
     {
+
         var checkValidation = ValidationForm();
+
+        var hasQuestion = await _serQuestion.Checkvalidate(question.Content, question.QuestionTypeId, question.SubjectId, question.Id);
+        if (hasQuestion)
+        {
+            snackbar.Add("Đã tồn tại câu hỏi này!", Severity.Warning);
+            return;
+        }
+
+        var hasExamSchedule = await _serQuestion.CheckUpdate(question.Id);
+        if (hasExamSchedule)
+        {
+            snackbar.Add("Không thể sửa!", Severity.Warning);
+            return;
+        }
 
         if (!checkValidation)
         {

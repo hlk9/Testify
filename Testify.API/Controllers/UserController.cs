@@ -157,9 +157,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Check-Email-Or-Phone")]
-        public async Task<ActionResult> CheckEmailOrPhone(string email, string phoneNumber, string userName)
+        public async Task<ActionResult> CheckEmailOrPhone(string email, string phoneNumber, string userName, Guid? userId)
         {
-            bool result = await userRepos.CheckEmailOrPhone(email, phoneNumber, userName);
+            bool result = await userRepos.CheckEmailOrPhone(email, phoneNumber, userName, userId);
             return Ok(result);
         }
 

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using SendGrid.Helpers.Mail;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using Testify.Web.Components.Pages.Examiner;
 
 namespace Testify.Web.Services
 {
@@ -73,6 +75,20 @@ namespace Testify.Web.Services
         public async Task<HttpResponseMessage> ExportQuestionBySubjectId(int subjectId, bool isAnswer)
         {
             return await _httpClient.GetAsync($"Question/Export-Question-By-SubjectId?subjectId={subjectId}&isAnswer={isAnswer}");
+        }
+
+        public async Task<bool> Checkvalidate(string content, int questionTypeId, int subjectId, int? questionId)
+        {
+            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Validate?content={content}&questionTypeId={questionTypeId}&subjectId={subjectId}&questionId={questionId}");
+            var response = await hasQuestion.Content.ReadFromJsonAsync<bool>();
+            return response;
+        }
+
+        public async Task<bool> CheckUpdate(int questionId)
+        {
+            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Update?questionId={questionId}");
+            var response = await hasQuestion.Content.ReadFromJsonAsync<bool>();
+            return response;
         }
 
         public async Task<int> ImportExcelQuestion(IBrowserFile file, int subjectId)
