@@ -66,19 +66,27 @@
                         </MudTextField>
                         <MudTable Items="@_lstChoice_Select" MultiSelection="true" Context="_lstChoiceSelect" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="400px" @bind-SelectedItems="listQuestionSelected" Striped="true">
                             <ToolBarContent>
-                                <MudText Style="font-size: 22px; font-weight: bold; color: #29a69a; display: flex; justify-content: center; width: 100%;">Kho câu hỏi</MudText>
+                                <MudText Style="font-size: 22px; font-weight: bold; color: #29a69a; display: flex; justify-content: center; width: 100%;">Kho câu hỏi </MudText>
                             </ToolBarContent>
 
                             <HeaderContent>
                                 <MudTh hidden><MudTableSortLabel SortLabel="ID" T="string">Mã câu hỏi</MudTableSortLabel></MudTh>
                                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Nội dung câu hỏi</MudTableSortLabel></MudTh>
-                                <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Mức độ câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Mức độ câu hỏi </MudTableSortLabel></MudTh>
                                 <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Loại câu hỏi</MudTableSortLabel></MudTh>
                             </HeaderContent>
                             <RowTemplate>
                                 <MudTd hidden>@_lstChoiceSelect.Id</MudTd>
                                 <MudTd>@_lstChoiceSelect.Content</MudTd>
-                                <MudTd>@_lstChoiceSelect.QuestionLeveName</MudTd>
+                               
+                                @if (_lstChoiceSelect.QuestionLeveName == null)
+                                {
+                                    <MudTd>Không có</MudTd>
+                                }
+                                else
+                                {
+                                    <MudTd>@_lstChoiceSelect.QuestionLeveName</MudTd>
+                                }
                                 <MudTd>@_lstChoiceSelect.QuestionTypeName</MudTd>
                             </RowTemplate>
                             <NoRecordsContent>
@@ -110,7 +118,15 @@
                             <RowTemplate>
                                 <MudTd hidden>@_lstChoiceContext.Id</MudTd>
                                 <MudTd>@_lstChoiceContext.Content</MudTd>
-                                <MudTd>@_lstChoiceContext.QuestionLeveName</MudTd>
+                                
+                                @if (_lstChoiceContext.QuestionLeveName == null)
+                                {
+                                    <MudTd>Không có</MudTd>
+                                }
+                                else
+                                {
+                                    <MudTd>@_lstChoiceContext.QuestionLeveName</MudTd>
+                                }
                                 <MudTd>@_lstChoiceContext.QuestionTypeName</MudTd>
                             </RowTemplate>
                             <NoRecordsContent>

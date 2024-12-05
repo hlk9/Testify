@@ -78,7 +78,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<QuestionInExam>> GetQuestionByExamDetailID_NOT(int examdetailID, int SubjectId)
         {
-           
+
             //var data = (from a in _context.ExamDetailQuestions
             //            join b in _context.Questions on a.QuestionId equals b.Id
             //            join c in _context.QuestionLevels on b.QuestionLevelId equals c.Id
@@ -98,29 +98,32 @@ namespace Testify.DAL.Reposiroties
             //                SubjectId = b.SubjectId,
             //                Code = e.Code,
             //            }).Distinct().ToList();
-
             var _data = (from b in _context.Questions
-                        join c in _context.QuestionLevels on b.QuestionLevelId equals c.Id
-                        join d in _context.QuestionTypes on b.QuestionTypeId equals d.Id
-                        //join e in _context.ExamDetails on b.SubjectId equals e.Id
-                        where !_context.ExamDetailQuestions
-                                     .Where(a => a.ExamDetailId == examdetailID)
-                                     .Select(a => a.QuestionId)
-                                     .Contains(b.Id) // Điều kiện loại trừ QuestionId
-                              && b.SubjectId == SubjectId // Điều kiện SubjectId
+                         join c in _context.QuestionLevels
+                             on b.QuestionLevelId equals c.Id into questionLevelsGroup
+                         from c in questionLevelsGroup.DefaultIfEmpty() // Left join
+                         join d in _context.QuestionTypes
+                             on b.QuestionTypeId equals d.Id
+                         where b.Status == 1
+                               && !_context.ExamDetailQuestions
+                                    .Where(a => a.ExamDetailId == examdetailID)
+                                    .Select(a => a.QuestionId)
+                                    .Contains(b.Id) // Điều kiện loại trừ QuestionId
+                               && b.SubjectId == SubjectId // Điều kiện SubjectId
                          select new QuestionInExam
-                        {
-                            Id = b.Id,
-                            Content = b.Content,
-                            QuestionLevelId = b.QuestionLevelId,
-                            QuestionLeveName = c.Name,
-                            QuestionTypeId = b.QuestionTypeId,
-                            QuestionTypeName = d.Name,
-                            CreatedDate = b.CreatedDate,
-                            Status = b.Status,
-                            SubjectId = b.SubjectId,
-                            //Code = e.Code,
-                        }).Distinct().ToList();
+                         {
+                             Id = b.Id,
+                             Content = b.Content,
+                             QuestionLevelId = b.QuestionLevelId,
+                             QuestionLeveName = c != null ? c.Name : null, // Check null
+                             QuestionTypeId = b.QuestionTypeId,
+                             QuestionTypeName = d.Name,
+                             CreatedDate = b.CreatedDate,
+                             Status = b.Status,
+                             SubjectId = b.SubjectId,
+                             // Code = e.Code,
+                         }).Distinct().ToList();
+
 
 
             return _data.DistinctBy(x => x.Id).ToList();
