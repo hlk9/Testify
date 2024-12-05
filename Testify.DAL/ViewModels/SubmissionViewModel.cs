@@ -8,6 +8,7 @@ namespace Testify.DAL.ViewModels
 {
     public class SubmissionViewModel
     {
+        public int ID { get; set; }
         public string ExamName { get; set; }
         public string SubjectName { get; set; }
         public DateTime SubmitTime { get; set; }
