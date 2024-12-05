@@ -42,6 +42,20 @@ namespace Testify.API.Controllers
             return Ok(question);
         }
 
+        [HttpGet("Check-Validate")]
+        public async Task<ActionResult<bool>> CheckValidate(string content, int questionTypeId, int subjectId, int? questionId)
+        {
+            var hasQuestion = await _repoQuestion.CheckValidate(content, questionTypeId, subjectId, questionId);
+            return Ok(hasQuestion);
+        }
+
+        [HttpGet("Check-Update")]
+        public async Task<ActionResult<bool>> CheckUpdate(int questionId)
+        {
+            var hasQuestion = await _repoQuestion.CheckUpdateIsExamSchedule(questionId);
+            return Ok(hasQuestion);
+        }
+
         [HttpPost("Create-Question")]
         public async Task<ActionResult<Question>> Create(Question question)
         {
