@@ -16,7 +16,10 @@ namespace Testify.DAL.Models
         [ForeignKey("QuestionLevelId")]
         public int? QuestionLevelId { get; set; }
         public virtual QuestionLevel? QuestionLevel { get; set; }
-
+        public Guid? CreatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public virtual ICollection<QuestionAnswer>? QuestionAnswers { get; set; }
         public virtual ICollection<ExamDetailQuestion>? ExamDetailQuestions { get; set; }
     }

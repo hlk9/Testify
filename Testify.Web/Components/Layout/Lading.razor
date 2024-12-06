@@ -1,15 +1,19 @@
 ﻿@page "/"
 
 
-<MudPaper Elevation="0" Style="background-color: #29a69a" Class="position-sticky sticky-top text-center shadow">
-    <MudContainer MaxWidth="MaxWidth.Large" Class="w-100 py-4">
+<MudPaper Elevation="0" Class="position-sticky sticky-top text-center shadow">
+    <MudContainer MaxWidth="MaxWidth.Large" Class="w-100 py-2">
         <MudGrid Class="p-0 m-0 w-100 align-items-center">
             <MudItem xl="2" lg="2" md="4" xs="4" Class="p-0">
-                <MudText Class="border border-white p-1 text-center">Logo</MudText>
+	            <MudText Class="border border-white p-1 text-center">
+		            <MudImage Height="45" Src="/Asset/Logo/TestifyStraiWithText.svg">
+			            
+		            </MudImage>
+	            </MudText>
             </MudItem>
             <MudItem xl="8" lg="8" md="4" xs="2" Class="p-0"></MudItem>
             <MudItem xl="2" lg="2" md="4" xs="6" Class="p-0 text-end">
-                <MudLink Style="border: 2px solid #fff; border-radius:15px; color: #fff !important; align-items: center; width: 100%; padding: 10px 40px;" Class="pointer-event fw-bold" Href="/Login">Đăng Nhập</MudLink>
+                <MudLink Style="border: 2px solid; border-radius:15px; align-items: center; width: 100%; padding: 10px 40px;" Class="pointer-event fw-bold btn-primary" Href="/Login">Đăng Nhập</MudLink>
             </MudItem>
         </MudGrid>
     </MudContainer>

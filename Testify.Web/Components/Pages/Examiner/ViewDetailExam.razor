@@ -1,6 +1,6 @@
 ﻿@page "/Examiner/ViewDetailExam"
 @using Testify.DAL.ViewModels
-@layout AdminLayout
+@layout ExaminerLayout
 
 <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
@@ -52,7 +52,7 @@
                 </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Chi tiết">
-                        <MudIconButton Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.Notes" @onclick="() => ViewSubmision(context.ID) "  aria-label="details"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Hành động">
                         <MudIconButton Icon="@Icons.Material.Filled.Girl" aria-label="hd"></MudIconButton>
@@ -90,6 +90,11 @@
         _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, textSearch);
     }
 
+
+    private void ViewSubmision(int id)
+    {
+        navigation.NavigateTo("/result-of-submission/"+id,forceLoad:true);
+    }
     protected override async Task OnInitializedAsync()
     {
         await LoadData("");

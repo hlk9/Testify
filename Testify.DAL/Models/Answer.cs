@@ -13,5 +13,9 @@ namespace Testify.DAL.Models
         public string Content { get; set; }
         public bool IsCorrect { get; set; }
         public byte? Status { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

@@ -194,6 +194,7 @@ namespace Testify.DAL.Reposiroties
                         s.ExamDetail.Exam.Subject.Name.Contains(textSearch)))
                 .Select(s => new SubmissionViewModel
                 {
+                    ID=s.Id,
                     ExamName = s.ExamDetail.Exam.Name,
                     SubjectName = s.ExamDetail.Exam.Subject.Name,
                     SubmitTime = s.SubmitTime,
