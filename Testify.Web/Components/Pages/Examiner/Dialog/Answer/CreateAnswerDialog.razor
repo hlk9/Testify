@@ -36,12 +36,23 @@
 
     private bool isLoading { get; set; } = true;
     private int questionTypeId;
+    private Guid _userId;
 
     [Parameter]
     public int questionIdParams { get; set; }
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     MudForm form;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(userId.Value);
+        }
+    }
 
     private async Task LoadData()
     {
@@ -77,6 +88,8 @@
 
         answer.QuestionId = questionIdParams;
         answer.Status = 1;
+        answer.CreatedBy = _userId;
+        answer.CreatedAt = DateTime.Now;
         var checkAddSuccess = await _serAnswer.Create(answer);
         if (checkAddSuccess)
         {

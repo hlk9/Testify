@@ -29,9 +29,9 @@ namespace Testify.API.Controllers
 
         [HttpGet("Get-All-Questions")]
         //[Authorize]
-        public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord, bool isActive)
+        public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord, Guid? userId)
         {
-            var lstQuestion = await _repoQuestion.GetAllQuestions(keyWord, isActive);
+            var lstQuestion = await _repoQuestion.GetAllQuestions(keyWord, userId);
             return Ok(lstQuestion);
         }
 
@@ -336,7 +336,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpPost("Import-Excel-Question")]
-        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int subjectId, string? textSearch)
+        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int subjectId, [FromForm] Guid? userId)
         {
             if (file == null || file.Length == 0)
             {
@@ -350,9 +350,9 @@ namespace Testify.API.Controllers
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             var package = new ExcelPackage(stream);
 
-            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels(textSearch);
+            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels("");
             var lstQuestionType = await _repoQuestionType.GetAllTypes();
-            var lstQuestion = await _repoQuestion.GetAllQuestions("", true);
+            var lstQuestion = await _repoQuestion.GetAllQuestions("", null);
 
             var lstQuestionTemp = new List<QuestionInExcel>();
 
@@ -372,7 +372,7 @@ namespace Testify.API.Controllers
                     questionFailCount++;
                     continue;
                 }
-                else if ((lstQuestionTemp.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower())) || lstQuestion.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.SubjectId == subjectId)))
+                else if ((lstQuestionTemp.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower())) || lstQuestion.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.QuestionTypeId == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) && x.SubjectId == subjectId)))
                 {
                     questionFailCount++;
                     continue;
@@ -447,11 +447,8 @@ namespace Testify.API.Controllers
                     QnA.Answers = lstAnswer;
                     lstQuestionTemp.Add(QnA);
 
-                    if (lstQuestionTemp.Count == batchSize || rowQ == totalRows)
-                    {
-                        await AddQuestionSuccessInDb(lstQuestionTemp, subjectId);
-                        lstQuestionTemp.Clear();
-                    }
+                    await AddQuestionSuccessInDb(lstQuestionTemp, subjectId, userId);
+                    lstQuestionTemp.Clear();
                 }
                 else
                 {
@@ -461,18 +458,19 @@ namespace Testify.API.Controllers
             return questionFailCount;
         }
 
-        private async Task AddQuestionSuccessInDb(List<QuestionInExcel> lstQuestionTemp, int subjectId)
+        private async Task AddQuestionSuccessInDb(List<QuestionInExcel> lstQuestionTemp, int subjectId, Guid? userId)
         {
             foreach (var item in lstQuestionTemp)
             {
                 var question = new Question
                 {
-                    Content = item.Content,
+                    Content = item.Content.Trim(),
                     QuestionLevelId = item.QuestionLevelId == 0 ? null : item.QuestionLevelId,
                     QuestionTypeId = item.QuestionTypeId,
                     CreatedDate = DateTime.Now,
                     Status = 1,
-                    SubjectId = subjectId
+                    SubjectId = subjectId,
+                    CreatedBy = userId
                 };
 
                 var successAddQuestion = await _repoQuestion.CreateQuestion(question);
