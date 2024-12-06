@@ -28,6 +28,14 @@
             return;
         }
 
+        var lstClassCode = await _serClass.GetAllClass("", true);
+        var obj = lstClassCode.FirstOrDefault(x => x.ClassCode.Trim().Equals(classCode.Trim()));
+        if (obj == null)
+        {
+            snackbar.Add("Lớp không tồn tại trong hệ thống", Severity.Error);
+            return;
+        }
+
         var objClass = await _serClass.GetClassByCode(classCode.Trim());
         var lstClassUser = await _serClassUser.GetAllClassUser(10);
         if (lstClassUser.FirstOrDefault(x => x.ClassId == objClass.Id && x.UserId == userId) != null)
@@ -64,4 +72,6 @@
 
     private void Cancel() => MudDialog.Cancel();
 }
+
+
 
