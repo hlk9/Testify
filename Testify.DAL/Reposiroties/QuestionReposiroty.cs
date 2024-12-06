@@ -17,24 +17,42 @@ namespace Testify.DAL.Reposiroties
             _repoExamDetailQuestion = new ExamDetailQuestionRepository();
         }
 
-        public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
+        public async Task<List<Question>> GetAllQuestions(string? textSearch, Guid? userId)
         {
-            if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == false)
+            if (userId != null)
             {
-                return await _context.Questions.ToListAsync();
+                var user = await _context.Users.FindAsync(userId);
+
+                if (user.LevelId == 2 || user.LevelId == 1)
+                {
+                    if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
+                    {
+                        return await _context.Questions.Where(x => x.Status == 1).ToListAsync();
+                    }
+                    else if (textSearch != null || textSearch != "")
+                    {
+                        return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1).ToListAsync();
+                    }
+                }
+                else if (user.LevelId == 3)
+                {
+                    if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
+                    {
+                        return await _context.Questions.Where(x => x.Status == 1 && x.CreatedBy == user.Id).ToListAsync();
+                    }
+                    else if (textSearch != null || textSearch != "")
+                    {
+                        return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1 && x.CreatedBy == user.Id).ToListAsync();
+                    }
+                }
             }
-            else if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0) && isActive == true)
+
+            if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
             {
                 return await _context.Questions.Where(x => x.Status == 1).ToListAsync();
             }
-            else if ((textSearch != null || textSearch != "") && isActive == true)
-            {
-                return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1).ToListAsync();
-            }
-            else
-            {
-                return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-            }
+
+            return await _context.Questions.Where(x => x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == 1).ToListAsync();
         }
 
         public async Task<Question> GetQuestionById(int id)
@@ -54,21 +72,21 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<bool> CheckValidate(string content, int questionTypeId, int subjectId, int? questionId)
         {
-                bool hasQuestion;
-                if (questionId != null)
-                {
-                    hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Id != questionId);
-                }
-                else
-                {
-                    hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId);
-                }
+            bool hasQuestion;
+            if (questionId != null)
+            {
+                hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Id != questionId);
+            }
+            else
+            {
+                hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId);
+            }
 
-                if (hasQuestion)
-                {
-                    return true;
-                }
-                return false;
+            if (hasQuestion)
+            {
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> CheckUpdateIsExamSchedule(int questionId)
@@ -117,6 +135,8 @@ namespace Testify.DAL.Reposiroties
                 objUpdateQuestion.DocumentPath = question.DocumentPath;
                 objUpdateQuestion.QuestionLevelId = question.QuestionLevelId;
                 objUpdateQuestion.QuestionTypeId = question.QuestionTypeId;
+                objUpdateQuestion.UpdatedAt = question.UpdatedAt;
+                objUpdateQuestion.UpdatedBy = question.UpdatedBy;
 
                 var updateQuestion = _context.Questions.Update(objUpdateQuestion).Entity;
                 await _context.SaveChangesAsync();
