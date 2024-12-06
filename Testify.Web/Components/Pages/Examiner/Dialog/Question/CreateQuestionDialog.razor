@@ -172,7 +172,6 @@
     private Question question { get; set; } = new();
     private Answer answer { get; set; } = new();
 
-    private List<Question> _lstQuestion = new List<Question>();
     private List<Answer> lstAnswers = new List<Answer>();
     private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
     private List<QuestionType> _lstQuestionTypes = new List<QuestionType>();
@@ -184,6 +183,7 @@
     private int subjectId = -1;
     private int questionLevelId = -1;
     private int questionTypeId = -1;
+    private Guid _userId;
 
     private int countQuestion;
     private int countQuestionPass;
@@ -208,6 +208,17 @@
     private IDialogService _mudDialogServices { get; set; }
     MudForm form;
 
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(userId.Value);
+
+            await LoadData("");
+        }
+    }
+
     private async Task LoadData(string? textSearch)
     {
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
@@ -216,14 +227,12 @@
 
         _lstSubjects = await _serSub.GetAllSub(null, true);
 
-        _lstQuestion = await _serQuestion.GetAllQuestions("", true);
-
         isLoading = false;
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData("");
     }
 
     private void changeValueType()
@@ -407,7 +416,7 @@
                     snackbar.Add("Chưa chọn file import", Severity.Error);
                     return;
                 }
-                var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId);
+                var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId, _userId);
 
                 snackbar.Add($"Thêm câu hỏi thành công, trong đó có {check} không thêm được", Severity.Info);
                 MudDialog.Close(DialogResult.Ok(true));
@@ -467,6 +476,7 @@
             question.QuestionTypeId = questionTypeId;
             question.QuestionLevelId = questionLevelId == -1 ? null : questionLevelId;
             question.SubjectId = subjectId;
+            question.CreatedBy = _userId;
             question.Status = (byte)StatusType.isActive;
 
             if (!checkValidation)

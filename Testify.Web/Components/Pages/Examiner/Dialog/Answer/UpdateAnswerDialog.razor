@@ -38,6 +38,17 @@
 
     private bool valueIsCorrect;
     private bool checkContentAnswer = false;
+    private Guid _userId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(userId.Value);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -90,6 +101,8 @@
         if(!checkIcorrect)
         {
             answer.IsCorrect = valueIsCorrect;
+            answer.UpdatedBy = _userId;
+            answer.UpdatedAt = DateTime.Now;
             var updateAnswer = await _serAnswer.Update(answer);
             if (updateAnswer != null)
             {
