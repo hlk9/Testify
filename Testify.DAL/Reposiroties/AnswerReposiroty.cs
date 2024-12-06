@@ -52,6 +52,8 @@ namespace Testify.DAL.Reposiroties
                 obj.Content = answer.Content;
                 obj.IsCorrect = answer.IsCorrect;
                 obj.Status = answer.Status;
+                obj.UpdatedBy = answer.UpdatedBy;
+                obj.UpdatedAt = answer.UpdatedAt;
 
                 var update = _context.Answers.Update(obj).Entity;
                 await _context.SaveChangesAsync();

@@ -24,7 +24,7 @@
                     </MudFileUpload>
                 </div>
                 <MudSelect T="int" @bind-Value="questionLevelId" Label="Mức độ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @if(questionLevelId == -1)
+                    @if (questionLevelId == -1)
                     {
                         <MudSelectItem Value="@questionLevelId">Không có</MudSelectItem>
                     }
@@ -55,7 +55,7 @@
     private Question questionMock { get; set; } = new();
     private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
     private List<Subject> _lstSubjects = new List<Subject>();
-    private bool isLoading { get; set; } = true;
+    private bool isLoading { get; set; } = false;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
     [Parameter]
@@ -65,9 +65,33 @@
     private IBrowserFile selectFile;
     private string newNameFile;
     private string currentFileImage = "";
+    private Guid _userId;
 
     private string[] allowFileUpload = { ".jpg", ".png", ".mp3" };
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                isLoading = true;
+                StateHasChanged();
+
+                var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                _userId = Guid.Parse(userId.Value);
+                await LoadData("");
+            }
+            catch { }
+            finally
+            {
+
+                isLoading = false;
+                StateHasChanged();
+            }
+
+        }
+    }
 
     private async Task LoadData(string? textSearch)
     {
@@ -83,12 +107,10 @@
 
         currentFileImage = question.DocumentPath ?? "";
 
-        isLoading = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData("");
     }
 
     private bool ValidationForm()
@@ -174,6 +196,8 @@
         {
             RenameImage(question.Id);
             question.DocumentPath = newNameFile;
+            question.UpdatedAt = DateTime.Now;
+            question.UpdatedBy = _userId;
             question.QuestionLevelId = questionLevelId == -1 ? null : questionLevelId;
             var check = await _serQuestion.UpdateQuestion(question);
             await SaveFileUpload();
