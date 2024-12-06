@@ -4,11 +4,9 @@
         <MudText Typo="Typo.h6" Class="px-4">Testify</MudText>
         <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">@roleTitle</MudText>
         <MudDivider Class="my-2" />
-        <MudNavGroup hidden="@showDashboard" Title="Dasboard" Icon="@Icons.Material.Filled.Fort" Expanded="true">
-            <MudNavLink Href="/Admin/Home" Icon="@Icons.Material.Filled.Home">Dashboard Admin</MudNavLink>
-            <MudNavLink Href="/Examiner/Home" Icon="@Icons.Material.Filled.Home">Dashboard Examiner</MudNavLink>
-            <MudNavLink Href="/Student/Home" Icon="@Icons.Material.Filled.Home">Dashboard Student</MudNavLink>
-        </MudNavGroup>
+        <MudNavLink hidden="@showDashboardAdmin" Href="/Admin/Home" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
+        <MudNavLink hidden="@showDashboardExaminer" Href="/Examiner/Home" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
+        <MudNavLink hidden="@showDashboardStudent" Href="/Student/Home" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
         <MudNavLink hidden="@showSchedule" Href="/Examiner/ExamScheduleManagement" Icon="@Icons.Material.Filled.CalendarToday">Quản Lý Lịch Thi</MudNavLink>
         <MudNavLink Href="/Examiner/ClassManagement" Icon="@Icons.Material.Filled.Class">Quản Lý Lớp Học</MudNavLink>
         <MudNavLink hidden="@showAccount" Href="/Examiner/AccountManagement" Icon="@Icons.Material.Filled.ManageAccounts">Quản Lý Tài Khoản</MudNavLink>
@@ -27,7 +25,7 @@
             <MudNavLink Href="/ScoreDistribution-Subject" Icon="@Icons.Material.Filled.MenuBook">Môn</MudNavLink>
         </MudNavGroup>
         <MudNavLink hidden="@showPermission" Href="/Examiner/PermissionManagement" Icon="@Icons.Material.Filled.FrontHand">Phân quyền</MudNavLink>
-        <MudNavLink Href="/Examiner/ViewDetailExam" Icon="@Icons.Material.Filled.CalendarToday">Danh sách bài bài làm</MudNavLink>
+        <MudNavLink Href="/Examiner/ViewDetailExam" Icon="@Icons.Material.Filled.CalendarToday">Danh sách bài làm</MudNavLink>
     </MudNavMenu>
 </MudPaper>
 @code
@@ -45,6 +43,9 @@
     private bool showExamManagement = false;
     private bool showPermission = false;
     private string roleTitle = "Quản trị";
+    private bool showDashboardAdmin = false;
+    private bool showDashboardExaminer = false;
+    private bool showDashboardStudent = false;
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -80,6 +81,8 @@
         if (user.LevelId == 3)
         {
             showAccount = true;
+            showDashboardAdmin = true;
+            showDashboardStudent = true;
             showChart = true;
             showDashboard = true;
             showPermission = true;
@@ -98,10 +101,14 @@
         {
             roleTitle = "Khảo thí";
             showAccount = true;
+            showDashboardAdmin = true;
+            showDashboardStudent = true;
         }
         else if (user.LevelId == 1)
         {
             roleTitle = "Quản trị";
+            showDashboardStudent = true;
+            showDashboardExaminer = true;
         }
     }
 }

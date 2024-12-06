@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
+<title>Testify</title>
 @if (isLoading == true)
 {
     <MudOverlay Visible="isLoading" Style="background-color:white; opacity:1;" LightBackground="true" LockScroll="true" Absolute="true">
@@ -14,7 +15,9 @@
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1" Style="position: sticky">
-        <MudLink Typo="Typo.h5" Class="" Color="Color.Primary" Href="/Student/Home">Testify</MudLink>
+        <MudLink Typo="Typo.h5" Class="" Color="Color.Primary" Href="/Student/Home">
+            <MudImage Height="40" Src="/Asset/Logo/TestifyStraiWithText.svg"></MudImage>
+        </MudLink>
         <MudSpacer />
         <MudButton Href="/Class">
             Lớp
