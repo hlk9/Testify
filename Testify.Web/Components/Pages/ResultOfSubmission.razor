@@ -351,18 +351,6 @@ else
     {
         if (firstRender)
         {
-            isTokenValid = await CheckingToken();
-            isLoading = false;
-            StateHasChanged();
-            if (isTokenValid == false)
-            {
-                navigation.NavigateTo("/Login");
-                return;
-
-            }
-           
-
-
             await LoadExam();
             StateHasChanged();
         }
