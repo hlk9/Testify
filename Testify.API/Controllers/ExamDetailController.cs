@@ -59,5 +59,14 @@ namespace Testify.API.Controllers
                 Message = deleteEx.Message
             });
         }
+
+        [HttpPut("Update-satus")]
+        public async Task<ActionResult<ExamDetail>> UpdateStatus(ExamDetail examDetail)
+        {
+            var obj = await _respon.UpdateStatus(examDetail);
+            return Ok(obj);
+        }
+
+
     }
 }

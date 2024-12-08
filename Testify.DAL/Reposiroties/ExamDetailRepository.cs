@@ -74,5 +74,25 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
+        public async Task<ExamDetail> UpdateStatus(ExamDetail exam)
+        {
+            try
+            {
+                var objUpdate = await _context.ExamDetails.FindAsync(exam.Id);
+
+
+                objUpdate.Status = exam.Status;
+
+
+                var updateLevel = _context.ExamDetails.Update(objUpdate).Entity;
+                await _context.SaveChangesAsync();
+                return updateLevel;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
     }
 }
