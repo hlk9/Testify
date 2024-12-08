@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using System.Web;
+using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 using Testify.Web.Components.Layout;
 
@@ -77,9 +78,13 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<List<SubmissionViewModel>> GetAllBySubjectId(int? subjectId, string? textSearch)
+        public async Task<List<SubmissionViewModel>> GetAllBySubjectId(int? subjectId, string? textSearch, Guid? usersID, int? classId, DateTime? startTime, DateTime? endTime)
         {
-            var lstUser = await _httpClient.GetAsync($"Subject/get-all-by-subjectId?subjectId={subjectId}&textSearch{textSearch}");
+            string startDateFormat = startTime?.ToString("yyyy/MM/dd");
+            string endDateFormat = endTime?.ToString("yyyy/MM/dd");
+
+
+            var lstUser = await _httpClient.GetAsync($"Subject/get-all-by-subjectId?subjectId={subjectId}&textSearch={textSearch}&usersID={usersID}&classId={classId}&startTime={HttpUtility.UrlEncode(startDateFormat)}&endTime={HttpUtility.UrlEncode(endDateFormat)}");
             var response = await lstUser.Content.ReadFromJsonAsync<List<SubmissionViewModel>>();
             return response;
         }
