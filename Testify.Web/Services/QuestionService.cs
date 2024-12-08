@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using SendGrid.Helpers.Mail;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using Testify.Web.Components.Pages.Examiner;
 
 namespace Testify.Web.Services
 {
@@ -14,9 +16,9 @@ namespace Testify.Web.Services
             _httpClient.Timeout = TimeSpan.FromMinutes(60);
         }
 
-        public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
+        public async Task<List<Question>> GetAllQuestions(string? textSearch, Guid? userId)
         {
-            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={textSearch}&isActive={isActive}");
+            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={textSearch}&userId={userId}");
             var response = await allQuestion.Content.ReadFromJsonAsync<List<Question>>();
 
             return response;
@@ -75,7 +77,21 @@ namespace Testify.Web.Services
             return await _httpClient.GetAsync($"Question/Export-Question-By-SubjectId?subjectId={subjectId}&isAnswer={isAnswer}");
         }
 
-        public async Task<int> ImportExcelQuestion(IBrowserFile file, int subjectId)
+        public async Task<bool> Checkvalidate(string content, int questionTypeId, int subjectId, int? questionId)
+        {
+            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Validate?content={content}&questionTypeId={questionTypeId}&subjectId={subjectId}&questionId={questionId}");
+            var response = await hasQuestion.Content.ReadFromJsonAsync<bool>();
+            return response;
+        }
+
+        public async Task<bool> CheckUpdate(int questionId)
+        {
+            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Update?questionId={questionId}");
+            var response = await hasQuestion.Content.ReadFromJsonAsync<bool>();
+            return response;
+        }
+
+        public async Task<int> ImportExcelQuestion(IBrowserFile file, int subjectId, Guid? userId)
         {
             using var content = new MultipartFormDataContent();
 
@@ -85,6 +101,7 @@ namespace Testify.Web.Services
 
             content.Add(new StreamContent(stream), "file", file.Name);
             content.Add(new StringContent(subjectId.ToString()), "subjectId");
+            content.Add(new StringContent(userId.ToString()), "userId");
 
             var allQuestion = await _httpClient.PostAsync("Question/Import-Excel-Question", content);
             var response = await allQuestion.Content.ReadFromJsonAsync<int>();

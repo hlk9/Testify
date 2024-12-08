@@ -55,5 +55,20 @@ namespace Testify.Web.Services
             };
         }
 
+        
+
+        public async Task<bool> UpdateStatusExamDetail(ExamDetail e)
+        {
+            var updateExamDetail = await _httpClient.PutAsJsonAsync("ExamDetail/Update-satus", e);
+            if (updateExamDetail.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

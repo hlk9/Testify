@@ -72,9 +72,9 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<User>($"User/Get-By-idUser?id={id}");
         }
 
-        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName)
+        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName, Guid? userId)
         {
-            return await _httpClient.GetFromJsonAsync<bool>($"User/Check-Email-Or-Phone?email={email}&phoneNumber={phoneNumber}&userName={userName}");
+            return await _httpClient.GetFromJsonAsync<bool>($"User/Check-Email-Or-Phone?email={email}&phoneNumber={phoneNumber}&userName={userName}&userId={userId}");
         }
 
         public async Task<HttpResponseMessage> ExportAccountByLevelId(int levelId)

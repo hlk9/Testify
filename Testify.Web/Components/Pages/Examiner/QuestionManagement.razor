@@ -167,6 +167,19 @@
     private bool isLoading { get; set; } = true;
     private string searchValue = "";
 
+    private Guid _userId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(userId.Value);
+            await LoadData("");
+        }
+    }
+
     private async Task onChangeSearch()
     {
 
@@ -192,9 +205,9 @@
     private async Task LoadData(string? textSearch)
     {
 
-        _lstQuestions = await _serQuestion.GetAllQuestions(textSearch, true);
-        StateHasChanged();
+        _lstQuestions = await _serQuestion.GetAllQuestions(textSearch, _userId);
         isLoading = false;
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
@@ -202,7 +215,6 @@
         _lstSubjects = await _serSub.GetAllSub(null, true);
         _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels(searchValue);
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
-        await LoadData("");
     }
 
     private readonly DialogOptions _maxWidthLarge = new() { MaxWidth = MaxWidth.Large, FullWidth = true };

@@ -35,6 +35,9 @@
                 <MudItem xl="5" lg="5" md="4" xs="12">
                     <MudText Class="w-100 text-end h5 fw-bold">Số câu hỏi đã chọn: @_lstChoice.Count / @exam.NumberOfQuestions</MudText>
                 </MudItem>
+                <MudItem xl="2" lg="2" md="4" xs="12">
+                    <MudCheckBox T="bool" @bind-Value="CheckBoxStatus"  Label="Sử dụng trong bài thi"></MudCheckBox>
+                </MudItem>
 
             </MudGrid>
 
@@ -66,19 +69,27 @@
                         </MudTextField>
                         <MudTable Items="@_lstChoice_Select" MultiSelection="true" Context="_lstChoiceSelect" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="400px" @bind-SelectedItems="listQuestionSelected" Striped="true">
                             <ToolBarContent>
-                                <MudText Style="font-size: 22px; font-weight: bold; color: #29a69a; display: flex; justify-content: center; width: 100%;">Kho câu hỏi</MudText>
+                                <MudText Style="font-size: 22px; font-weight: bold; color: #29a69a; display: flex; justify-content: center; width: 100%;">Kho câu hỏi </MudText>
                             </ToolBarContent>
 
                             <HeaderContent>
                                 <MudTh hidden><MudTableSortLabel SortLabel="ID" T="string">Mã câu hỏi</MudTableSortLabel></MudTh>
                                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Nội dung câu hỏi</MudTableSortLabel></MudTh>
-                                <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Mức độ câu hỏi</MudTableSortLabel></MudTh>
+                                <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Mức độ câu hỏi </MudTableSortLabel></MudTh>
                                 <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Loại câu hỏi</MudTableSortLabel></MudTh>
                             </HeaderContent>
                             <RowTemplate>
                                 <MudTd hidden>@_lstChoiceSelect.Id</MudTd>
                                 <MudTd>@_lstChoiceSelect.Content</MudTd>
-                                <MudTd>@_lstChoiceSelect.QuestionLeveName</MudTd>
+                               
+                                @if (_lstChoiceSelect.QuestionLeveName == null)
+                                {
+                                    <MudTd>Không có</MudTd>
+                                }
+                                else
+                                {
+                                    <MudTd>@_lstChoiceSelect.QuestionLeveName</MudTd>
+                                }
                                 <MudTd>@_lstChoiceSelect.QuestionTypeName</MudTd>
                             </RowTemplate>
                             <NoRecordsContent>
@@ -110,7 +121,15 @@
                             <RowTemplate>
                                 <MudTd hidden>@_lstChoiceContext.Id</MudTd>
                                 <MudTd>@_lstChoiceContext.Content</MudTd>
-                                <MudTd>@_lstChoiceContext.QuestionLeveName</MudTd>
+                                
+                                @if (_lstChoiceContext.QuestionLeveName == null)
+                                {
+                                    <MudTd>Không có</MudTd>
+                                }
+                                else
+                                {
+                                    <MudTd>@_lstChoiceContext.QuestionLeveName</MudTd>
+                                }
                                 <MudTd>@_lstChoiceContext.QuestionTypeName</MudTd>
                             </RowTemplate>
                             <NoRecordsContent>
@@ -145,11 +164,13 @@
     private MudDialogInstance MudDialog { get; set; }
 
     public string textSearch = "";
+    private bool CheckBoxStatus;
+
 
     [Inject] ISnackbar Snackbar { get; set; }
 
     private void Cancel() => MudDialog.Cancel();
-    
+
 
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
     // Radio
@@ -159,6 +180,7 @@
     private int NumberOfQuestion = 0;
     private ExamDetail examDetail = new ExamDetail();
     private string searchValue = "";
+    private byte? changestatus ;
 
     private Exam exam { get; set; } = new();
 
@@ -197,6 +219,14 @@
         _lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
         _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
         examDetail = await examdetailService.GetExamDetailById(ExamDetailID);
+
+        if (examDetail.Status == 2)
+        {
+            CheckBoxStatus = false;
+        }else
+        {
+            CheckBoxStatus = true;
+        }
         _lstChoice = await examdetailQuestionService.GetAllQuestionByExamDetailIDAsync(ExamDetailID);
 
         if (questionLevelId > -1)
@@ -223,6 +253,10 @@
         StateHasChanged();
     }
 
+    // private void OnCheckBoxChanged(bool newValue)
+    // {
+    //     CheckBoxStatus_2 = newValue;
+    // }
 
     private async Task Submit()
     {
@@ -232,7 +266,29 @@
             Snackbar.Add("Đề chưa đủ số câu hỏi yêu cầu", Severity.Warning);
         }else
         {
-            MudDialog.Close(DialogResult.Ok(true));
+
+            // examDetail.Status = Convert.ToByte(CheckBoxStatus);
+            if (CheckBoxStatus == false)
+            {
+                examDetail.Status = 2;
+            }else
+            {
+                examDetail.Status = 1;
+            }
+           
+            bool stats = await examdetailService.UpdateStatusExamDetail(examDetail);
+            if (stats == true)
+            {
+                
+                MudDialog.Close(DialogResult.Ok(true));
+                StateHasChanged();
+            }
+            else
+            {
+                Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
+            }
+
+            //MudDialog.Close(DialogResult.Ok(true));
         }
 
     }

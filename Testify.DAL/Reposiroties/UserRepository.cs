@@ -141,9 +141,15 @@ namespace Testify.DAL.Reposiroties
             return usersWithStatusTwo;
         }
 
-        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName)
+        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName, Guid? userId)
         {
-            return await _context.Users.AnyAsync(a => a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName);
+            if(userId != null)
+            {
+                return await _context.Users.AnyAsync(a => (a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName) && a.Id != userId);
+            }else
+            {
+                return await _context.Users.AnyAsync(a => a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName);
+            }
         }
 
         public async Task<List<User>> GetUsersByLevelId(int levelId)

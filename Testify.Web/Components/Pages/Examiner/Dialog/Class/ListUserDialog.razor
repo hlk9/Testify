@@ -229,6 +229,22 @@
 
     private async Task Submit()
     {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            snackbar.Add("Vui lòng nhập email sinh viên", Severity.Error);
+            return;
+        }
+
+        var lstUser = await _serUser.GetUsers();
+
+        var obj = lstUser.FirstOrDefault(x => x.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && x.LevelId == 4);
+
+        if (obj == null)
+        {
+            snackbar.Add("Sinh viên không tồn tại trong hệ thống", Severity.Error);
+            return;
+        }
+
         var a = await _serClass.GetAllClass("", true);
 
         var compare = a.Where(x => x.Id == ClassId).Select(x => new
@@ -237,49 +253,46 @@
             x.CountUser,
         }).FirstOrDefault();
 
-        if (compare.CountUser < compare.Capacity)
+        if (compare.CountUser >= compare.Capacity)
         {
-            var lstUser = await _serUser.GetUsers();
+            snackbar.Add("Vượt quá số học sinh cho phép", Severity.Error);
+            return;
+        }
 
-            var obj = lstUser.FirstOrDefault(x => x.Email.Trim().ToLower().Equals(email.Trim().ToLower()) && x.LevelId == 4);
+        var userInClass = await _serClassUser.GetAllClassUser(1);
 
-            var userInClass = await _serClassUser.GetAllClassUser(1);
-
-            var existingUserInClass = userInClass
+        var existingUserInClass = userInClass
             .Where(cu => cu.ClassId == ClassId && cu.UserId == obj.Id)
             .FirstOrDefault();
 
-            if (existingUserInClass != null)
-            {
-                snackbar.Add("Đã có học sinh này trong lớp", Severity.Error);
-                return;
-            }
+        if (existingUserInClass != null)
+        {
+            snackbar.Add("Đã có học sinh này trong lớp", Severity.Error);
+            return;
+        }
 
-            ClassUser classUser = new ClassUser();
-
-            classUser.Status = 1;
-            classUser.UserId = obj.Id;
-            classUser.ClassId = ClassId;
-
-            var checkAddClassUser = await _serClassUser.CreateClassUser(classUser);
-            if (checkAddClassUser != null)
+        ClassUser classUser = new ClassUser
             {
-                snackbar.Add("Thêm thành công", Severity.Success);
-                await SendEmail(obj.Id);
-                MudDialog.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                snackbar.Add("Thêm thất bại", Severity.Error);
-                MudDialog.Close(DialogResult.Ok(true));
-            }
-            await LoadData("");
+                Status = 1,
+                UserId = obj.Id,
+                ClassId = ClassId
+            };
+
+        var checkAddClassUser = await _serClassUser.CreateClassUser(classUser);
+        if (checkAddClassUser != null)
+        {
+            snackbar.Add("Thêm thành công", Severity.Success);
+            await SendEmail(obj.Id);
+            MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            snackbar.Add("Vượt quá số học sinh cho phép", Severity.Error);
+            snackbar.Add("Thêm thất bại", Severity.Error);
+            MudDialog.Close(DialogResult.Ok(true));
         }
+        await LoadData("");
     }
+
 
     private void Cancel()
     {
