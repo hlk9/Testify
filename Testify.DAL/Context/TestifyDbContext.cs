@@ -10,6 +10,7 @@ namespace Testify.DAL.Context
 
         }
 
+
         public TestifyDbContext(DbContextOptions options) : base(options)
         {
 
@@ -18,7 +19,7 @@ namespace Testify.DAL.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=172.188.18.115,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
+            optionsBuilder.UseSqlServer("Data Source=57.155.114.218,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
         }
 
         public DbSet<Answer> Answers { get; set; }

@@ -75,9 +75,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("get-all-by-subjectId")]
-        public async Task<List<SubmissionViewModel>> GetAllSubmissionsAsync(int? subjectId, string? textSearch)
+        public async Task<List<SubmissionViewModel>> GetAllSubmissionsAsync(int? subjectId, string? textSearch, Guid? usersID, int? classId, string? startTime, string? endTime)
         {
-            return await _repo.GetSubmissionDetails(subjectId, textSearch);
+            return await _repo.GetSubmissionDetails(subjectId, textSearch, usersID, classId, startTime, endTime);
         }
     }
 }

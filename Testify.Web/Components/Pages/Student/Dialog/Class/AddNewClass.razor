@@ -32,17 +32,28 @@
         var obj = lstClassCode.FirstOrDefault(x => x.ClassCode.Trim().Equals(classCode.Trim()));
         if (obj == null)
         {
-            snackbar.Add("Lớp không tồn tại trong hệ thống", Severity.Error);
+            snackbar.Add("Lớp không tồn tại trong hệ thống", Severity.Warning);
             return;
         }
 
         var objClass = await _serClass.GetClassByCode(classCode.Trim());
+        var lstClU = await _serClassUser.GetAllClassUser(1);
+        var countUser = lstClU.Where(x => x.ClassId == objClass.Id).ToList();
+
+        if(objClass.Capacity <= countUser.Count)
+        {
+            snackbar.Add("Lớp học đạt số lượng tối đa", Severity.Warning);
+            return;
+        };
+
         var lstClassUser = await _serClassUser.GetAllClassUser(10);
         if (lstClassUser.FirstOrDefault(x => x.ClassId == objClass.Id && x.UserId == userId) != null)
         {
             snackbar.Add("Đã tham gia hoặc đang chờ phê duyệt lớp học này!", Severity.Warning);
             return;
         }
+
+
 
         if (objClass != null)
         {
