@@ -4,24 +4,30 @@
 
 @if (isLoading)
 {
+    <MudPaper Elevation="0" Style="width: 100%; height: calc(100svh - 64px); display: flex; justify-content: center; align-items: center; background-color: transparent">
+
+    </MudPaper>
     <Testify.Web.Shared.LoadingContext />
 }
 else
 {
     <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
         <MudPaper Style="padding:15px;">
-            <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">DANH SÁCH BÀI THI ĐÃ LÀM</MudText>
+            <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">DANH SÁCH BÀI ĐÃ THI</MudText>
         </MudPaper>
 
         <MudGrid Style="padding:20px 0; margin:0; width:100%">
             <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
-                <MudSelect T="int" Class="w-100" Label="Chọn môn" @bind-Value="@subjectId" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="SelectValueSubjectChanged">
-                    <MudSelectItem Value="-1">Tất cả</MudSelectItem>
-                    @foreach (var item in _lstSubject)
-                    {
-                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                    }
-                </MudSelect>
+                @if(_levelId == 1 || _levelId == 2)
+                {
+                    <MudSelect T="int" Class="w-100" Label="Chọn môn" @bind-Value="@subjectId" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="SelectValueSubjectChanged">
+                        <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                        @foreach (var item in _lstSubject)
+                        {
+                            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
             </MudItem>
 
             <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
@@ -35,11 +41,11 @@ else
             </MudItem>
 
             <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
-                <MudDatePicker Label="Ngày bắt đầu" DateChanged="@selectStartChanged" Variant="Variant.Outlined" />
+                <MudDatePicker Date="@startTime" Label="Ngày bắt đầu" DateChanged="@selectStartChanged" Variant="Variant.Outlined" />
             </MudItem>
 
             <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
-                <MudDatePicker Label="Ngày kết thúc" DateChanged="selectEndChanged" Variant="Variant.Outlined" />
+                <MudDatePicker Date="endTime" Label="Ngày kết thúc" DateChanged="selectEndChanged" Variant="Variant.Outlined" />
             </MudItem>
         </MudGrid>
 
@@ -51,7 +57,7 @@ else
                 <ToolBarContent>
                     <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
                         <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách tài khoản</MudText>
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh bài đã làm</MudText>
                         </MudItem>
                         <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
                             <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
@@ -62,14 +68,16 @@ else
                 <HeaderContent>
                     <MudTh><MudTableSortLabel SortLabel="Tên" T="string">Tên Sinh Viên</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Email" T="string">Email</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Email" T="string">Lớp</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Tên Bài Thi" T="string">Tên Bài Thi</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Thời gian nộp" T="string">Thời gian nộp</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Tên">@context.SubjectName</MudTd>
+                    <MudTd DataLabel="Tên">@context.UserName</MudTd>
                     <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Email">@context.ClassName</MudTd>
                     <MudTd DataLabel="Tên Bài Thi">@context.ExamName</MudTd>
                     <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
                     <MudTd DataLabel="Thời gian nộp">@context.SubmitTime.ToString("dd/MM/yyyy HH:mm")</MudTd>
@@ -83,7 +91,7 @@ else
                     </MudTd>
                 </RowTemplate>
                 <NoRecordsContent>
-                    <MudText>Không có dữ liệu</MudText>
+                    <MudText></MudText>
                 </NoRecordsContent>
                 <LoadingContent>
                     <MudText>Loading...</MudText>
@@ -101,6 +109,7 @@ else
     private int classId = -1;
     private bool isLoading = false;
     private Guid _userId;
+    private int _levelId = -1;
     private List<Subject> _lstSubject = new List<Subject>();
     private List<Class> _lstClass = new List<Class>();
     private List<SubmissionViewModel> _lstSubmission = new List<SubmissionViewModel>();
@@ -120,8 +129,10 @@ else
 
                 var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
                 _userId = Guid.Parse(userId.Value);
-                startTime = DateTime.Now.AddDays(-7);
-                endTime = DateTime.Now.AddDays(+1);
+                var user = await _serLec.GetLecturerById(_userId);
+                _levelId = user.LevelId;
+                startTime = DateTime.Now.AddDays(-7).Date.AddHours(00).AddMinutes(00).AddMilliseconds(00);
+                endTime = DateTime.Now.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
                 await loadData();
             }
             catch { }
@@ -137,7 +148,15 @@ else
     private async Task loadData()
     {
         _lstSubject = await _serSub.GetAllSub(null, true);
-        _lstClass = await _serClass.GetClassList(null, true);
+        var lst = await _serClass.GetClassList(null, true);
+        if(_levelId == 3)
+        {
+            _lstClass = lst.Where(x => x.TeacherId == _userId).ToList();
+        }
+        else
+        {
+            _lstClass = lst;
+        }
         _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
     }
 
@@ -153,6 +172,16 @@ else
 
     private async Task SelectValueSubjectChanged()
     {
+        if(subjectId != -1)
+        {
+            var lst = await _serClass.GetClassList(null, true);
+            _lstClass = lst.Where(x => x.SubjectId == subjectId).ToList();
+        } 
+        else
+        {
+            _lstClass = await _serClass.GetClassList(null, true);
+        }
+
         _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
     }
 
@@ -161,13 +190,25 @@ else
         _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
     }
 
-    private async Task selectStartChanged()
+    private async Task selectStartChanged(DateTime? newDate)
     {
+        if(newDate > endTime)
+        {
+            snackbar.Add("Thời gian bắt đàu không hợp lệ", Severity.Warning);
+            return;
+        }
+        startTime = newDate?.Date.AddHours(00).AddMinutes(00).AddSeconds(00);
         _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
     }
 
-    private async Task selectEndChanged()
+    private async Task selectEndChanged(DateTime? newDate)
     {
+        if (newDate < startTime)
+        {
+            snackbar.Add("Thời gian kết thúc không hợp lệ", Severity.Warning);
+            return;
+        }
+        endTime = newDate?.Date.AddHours(23).AddMinutes(59).AddSeconds(59); 
         _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
     }
 }

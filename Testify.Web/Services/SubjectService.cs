@@ -80,8 +80,8 @@ namespace Testify.Web.Services
 
         public async Task<List<SubmissionViewModel>> GetAllBySubjectId(int? subjectId, string? textSearch, Guid? usersID, int? classId, DateTime? startTime, DateTime? endTime)
         {
-            string startDateFormat = startTime?.ToString("yyyy/MM/dd");
-            string endDateFormat = endTime?.ToString("yyyy/MM/dd");
+            string startDateFormat = startTime?.ToString("yyyy/MM/dd HH:mm:ss");
+            string endDateFormat = endTime?.ToString("yyyy/MM/dd HH:mm:ss");
 
 
             var lstUser = await _httpClient.GetAsync($"Subject/get-all-by-subjectId?subjectId={subjectId}&textSearch={textSearch}&usersID={usersID}&classId={classId}&startTime={HttpUtility.UrlEncode(startDateFormat)}&endTime={HttpUtility.UrlEncode(endDateFormat)}");
