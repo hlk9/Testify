@@ -189,22 +189,23 @@ namespace Testify.DAL.Reposiroties
         {
 
             var lstne = await (from submis in _context.Submissions
+                               join u in _context.Users on submis.UserId equals u.Id
                                join examsche in _context.ExamSchedules on submis.ExamScheduleId equals examsche.Id
                                join sub in _context.Subjects on examsche.SubjectId equals sub.Id
                                join e in _context.Exams on examsche.ExamId equals e.Id
                                join ces in _context.ClassExamSchedules on examsche.Id equals ces.ExamScheduleId
                                join c in _context.Classes on ces.ClassId equals c.Id
-                               join u in _context.Users on submis.UserId equals u.Id
-                               where (string.IsNullOrEmpty(textSearch) ||
+                               join cu in _context.ClassUsers on c.Id equals cu.ClassId
+                               where (cu.UserId == submis.UserId && (string.IsNullOrEmpty(textSearch) ||
                                       c.Name.ToLower().Contains(textSearch.Trim().ToLower()) ||
                                       u.FullName.ToLower().Contains(textSearch.Trim().ToLower()) ||
                                       sub.Name.ToLower().Contains(textSearch.Trim().ToLower()) ||
-                                      e.Name.ToLower().Contains(textSearch.Trim().ToLower()))
+                                      e.Name.ToLower().Contains(textSearch.Trim().ToLower())))
                                select new SubmissionViewModel
                                {
                                    ID = submis.Id,
                                    SubmitTime = submis.SubmitTime,
-                                   UserName = u.UserName,
+                                   UserName = u.FullName,
                                    TeacherId = c.TeacherId,
                                    Email = u.Email,
                                    ExamName = e.Name,
