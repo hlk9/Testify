@@ -52,7 +52,7 @@
                 <MudTh><MudTableSortLabel SortLabel="ID" T="string">Mã đề</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Người tạo</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Công khai</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Sử dụng trong bài thi</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Ngày Cập Nhật" T="string">Ngày cập nhật</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
@@ -75,16 +75,20 @@
                     }
                     </MudTd>
                 <MudTd DataLabel="Công khai">
-                    @if (context.Status == 0)
+                    @if (context.Status == 2)
                     {
-                        <span class="text-center btn btn-danger">Chỉ mình tôi </span>
+                        
+                        <MudText> Không cho phép </MudText>
                     }
                     else
                     {
-                        <span class="text-center btn btn-success">Công khai </span>
+
+                        <MudText> Cho phép </MudText>
                     }
+                    
 
                 </MudTd>
+
                 <MudTd DataLabel="Ngày tạo"> @context.CreateDate.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Thao tác">
@@ -129,6 +133,8 @@
     private void Cancel() => MudDialog.Cancel();
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
     private readonly DialogOptions _maxWidthUpdate = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true, BackdropClick = false };
+    public bool CheckBox_True { get; set; } = true;
+    public bool CheckBox_False { get; set; } = false;
 
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private List<User> user = new List<User>();
@@ -162,6 +168,12 @@
             throw;
         }
     }
+    private void ToggleStatus(ExamDetail context, bool isChecked)
+    {
+        context.Status = isChecked ? (byte?)1 : (byte?)0;
+        
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
