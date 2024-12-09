@@ -35,6 +35,7 @@
     <Content Remove="Components\Pages\ViewDetailExam.razor" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="wwwroot\Asset\static\" />
     <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
   <ItemGroup>

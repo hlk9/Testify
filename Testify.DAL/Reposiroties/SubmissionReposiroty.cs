@@ -38,7 +38,7 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task <List<Submission>>GetHistory(Guid userId,int examscheduleId)
+        public async Task<List<Submission>> GetHistory(Guid userId, int examscheduleId)
         {
             var data = await _context.Submissions.Where(x => x.UserId == userId && x.ExamScheduleId == examscheduleId).ToListAsync();
             return data;
@@ -91,22 +91,34 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<Achievenment>> GetAllAchievenment(Guid userId)
         {
-            var data = await (from cls in _context.ClassUsers.Where(x => x.UserId == userId && x.Status == 1)
-                              join cl in _context.Classes on cls.ClassId equals cl.Id
-                              join clexs in _context.ClassExamSchedules on cl.Id equals clexs.ClassId
-                              join exs in _context.ExamSchedules on clexs.ExamScheduleId equals exs.Id
-                              join submission in _context.Submissions on exs.Id equals submission.ExamScheduleId
-                              join sub in _context.Subjects on cl.SubjectId equals sub.Id
-                              group submission by new { className = cl.Name, subjectName = sub.Name } into gr
+            var data = await (from sub in _context.Submissions
+                              join es in _context.ExamSchedules on sub.ExamScheduleId equals es.Id
+                              join s in _context.Subjects on es.SubjectId equals s.Id
+                              join ces in _context.ClassExamSchedules on es.Id equals ces.ExamScheduleId
+                              join c in _context.Classes on ces.ClassId equals c.Id
+                              join cu in _context.ClassUsers on c.Id equals cu.ClassId
+                              where cu.UserId == userId && sub.UserId == userId
                               select new Achievenment
                               {
-                                  ClassName = gr.Key.className,
-                                  SubjectName = gr.Key.subjectName,
-                                  AvgScore = gr.Any(x => x != null) ? gr.Average(x => x.TotalMark) : 0
+                                  ClassId = c.Id,
+                                  ClassName = c.Name,
+                                  SubjectName = s.Name,
+                                  AvgScore = sub.TotalMark
                               }
                               ).ToListAsync();
 
-            return data;
+            var groupedData = data
+                            .GroupBy(d => new { d.ClassId, d.ClassName })
+                            .Select(g => new Achievenment
+                            {
+                                ClassId = g.Key.ClassId,
+                                ClassName = g.Key.ClassName,
+                                SubjectName = string.Join(", ", g.Select(x => x.SubjectName).Distinct()),
+                                AvgScore = g.Average(x => x.AvgScore)
+                            })
+                            .ToList();
+
+            return groupedData;
         }
     }
 }

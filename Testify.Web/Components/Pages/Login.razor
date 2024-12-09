@@ -462,8 +462,10 @@ else
                         username = "";
                         password = "";
                     }
+
                     return;
                 }
+
                 await ProtectedSessionStore.SetAsync("userLogin", ult.Id);
                 Snackbar.Add("Đăng nhập thành công!", Severity.Success);
                 var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
@@ -494,7 +496,10 @@ else
                 Snackbar.Add("Đăng nhập không thành công. Vui lòng kiểm tra lại tên người dùng và mật khẩu.", Severity.Warning);
             }
         }
-        catch { }
+        catch
+        {
+            Snackbar.Add("Có lỗi xảy ra", Severity.Warning);
+        }
         finally
         {
             isLoading = false;

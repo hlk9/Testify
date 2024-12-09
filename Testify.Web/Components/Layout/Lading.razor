@@ -5418,7 +5418,15 @@
 	protected override async void OnAfterRender(bool firstRender)
 	{
 		if (firstRender)
-		await CheckToken();
+		{
+			try
+			{
+				await CheckToken();
+			}
+			catch{}
+		}
+
+		
 	}
 
 	private async Task CheckToken()
