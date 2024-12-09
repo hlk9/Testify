@@ -1,0 +1,11 @@
+@inject NavigationManager NavigationManager
+@page "/404"
+
+@code {
+
+   protected override void OnInitialized()
+   {
+      NavigationManager.NavigateTo("/NotFound.html");
+   }
+
+}

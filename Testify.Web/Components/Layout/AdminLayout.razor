@@ -93,13 +93,21 @@
             string nameUser = objUser.FullName;
             string[] tu = nameUser.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             _name = tu[^1][0].ToString().ToUpper();
-            isTokenValid = await CheckingToken();
-            isLoading = false;
-            StateHasChanged();
-            if (isTokenValid == false)
+            try
             {
-                navigation.NavigateTo("/");
+                isTokenValid = await CheckingToken();
+                isLoading = false;
+                StateHasChanged();
+                if (isTokenValid == false)
+                {
+                    navigation.NavigateTo("/");
 
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
     }
