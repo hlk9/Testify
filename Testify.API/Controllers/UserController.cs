@@ -2,6 +2,8 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using System.Security.Cryptography;
+using System.Text;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -69,6 +71,146 @@ namespace Testify.API.Controllers
             return Ok(deleteU);
         }
 
+        [HttpGet("Export-Excel-Template-Account")]
+        public async Task<ActionResult> ExportTemplateAccount()
+        {
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+            var package = new ExcelPackage();
+
+            var worksheetA = package.Workbook.Worksheets.Add("Tài Khoản");
+
+            worksheetA.Cells.Style.Font.Name = "Times New Roman";
+            System.Drawing.Color customColor = System.Drawing.Color.FromArgb(41, 166, 154); //màu chính của web
+            System.Drawing.Color customColorYellow = System.Drawing.Color.Yellow;
+
+            worksheetA.Column(1).Width = 35;
+            worksheetA.Column(2).Width = 20;
+            worksheetA.Column(3).Width = 30;
+            worksheetA.Column(4).Width = 25;
+            worksheetA.Column(5).Width = 45;
+            worksheetA.Column(6).Width = 20;
+            worksheetA.Column(7).Width = 30;
+            worksheetA.Column(8).Width = 30;
+            worksheetA.Column(11).Width = 25;
+
+            worksheetA.Row(1).Height = 40;
+
+            worksheetA.Cells[1, 1].Value = "Họ và tên";
+            worksheetA.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 1].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 1].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 1].Style.Font.Bold = true;
+            worksheetA.Cells[1, 1].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 2].Value = "Ngày sinh";
+            worksheetA.Cells[1, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 2].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 2].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 2].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 2].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 2].Style.Font.Bold = true;
+            worksheetA.Cells[1, 2].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 3].Value = "Email";
+            worksheetA.Cells[1, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 3].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 3].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 3].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 3].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 3].Style.Font.Bold = true;
+            worksheetA.Cells[1, 3].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 4].Value = "Số điện thoại";
+            worksheetA.Cells[1, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 4].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 4].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 4].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 4].Style.Font.Bold = true;
+            worksheetA.Cells[1, 4].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 5].Value = "Địa chỉ";
+            worksheetA.Cells[1, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 5].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 5].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 5].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 5].Style.Font.Bold = true;
+            worksheetA.Cells[1, 5].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 6].Value = "Giới tính";
+            worksheetA.Cells[1, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 6].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 6].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 6].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 6].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 6].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 6].Style.Font.Bold = true;
+            worksheetA.Cells[1, 6].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 7].Value = "Tên tài khoản";
+            worksheetA.Cells[1, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 7].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 7].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 7].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 7].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 7].Style.Font.Bold = true;
+            worksheetA.Cells[1, 7].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 8].Value = "Mật khẩu";
+            worksheetA.Cells[1, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 8].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 8].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 8].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 8].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 8].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 8].Style.Font.Bold = true;
+            worksheetA.Cells[1, 8].Style.Font.Size = 12;
+
+            worksheetA.Cells[1, 11].Value = "Ví dụ giới tính";
+            worksheetA.Cells[1, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheetA.Cells[1, 11].Style.Fill.BackgroundColor.SetColor(customColor);
+            worksheetA.Cells[1, 11].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+            worksheetA.Cells[1, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+            worksheetA.Cells[1, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+            worksheetA.Cells[1, 11].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+            worksheetA.Cells[1, 11].Style.Font.Color.SetColor(System.Drawing.Color.White);
+            worksheetA.Cells[1, 11].Style.Font.Bold = true;
+            worksheetA.Cells[1, 11].Style.Font.Size = 12;
+
+            worksheetA.Cells[2, 1].Value = "Nguyễn Văn A";
+            worksheetA.Cells[2, 2].Value = "05/01/2004";
+            worksheetA.Cells[2, 3].Value = "nva@gmail.com";
+            worksheetA.Cells[2, 4].Value = "0912888999";
+            worksheetA.Cells[2, 5].Value = "Trịnh Văn Bô - Phương Canh - Hà Nội";
+            worksheetA.Cells[2, 6].Value = 1;
+            worksheetA.Cells[2, 7].Value = "nva";
+            worksheetA.Cells[2, 8].Value = "123123";
+            worksheetA.Cells[2, 11].Value = "Nam điền - 1";
+            worksheetA.Cells[3, 11].Value = "Nữ điền - 0";
+
+            var excelByBytes = package.GetAsByteArray();
+
+            return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Template_Account_LVT.xlsx");
+        }
+
         [HttpPost("Import-Excel-User")]
         public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int levelId)
         {
@@ -120,7 +262,16 @@ namespace Testify.API.Controllers
                     continue;
                 }
 
-                //else if()
+                MD5 md5 = MD5.Create();
+                byte[] inputBytes = Encoding.ASCII.GetBytes(worksheetsU.Cells[rowU, 7].Value.ToString());
+                byte[] hash = md5.ComputeHash(inputBytes);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    sb.Append(hash[i].ToString("X2"));
+                }
+                md5.Clear();
+
                 User u = new User();
                 u.FullName = worksheetsU.Cells[rowU, 1].Value.ToString();
                 u.UserName = worksheetsU.Cells[rowU, 2].Value.ToString();
@@ -128,15 +279,10 @@ namespace Testify.API.Controllers
                 u.PhoneNumber = worksheetsU.Cells[rowU, 4].Value.ToString();
                 u.Address = worksheetsU.Cells[rowU, 5].Value.ToString();
                 u.Email = worksheetsU.Cells[rowU, 6].Value.ToString();
-                u.PasswordHash = worksheetsU.Cells[rowU, 7].Value.ToString();
+                var hashPass = sb;
                 u.LevelId = levelId;
 
-
                 var successAddUser = await userRepos.AddUser(u);
-
-
-
-
             }
 
             return userFailCount++;
@@ -176,28 +322,92 @@ namespace Testify.API.Controllers
                 var worksheet = package.Workbook.Worksheets.Add("Tài khoản");
 
                 worksheet.Cells.Style.Font.Name = "Times New Roman";
-                System.Drawing.Color customColor = System.Drawing.Color.FromArgb(41, 166, 154);
+                System.Drawing.Color customColor = System.Drawing.Color.FromArgb(41, 166, 154); //màu chính của web
+                System.Drawing.Color answerCorrect = System.Drawing.Color.FromArgb(112, 173, 71);
 
-                worksheet.Column(1).Width = 20;
-                worksheet.Column(2).Width = 25;
-                worksheet.Column(3).Width = 25;
-                worksheet.Column(4).Width = 15;
-                worksheet.Column(5).Width = 25;
-                worksheet.Column(6).Width = 25;
-                worksheet.Column(7).Width = 25;
-                worksheet.Column(8).Width = 25;
+                worksheet.Column(1).Width = 35;
+                worksheet.Column(2).Width = 20;
+                worksheet.Column(3).Width = 30;
+                worksheet.Column(4).Width = 25;
+                worksheet.Column(5).Width = 45;
+                worksheet.Column(6).Width = 20;
 
                 worksheet.Row(1).Height = 30;
-                worksheet.Cells[1, 1].Value = "Full Name";
-                worksheet.Cells[1, 2].Value = "Username";
-                worksheet.Cells[1, 3].Value = "Username";
-                worksheet.Cells[1, 4].Value = "Date of Birth";
-                worksheet.Cells[1, 5].Value = "Phone Number";
-                worksheet.Cells[1, 6].Value = "Address";
-                worksheet.Cells[1, 7].Value = "Email";
-                worksheet.Cells[1, 8].Value = "Sex";
 
-                for (int i = 1; i <= 8; i++)
+                worksheet.Cells[1, 1].Value = "Họ và tên";
+                worksheet.Cells[1, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[1, 1].Style.Fill.BackgroundColor.SetColor(customColor);
+                worksheet.Cells[1, 1].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+                worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+                worksheet.Cells[1, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+                worksheet.Cells[1, 1].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+                worksheet.Cells[1, 1].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                worksheet.Cells[1, 1].Style.Font.Bold = true;
+                worksheet.Cells[1, 1].Style.Font.Size = 12;
+
+                worksheet.Cells[1, 2].Value = "Ngày sinh";
+                worksheet.Cells[1, 2].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[1, 2].Style.Fill.BackgroundColor.SetColor(customColor);
+                worksheet.Cells[1, 2].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+                worksheet.Cells[1, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+                worksheet.Cells[1, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+                worksheet.Cells[1, 2].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+                worksheet.Cells[1, 2].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                worksheet.Cells[1, 2].Style.Font.Bold = true;
+                worksheet.Cells[1, 2].Style.Font.Size = 12;
+
+                worksheet.Cells[1, 3].Value = "Email";
+                worksheet.Cells[1, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[1, 3].Style.Fill.BackgroundColor.SetColor(customColor);
+                worksheet.Cells[1, 3].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+                worksheet.Cells[1, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+                worksheet.Cells[1, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+                worksheet.Cells[1, 3].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+                worksheet.Cells[1, 3].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                worksheet.Cells[1, 3].Style.Font.Bold = true;
+                worksheet.Cells[1, 3].Style.Font.Size = 12;
+
+                worksheet.Cells[1, 4].Value = "Số điện thoại";
+                worksheet.Cells[1, 4].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[1, 4].Style.Fill.BackgroundColor.SetColor(customColor);
+                worksheet.Cells[1, 4].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+                worksheet.Cells[1, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+                worksheet.Cells[1, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+                worksheet.Cells[1, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+                worksheet.Cells[1, 4].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                worksheet.Cells[1, 4].Style.Font.Bold = true;
+                worksheet.Cells[1, 4].Style.Font.Size = 12;
+
+                worksheet.Cells[1, 5].Value = "Địa chỉ";
+                worksheet.Cells[1, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[1, 5].Style.Fill.BackgroundColor.SetColor(customColor);
+                worksheet.Cells[1, 5].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+                worksheet.Cells[1, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+                worksheet.Cells[1, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+                worksheet.Cells[1, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+                worksheet.Cells[1, 5].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                worksheet.Cells[1, 5].Style.Font.Bold = true;
+                worksheet.Cells[1, 5].Style.Font.Size = 12;
+
+                worksheet.Cells[1, 6].Value = "Giới tính";
+                worksheet.Cells[1, 6].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                worksheet.Cells[1, 6].Style.Fill.BackgroundColor.SetColor(customColor);
+                worksheet.Cells[1, 6].Style.WrapText = true; // Cho phép chữ tự xuống dòng
+                worksheet.Cells[1, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // Căn giữa theo chiều ngang
+                worksheet.Cells[1, 6].Style.VerticalAlignment = ExcelVerticalAlignment.Center; // căn giữa theo chiều dọc
+                worksheet.Cells[1, 6].Style.Border.BorderAround(ExcelBorderStyle.Thin, System.Drawing.Color.Black);
+                worksheet.Cells[1, 6].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                worksheet.Cells[1, 6].Style.Font.Bold = true;
+                worksheet.Cells[1, 6].Style.Font.Size = 12;
+
+                worksheet.Cells[1, 1].Value = "Họ và tên";
+                worksheet.Cells[1, 2].Value = "Ngày sinh";
+                worksheet.Cells[1, 3].Value = "Email";
+                worksheet.Cells[1, 4].Value = "Số điện thoại";
+                worksheet.Cells[1, 5].Value = "Địa chỉ";
+                worksheet.Cells[1, 6].Value = "Giới tính";
+
+                for (int i = 1; i <= 6; i++)
                 {
                     worksheet.Cells[1, i].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     worksheet.Cells[1, i].Style.Fill.BackgroundColor.SetColor(customColor);
@@ -214,13 +424,11 @@ namespace Testify.API.Controllers
                     var user = users[i];
 
                     worksheet.Cells[i + 2, 1].Value = user.FullName;
-                    worksheet.Cells[i + 2, 2].Value = user.UserName;
-                    worksheet.Cells[i + 2, 3].Value = user.PasswordHash;
-                    worksheet.Cells[i + 2, 4].Value = user.DateOfBirth.ToString("yyyy-MM-dd");
-                    worksheet.Cells[i + 2, 5].Value = user.PhoneNumber;
-                    worksheet.Cells[i + 2, 6].Value = user.Address;
-                    worksheet.Cells[i + 2, 7].Value = user.Email;
-                    worksheet.Cells[i + 2, 8].Value = user.Sex ? "Male" : "Female";
+                    worksheet.Cells[i + 2, 2].Value = user.DateOfBirth.ToString("dd/MM/yyyy");
+                    worksheet.Cells[i + 2, 3].Value = user.Email;
+                    worksheet.Cells[i + 2, 4].Value = user.PhoneNumber.ToString();
+                    worksheet.Cells[i + 2, 5].Value = user.Address;
+                    worksheet.Cells[i + 2, 6].Value = user.Sex ? "Nam" : "Nữ";
                 }
 
                 var excelByBytes = package.GetAsByteArray();

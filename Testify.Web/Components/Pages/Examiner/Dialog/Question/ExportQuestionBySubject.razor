@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime jsruntime;
+﻿@inject IJSRuntime jsruntime
 <MudDialog>
     <TitleContent>
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tải danh sách câu hỏi theo môn</MudText>
@@ -51,7 +51,7 @@
         if (successExport.IsSuccessStatusCode)
         {
             var fileContent = await successExport.Content.ReadAsByteArrayAsync();
-            var fileName = $"Câu_hỏi_{objSub.Name}.xlsx";
+            var fileName = $"List_Question.xlsx";
 
             // Tạo một URL Blob từ nội dung của file Excel
             var fileUrl = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{Convert.ToBase64String(fileContent)}";

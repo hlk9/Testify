@@ -598,7 +598,7 @@ namespace Testify.API.Controllers
 
                     var excelByBytes = package.GetAsByteArray();
 
-                    return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Question_in_{objSubject.Name}.xlsx");
+                    return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"List_Question.xlsx");
                 }
                 else
                 {

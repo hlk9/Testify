@@ -36,6 +36,10 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<List<User>>("User/get-all-users");
         }
 
+        public async Task<HttpResponseMessage> ExportExcelTemplateAccount()
+        {
+            return await _httpClient.GetAsync("User/Export-Excel-Template-Account");
+        }
 
         public async Task<int> ImportExcelUser(IBrowserFile file, int levelId)
         {
