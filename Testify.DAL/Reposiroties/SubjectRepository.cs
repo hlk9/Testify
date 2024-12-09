@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
@@ -183,25 +185,94 @@ namespace Testify.DAL.Reposiroties
             };
         }
 
-        public async Task<List<SubmissionViewModel>> GetSubmissionDetails(int? subjectId, string? textSearch)
+        public async Task<List<SubmissionViewModel>> GetSubmissionDetails(int? subjectId, string? textSearch, Guid? usersID, int? classId, string? startTime, string? endTime)
         {
-            return await _context.Submissions
-                .Include(s => s.ExamDetail)
-                    .ThenInclude(ed => ed.Exam)
-                        .ThenInclude(e => e.Subject)
-                .Where(s => (!subjectId.HasValue || s.ExamDetail.Exam.SubjectId == subjectId.Value) 
-                        && (string.IsNullOrEmpty(textSearch) || s.ExamDetail.Exam.Name.Contains(textSearch) || 
-                        s.ExamDetail.Exam.Subject.Name.Contains(textSearch)))
-                .Select(s => new SubmissionViewModel
-                {
-                    ID=s.Id,
-                    ExamName = s.ExamDetail.Exam.Name,
-                    SubjectName = s.ExamDetail.Exam.Subject.Name,
-                    SubmitTime = s.SubmitTime,
-                    Status = s.Status ?? false
-                })
-                .ToListAsync();
-        }
 
+            var lstne = await (from submis in _context.Submissions
+                               join u in _context.Users on submis.UserId equals u.Id
+                               join examsche in _context.ExamSchedules on submis.ExamScheduleId equals examsche.Id
+                               join sub in _context.Subjects on examsche.SubjectId equals sub.Id
+                               join e in _context.Exams on examsche.ExamId equals e.Id
+                               join ces in _context.ClassExamSchedules on examsche.Id equals ces.ExamScheduleId
+                               join c in _context.Classes on ces.ClassId equals c.Id
+                               join cu in _context.ClassUsers on c.Id equals cu.ClassId
+                               where (cu.UserId == submis.UserId && (string.IsNullOrEmpty(textSearch) ||
+                                      c.Name.ToLower().Contains(textSearch.Trim().ToLower()) ||
+                                      u.FullName.ToLower().Contains(textSearch.Trim().ToLower()) ||
+                                      sub.Name.ToLower().Contains(textSearch.Trim().ToLower()) ||
+                                      e.Name.ToLower().Contains(textSearch.Trim().ToLower())))
+                               select new SubmissionViewModel
+                               {
+                                   ID = submis.Id,
+                                   SubmitTime = submis.SubmitTime,
+                                   UserName = u.FullName,
+                                   TeacherId = c.TeacherId,
+                                   Email = u.Email,
+                                   ExamName = e.Name,
+                                   SubjectId = sub.Id,
+                                   SubjectName = sub.Name,
+                                   ClassId = c.Id,
+                                   ClassName = c.Name
+                               }).ToListAsync();
+
+            User user = new User();
+
+            if (usersID != null)
+            {
+                user = _context.Users.Find(usersID);
+            };
+
+            if (user.LevelId == 1 || user.LevelId == 2)
+            {
+                if (subjectId == -1)
+                {
+                    if (classId == -1)
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime)).ToList();
+                    }
+                    else
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime) && a.ClassId == classId).ToList();
+                    }
+                }
+                else
+                {
+                    if (classId == -1)
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime) && a.SubjectId == subjectId).ToList();
+                    }
+                    else
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime) && a.SubjectId == subjectId && a.ClassId == classId).ToList();
+                    }
+                }
+            }
+            else if (user.LevelId == 3)
+            {
+                if (subjectId == -1)
+                {
+                    if (classId == -1)
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime) && a.TeacherId == user.Id).ToList();
+                    }
+                    else
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime) && classId == a.ClassId && a.TeacherId == user.Id).ToList();
+                    }
+                }
+                else
+                {
+                    if (classId == -1)
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime) && subjectId == a.SubjectId && a.TeacherId == user.Id).ToList();
+                    }
+                    else
+                    {
+                        return lstne.Where(a => a.SubmitTime <= Convert.ToDateTime(endTime) && a.SubmitTime >= Convert.ToDateTime(startTime) && subjectId == a.SubjectId && classId == a.ClassId && a.TeacherId == user.Id).ToList();
+                    }
+                }
+            }
+            return lstne;
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace Testify.DAL.Context
 
         }
 
+
         public TestifyDbContext(DbContextOptions options) : base(options)
         {
 

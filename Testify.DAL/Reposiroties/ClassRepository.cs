@@ -22,22 +22,20 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<Class>> GetAllClass(string? textSearch, bool isActive)
         {
-            var query = _context.Classes.AsQueryable();
-
             if (isActive)
             {
-                query = query.Where(x => x.Status == 1 || x.Status == 255);
+                return await _context.Classes.Where(x => x.Status == 1).ToListAsync();
             }
 
             if (!string.IsNullOrEmpty(textSearch))
             {
-                query = query.Where(c =>
+                return await _context.Classes.Where(c =>
                     c.Name.ToLower().Contains(textSearch.Trim().ToLower()) ||
                     _context.Users.Any(u => u.Id == c.TeacherId && u.FullName.ToLower().Contains(textSearch.Trim().ToLower()))
-                );
+                ).ToListAsync();
             }
 
-            return await query.ToListAsync();
+            return await _context.Classes.ToListAsync();
         }
 
         public async Task<List<ClassWithUser>> GetClassWithUser(string? textSearch, bool isActive)
