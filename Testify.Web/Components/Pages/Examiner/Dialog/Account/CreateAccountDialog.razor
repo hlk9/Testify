@@ -1,6 +1,7 @@
 @using MudBlazor
 @using Testify.DAL.Models
 @using Testify.Web.Shared
+@inject IJSRuntime jsruntime;
 
 @if (isLoading)
 {
@@ -47,14 +48,13 @@ else
                     </MudPaper>
                 </MudTabPanel>
                 <MudTabPanel Text="Thêm bằng excel">
-
                     <MudPaper Class="my-3" Elevation="0">
-                        <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelect T="int" @bind-Value="levelExcelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                             @if (levelId == -1)
                             {
                                 <MudSelectItem Value="-1">Chọn chức vụ</MudSelectItem>
                             }
-                            @foreach (var item in _lstLevel)
+                            @foreach (var item in _lstLevelExcel)
                             {
                                 <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
                             }
@@ -71,7 +71,7 @@ else
                         </MudFileUpload>
                     </MudPaper>
                     <MudPaper Elevation="0" Class="d-flex justify-content-start gap-2 align-items-center flex-wrap">
-                        <MudText>Vui lòng soạn câu hỏi đúng với định dạng:</MudText> <MudButton Class="bg-success text-white my-3" OnClick="ExportTemPlateQuestion">Tải file mẫu</MudButton>
+                        <MudText>Vui lòng soạn câu hỏi đúng với định dạng:</MudText> <MudButton Class="bg-success text-white my-3" OnClick="ExportTemPlateAccount">Tải file mẫu</MudButton>
                     </MudPaper>
 
 
@@ -100,9 +100,9 @@ else
     private string nameFileCurrent;
     private IBrowserFile selectFileCurrent;
     private int countAccount = 0;
-    private JSRuntime jsruntime;
     private bool isLoading { get; set; } = true;
     private int levelId = -1;
+    private int levelExcelId = -1;
 
     private DateTime? _date;
 
@@ -110,6 +110,7 @@ else
     private IDialogService _mudDialogServices { get; set; }
 
     private List<Level> _lstLevel = new List<Level>();
+    private List<Level> _lstLevelExcel = new List<Level>();
 
     private async Task UploadFileExcel(IBrowserFile file)
     {
@@ -140,6 +141,16 @@ else
         if (_lstLevel.Any())
         {
             levelId = _lstLevel[0].Id;
+            _lstLevelExcel = _lstLevel.Where(x => x.Id == 3 || x.Id == 4).ToList();
+            if(_lstLevelExcel.Any())
+            {
+                levelExcelId = _lstLevelExcel[0].Id;
+            }
+            else
+            {
+                levelExcelId = -1;
+            }
+
         }
         else
         {
@@ -210,14 +221,14 @@ else
     }
 
 
-    private async Task ExportTemPlateQuestion()
+    private async Task ExportTemPlateAccount()
     {
-        var response = await _serQuestion.ExportExcelQuestion();
+        var response = await _serUser.ExportExcelTemplateAccount();
 
         if (response.IsSuccessStatusCode)
         {
             var fileContent = await response.Content.ReadAsByteArrayAsync();
-            var fileName = "Import_Account.xlsx";
+            var fileName = "Template_Account_LVT.xlsx";
             var fileUrl = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{Convert.ToBase64String(fileContent)}";
             await jsruntime.InvokeVoidAsync("downloadFile", fileUrl, fileName);
         }
@@ -232,7 +243,7 @@ else
             {
                 isLoading = true;
 
-                if (levelId == null || levelId <= 0)
+                if (levelExcelId == null || levelExcelId <= 0)
                 {
                     snackbar.Add("Chưa chọn chức vụ", Severity.Warning);
                     return;
@@ -244,7 +255,7 @@ else
                     return;
                 }
 
-                var check = await _serviceUser.ImportExcelUser(selectFileCurrent, levelId);
+                var check = await _serviceUser.ImportExcelUser(selectFileCurrent, levelExcelId);
                 snackbar.Add($"Thêm tài khoản thành công, trong đó có {check} không thêm được", Severity.Info);
                 MudDialog.Close(DialogResult.Ok(true));
             }

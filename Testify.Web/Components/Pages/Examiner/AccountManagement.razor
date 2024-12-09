@@ -3,30 +3,40 @@
 @using Testify.Web.Data.Commons
 @layout ExaminerLayout
 @inject IDialogService DialogService
-<style>
 
-    .add-button-end {
+<style>
+    .input-search-end {
+        color: #8e8e8e;
+        padding-left: 15px;
+    }
+
+    .button-add-new-hover {
         background-color: #29A69A;
         color: white;
         width: 100%;
     }
 
-        .add-button-end:hover {
+        .button-add-new-hover:hover {
             background-color: white;
             color: #29a69a;
         }
 
-    .button-import {
-        background-color: red;
-        color: #fff;
-        width: 100%;
+    .button-export {
+        background-color: #fff;
+        border: 1px solid #29a69a;
+        color: #29a69a
     }
 
-        .button-import:hover {
-            background-color: transparent;
-            color: red;
-            width: 100%;
+        .button-export:hover {
+            background-color: #29a69a;
+            border: 1px solid #29a69a;
+            color: #fff
         }
+
+    .icon-input-search {
+        padding-left: 100px;
+    }
+
 </style>
 <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
@@ -43,11 +53,11 @@
             </MudSelect>
         </MudItem >
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ExportExcel, Guid.Empty))">Export</MudButton>
+            <MudButton Class="button-export w-100" Variant="Variant.Outlined" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ExportExcel, Guid.Empty))">Tải danh sách tài khoản</MudButton>
         </MudItem>
 
         <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
