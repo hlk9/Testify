@@ -66,7 +66,7 @@ namespace Testify.API.Controllers
                     .Join(listUsers, classU => classU.UserId, usr => usr.Id, (classU, usr) => usr)
                     .ToList();
 
-                var listClassExam =  repos.GetAllActive(); // Active ClassExamSchedules
+                var listClassExam = repos.GetAllActive(); // Active ClassExamSchedules
                 var listStudent_ExistInSchedule = (
                     from classExam in listClassExam
                     join classO in await repoClass.GetAllClass(null, true)
@@ -75,7 +75,7 @@ namespace Testify.API.Controllers
                         on classO.Id equals classU.ClassId
                     join usr in listUsers
                         on classU.UserId equals usr.Id
-                    join examSchedule in  scheduleRepo.GetAll()
+                    join examSchedule in scheduleRepo.GetAll()
                         on classExam.ExamScheduleId equals examSchedule.Id
                     where
                         // Điều kiện kiểm tra lịch thi trùng với khoảng thời gian của oneSchedule
