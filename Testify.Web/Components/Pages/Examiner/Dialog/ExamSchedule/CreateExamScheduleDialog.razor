@@ -103,7 +103,15 @@
     private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
     {
 
+        try
+        {
+
         listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        }
+        catch
+        {
+
+        }
 
 
         if (string.IsNullOrEmpty(value))
