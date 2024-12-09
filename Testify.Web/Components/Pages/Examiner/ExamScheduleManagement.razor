@@ -9,6 +9,7 @@
         color: white;
         width: 100%;
     }
+
         .add-button-end:hover {
             background-color: white;
             color: #29a69a;
@@ -30,68 +31,67 @@
 
     <div class="bg-white rounded-3" style="width:100%;">
 
+            <MudTable Items="@listSchedule" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
 
-        <MudTable Items="@listSchedule" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách lịch thi</MudText>
 
-            <ToolBarContent>
-                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách lịch thi</MudText>
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
 
-                    </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </MudItem>
-                </MudGrid>
-
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Tên lịch thi" T="string">Tên lịch thi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Bài thi" T="string">Bài thi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thời gian bắt đầu" T="string">Thời gian bắt đầu</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thời gian kết thúc" T="string">Thời gian kết thúc</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Tên lịch thi">@context.Title</MudTd>
-                <MudTd DataLabel="Bài thi">@context.ExamName</MudTd>
-                <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
-                <MudTd DataLabel="Thời gian bắt đầu">@context.StartTime</MudTd>
-                <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
-                <MudTd DataLabel="Trạng thái">@(DateTime.Now < context.StartTime ? "Chưa diễn ra" : DateTime.Now > context.EndTime ? "Kết thúc" : "Đang diễn ra")
-                </MudTd>
-                <MudTd DataLabel="Thao tác">
-                    <MudTooltip Text="Xếp lịch">
-                        <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
-                    </MudTooltip>
-                    <MudTooltip Text="Danh sách lớp">
-                        <MudIconButton OnClick="@(()=> ShowClassAndStudentDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.People" aria-label="listClass"></MudIconButton>
-                    </MudTooltip>
-                    <MudTooltip Text="Sửa"> 
-                        <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    </MudTooltip>
-                    <MudTooltip Text="Chi tiết">
-                        <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    </MudTooltip>
-                    <MudTooltip Text="Xoá">
-                        <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                    </MudTooltip>
-                </MudTd>
-            </RowTemplate>
-            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
-
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="Tên lịch thi" T="string">Tên lịch thi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Bài thi" T="string">Bài thi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thời gian bắt đầu" T="string">Thời gian bắt đầu</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thời gian kết thúc" T="string">Thời gian kết thúc</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Tên lịch thi">@context.Title</MudTd>
+                    <MudTd DataLabel="Bài thi">@context.ExamName</MudTd>
+                    <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                    <MudTd DataLabel="Thời gian bắt đầu">@context.StartTime</MudTd>
+                    <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
+                    <MudTd DataLabel="Trạng thái">
+                        @(DateTime.Now < context.StartTime ? "Chưa diễn ra" : DateTime.Now > context.EndTime ? "Kết thúc" : "Đang diễn ra")
+                    </MudTd>
+                    <MudTd DataLabel="Thao tác">
+                        <MudTooltip Text="Xếp lịch">
+                            <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Danh sách lớp">
+                            <MudIconButton OnClick="@(()=> ShowClassAndStudentDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.People" aria-label="listClass"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Sửa">
+                            <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Chi tiết">
+                            <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Xoá">
+                            <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText></MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Đang tải...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
     </div>
 
 
@@ -99,7 +99,6 @@
 </div>
 @code {
     private int Index = -1;
-
     private List<ExamScheduleDto> listSchedule = new List<ExamScheduleDto>();
 
     protected override async Task OnInitializedAsync()
@@ -128,7 +127,7 @@
                 {"titleSchedule",title }
         };
         var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.ClassAndStudentSchedule>("Options Dialog", parameters, options);
-        
+
     }
 
 
