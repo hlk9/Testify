@@ -75,11 +75,11 @@ namespace Testify.DAL.Reposiroties
             bool hasQuestion;
             if (questionId != null)
             {
-                hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Id != questionId);
+                hasQuestion = _context.Questions.Any(x => x.Content.Trim().ToLower().Equals(content.Trim().ToLower()) && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Id != questionId);
             }
             else
             {
-                hasQuestion = _context.Questions.Any(x => x.Content.Trim() == content.Trim() && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId);
+                hasQuestion = _context.Questions.Any(x => x.Content.Trim().ToLower().Equals(content.Trim().ToLower()) && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId);
             }
 
             if (hasQuestion)
@@ -100,8 +100,7 @@ namespace Testify.DAL.Reposiroties
                                  join qs in _context.Questions on edq.QuestionId equals qs.Id
                                  where qs.Id == questionId &&
                                        (
-                                           (es.StartTime <= currentDateTime && es.EndTime >= currentDateTime) ||
-                                           es.StartTime > currentDateTime
+                                           (es.StartTime <= currentDateTime && es.EndTime >= currentDateTime)
                                        )
                                  select qs.Id).AnyAsync();
 
@@ -112,6 +111,7 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
+                question.Content = question.Content.Trim();
                 var addQuestion = _context.Questions.Add(question).Entity;
                 await _context.SaveChangesAsync();
                 return addQuestion;
@@ -128,7 +128,7 @@ namespace Testify.DAL.Reposiroties
             {
                 var objUpdateQuestion = await _context.Questions.FindAsync(question.Id);
 
-                objUpdateQuestion.Content = question.Content;
+                objUpdateQuestion.Content = question.Content.Trim();
                 objUpdateQuestion.CreatedDate = question.CreatedDate;
                 objUpdateQuestion.Status = question.Status;
                 objUpdateQuestion.SubjectId = question.SubjectId;

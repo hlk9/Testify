@@ -79,7 +79,8 @@ namespace Testify.Web.Services
 
         public async Task<bool> Checkvalidate(string content, int questionTypeId, int subjectId, int? questionId)
         {
-            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Validate?content={content}&questionTypeId={questionTypeId}&subjectId={subjectId}&questionId={questionId}");
+            string encodedContent = Uri.EscapeDataString(content);
+            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Validate?content={encodedContent}&questionTypeId={questionTypeId}&subjectId={subjectId}&questionId={questionId}");
             var response = await hasQuestion.Content.ReadFromJsonAsync<bool>();
             return response;
         }

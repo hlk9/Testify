@@ -58,10 +58,20 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("Delete-Answer")]
-        public async Task<ActionResult<Answer>> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var deleteAnswer = await _repoAnswer.DeleteAnswer(id);
-            return Ok(deleteAnswer);
+
+            if (deleteAnswer.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteAnswer.ErrorCode,
+                Message = deleteAnswer.Message
+            });
         }
     }
 }
