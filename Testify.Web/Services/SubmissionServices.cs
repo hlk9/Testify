@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using System.Net;
+using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -63,6 +64,16 @@ namespace Testify.Web.Services
             var lst = await _httpClient.GetAsync($"submission/Get-SubmitHistory?userId={userId}&examscheduleId={examscheduleId}");
             var response = await lst.Content.ReadFromJsonAsync<List<Submission>>();
             return response;
+        }
+
+        public async Task<bool> UpdateStatus(Submission submission)
+        {
+            var stats = await _httpClient.PostAsJsonAsync($"submission/Update-Status", submission);
+            if (stats.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
