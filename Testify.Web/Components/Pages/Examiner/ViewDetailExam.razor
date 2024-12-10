@@ -1,6 +1,7 @@
 ﻿@page "/Examiner/ViewDetailExam"
 @using Testify.DAL.ViewModels
 @layout ExaminerLayout
+@inject IDialogService DialogService
 
 @if (isLoading)
 {
@@ -66,27 +67,45 @@ else
                     </MudGrid>
                 </ToolBarContent>
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel SortLabel="Tên" T="string">Tên Sinh Viên</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Tên"  T="string">Tên</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Lớp" T="string">Lớp</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Email" T="string">Email</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Email" T="string">Lớp</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Tên Bài Thi" T="string">Tên Bài Thi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Tên Bài Thi" SortBy="new Func<SubmissionViewModel, object>(x=>x.ExamName)"  T="SubmissionViewModel">Tên Bài Thi</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortLabel="Thời gian nộp" T="string">Thời gian nộp</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<SubmissionViewModel, object>(x=>x.SubmitTime)" SortLabel="Thời gian nộp" T="SubmissionViewModel">Thời gian nộp</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Tên">@context.UserName</MudTd>
+                    <MudTd DataLabel="Lớp">@context.ClassName</MudTd>
                     <MudTd DataLabel="Email">@context.Email</MudTd>
-                    <MudTd DataLabel="Email">@context.ClassName</MudTd>
                     <MudTd DataLabel="Tên Bài Thi">@context.ExamName</MudTd>
                     <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                    <MudTd DataLabel="Trạng thái">
+
+                        @{
+                            if (context.Status == true)
+                            {
+                                <MudChip T="string" Variant="Variant.Text" Color="Color.Success">Chấp nhận</MudChip>
+                            }
+                            else if (context.Status == false)
+                            {
+                                <MudChip T="string" Variant="Variant.Text" Color="Color.Error">Không công nhận</MudChip>
+                            }
+                            else
+                            {
+                                <MudChip T="string" Variant="Variant.Text" Color="Color.Warning">Cần kiểm tra</MudChip>
+                            }
+                        }
+                    </MudTd>
+   
+                   
                     <MudTd DataLabel="Thời gian nộp">@context.SubmitTime.ToString("dd/MM/yyyy HH:mm")</MudTd>
                     <MudTd DataLabel="Thao tác">
-                        <MudTooltip Text="Chi tiết">
-                            <MudIconButton Icon="@Icons.Material.Filled.Notes" @onclick="() => ViewSubmision(context.ID) " aria-label="details"></MudIconButton>
-                        </MudTooltip>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => ViewSubmision(context.ID)">Xem</MudButton>
                         <MudTooltip Text="Hành động">
-                            <MudIconButton Icon="@Icons.Material.Filled.Girl" aria-label="hd"></MudIconButton>
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(@context.ID,@context.ExamName) )" Icon="@Icons.Material.Filled.Settings" aria-label="hd"></MudIconButton>
                         </MudTooltip>
                     </MudTd>
                 </RowTemplate>
@@ -118,6 +137,7 @@ else
     private DateTime? startTime;
     private DateTime? endTime;
 
+    
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -125,7 +145,6 @@ else
             try
             {
                 isLoading = true;
-                StateHasChanged();
 
                 var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
                 _userId = Guid.Parse(userId.Value);
@@ -133,7 +152,8 @@ else
                 _levelId = user.LevelId;
                 startTime = DateTime.Now.AddDays(-7).Date.AddHours(00).AddMinutes(00).AddMilliseconds(00);
                 endTime = DateTime.Now.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-                await loadData();
+                await LoadData();
+                StateHasChanged();
             }
             catch { }
             finally
@@ -144,8 +164,26 @@ else
             }
         }
     }
+    
+    private async Task  OpenDialogAsync(int Id, string title)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small    , FullWidth = true };
+        var parameters = new DialogParameters
+        {
+            { "Id", Id },
+            {"titleExam",title }
+        };
+      var  dialog = await DialogService.ShowAsync<Dialog.ViewExamDetail.SetStatusSubmit>("Simple Dialog",parameters, options);
+      var result = await dialog.Result;
+      if (!result.Canceled)
+      {
+          _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+          StateHasChanged();
+      }
+      
+    }
 
-    private async Task loadData()
+    private async Task LoadData()
     {
         _lstSubject = await _serSub.GetAllSub(null, true);
         var lst = await _serClass.GetClassList(null, true);
@@ -211,4 +249,6 @@ else
         endTime = newDate?.Date.AddHours(23).AddMinutes(59).AddSeconds(59); 
         _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
     }
+    
+    
 }

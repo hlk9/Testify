@@ -58,5 +58,11 @@ namespace Testify.API.Controllers
         {
             return await _repo.GetAllAchievenment(userId);
         }
+
+        [HttpPost("Update-Status")]
+        public  bool UpdateStatus(Submission submission)
+        {
+            return _repo.UpdateStatus(submission);
+        }
     }
 }

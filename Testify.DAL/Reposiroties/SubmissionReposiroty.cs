@@ -120,5 +120,17 @@ namespace Testify.DAL.Reposiroties
 
             return groupedData;
         }
+
+        public bool UpdateStatus(Submission submission)
+        {
+            var sub = _context.Submissions.Find(submission.Id);
+            if (sub != null)
+            {
+                sub.Status = submission.Status;
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
     }
 }
