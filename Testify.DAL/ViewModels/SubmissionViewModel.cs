@@ -18,5 +18,6 @@ namespace Testify.DAL.ViewModels
         public int ClassId { get; set; }
         public string ClassName {  get; set; } 
         public DateTime SubmitTime { get; set; }
+        public bool? Status { get; set; }
     }
 }
