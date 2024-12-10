@@ -71,6 +71,12 @@
     {
         int answerCorrect = lstAnswered.Count(x => x.IsCorrect);
 
+        if (string.IsNullOrWhiteSpace(answer.Content) || string.IsNullOrEmpty(answer.Content))
+        {
+            snackbar.Add("Nội dung trống!", Severity.Warning);
+            return;
+        }
+
         if (lstAnswered.Any(x => x.Content.Trim().ToLower().Equals(answer.Content.Trim().ToLower())))
         {
             snackbar.Add("Đã có nội dung đáp án này", Severity.Warning);
@@ -84,6 +90,13 @@
                 snackbar.Add("Câu hỏi này chỉ 1 đáp án đúng", Severity.Warning);
                 return;
             }
+        }
+
+        var hasExamSchedule = await _serQuestion.CheckUpdate(questionIdParams);
+        if (hasExamSchedule)
+        {
+            snackbar.Add("Không thể thêm mới do có bài thi đang diễn ra có câu hỏi chứa đáp án này!", Severity.Warning);
+            return;
         }
 
         answer.QuestionId = questionIdParams;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -32,6 +33,7 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
+                answer.Content = answer.Content.Trim();
                 var create = _context.Answers.Add(answer).Entity;
                 await _context.SaveChangesAsync();
                 return create;
@@ -49,7 +51,7 @@ namespace Testify.DAL.Reposiroties
                 var obj = await _context.Answers.FindAsync(answer.Id);
 
                 obj.QuestionId = answer.QuestionId;
-                obj.Content = answer.Content;
+                obj.Content = answer.Content.Trim();
                 obj.IsCorrect = answer.IsCorrect;
                 obj.Status = answer.Status;
                 obj.UpdatedBy = answer.UpdatedBy;
@@ -83,19 +85,27 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<Answer> DeleteAnswer(int id)
+        public async Task<ErrorResponse> DeleteAnswer(int id)
         {
             try
             {
-                var delete = await _context.Answers.FindAsync(id);
+                var objDeleteAnswer = await _context.Answers.FindAsync(id);
+                var isInExamDetail = await _context.ExamDetailQuestions.AnyAsync(x => x.QuestionId == objDeleteAnswer.QuestionId);
 
-                _context.Answers.Remove(delete);
+                if (isInExamDetail)
+                {
+                    return new ErrorResponse { Success = false, ErrorCode = "PERMISSION_DENIED", Message = "permission_denied" };
+                };
+
+
+                objDeleteAnswer.Status = 255;
+                _context.Answers.Update(objDeleteAnswer);
                 await _context.SaveChangesAsync();
-                return delete;
+                return new ErrorResponse { Success = true };
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
     }

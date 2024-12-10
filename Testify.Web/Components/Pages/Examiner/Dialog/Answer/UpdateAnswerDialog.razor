@@ -69,6 +69,18 @@
         var correct = lstNoCurrentAnswer.Count(x => x.IsCorrect);
         var isCorrect = lstNoCurrentAnswer.Count(x => !x.IsCorrect);
 
+        if (string.IsNullOrEmpty(answer.Content) || string.IsNullOrWhiteSpace(answer.Content))
+        {
+            snackbar.Add("Nội dung trống", Severity.Warning);
+            return true;
+        }
+
+        if (lstNoCurrentAnswer.Any(a => a.Content.Trim().ToLower().Equals(answer.Content.Trim().ToLower())))
+        {
+            snackbar.Add("Đã có nội dung này", Severity.Warning);
+            return true;
+        }
+
         if (question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice) || question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
         {
             if (valueIsCorrect == true && correct > 0)
@@ -100,6 +112,12 @@
 
         if(!checkIcorrect)
         {
+            var hasExamSchedule = await _serQuestion.CheckUpdate(answer.QuestionId);
+            if (hasExamSchedule)
+            {
+                snackbar.Add("Không thể sửa do có bài thi đang diễn ra có câu hỏi chứa đáp án này!", Severity.Warning);
+                return;
+            }
             answer.IsCorrect = valueIsCorrect;
             answer.UpdatedBy = _userId;
             answer.UpdatedAt = DateTime.Now;

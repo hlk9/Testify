@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -45,7 +46,8 @@ namespace Testify.API.Controllers
         [HttpGet("Check-Validate")]
         public async Task<ActionResult<bool>> CheckValidate(string content, int questionTypeId, int subjectId, int? questionId)
         {
-            var hasQuestion = await _repoQuestion.CheckValidate(content, questionTypeId, subjectId, questionId);
+            string decodedContent = Uri.UnescapeDataString(content);
+            var hasQuestion = await _repoQuestion.CheckValidate(decodedContent, questionTypeId, subjectId, questionId);
             return Ok(hasQuestion);
         }
 
@@ -191,10 +193,10 @@ namespace Testify.API.Controllers
             worksheetQ.Cells[1, 4].Style.Font.Size = 12;
 
             //giá trị demo
-            worksheetQ.Cells[2, 1].Value = "1";
+            worksheetQ.Cells[2, 1].Value = 1;
             worksheetQ.Cells[2, 2].Value = "1 + 1 = ?";
-            worksheetQ.Cells[2, 3].Value = "1";
-            worksheetQ.Cells[2, 4].Value = "4";
+            worksheetQ.Cells[2, 3].Value = 1;
+            worksheetQ.Cells[2, 4].Value = 2;
 
             //bảng chỉ dẫn questionlevel
             worksheetQ.Cells[1, 6].Value = "Mã mức độ câu hỏi";
@@ -317,18 +319,18 @@ namespace Testify.API.Controllers
             worksheetA.Cells[1, 3].Style.Font.Bold = true;
             worksheetA.Cells[1, 3].Style.Font.Size = 12;
 
-            worksheetA.Cells[2, 1].Value = "1";
-            worksheetA.Cells[2, 2].Value = "2";
-            worksheetA.Cells[2, 3].Value = "1";
+            worksheetA.Cells[2, 1].Value = 1;
+            worksheetA.Cells[2, 2].Value = 2;
+            worksheetA.Cells[2, 3].Value = 1;
 
 
-            worksheetA.Cells[3, 1].Value = "1";
-            worksheetA.Cells[3, 2].Value = "3";
-            worksheetA.Cells[3, 3].Value = "0";
+            worksheetA.Cells[3, 1].Value = 1;
+            worksheetA.Cells[3, 2].Value = 3;
+            worksheetA.Cells[3, 3].Value = 0;
 
-            worksheetA.Cells[4, 1].Value = "1";
-            worksheetA.Cells[4, 2].Value = "4";
-            worksheetA.Cells[4, 3].Value = "0";
+            worksheetA.Cells[4, 1].Value = 1;
+            worksheetA.Cells[4, 2].Value = 4;
+            worksheetA.Cells[4, 3].Value = 0;
 
             var excelByBytes = package.GetAsByteArray();
 
@@ -361,13 +363,18 @@ namespace Testify.API.Controllers
             var worksheetsQ = package.Workbook.Worksheets[0];
             var worksheetsA = package.Workbook.Worksheets[1];
 
-            int batchSize = 100;
             int totalRows = worksheetsQ.Dimension.Rows;
             for (int rowQ = 2; rowQ <= totalRows; rowQ++)
             {
                 if (worksheetsQ.Cells[rowQ, 1].Value == null ||
                     worksheetsQ.Cells[rowQ, 2].Value == null ||
-                    worksheetsQ.Cells[rowQ, 4].Value == null)
+                    worksheetsQ.Cells[rowQ, 4].Value == null || 
+                    string.IsNullOrEmpty(worksheetsQ.Cells[rowQ, 1].Value.ToString()) || 
+                    string.IsNullOrWhiteSpace(worksheetsQ.Cells[rowQ, 1].Value.ToString()) ||
+                    string.IsNullOrEmpty(worksheetsQ.Cells[rowQ, 2].Value.ToString()) ||
+                    string.IsNullOrWhiteSpace(worksheetsQ.Cells[rowQ, 2].Value.ToString()) ||
+                    string.IsNullOrEmpty(worksheetsQ.Cells[rowQ, 4].Value.ToString()) ||
+                    string.IsNullOrWhiteSpace(worksheetsQ.Cells[rowQ, 4].Value.ToString()))
                 {
                     questionFailCount++;
                     continue;
@@ -377,12 +384,12 @@ namespace Testify.API.Controllers
                     questionFailCount++;
                     continue;
                 }
-                else if (worksheetsQ.Cells[rowQ, 3].Value != null && !lstQuestionLevel.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value)))
+                else if (worksheetsQ.Cells[rowQ, 3].Value != null && !lstQuestionLevel.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim())))
                 {
                     questionFailCount++;
                     continue;
                 }
-                else if (!lstQuestionType.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value)))
+                else if (!lstQuestionType.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim())))
                 {
                     questionFailCount++;
                     continue;
@@ -402,14 +409,19 @@ namespace Testify.API.Controllers
                     if (worksheetsQ.Cells[rowQ, 1].Value.ToString().Trim() == worksheetsA.Cells[rowA, 1].Value.ToString().Trim())
                     {
                         countAnswer++;
-                        if (worksheetsA.Cells[rowA, 2].Value == null || worksheetsA.Cells[rowA, 3].Value == null)
+                        if (worksheetsA.Cells[rowA, 2].Value == null || 
+                            worksheetsA.Cells[rowA, 3].Value == null || 
+                            string.IsNullOrEmpty(worksheetsA.Cells[rowA, 2].Value.ToString()) ||
+                            string.IsNullOrWhiteSpace(worksheetsA.Cells[rowA, 2].Value.ToString()) ||
+                            string.IsNullOrEmpty(worksheetsA.Cells[rowA, 3].Value.ToString()) ||
+                            string.IsNullOrWhiteSpace(worksheetsA.Cells[rowA, 3].Value.ToString()))
                         {
                             isValid = false;
                             break;
                         }
 
                         Answer answer = new Answer();
-                        answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString();
+                        answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString().Trim();
                         answer.IsCorrect = worksheetsA.Cells[rowA, 3].Value.ToString().Trim() == "1" ? true : false;
                         lstAnswer.Add(answer);
                     }
@@ -424,7 +436,7 @@ namespace Testify.API.Controllers
                         questionFailCount++;
                         continue;
                     }
-                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 2 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 3) && lstAnswer.Count < 2)
+                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 2 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 3) && lstAnswer.Count < 2)
                     {
                         questionFailCount++;
                         continue;
@@ -434,27 +446,28 @@ namespace Testify.API.Controllers
                         questionFailCount++;
                         continue;
                     }
-                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 1 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 2) && countAnswerCorrect > 1)
+                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 1 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 2) && countAnswerCorrect > 1)
                     {
                         questionFailCount++;
                         continue;
                     }
 
                     QuestionInExcel QnA = new QuestionInExcel();
-                    QnA.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString();
-                    QnA.QuestionLevelId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value);
-                    QnA.QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value);
+                    QnA.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim();
+                    QnA.QuestionLevelId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim());
+                    QnA.QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim());
                     QnA.Answers = lstAnswer;
                     lstQuestionTemp.Add(QnA);
 
                     await AddQuestionSuccessInDb(lstQuestionTemp, subjectId, userId);
-                    lstQuestionTemp.Clear();
+                    
                 }
                 else
                 {
                     questionFailCount++;
                 }
             }
+            lstQuestionTemp.Clear();
             return questionFailCount;
         }
 

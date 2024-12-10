@@ -116,7 +116,7 @@
     private bool ValidationForm()
     {
         int count = 0;
-        if (question.Content == null || question.Content.Trim().Length == 0)
+        if (string.IsNullOrEmpty(question.Content) || string.IsNullOrWhiteSpace(question.Content))
         {
             snackbar.Add("Nội dung trống!", Severity.Error);
             count += 1;
@@ -178,22 +178,22 @@
 
         var checkValidation = ValidationForm();
 
-        var hasQuestion = await _serQuestion.Checkvalidate(question.Content, question.QuestionTypeId, question.SubjectId, question.Id);
-        if (hasQuestion)
-        {
-            snackbar.Add("Đã tồn tại câu hỏi này!", Severity.Warning);
-            return;
-        }
-
-        var hasExamSchedule = await _serQuestion.CheckUpdate(question.Id);
-        if (hasExamSchedule)
-        {
-            snackbar.Add("Không thể sửa!", Severity.Warning);
-            return;
-        }
-
         if (!checkValidation)
         {
+            var hasQuestion = await _serQuestion.Checkvalidate(question.Content, question.QuestionTypeId, question.SubjectId, question.Id);
+            if (hasQuestion)
+            {
+                snackbar.Add("Đã tồn tại câu hỏi này!", Severity.Warning);
+                return;
+            }
+
+            var hasExamSchedule = await _serQuestion.CheckUpdate(question.Id);
+            if (hasExamSchedule)
+            {
+                snackbar.Add("Không thể sửa!", Severity.Warning);
+                return;
+            }
+
             RenameImage(question.Id);
             question.DocumentPath = newNameFile;
             question.UpdatedAt = DateTime.Now;
