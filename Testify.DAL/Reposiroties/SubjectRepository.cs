@@ -212,7 +212,8 @@ namespace Testify.DAL.Reposiroties
                                    SubjectId = sub.Id,
                                    SubjectName = sub.Name,
                                    ClassId = c.Id,
-                                   ClassName = c.Name
+                                   ClassName = c.Name,
+                                   Status = submis.Status
                                }).ToListAsync();
 
             User user = new User();
