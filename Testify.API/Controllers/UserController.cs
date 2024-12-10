@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Testify.DAL.Models;
@@ -226,6 +227,7 @@ namespace Testify.API.Controllers
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             var package = new ExcelPackage(stream);
 
+            var lstUserTemp = new List<User>();
             var lstUser = await userRepos.GetAllUsers();
             var worksheetsU = package.Workbook.Worksheets[0];
 
@@ -240,30 +242,36 @@ namespace Testify.API.Controllers
                     worksheetsU.Cells[rowU, 4].Value == null ||
                     worksheetsU.Cells[rowU, 5].Value == null ||
                     worksheetsU.Cells[rowU, 6].Value == null ||
-                    worksheetsU.Cells[rowU, 7].Value == null
+                    worksheetsU.Cells[rowU, 7].Value == null ||
+                    worksheetsU.Cells[rowU, 8].Value == null
                     )
                 {
                     userFailCount++;
                     continue;
                 }
-                else if (lstUser.Any(x => x.UserName.Trim().ToLower().Equals(worksheetsU.Cells[rowU, 2].Value.ToString().Trim().ToLower())))
+                else if (lstUser.Any(x => x.UserName.Trim().ToLower().Equals(worksheetsU.Cells[rowU, 7].Value.ToString().Trim().ToLower())) || lstUserTemp.Any(x => x.UserName.Trim().ToLower().Equals(worksheetsU.Cells[rowU, 7].Value.ToString().Trim().ToLower())))
                 {
                     userFailCount++;
                     continue;
                 }
-                else if (lstUser.Any(x => x.PhoneNumber.Trim().Equals(worksheetsU.Cells[rowU, 4].Value.ToString().Trim())))
+                else if (lstUser.Any(x => x.PhoneNumber.Trim().Equals(worksheetsU.Cells[rowU, 4].Value.ToString().Trim())) || lstUserTemp.Any(x => x.PhoneNumber.Trim().Equals(worksheetsU.Cells[rowU, 4].Value.ToString().Trim())))
                 {
                     userFailCount++;
                     continue;
                 }
-                else if (lstUser.Any(x => x.Email.Trim().Equals(worksheetsU.Cells[rowU, 6].Value.ToString())))
+                else if (lstUser.Any(x => x.Email.Trim().Equals(worksheetsU.Cells[rowU, 3].Value.ToString().Trim().ToLower())) || lstUserTemp.Any(x => x.Email.Trim().Equals(worksheetsU.Cells[rowU, 3].Value.ToString().Trim().ToLower())))
                 {
                     userFailCount++;
                     continue;
                 }
+                //else if (Convert.ToInt32(worksheetsU.Cells[rowU, 6].Value.ToString().Trim()) != 1 ||Convert.ToInt32(worksheetsU.Cells[rowU, 6].Value.ToString().Trim()) != 0)
+                //{
+                //    userFailCount++;
+                //    continue;
+                //}
 
                 MD5 md5 = MD5.Create();
-                byte[] inputBytes = Encoding.ASCII.GetBytes(worksheetsU.Cells[rowU, 7].Value.ToString());
+                byte[] inputBytes = Encoding.ASCII.GetBytes(worksheetsU.Cells[rowU, 8].Value.ToString().Trim());
                 byte[] hash = md5.ComputeHash(inputBytes);
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < hash.Length; i++)
@@ -272,19 +280,33 @@ namespace Testify.API.Controllers
                 }
                 md5.Clear();
 
-                User u = new User();
-                u.FullName = worksheetsU.Cells[rowU, 1].Value.ToString();
-                u.UserName = worksheetsU.Cells[rowU, 2].Value.ToString();
-                u.DateOfBirth = DateTime.Parse(worksheetsU.Cells[rowU, 3].Value.ToString());
-                u.PhoneNumber = worksheetsU.Cells[rowU, 4].Value.ToString();
-                u.Address = worksheetsU.Cells[rowU, 5].Value.ToString();
-                u.Email = worksheetsU.Cells[rowU, 6].Value.ToString();
-                var hashPass = sb;
+                string cellValue = worksheetsU.Cells[rowU, 2].Value.ToString().Trim();
+
+                string dateFormat = "dd/MM/yyyy";
+
+                if (DateTime.TryParseExact(cellValue, dateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+                {
+                    cellValue = parsedDate.ToString("yyyy/MM/dd");
+                }
+                    User u = new User();
+                u.FullName = worksheetsU.Cells[rowU, 1].Value.ToString().Trim();
+                u.DateOfBirth = DateTime.Parse(cellValue);
+                u.Email = worksheetsU.Cells[rowU, 3].Value.ToString().Trim();
+                u.PhoneNumber = "0" + worksheetsU.Cells[rowU, 4].Value.ToString().Trim();
+                u.Address = worksheetsU.Cells[rowU, 5].Value.ToString().Trim();
+                u.Sex = worksheetsU.Cells[rowU, 6].Value.ToString().Trim() == "1" ? true : false;
+                u.UserName = worksheetsU.Cells[rowU, 7].Value.ToString().Trim();
+                u.PasswordHash = sb.ToString();
                 u.LevelId = levelId;
+                u.Status = 1;
 
                 var successAddUser = await userRepos.AddUser(u);
+                if(successAddUser != null)
+                {
+                    lstUserTemp.Add(u);
+                }
             }
-
+            lstUserTemp.Clear();
             return userFailCount++;
         }
 
@@ -433,7 +455,7 @@ namespace Testify.API.Controllers
 
                 var excelByBytes = package.GetAsByteArray();
 
-                return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Danh_Sach_Tai_Khoan.xlsx");
+                return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"List_Account.xlsx");
             }
             else
             {
