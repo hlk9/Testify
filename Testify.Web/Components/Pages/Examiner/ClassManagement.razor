@@ -131,11 +131,10 @@
                                 <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                             </MudTd>
                         }
-
                     </RowTemplate>
 
                     <NoRecordsContent>
-                        <MudText>Không có lớp nào</MudText>
+                        <MudText>Không có lớp nào!!!</MudText>
                     </NoRecordsContent>
                     <LoadingContent>
                         <MudText>Đang tải...</MudText>
@@ -185,7 +184,6 @@
             if (u.LevelId != 1 || u.LevelId != 2)
                 return false;
         }
-
         return true;
     }
 
@@ -205,18 +203,18 @@
             _lstSubject = await _serSub.GetAllSub(textSearch, true);
             classWithUsers = await _serClass.GetAllClass(textSearch, true);
             isLoading = false;
+            StateHasChanged();
         }else if (ID_Level == 3)
         {
             _lstUser = await _serLec.GetAllTeacher();
             _lstSubject = await _serSub.GetAllSub(textSearch, true);
             classWithUsers = await _serClass.GetAllClass_OfTeacher(textSearch, true, userId);
             isLoading = false;
+            StateHasChanged();
         }else
         {
 
         }
-
-
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

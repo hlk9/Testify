@@ -19,27 +19,27 @@
 
 </style>
 
-@if (isLoading)
-{
-    <LoadingContext />
-}
-else
-{
-    <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
-        <MudPaper Style="padding:15px;">
-            <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">MÔN HỌC</MudText>
-        </MudPaper>
-        <MudGrid Style="padding:20px 0 ">
-            <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
 
-            </MudItem>
-            <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
-                <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create ,-1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
-            </MudItem>
-        </MudGrid>
+<div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
+    <MudPaper Style="padding:15px;">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">MÔN HỌC</MudText>
+    </MudPaper>
+    <MudGrid Style="padding:20px 0 ">
+        <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
 
-        <div class="bg-white rounded-3" style="width:100%;">
+        </MudItem>
+        <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth,OpenDialogType.Create ,-1))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+        </MudItem>
+    </MudGrid>
 
+    <div class="bg-white rounded-3" style="width:100%;">
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
             <MudTable Items="@subject" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
 
                 <ToolBarContent>
@@ -80,9 +80,10 @@ else
                     <MudTablePager />
                 </PagerContent>
             </MudTable>
-        </div>
+        }
     </div>
-}
+</div>
+
 @code {
     private List<Subject> subject = new();
     private string searchValue = "";
@@ -177,7 +178,7 @@ else
         }
         else
         {
-            if (! await CheckAllowdelete())
+            if (!await CheckAllowdelete())
             {
                 await JS.InvokeVoidAsync("alert", "Bạn không có quyền xóa, hãy liên hệ cấp trên");
                 return;
