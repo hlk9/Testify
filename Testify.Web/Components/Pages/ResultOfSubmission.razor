@@ -442,7 +442,7 @@ else
 
       
         Random rad = new Random();
-        snackbar.Add("Loading..." + Id, Severity.Normal);
+        snackbar.Add("Đang tải bài làm", Severity.Normal);
         eDetail = await _serSubmission.GetById(Id);
         var eD = await _serExamDetail.GetExamDetailById(eDetail.ExamDetailId);
         currentExam = await _serExam.GetExamId(eD.ExamId);
