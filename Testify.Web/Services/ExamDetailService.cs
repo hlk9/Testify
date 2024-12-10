@@ -1,5 +1,6 @@
 ﻿using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using Testify.Web.Components.Pages.Examiner.Dialog.DeThi;
 
 namespace Testify.Web.Services
 {
@@ -61,6 +62,19 @@ namespace Testify.Web.Services
         {
             var updateExamDetail = await _httpClient.PutAsJsonAsync("ExamDetail/Update-satus", e);
             if (updateExamDetail.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> IsExamDetailCodeDuplicate(string code)
+        {
+            var response = await _httpClient.GetAsync($"ExamDetail/CheckTrungCodeDT?code={code}");
+            if (response.IsSuccessStatusCode)
             {
                 return true;
             }

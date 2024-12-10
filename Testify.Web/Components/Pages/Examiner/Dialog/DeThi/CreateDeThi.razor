@@ -269,6 +269,14 @@
             return;
         }
 
+        var checktrungTenDT = await _serExamDetail.IsExamDetailCodeDuplicate(examDetail.Code.Trim().ToLower().ToUpper());
+        if (checktrungTenDT)
+        {
+            snackbar.Add("Tiêu đề thi này đã tồn tại. Vui lòng nhập tiêu đề khác.", Severity.Warning);
+            return;
+        }
+
+
         var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
         var userId = Guid.Parse(a.Value);
 

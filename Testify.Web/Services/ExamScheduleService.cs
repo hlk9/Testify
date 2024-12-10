@@ -186,5 +186,21 @@ namespace Testify.Web.Services
             var response = await count.Content.ReadFromJsonAsync<int>();
             return response;
         }
+
+        public async Task<bool> Check_LichTHI(int? id)
+        {
+            var res = await _httpClient.GetAsync($"ExamSchedule/Check-LT?id={id}");
+            if (res.IsSuccessStatusCode)
+            {
+                var content = await res.Content.ReadAsStringAsync();
+                
+                return bool.TryParse(content, out var result) && result;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

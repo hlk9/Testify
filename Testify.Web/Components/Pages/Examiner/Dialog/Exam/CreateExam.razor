@@ -102,31 +102,41 @@
 
     private async void SubmitValid()
     {
+        var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim().ToUpper().ToLower());
+        
+
         if (subjectCurrent == null || exam.Name == null || exam.MaximmumMark == null || exam.PassMark == null || exam.NumberOfQuestions == null || exam.Duration == null)
         {
-            Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
+            Snackbar.Add("Thất bại, Vui lòng điền đầy đủ  thông tin", Severity.Warning);
             return;
         }
         else
         {
+
+
             if (exam.MaximmumMark <= 0)
             {
-                Snackbar.Add("Thất bại, Điểm tối đa không được nhỏ hơn 0", Severity.Error);
+                Snackbar.Add("Thất bại, Điểm tối đa không được nhỏ hơn 0", Severity.Warning);
                 return;
             }
             else if (exam.PassMark <= 0)
             {
-                Snackbar.Add("Thất bại, Điểm đạt không được nhỏ hơn 0", Severity.Error);
+                Snackbar.Add("Thất bại, Điểm đạt không được nhỏ hơn 0", Severity.Warning);
                 return;
             }
             else if (exam.NumberOfQuestions <= 0)
             {
-                Snackbar.Add("Thất bại, Tổng số câu không được nhỏ hơn 0", Severity.Error);
+                Snackbar.Add("Thất bại, Tổng số câu không được nhỏ hơn 0", Severity.Warning);
                 return;
             }
             else if (exam.Duration <= 0)
             {
-                Snackbar.Add("Thất bại, Thời gian cho bài thi không được nhỏ hơn 0", Severity.Error);
+                Snackbar.Add("Thất bại, Thời gian cho bài thi không được nhỏ hơn 0", Severity.Warning);
+                return;
+            }
+            else if (checktrungTen_Exam)
+            {
+                Snackbar.Add("Thất bại! Tên bài thi đã tồn tại, vui lòng nhập tên khác! ", Severity.Warning);
                 return;
             }
             else

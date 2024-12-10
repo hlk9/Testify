@@ -150,7 +150,7 @@
     </DialogContent>
     <DialogActions>
         @* <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton> *@
-        <MudButton  OnClick="Submit">Đóng</MudButton>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="Submit">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -179,6 +179,7 @@
     private int stt;
     private int NumberOfQuestion = 0;
     private ExamDetail examDetail = new ExamDetail();
+    private ExamDetail examDetailUpdate = new ExamDetail();
     private string searchValue = "";
     private byte? changestatus ;
 
@@ -219,6 +220,7 @@
         _lstQuestionType = await _serQuestionType.GetAllQuestionTypes();
         _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
         examDetail = await examdetailService.GetExamDetailById(ExamDetailID);
+        examDetailUpdate = await examdetailService.GetExamDetailById(ExamDetailID);
 
         if (examDetail.Status == 2)
         {
@@ -266,20 +268,22 @@
             Snackbar.Add("Đề chưa đủ số câu hỏi yêu cầu", Severity.Warning);
         }else
         {
+            
 
-            // examDetail.Status = Convert.ToByte(CheckBoxStatus);
             if (CheckBoxStatus == false)
             {
-                examDetail.Status = 2;
+                examDetailUpdate.Status = 2;
             }else
             {
-                examDetail.Status = 1;
+                examDetailUpdate.Status = 1;
             }
-           
-            bool stats = await examdetailService.UpdateStatusExamDetail(examDetail);
+            examDetailUpdate.Code = examDetail.Code;
+
+
+            bool stats = await examdetailService.UpdateStatusExamDetail(examDetailUpdate);
             if (stats == true)
             {
-                
+                Snackbar.Add("Sửa đề thi thành công", Severity.Success);
                 MudDialog.Close(DialogResult.Ok(true));
                 StateHasChanged();
             }
