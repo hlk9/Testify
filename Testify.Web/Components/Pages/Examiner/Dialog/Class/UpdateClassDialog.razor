@@ -40,7 +40,7 @@
                     }
                 </MudSelect>
 
-                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" Disabled AnchorOrigin="Origin.BottomCenter">
                     @if (subjectId == -1)
                     {
                         <MudSelectItem Value="-1">Không có môn học nào!</MudSelectItem>
