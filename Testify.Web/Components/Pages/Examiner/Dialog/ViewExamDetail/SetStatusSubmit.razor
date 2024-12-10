@@ -16,10 +16,10 @@
                </div>
            </div>
            <div>
-               <MudSelect @bind-Value="statusChange" T="bool?" Label="Sửa trạng thái bài thi" Variant="Variant.Outlined">
-                   <MudSelectItem Value="true as bool?">Chấp nhận</MudSelectItem>
-                   <MudSelectItem Value="false as bool?">Không công nhận</MudSelectItem>
-                   <MudSelectItem Value="null as bool?">Cần kiểm tra</MudSelectItem>
+               <MudSelect @bind-Value="statusChange" T="int" Label="Sửa trạng thái bài thi" Variant="Variant.Outlined">
+                   <MudSelectItem Value="1">Chấp nhận</MudSelectItem>
+                   <MudSelectItem Value="0">Không công nhận</MudSelectItem>
+                   <MudSelectItem Value="-1">Cần kiểm tra</MudSelectItem>
                </MudSelect>
 
            </div>
@@ -41,14 +41,14 @@
     public int Id { get; set; }
     [Parameter]
     public string titleExam { get; set; }
- 
 
-    private bool? statusChange = null;
+
+    private int statusChange;
 
     private User currentUser = new User();
 
     private Submission currentSubmission = new Submission();
-
+    
     protected override async Task OnInitializedAsync()
     {
         var sub =  await _serSubmission.GetById(Id);
@@ -58,25 +58,42 @@
             var usr = await _serUser.GetByidUser(sub.UserId);
             currentSubmission = sub;
             currentUser = usr;
-            statusChange = currentSubmission.Status;
+            switch (currentSubmission.Status )
+            {
+                case true:
+                    statusChange = 1;
+                    break;
+                case false:
+                    statusChange = 0;
+                    break;
+                default:
+                    statusChange = -1;
+                    break;
+            }
             StateHasChanged();
         }
     }
 
     public async void SaveSubmit()
     {
-
-        if (statusChange==currentSubmission.Status)
+        switch (statusChange)
         {
-            snackbar.Add("Không có gì thay đổi", Severity.Info);
-            return;
+            case 1:
+                currentSubmission.Status = true;
+                break;
+            case 0:
+                currentSubmission.Status = false;
+                break;
+            default:
+                currentSubmission.Status = null;
+                break;
         }
-        
-        currentSubmission.Status = statusChange;
         bool stats = await _serSubmission.UpdateStatus(currentSubmission);
         if (stats)
         {
             snackbar.Add("Cập nhật thành công", Severity.Info);
+            MudDialog.Close(DialogResult.Ok(true));
+            StateHasChanged();
         }
         else
         {

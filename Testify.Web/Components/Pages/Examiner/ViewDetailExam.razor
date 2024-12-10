@@ -145,7 +145,6 @@ else
             try
             {
                 isLoading = true;
-                StateHasChanged();
 
                 var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
                 _userId = Guid.Parse(userId.Value);
@@ -153,7 +152,8 @@ else
                 _levelId = user.LevelId;
                 startTime = DateTime.Now.AddDays(-7).Date.AddHours(00).AddMinutes(00).AddMilliseconds(00);
                 endTime = DateTime.Now.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
-                await loadData();
+                await LoadData();
+                StateHasChanged();
             }
             catch { }
             finally
@@ -165,7 +165,7 @@ else
         }
     }
     
-    private Task OpenDialogAsync(int Id, string title)
+    private async Task  OpenDialogAsync(int Id, string title)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small    , FullWidth = true };
         var parameters = new DialogParameters
@@ -173,10 +173,17 @@ else
             { "Id", Id },
             {"titleExam",title }
         };
-        return DialogService.ShowAsync<Dialog.ViewExamDetail.SetStatusSubmit>("Simple Dialog",parameters, options);
+      var  dialog = await DialogService.ShowAsync<Dialog.ViewExamDetail.SetStatusSubmit>("Simple Dialog",parameters, options);
+      var result = await dialog.Result;
+      if (!result.Canceled)
+      {
+          _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+          StateHasChanged();
+      }
+      
     }
 
-    private async Task loadData()
+    private async Task LoadData()
     {
         _lstSubject = await _serSub.GetAllSub(null, true);
         var lst = await _serClass.GetClassList(null, true);
