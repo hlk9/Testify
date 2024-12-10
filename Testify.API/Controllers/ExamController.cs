@@ -123,5 +123,12 @@ namespace Testify.API.Controllers
             var lst = await _respon.ScoreDistributionByExam(ExamId);
             return Ok(lst);
         }
+
+        [HttpGet("Check-TrungNamExam")]
+        public async Task<IActionResult> ChekTrungCodeDT_Exam(string name)
+        {
+            var isDuplicate = await _respon.IsExamCode_Exist(name);
+            return Ok(isDuplicate);
+        }
     }
 }

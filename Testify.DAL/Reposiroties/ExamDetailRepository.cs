@@ -79,9 +79,8 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 var objUpdate = await _context.ExamDetails.FindAsync(exam.Id);
-
-
                 objUpdate.Status = exam.Status;
+                objUpdate.Code = exam.Code;
 
 
                 var updateLevel = _context.ExamDetails.Update(objUpdate).Entity;
@@ -92,6 +91,11 @@ namespace Testify.DAL.Reposiroties
             {
                 return null;
             }
+        }
+
+        public async Task<bool> IsExamDetailCodeExist(string code)
+        {
+            return await _context.ExamDetails.AnyAsync(x => x.Code == code && x.Status != 255);
         }
 
     }

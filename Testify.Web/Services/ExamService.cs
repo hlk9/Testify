@@ -102,5 +102,19 @@ namespace Testify.Web.Services
             var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
             return response;
         }
+
+        public async Task<bool> IsExamCodeDuplicate_Exam(string name)
+        {
+            //var response = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?code={name}");
+            var res = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?name={name}");   
+            if (res.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

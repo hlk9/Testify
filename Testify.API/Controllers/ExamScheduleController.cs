@@ -175,6 +175,17 @@ namespace Testify.API.Controllers
             var count = await repos.GetCountExamScheduleByUserId(userId);
             return Ok(count);
         }
+
+        [HttpGet("Check-LT")]
+        public async Task<IActionResult> Check_LichTHI(int? id)
+        {
+            var res = await repos.Check_LichTHI(id);
+            
+            return Ok(res); 
+        }
+
+
+
     }
 }
 

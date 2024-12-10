@@ -200,5 +200,12 @@ namespace Testify.DAL.Reposiroties
             }
             return -1;
         }
+
+
+        public async Task<bool> Check_LichTHI(int? id)
+        {
+            var a = await _context.ExamSchedules.AnyAsync(x => x.ExamId == id && x.Status != 255 && x.StartTime < DateTime.Now && x.EndTime > DateTime.Now);
+            return a;
+        }
     }
 }

@@ -284,5 +284,10 @@ namespace Testify.DAL.Reposiroties
                 }
             };
         }
+
+        public async Task<bool> IsExamCode_Exist(string name)
+        {
+            return await _context.Exams.AnyAsync(x => x.Name == name && x.Status != 255);
+        }
     }
 }

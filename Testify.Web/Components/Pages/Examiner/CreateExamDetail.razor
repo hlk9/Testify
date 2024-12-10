@@ -6,6 +6,7 @@
 @inject ExamService examService
 @inject SubjectService subjectService
 @inject ExamDetailService examdetailService
+@inject ExamScheduleService scheduleService
 
 
 
@@ -137,6 +138,7 @@
     public bool CheckBox_False { get; set; } = false;
 
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
+    private ExamSchedule currentSchedule = new ExamSchedule();
     private List<User> user = new List<User>();
 
 
@@ -171,7 +173,7 @@
     private void ToggleStatus(ExamDetail context, bool isChecked)
     {
         context.Status = isChecked ? (byte?)1 : (byte?)0;
-        
+
     }
 
 
@@ -204,18 +206,28 @@
 
     private async Task DeleteDeThiDialog(DialogOptions options, int IdExamDetail)
     {
-        var parameters = new DialogParameters
-        {
-              { "IdExamDetail", IdExamDetail }
+        var checkLTTT = await scheduleService.Check_LichTHI(ExamID);
 
-        };
-        var dialog = await DialogService.ShowAsync<Dialog.DeThi.DeleteExamDetail>("Options Dialog", parameters, options);
-        var result = await dialog.Result;
-        if (result == null || !result.Canceled)
-        {
-            //listSchedule = await scheduleService.GetInforBasic();
-            await LoadData();
-        }
+            if (checkLTTT)
+            {
+                snackbar.Add("Bài thi này đang diễn ra, không thể thao tác", Severity.Warning);
+                return;
+
+            }
+            var parameters = new DialogParameters
+            {
+                  { "IdExamDetail", IdExamDetail }
+
+            };
+            var dialog = await DialogService.ShowAsync<Dialog.DeThi.DeleteExamDetail>("Options Dialog", parameters, options);
+            var result = await dialog.Result;
+            if (result == null || !result.Canceled)
+            {
+                //listSchedule = await scheduleService.GetInforBasic();
+                await LoadData();
+            }
+        
+
     }
 
     private class IsCheckQuestion
@@ -227,20 +239,32 @@
 
     private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID, int Sub_id)
     {
-        var parameters = new DialogParameters
-        {
+        
+        var checkLTTT = await scheduleService.Check_LichTHI(ExamID);
 
-              { "ExamDetailID", ExamDetailID },
-              { "ExamID", ExamID},
-              {"SubjectId",Sub_id }
-
-        };
-        var dialog = await DialogService.ShowAsync<Dialog.DeThi.UpdateExamDetail>("Options Dialog", parameters, options);
-        var result = await dialog.Result;
-        if (result == null || !result.Canceled)
+        if (checkLTTT)
         {
-            await LoadData();
+            snackbar.Add("Bài thi này đang diễn ra, không thể thao tác", Severity.Warning);
+            return;
+
         }
+            var parameters = new DialogParameters
+            {
+                  { "ExamDetailID", ExamDetailID },
+                  { "ExamID", ExamID},
+                  {"SubjectId",Sub_id }
+
+            };
+            var dialog = await DialogService.ShowAsync<Dialog.DeThi.UpdateExamDetail>("Options Dialog", parameters, options);
+            var result = await dialog.Result;
+            if (result == null || !result.Canceled)
+            {
+                await LoadData();
+            }
+        
+
+
+        
     }
     
 
