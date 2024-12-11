@@ -51,7 +51,7 @@
                 </MudGrid>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="ID" T="string">Mã đề</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="ID" T="string">Tên đề</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Người tạo</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Sử dụng trong bài thi</MudTableSortLabel></MudTh>
@@ -61,7 +61,7 @@
 
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="ID"> @context.Id</MudTd>
+                <MudTd DataLabel="ID"> @context.Code</MudTd>
                 <MudTd DataLabel="Môn">
                     @subjectCurrent.Name
                 </MudTd>

@@ -68,9 +68,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("CheckTrungCodeDT")]
-        public async Task<IActionResult> ChekTrungCodeDT(string code)
+        public async Task<IActionResult> ChekTrungCodeDT(string code, int? idSub)
         {
-            var isDuplicate = await _respon.IsExamDetailCodeExist(code);
+            var isDuplicate = await _respon.IsExamDetailCodeExist(code, idSub); 
             return Ok(isDuplicate);
         }
 

@@ -269,7 +269,7 @@
             return;
         }
 
-        var checktrungTenDT = await _serExamDetail.IsExamDetailCodeDuplicate(examDetail.Code.Trim().ToLower().ToUpper());
+        var checktrungTenDT = await _serExamDetail.IsExamDetailCodeDuplicate(examDetail.Code.Trim().ToLower().ToUpper(), SubjectId);
         if (checktrungTenDT)
         {
             snackbar.Add("Tiêu đề thi này đã tồn tại. Vui lòng nhập tiêu đề khác.", Severity.Warning);
