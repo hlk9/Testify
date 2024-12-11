@@ -65,6 +65,7 @@ builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<ExamActivityLogService>();
 builder.Services.AddScoped<UserPermissionService>();
 builder.Services.AddScoped<PermissionService>();
+builder.Services.AddScoped<LogUserService>();
 
 // Add response compression services
 builder.Services.AddResponseCompression(options =>
