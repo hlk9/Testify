@@ -13,9 +13,11 @@ else
         </TitleContent>
 
         <DialogContent>
-            <textarea>
-                @allLogs
-            </textarea>
+            <div class="w-100" style="height:50vh">
+                <textarea class="w-100 h-100">
+                    @allLogs
+                </textarea>
+            </div>
         </DialogContent>
         <DialogActions>
             <MudButton Color="Color.Surface" OnClick="Cancel">Quay lại</MudButton>
@@ -36,7 +38,7 @@ else
     private int levelId = -1;
     private List<Level> _lstLevel = new List<Level>();
     private bool isLoading { get; set; } = true;
-    private StringBuilder allLogs;
+    private StringBuilder allLogs = new StringBuilder();
     protected override async Task OnInitializedAsync()
     {
         users = await _serLec.GetLecturerById(UserId);
@@ -48,14 +50,26 @@ else
         if (firstRender)
         {
             List<LogEntity> listLog = await logUserInService.GetLogsByGuidAsync(UserId.ToString());
-            listLog = listLog.OrderByDescending(log => log.TimeStamp).ToList();
+            if(listLog == null)
+            {
+                allLogs.Append("Không của nhật ký!");
+                StateHasChanged();
+                return;
+            }
             if (listLog.Count > 0)
             {
+                listLog = listLog.OrderByDescending(log => log.TimeStamp).ToList();
                 foreach (var item in listLog)
                 {
-                    allLogs.Append(item.Message + "\n");
+                    allLogs.Append(item.Message.Replace(UserId.ToString(),"")+" | "+item.TimeStamp + "\n");
                 }
                 StateHasChanged();
+            }
+            else
+            {
+                allLogs.Append("Không của nhật ký!");
+                StateHasChanged();
+                return;
             }
         }
     }
