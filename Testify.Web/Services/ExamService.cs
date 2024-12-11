@@ -109,7 +109,9 @@ namespace Testify.Web.Services
             var res = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?name={name}");   
             if (res.IsSuccessStatusCode)
             {
-                return true;
+                var content = await res.Content.ReadAsStringAsync();
+
+                return bool.TryParse(content, out var result) && result;
             }
             else
             {
