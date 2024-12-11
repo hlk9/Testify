@@ -93,10 +93,15 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<bool> IsExamDetailCodeExist(string code)
+        public async Task<bool> IsExamDetailCodeExist(string code, int? idSub)
         {
-            return await _context.ExamDetails.AnyAsync(x => x.Code == code && x.Status != 255);
+            var obj = await (from a in _context.ExamDetails
+                          join b in _context.Exams on a.ExamId equals b.Id
+                          where a.Status != 255 && a.Code == code && b.SubjectId == idSub
+                          select a).AnyAsync();
+            return obj;
         }
+
 
     }
 }

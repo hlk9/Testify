@@ -71,9 +71,9 @@ namespace Testify.Web.Services
             }
         }
 
-        public async Task<bool> IsExamDetailCodeDuplicate(string code)
+        public async Task<bool> IsExamDetailCodeDuplicate(string code, int? idSub)
         {
-            var response = await _httpClient.GetAsync($"ExamDetail/CheckTrungCodeDT?code={code}");
+            var response = await _httpClient.GetAsync($"ExamDetail/CheckTrungCodeDT?code={code}&idSub={idSub}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();

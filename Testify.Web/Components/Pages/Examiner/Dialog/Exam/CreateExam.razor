@@ -102,7 +102,7 @@
 
     private async void SubmitValid()
     {
-        var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim().ToUpper().ToLower());
+        var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim().ToUpper().ToLower() , subjectCurrent.Id);
         
 
         if (subjectCurrent == null || exam.Name == null || exam.MaximmumMark == null || exam.PassMark == null || exam.NumberOfQuestions == null || exam.Duration == null)
