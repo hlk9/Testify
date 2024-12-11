@@ -1,0 +1,81 @@
+@using System.Text
+@using Testify.Web.Shared
+
+@if(isLoading)
+{
+    <LoadingContext />
+}
+else
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Nhật ký hoạt động của tài khoản @users.FullName</MudText>
+        </TitleContent>
+
+        <DialogContent>
+            <textarea>
+                @allLogs
+            </textarea>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Surface" OnClick="Cancel">Quay lại</MudButton>
+
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    MudForm form;
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid UserId { get; set; }
+    private DateTime? _date = new DateTime();
+    private User users { get; set; } = new();
+    private int levelId = -1;
+    private List<Level> _lstLevel = new List<Level>();
+    private bool isLoading { get; set; } = true;
+    private StringBuilder allLogs;
+    protected override async Task OnInitializedAsync()
+    {
+        users = await _serLec.GetLecturerById(UserId);
+        await Loaddata();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            List<LogEntity> listLog = await logUserInService.GetLogsByGuidAsync(UserId.ToString());
+            listLog = listLog.OrderByDescending(log => log.TimeStamp).ToList();
+            if (listLog.Count > 0)
+            {
+                foreach (var item in listLog)
+                {
+                    allLogs.Append(item.Message + "\n");
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task Loaddata()
+    {
+        
+        _lstLevel = await _serLevel.GetAllLevel();
+        if (users.LevelId != null)
+        {
+            levelId = users.LevelId;
+        }
+        else
+        {
+            levelId = -1;
+        }
+        _date = users.DateOfBirth;
+        isLoading = false;
+        
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
