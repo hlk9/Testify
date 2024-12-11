@@ -331,6 +331,15 @@ namespace Testify.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("Get-Users-Not-In-Class")]
+        public async Task<ActionResult<List<User>>> GetUsersNotInClassAsync(int classId, string? textSearch)
+        {
+            var usersNotInClass = await userRepos.GetUsersNotInClassAsync(classId, textSearch);
+
+            return Ok(usersNotInClass);
+        }
+
+
         [HttpGet("Export-Account-By-LevelId")]
         public async Task<ActionResult> ExportAccountByLevelId(int levelId)
         {
