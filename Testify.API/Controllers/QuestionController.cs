@@ -384,7 +384,7 @@ namespace Testify.API.Controllers
                     questionFailCount++;
                     continue;
                 }
-                else if ((lstQuestionTemp.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower())) || lstQuestion.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.QuestionTypeId == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) && x.SubjectId == subjectId)))
+                else if ((lstQuestionTemp.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.QuestionTypeId == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value)) || lstQuestion.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.QuestionTypeId == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) && x.SubjectId == subjectId)))
                 {
                     questionFailCount++;
                     continue;
@@ -459,13 +459,33 @@ namespace Testify.API.Controllers
 
                     QuestionInExcel QnA = new QuestionInExcel();
                     QnA.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim();
-                    QnA.QuestionLevelId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim());
                     QnA.QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim());
                     QnA.Answers = lstAnswer;
                     lstQuestionTemp.Add(QnA);
 
-                    await AddQuestionSuccessInDb(lstQuestionTemp, subjectId, userId);
-                    
+                    var question = new Question
+                    {
+                        Content = worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim(),
+                        QuestionLevelId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim()) == 0 ? null : Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim()),
+                        QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()),
+                        CreatedDate = DateTime.Now,
+                        Status = 1,
+                        SubjectId = subjectId,
+                        CreatedBy = userId
+                    };
+
+                    var successAddQuestion = await _repoQuestion.CreateQuestion(question);
+
+                    if (successAddQuestion != null)
+                    {
+                        foreach (var answer in lstAnswer)
+                        {
+                            answer.QuestionId = successAddQuestion.Id;
+                            answer.Status = 1;
+                            await _repoAnswer.CreateAnswer(answer);
+                        }
+                    }
+
                 }
                 else
                 {
@@ -474,35 +494,6 @@ namespace Testify.API.Controllers
             }
             lstQuestionTemp.Clear();
             return questionFailCount;
-        }
-
-        private async Task AddQuestionSuccessInDb(List<QuestionInExcel> lstQuestionTemp, int subjectId, Guid? userId)
-        {
-            foreach (var item in lstQuestionTemp)
-            {
-                var question = new Question
-                {
-                    Content = item.Content.Trim(),
-                    QuestionLevelId = item.QuestionLevelId == 0 ? null : item.QuestionLevelId,
-                    QuestionTypeId = item.QuestionTypeId,
-                    CreatedDate = DateTime.Now,
-                    Status = 1,
-                    SubjectId = subjectId,
-                    CreatedBy = userId
-                };
-
-                var successAddQuestion = await _repoQuestion.CreateQuestion(question);
-
-                if (successAddQuestion != null)
-                {
-                    foreach (var answer in item.Answers)
-                    {
-                        answer.QuestionId = successAddQuestion.Id;
-                        answer.Status = 1;
-                        await _repoAnswer.CreateAnswer(answer);
-                    }
-                }
-            }
         }
 
         [HttpGet("Export-Question-By-SubjectId")]
