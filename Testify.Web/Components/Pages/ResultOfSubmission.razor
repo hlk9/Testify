@@ -110,14 +110,7 @@ else
                                 }
                             }
 
-                        </MudPaper>
-                        <MudScrollToTop TopOffset="100"
-                        OnScroll="OnScroll"
-                        Selector="#div-displayExam"
-                        VisibleCssClass="visible absolute"
-                        HiddenCssClass="invisible">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color">Lên trên cùng</MudButton>
-                        </MudScrollToTop>
+                        </MudPaper>                   
 
                     </div>
 
@@ -185,10 +178,11 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="fw-bold">
-                                                    @(lstAnswerSubmission
-                                                                                .Where(x => _lstQuestionWithAnswers
-                                                                                .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect == false)))
-                                                                                .Count())
+                                                    @(
+                                                        _lstQuestionWithAnswers
+                                                        .Where(q => lstAnswerSubmission.Any(a => q.Answers.Any(ans => ans.Id == a.AnswerId && ans.IsCorrect == false)))
+                                                        .Count()
+                                                        )
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-row justify-content-between mt-3">
@@ -331,16 +325,7 @@ else
     private Submission eDetail = new Submission();
 
     private List<Submission> lstHistory = new List<Submission>();
-    private void OnScroll(ScrollEventArgs e)
-    {
-        Color = (e.FirstChildBoundingClientRect.Top * -1) switch
-        {
-            var x when x < 500 => Color.Primary,
-            var x when x < 1500 => Color.Secondary,
-            var x when x < 2500 => Color.Tertiary,
-            _ => Color.Error
-        };
-    }
+   
 
     private void CheckAccess()
     {

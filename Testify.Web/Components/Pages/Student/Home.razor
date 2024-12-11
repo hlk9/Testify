@@ -164,7 +164,7 @@ else
                             <MudTd DataLabel="Position">@context.TotalMark</MudTd>
                             <MudTd DataLabel="Molar mass">@(context.IsPassed?"Đạt":"Chưa đạt")</MudTd>
                             <MudTd DataLabel="Position">@context.Note</MudTd>
-                            <MudTd DataLabel="Molar mass"><MudButton Variant="Variant.Outlined" Color="Color.Primary">Xem</MudButton></MudTd>
+                            <MudTd DataLabel="Molar mass"><MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => ViewSubmision(context.Id)">Xem</MudButton></MudTd>
                         </RowTemplate>
                         <NoRecordsContent>
                             <MudText>Chưa có bài đã thi</MudText>
@@ -202,6 +202,11 @@ else
         var lstClassByUserId = await _serClassUser.GetAllClassByUserId(_userId);
         _totalClassed = lstClassByUserId.Count();
         _lstAchivenment = await _serSubmission.GetAllAchievenment(_userId);
+    }
+
+    private void ViewSubmision(int id)
+    {
+        navigation.NavigateTo("/result-of-submission/" + id, forceLoad: true);
     }
 
     protected override async Task OnInitializedAsync()
