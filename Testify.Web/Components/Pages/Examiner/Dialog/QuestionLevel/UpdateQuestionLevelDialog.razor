@@ -53,12 +53,13 @@
 
     private async void Submit()
     {
-        if (questionLevel.Name.Trim() == "" || questionLevel.Name == null)
+        var lstQuestionLevelNoCurrentLevel = _lstQuestionLevel.Where(x => x.Id != QuestionLevelId).ToList();
+        if (string.IsNullOrEmpty(questionLevel.Name) || string.IsNullOrWhiteSpace(questionLevel.Name))
         {
             snackbar.Add("Tên không được để trống", Severity.Warning);
             return;
         }
-        else if (_lstQuestionLevel.Any(x => x.Name.Trim().ToLower() == questionLevel.Name.Trim().ToLower()))
+        else if (lstQuestionLevelNoCurrentLevel.Any(x => x.Name.Trim().ToLower() == questionLevel.Name.Trim().ToLower()))
         {
             snackbar.Add("Đã tồn tại mức độ này", Severity.Warning);
             return;

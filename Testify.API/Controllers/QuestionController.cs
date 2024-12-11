@@ -32,7 +32,12 @@ namespace Testify.API.Controllers
         //[Authorize]
         public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord, Guid? userId)
         {
-            var lstQuestion = await _repoQuestion.GetAllQuestions(keyWord, userId);
+            string decodedContent = "";
+            if(!string.IsNullOrEmpty(keyWord) || !string.IsNullOrWhiteSpace(keyWord))
+            {
+                decodedContent = Uri.UnescapeDataString(keyWord);
+            }
+            var lstQuestion = await _repoQuestion.GetAllQuestions(decodedContent, userId);
             return Ok(lstQuestion);
         }
 

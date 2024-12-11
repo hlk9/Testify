@@ -264,11 +264,11 @@ namespace Testify.API.Controllers
                     userFailCount++;
                     continue;
                 }
-                //else if (Convert.ToInt32(worksheetsU.Cells[rowU, 6].Value.ToString().Trim()) != 1 ||Convert.ToInt32(worksheetsU.Cells[rowU, 6].Value.ToString().Trim()) != 0)
-                //{
-                //    userFailCount++;
-                //    continue;
-                //}
+                else if (Convert.ToInt32(worksheetsU.Cells[rowU, 6].Value.ToString().Trim()) != 1 && Convert.ToInt32(worksheetsU.Cells[rowU, 6].Value.ToString().Trim()) != 0)
+                {
+                    userFailCount++;
+                    continue;
+                }
 
                 MD5 md5 = MD5.Create();
                 byte[] inputBytes = Encoding.ASCII.GetBytes(worksheetsU.Cells[rowU, 8].Value.ToString().Trim());

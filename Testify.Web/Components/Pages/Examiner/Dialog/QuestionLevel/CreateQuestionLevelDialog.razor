@@ -38,7 +38,7 @@
 
     private async void Submit()
     {
-        if(questionLevel.Name.Trim() == "" || questionLevel.Name == null)
+        if (string.IsNullOrEmpty(questionLevel.Name) || string.IsNullOrWhiteSpace(questionLevel.Name))
         {
             snackbar.Add("Tên không được để trống", Severity.Warning);
             return;
