@@ -308,7 +308,8 @@ else
         foreach (var item in _lstexamDetailsQuestion)
         {
             Question question = await _serQuestion.GetQuestionById(item.QuestionId);
-            List<Answer> shuffledAnswer = (await _serAnswer.GetAllByQuestionId(item.QuestionId)).OrderBy(x => rad.Next()).ToList();
+            var lstAns = await _serAnswer.GetAllByQuestionId(item.QuestionId);
+            List<Answer> shuffledAnswer = lstAns.Where(x => x.Status != 255).OrderBy(x => rad.Next()).ToList();
             QuestionWithAnswer questionWithAnswer = new QuestionWithAnswer()
                 {
                     Id = question.Id,

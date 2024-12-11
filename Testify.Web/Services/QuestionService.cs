@@ -18,7 +18,12 @@ namespace Testify.Web.Services
 
         public async Task<List<Question>> GetAllQuestions(string? textSearch, Guid? userId)
         {
-            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={textSearch}&userId={userId}");
+            string encodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                encodedContent = Uri.EscapeDataString(textSearch);
+            }
+            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={encodedContent}&userId={userId}");
             var response = await allQuestion.Content.ReadFromJsonAsync<List<Question>>();
 
             return response;
