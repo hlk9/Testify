@@ -143,10 +143,11 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName, Guid? userId)
         {
-            if(userId != null)
+            if (userId != null)
             {
                 return await _context.Users.AnyAsync(a => (a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName) && a.Id != userId);
-            }else
+            }
+            else
             {
                 return await _context.Users.AnyAsync(a => a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName);
             }
@@ -157,6 +158,17 @@ namespace Testify.DAL.Reposiroties
             return await _context.Users
                                  .Where(user => user.LevelId == levelId)
                                  .ToListAsync();
+        }
+
+        public async Task<List<User>> GetUsersNotInClassAsync(int classId, string? textSearch)
+        {
+            var usersNotInClass = await _context.Users
+                .Where(u => u.Status == 1 && u.LevelId == 4 &&
+                            !_context.ClassUsers.Any(cu => cu.UserId == u.Id && cu.ClassId == classId) &&
+                            (string.IsNullOrEmpty(textSearch) || u.FullName.Contains(textSearch)))
+                .ToListAsync(); 
+
+            return usersNotInClass;
         }
     }
 }

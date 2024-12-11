@@ -85,6 +85,13 @@ namespace Testify.Web.Services
         {
             return await _httpClient.GetAsync($"User/Export-Account-By-LevelId?levelId={levelId}");
         }
+
+        public async Task<List<User>> GetUsersNotInClassAsync(int classId, string? textSearch)
+        {
+            var lst = await _httpClient.GetAsync($"User/Get-Users-Not-In-Class?classId={classId}&textSearch={textSearch}");
+            var response = await lst.Content.ReadFromJsonAsync<List<User>>();
+            return response;
+        }
     }
 }
 
