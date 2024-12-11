@@ -76,7 +76,9 @@ namespace Testify.Web.Services
             var response = await _httpClient.GetAsync($"ExamDetail/CheckTrungCodeDT?code={code}");
             if (response.IsSuccessStatusCode)
             {
-                return true;
+                var content = await response.Content.ReadAsStringAsync();
+
+                return bool.TryParse(content, out var result) && result;
             }
             else
             {
