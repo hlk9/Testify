@@ -10,12 +10,7 @@ public class LogUserService
     {
         _httpClient = httpClient;
     }
-
-    /// <summary>
-    /// Gửi yêu cầu đến API để lấy danh sách logs chứa GUID trong Message.
-    /// </summary>
-    /// <param name="guid">GUID cần tìm</param>
-    /// <returns>Danh sách logs hoặc null nếu không tìm thấy</returns>
+    
     public async Task<List<LogEntity>> GetLogsByGuidAsync(string guid)
     {
         if (string.IsNullOrWhiteSpace(guid))

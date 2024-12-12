@@ -198,10 +198,10 @@
         else
         {
             var u = await _serUser.GetByidUser(Guid.Parse(userId.Value));
-            if (u.LevelId != 1 || u.LevelId != 2)
+            if (u.LevelId != 1 && u.LevelId != 2)
                 return false;
+           
         }
-
         return true;
     }
 
