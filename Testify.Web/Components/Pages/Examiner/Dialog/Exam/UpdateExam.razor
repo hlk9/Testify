@@ -168,9 +168,9 @@
                 Snackbar.Add("Thất bại, Thời gian cho bài thi không được nhỏ hơn 0", Severity.Error);
                 return;
             }
-            if (exam.NumberOfRepeat <= 0)
+            if (exam.NumberOfRepeat < 1)
             {
-                Snackbar.Add("Thất bại, Số lần làm bài thi không được nhỏ hơn 0", Severity.Error);
+                Snackbar.Add("Thất bại, Số lần làm bài thi không được nhỏ hơn 1", Severity.Error);
                 return;
             }
 
