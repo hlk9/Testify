@@ -292,7 +292,7 @@ namespace Testify.API.Controllers
                 u.FullName = worksheetsU.Cells[rowU, 1].Value.ToString().Trim();
                 u.DateOfBirth = DateTime.Parse(cellValue);
                 u.Email = worksheetsU.Cells[rowU, 3].Value.ToString().Trim();
-                u.PhoneNumber = "0" + worksheetsU.Cells[rowU, 4].Value.ToString().Trim();
+                u.PhoneNumber = worksheetsU.Cells[rowU, 4].Value.ToString().Trim();
                 u.Address = worksheetsU.Cells[rowU, 5].Value.ToString().Trim();
                 u.Sex = worksheetsU.Cells[rowU, 6].Value.ToString().Trim() == "1" ? true : false;
                 u.UserName = worksheetsU.Cells[rowU, 7].Value.ToString().Trim();
