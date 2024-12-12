@@ -368,8 +368,7 @@ namespace Testify.API.Controllers
             var worksheetsQ = package.Workbook.Worksheets[0];
             var worksheetsA = package.Workbook.Worksheets[1];
 
-            int totalRows = worksheetsQ.Dimension.Rows;
-            for (int rowQ = 2; rowQ <= totalRows; rowQ++)
+            for (int rowQ = 2; rowQ <= worksheetsQ.Dimension.Rows; rowQ++)
             {
                 if (worksheetsQ.Cells[rowQ, 1].Value == null ||
                     worksheetsQ.Cells[rowQ, 2].Value == null ||

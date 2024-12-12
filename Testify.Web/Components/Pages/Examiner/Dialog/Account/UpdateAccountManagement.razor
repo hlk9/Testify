@@ -96,12 +96,12 @@ else
             snackbar.Add("tên tài khoản không được để trống!", Severity.Error);
             count += 1;
         }
-        if (users.DateOfBirth == null)
+        if (_date == null)
         {
             snackbar.Add("Ngày sinh không được để trống!", Severity.Error);
             count += 1;
         }
-        else if (users.DateOfBirth >= DateTime.Now)
+        else if (_date >= DateTime.Now)
         {
             snackbar.Add("Ngày sinh không hợp lệ! Không được lớn hơn ngày hiện tại.", Severity.Error);
             count += 1;
@@ -147,8 +147,6 @@ else
         var email = users.Email;
         var phoneNumber = users.PhoneNumber;
         var userName = users.UserName;
-
-        users.DateOfBirth = _date.GetValueOrDefault(DateTime.Now);
 
         var existing = await _serUser.CheckEmailOrPhone(email, phoneNumber, userName, users.Id);
 
