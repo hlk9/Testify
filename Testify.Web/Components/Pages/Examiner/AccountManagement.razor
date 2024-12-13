@@ -200,6 +200,9 @@
 
         if (name.Equals(OpenDialogType.Create))
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã mở bảng thêm tài khoản | {userIdInSession.Value}");
             var dialog = await DialogService.ShowAsync<Dialog.Account.CreateAccountDialog>("Options Dialog", options);
             var result = await dialog.Result;
             if (!result.Canceled)
@@ -209,7 +212,10 @@
 
         }
         else if (name.Equals(OpenDialogType.Update))
-        {
+        {           
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã mở bảng cập nhật tài khoản | {userIdInSession.Value}");
             var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
             if (!result.Canceled)
@@ -237,6 +243,9 @@
         }
         else
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã mở bảng xóa tài khoản | {userIdInSession.Value}");
             var dialog = await DialogService.ShowAsync<Dialog.Account.DeleteAccountManagement>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)

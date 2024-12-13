@@ -467,9 +467,9 @@ else
                 }
 
                 await ProtectedSessionStore.SetAsync("userLogin", ult.Id);
+                await ProtectedSessionStore.SetAsync("usernName", ult.UserName);
                 Snackbar.Add("Đăng nhập thành công!", Severity.Success);
                 var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
-                Snackbar.Add(a.Value, Severity.Success);
                 await localStorage.SetItemAsync("token", ult.Token);
                 var token = await localStorage.GetItemAsync<string>("token");
 

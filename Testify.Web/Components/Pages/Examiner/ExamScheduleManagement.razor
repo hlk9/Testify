@@ -127,6 +127,9 @@
                 {"titleSchedule",title }
         };
         var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.ClassAndStudentSchedule>("Options Dialog", parameters, options);
+        var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+        LogService.LogInformation($"Người dùng {userNameInSession.Value} xem thí sinh trong lịch thi {title}  | {userIdInSession.Value}");
 
     }
 
@@ -142,6 +145,9 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã xếp lịch thi {title}  | {userIdInSession.Value}");
             listSchedule = await scheduleService.GetInforBasic();
         }
     }
@@ -158,6 +164,9 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã vô hiệu hóa lịch thi có id =  {Id}  | {userIdInSession.Value}");
             listSchedule = await scheduleService.GetInforBasic();
         }
     }
@@ -186,6 +195,9 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã cập nhật lịch thi có id =  {Id}  | {userIdInSession.Value}");
             listSchedule = await scheduleService.GetInforBasic();
         }
     }
@@ -201,6 +213,9 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
+                var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+                LogService.LogInformation($"Người dùng {userNameInSession.Value} đã tạo lịch thi {name}  | {userIdInSession.Value}");
                 listSchedule = await scheduleService.GetInforBasic();
             }
 

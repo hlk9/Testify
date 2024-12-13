@@ -20,10 +20,11 @@ namespace Testify.Web.Services
 
         public async Task<bool> AddListClassToSchedule(List<ClassWithUser> data, int scheduleId)
         {
-            var lis = CheckListClassInSchedule(data, scheduleId);
+            var lis = await CheckListClassInSchedule(data, scheduleId);
             var a = await _httpClient.PostAsJsonAsync("ClassExamSchedule/Add-ListClassToSchedule?scheduleId=" + scheduleId, data);
             if (a.IsSuccessStatusCode)
                 return true;
+            var error = await a.Content.ReadAsStringAsync();
             return false;
         }
 
