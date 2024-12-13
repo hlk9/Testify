@@ -16,9 +16,19 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<QuestionLevel>> GetAllLevels(string? textSearch)
         {
-            return await _context.QuestionLevels
-                .Where(x => string.IsNullOrEmpty(textSearch) || x.Name.ToLower().Contains(textSearch.Trim().ToLower()))
+            if(string.IsNullOrEmpty(textSearch) || string.IsNullOrWhiteSpace(textSearch))
+            {
+                return await _context.QuestionLevels
+                .Where(x => x.Status == true)
                 .ToListAsync();
+            }
+            else
+            {
+                return await _context.QuestionLevels
+                .Where(x => x.Name.Trim().ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == true)
+                .ToListAsync();
+            }
+            
         }
 
 
