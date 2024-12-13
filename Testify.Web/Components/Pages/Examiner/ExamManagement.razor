@@ -86,7 +86,7 @@
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xem đề thi">
-                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end" Disabled="@(context.Status == 2 ? true : false)">Xem đề</MudButton>
+                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end">Xem đề</MudButton>
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
