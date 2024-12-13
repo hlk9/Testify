@@ -138,7 +138,7 @@
         {
             var lstExamDetail = await _serExamDetail.GetExamDetailByExamId(exam.Id);
             var lstExamDetailFormat = lstExamDetail.Where(x => x.Status != 255).ToList();
-            if (!lstExamDetailFormat.Any())
+            if (!lstExamDetailFormat.Any() && status == 1)
             {
                 snackbar.Add("Thất bại, Không có đề thi nên không thể công khai", Severity.Warning);
                 return;
