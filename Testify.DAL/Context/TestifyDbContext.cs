@@ -107,17 +107,10 @@ namespace Testify.DAL.Context
 
             modelBuilder.Entity<Permission>()
                 .HasData(
-                new Permission { Id = 1, Name = "Quản Trị Viên", Description = "Quyền tối cao, cao nhất của tổ chức, có thể thi hành mọi chức năng của hệ thống", Status = 1 },
-                new Permission { Id = 2, Name = "Xem Giảng viên, Khảo thí và Sinh viên", Description = "Xem giảng viên, khảo thí, sinh viên", Status = 1 },
-                new Permission { Id = 3, Name = "Chỉnh sửa Giảng viên, Khảo thí và Sinh viên", Description = "Chỉnh sửa giảng viên, khảo thí, sinh viên", Status = 1 },
-                new Permission { Id = 4, Name = "Chỉnh sửa và Xoá Giảng viên, Khảo thí và Sinh viên", Description = "Chỉnh sửa và Xoá giảng viên, khảo thí, sinh viên", Status = 1 },
-                new Permission { Id = 5, Name = "Xem bài thi, câu hỏi, đáp án", Description = "Xem bài thi, câu hỏi, đáp án", Status = 1 },
-                new Permission { Id = 6, Name = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án", Description = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án", Status = 1 },
-                new Permission { Id = 7, Name = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án", Description = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án", Status = 1 },
-                new Permission { Id = 8, Name = "Xem lớp, môn", Description = "Xem lớp, môn", Status = 1 },
-                new Permission { Id = 9, Name = "Chỉnh sửa và Xoá lớp, môn", Description = "Chỉnh sửa và Xoá lớp, môn", Status = 1 },
-                new Permission { Id = 10, Name = "Xem bài làm đã nộp", Description = "Xem bài làm đã nộp", Status = 1 },
-                new Permission { Id = 11, Name = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Description = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Status = 1 }
+                new Permission { Id = 1, Name = "Quản lý bài thi", Description = "Quản lý bài thi", Status = 1 },
+                new Permission { Id = 2, Name = "Quản lý câu hỏi và đáp án", Description = "Quản lý câu hỏi và đáp án", Status = 1 },
+                new Permission { Id = 3, Name = "Quản lý môn học", Description = "Quản lý môn học", Status = 1 },
+                new Permission { Id = 4, Name = "Quản lý lịch thi", Description = "Quản lý lịch thi", Status = 1 }
                 );
             modelBuilder.Entity<User>()
                .HasData(

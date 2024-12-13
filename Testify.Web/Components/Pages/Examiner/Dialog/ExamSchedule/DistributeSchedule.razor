@@ -171,9 +171,9 @@
             }
 
 
-            
-           
-            
+
+
+
         }
         snackbar.Add("Bạn chưa chọn lớp nào", Severity.Error);
 
@@ -231,7 +231,7 @@
             }
             else
                 Snackbar.Add("Thêm thất bại, hãy kiểm tra lại", Severity.Error);
-
+            newClassToAdd.Clear();
             await ReloadData();
         }
     }
@@ -257,11 +257,13 @@
                 else
                     Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
 
+                listClassSelectedInSchedule.Clear();
                 await ReloadData();
 
             }
             catch
             {
+                listClassSelectedInSchedule.Clear();
                 Snackbar.Add("Xoá thất bại, hãy kiểm tra lại", Severity.Error);
             }
 
