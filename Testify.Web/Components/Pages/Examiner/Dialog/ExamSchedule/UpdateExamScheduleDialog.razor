@@ -95,11 +95,18 @@
             return;
         }
         else
-        {
+        {           
 
             if (startDateTime < DateTime.Now.AddMinutes(10))
             {
                 Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);
+                return;
+            }
+
+            TimeSpan duration = endDateTime - startDateTime;
+            if (duration.TotalMinutes < examCurrent.Duration + 10)
+            {
+                Snackbar.Add("Thất bại, Thời gian thi phải lớn hơn thời gian làm bài thi ít nhất 10 phút", Severity.Error);
                 return;
             }
 
