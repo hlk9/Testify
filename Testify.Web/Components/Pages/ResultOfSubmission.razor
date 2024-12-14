@@ -160,10 +160,12 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="fw-bold">
-                                                    @(lstAnswerSubmission
-                                                                                .Where(x => _lstQuestionWithAnswers
-                                                                                .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect)))
-                                                                                .Count())
+                                                    @(_lstQuestionWithAnswers
+                                                        .Where(q => q.Answers.Any(ans => lstAnswerSubmission
+                                                        .Any(a => a.AnswerId == ans.Id && ans.IsCorrect))
+                                                        && !q.Answers.Any(ans => lstAnswerSubmission
+                                                        .Any(a => a.AnswerId == ans.Id && !ans.IsCorrect)))
+                                                        .Count())
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-row justify-content-between mt-3">
