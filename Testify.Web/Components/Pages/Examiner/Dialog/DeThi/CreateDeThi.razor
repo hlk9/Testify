@@ -178,45 +178,9 @@
         }
     }
 
-    private async Task RowQuestionClick(TableRowClickEventArgs<QuestionInExam> args)
-    {
-        args.Item.IsChoosen = !args.Item.IsChoosen;
-        IsCheckQuestion objIsCheck = new IsCheckQuestion()
-            {
-                IdQues = args.Item.Id,
-                IsChecked = args.Item.IsChoosen,
-            };
-        if (_lstIsCheck.Any(x => x.IdQues == args.Item.Id))
-        {
-            _lstIsCheck.RemoveAll(x => x.IdQues == args.Item.Id);
-        }
-        else
-        {
-            _lstIsCheck.Add(objIsCheck);
-        }
-
-        var objChoice = _lstChoice.FirstOrDefault(x => x.Id == args.Item.Id);
-        if (objChoice == null)
-        {
-            _lstChoice.Add(args.Item);
-            var lstAnswer = await _serAnswer.GetAllByQuestionId(args.Item.Id);
-            _lstAnswer.AddRange(lstAnswer);
-        }
-        else
-        {
-            _lstChoice.Remove(objChoice);
-            _lstAnswer.RemoveAll(x => x.QuestionId == args.Item.Id);
-        }
-    }
-
     private async Task AutoGenQuestion()
     {
-        // if (questionLevelId == -1)
-        // {
-        //     snackbar.Add("Vui lòng chọn mức độ", Severity.Warning);
-        //     return;
-        // }
-
+        _lstQuestion = await _serQuestion.GetAllQuestioneByIdSub(SubjectId);
         if (NumberOfQuestion <= 0)
         {
             snackbar.Add("Vui lòng nhập số câu hỏi", Severity.Warning);
@@ -225,32 +189,33 @@
 
         if (NumberOfQuestion + _lstChoice.Count > exam.NumberOfQuestions)
         {
-            snackbar.Add("Số lượng câu hỏi nhập nhiều hơn số câu hỏi của đề ", Severity.Warning);
+            snackbar.Add("Số lượng câu hỏi nhập nhiều hơn số câu hỏi của đề", Severity.Warning);
             return;
         }
 
         if (questionLevelId > -1)
         {
-            _lstQuestion = await _serQuestion.GetAllQuestioneByIdSub_And_Level(SubjectId, questionLevelId);
-            if (_lstQuestion.Count < NumberOfQuestion)
+            var lstIsQuestionLevel = _lstQuestion.Where(q => q.QuestionLevelId == questionLevelId).ToList();
+            var lstIsQuestionLevelNotChoose = lstIsQuestionLevel.Where(q => !_lstChoice.Any(x => x.Id == q.Id)).ToList();
+            if (lstIsQuestionLevelNotChoose.Count < NumberOfQuestion)
             {
                 snackbar.Add("Số lượng câu hỏi không đủ", Severity.Warning);
                 return;
             }
             Random random = new Random();
-            var lstQuesRandom = _lstQuestion.OrderBy(x => random.Next()).Take(NumberOfQuestion).ToList();
+            var lstQuesRandom = lstIsQuestionLevelNotChoose.OrderBy(x => random.Next()).Take(NumberOfQuestion).ToList();
             _lstChoice.AddRange(lstQuesRandom);
         }
         else
         {
-            _lstQuestion = await _serQuestion.GetAllQuestioneByIdSub(SubjectId);
-            if (_lstQuestion.Count < NumberOfQuestion)
+            var lstIsQuestionLevel = _lstQuestion.Where(q => !_lstChoice.Any(x => x.Id == q.Id)).ToList();
+            if (lstIsQuestionLevel.Count < NumberOfQuestion)
             {
                 snackbar.Add("Số lượng câu hỏi không đủ", Severity.Warning);
                 return;
             }
             Random random = new Random();
-            var lstQuesRandom = _lstQuestion.OrderBy(x => random.Next()).Take(NumberOfQuestion).ToList();
+            var lstQuesRandom = lstIsQuestionLevel.OrderBy(x => random.Next()).Take(NumberOfQuestion).ToList();
             _lstChoice.AddRange(lstQuesRandom);
         }
     }

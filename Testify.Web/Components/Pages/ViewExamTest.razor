@@ -26,12 +26,12 @@ else
 {
     <MudDrawer @bind-Open="@_open" Width="30%" ClipMode="DrawerClipMode.Never" Elevation="3" Anchor="Anchor.End" Variant="@DrawerVariant.Responsive">
         <MudDrawerHeader Class="align-items-center">
-            <MudText Class="fs-6">Thí sinh: <b>@user.FullName</b></MudText>
-            <MudText>Số lần làm bài: <b>@numberofsubmit/@limitofsubmit</b></MudText>
+            <MudText Class="h5 fw-light m-0">Thí sinh: <b>@user.FullName</b></MudText>
         </MudDrawerHeader>
         <MudPaper Elevation="0" Class="w-100 pt-5 px-4 h-100 position-relative">
-            <MudText Class="fs-5 fw-bold text-center text-uppercase">@exam.Name</MudText>
-            <MudPaper Elevation="0" Class="w-100 d-flex justify-content-center gap-3 flex-wrap py-5 hidden-scroll" Style="min-height: 400px; max-height: 400px; overflow: scroll">
+            <MudText Class="fs-3 fw-bold text-center text-uppercase">@exam.Name</MudText>
+            <MudText Class="fs-4 text-center">@timeRemaining</MudText>
+            <MudPaper Elevation="0" Class="w-100 d-flex justify-content-start gap-3 flex-wrap py-5 hidden-scroll" Style="max-height: 400px; overflow: scroll">
                 @if (_lstQuestionWithAnswers != null)
                 {
                     @foreach (var a in _lstQuestionWithAnswers)
@@ -63,10 +63,7 @@ else
     </MudDrawer>
     <MudMainContent>
         <MudAppBar Elevation="2">
-            <MudText>Thời gian còn lại: <b>@timeRemaining</b></MudText>
-            <MudText>          Số lần làm bài: <b>@numberofsubmit/@limitofsubmit</b></MudText>
-
-
+            <MudText Class="h5 m-0">Thời gian còn lại: <b class="h5">@timeRemaining</b></MudText>
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Class="d-lg-none d-block" Edge="Edge.End" OnClick="@ToggleDrawer" />
         </MudAppBar>
@@ -381,9 +378,9 @@ else
     {
         try
         {
+            timer.Stop();
             isLoading = true;
             StateHasChanged();
-            timer.Stop();
             Submission submission = new Submission();
             double score = 0;
             bool isPassed = false;
@@ -512,12 +509,6 @@ else
         {
             await ScoreExam();
         }
-
-        // var dialogParametersDetail = new DialogParameters<Student.Dialog.FinalViewExam.FinalView>
-        // {
-        //     {x => x.submissionId, id}
-        // };
-        // return DialogService.ShowAsync<Student.Dialog.FinalViewExam.FinalView>("", dialogParametersDetail, options);
     }
 
     private async void StartCountdown()
