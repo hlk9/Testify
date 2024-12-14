@@ -153,7 +153,7 @@
     private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
     {
 
-        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
         listExam = listExam.Where(x => x.Status == 1).ToList();
 
 
@@ -177,7 +177,7 @@
     }
     private async Task SubjectChanged()
     {
-        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
         listExam = listExam.Where(x => x.Status == 1).ToList();
         examCurrent = null;
         StateHasChanged();

@@ -37,6 +37,17 @@ namespace Testify.DAL.Reposiroties
 
         }
 
+        public async Task<List<Exam>> GetExamHaveExDetailBySubject(int id)
+        {
+            var listEx = await (from ex in _context.Exams
+                                join exdt in _context.ExamDetails
+                                on ex.Id equals exdt.ExamId
+                                where exdt.Status == 1 && ex.SubjectId == id
+                                select ex).ToListAsync();
+
+            return listEx;
+        }
+
         public async Task<Exam> GetByIdExam(int id)
         {
             var a = await _context.Exams.FindAsync(id);

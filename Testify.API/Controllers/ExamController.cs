@@ -27,6 +27,12 @@ namespace Testify.API.Controllers
             return await _respon.GetAllActicveOfSubject(id);
         }
 
+        [HttpGet("Get-ExamHaveExDetailBySubject")]
+        public async Task<List<Exam>> GetExamHaveExDetailBySubject(int id)
+        {
+            return await _respon.GetExamHaveExDetailBySubject(id);
+        }
+
         [HttpGet("Get-Exams")]
         public async Task<ActionResult<List<ExamWhitExamDetail>>> GetAll(string? keyword, bool isActive)
         {
