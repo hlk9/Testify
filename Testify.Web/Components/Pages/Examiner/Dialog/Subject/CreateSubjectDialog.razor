@@ -31,6 +31,7 @@
     private bool isLoading { get; set; } = true;
     MudForm form;
     private Subject subject { get; set; } = new();
+    private List<Subject> _lstS = new List<Subject>();
 
     [Parameter]
     public int idSubject { get; set; }
@@ -41,6 +42,7 @@
     }
     private async Task LoadData()
     {
+        _lstS = await _serSub.GetAllSub("", true);
         isLoading = false;
     }
 
@@ -49,6 +51,14 @@
         var checkValidation = ValidateForm();
         if (!checkValidation)
         {
+            var isSubject = _lstS.Any(x => x.Name.Trim().ToLower().Equals(subject.Name.Trim().ToLower()));
+
+            if(isSubject)
+            {
+                snackbar.Add("Đã tồn tại môn này!", Severity.Error);
+                return;
+            }
+
             subject.Status = 1;
             var check = await _serSub.CreateSub(subject);
             if (check == true)
@@ -69,7 +79,7 @@
     private bool ValidateForm()
     {
         int count = 0;
-        if (subject.Name == null || subject.Name.Trim().Length == 0)
+        if (string.IsNullOrEmpty(subject.Name) || string.IsNullOrWhiteSpace(subject.Name))
         {
             snackbar.Add("Tên không được để trống!", Severity.Error);
             count += 1;
