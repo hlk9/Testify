@@ -25,23 +25,23 @@ else
                         <MudItem md="8" Class="p-0">
                             <MudText Style="font-weight: bold; font-size: 20px">@item.ExamScheduleName</MudText>
                             <MudText Style="font-weight: bold; font-size: 14px; color: #787878; margin: 10px 0">Môn: @item.SubjectName</MudText>
-                            <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : @item.ExamScheduleStartTime đến @item.ExamScheduleEndTime.Date</MudText>
+                            <MudText Style="font-size: 14px; color: #787878;">Diễn ra từ ngày : @item.ExamScheduleStartTime đến @item.ExamScheduleEndTime</MudText>
                         </MudItem>
                         <MudItem md="2" Class="p-0">
                             <div class="w-100 d-flex justify-content-between align-items-center">
                                 @if (DateTime.Now >= item.ExamScheduleStartTime && DateTime.Now <= item.ExamScheduleEndTime)
                                 {
-                                    <MudChip T="string" Style="width:100px; color: limegreen">Đang diễn ra</MudChip>
+                                    <MudChip T="string" Style="color: limegreen">Đang diễn ra</MudChip>
 
                                 }
                                 else if (DateTime.Now < item.ExamScheduleStartTime)
                                 {
-                                    <MudChip T="string" Style="width:100px">Chưa mở</MudChip>
+                                    <MudChip T="string">Chưa mở</MudChip>
 
                                 }
                                 else if (DateTime.Now > item.ExamScheduleEndTime)
                                 {
-                                    <MudChip T="string" Style="width:150px">Bài thi đã kết thúc</MudChip>
+                                    <MudChip T="string">Bài thi đã kết thúc</MudChip>
                                 }
                             </div>
                         </MudItem>
