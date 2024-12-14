@@ -88,7 +88,8 @@
 
     private async Task SubjectChanged()
     {
-        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
+        listExam = listExam.Where(x => x.Status == 1).ToList();
         examCurrent = null;
         StateHasChanged();
 
@@ -106,7 +107,8 @@
         try
         {
 
-        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
+        listExam = listExam.Where(x=>x.Status==1).ToList();
         }
         catch
         {
