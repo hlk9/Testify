@@ -174,6 +174,13 @@
                 return;
             }
 
+            var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim(), subjectCurrent.Id, Id);
+            if (checktrungTen_Exam)
+            {
+                Snackbar.Add("Thất bại! Tên bài thi đã tồn tại, vui lòng nhập tên khác! ", Severity.Warning);
+                return;
+            }
+
             exam.ScoreMethodId = null;
             exam.SubjectId = subjectCurrent.Id;
             exam.AllowViewResult = examAllowViewResult;

@@ -268,7 +268,18 @@
             Snackbar.Add("Đề chưa đủ số câu hỏi yêu cầu", Severity.Warning);
         }else
         {
-            
+            if (string.IsNullOrEmpty(examDetail.Code) || string.IsNullOrWhiteSpace(examDetail.Code))
+            {
+                snackbar.Add("Tiêu đề trống", Severity.Warning);
+                return;
+            }
+
+            var checktrungTenDT = await _serExamDetail.IsExamDetailCodeDuplicate(examDetail.Code.Trim(), ExamID, ExamDetailID);
+            if (checktrungTenDT)
+            {
+                snackbar.Add("Tiêu đề thi này đã tồn tại. Vui lòng nhập tiêu đề khác.", Severity.Warning);
+                return;
+            }
 
             if (CheckBoxStatus == false)
             {

@@ -1,9 +1,8 @@
 ﻿@using Testify.DAL.Models
+@using Testify.Web.Shared
 <MudDialog>
     <TitleContent>
-        <TitleContent>
             <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa môn học</MudText>
-        </TitleContent>
     </TitleContent>
     <DialogContent>
         @if (isLoading)
@@ -32,6 +31,7 @@
     public int idSubject { get; set; }
     private bool isLoading { get; set; } = true;
     private Subject subject { get; set; } = new();
+    private List<Subject> _lstS = new List<Subject>();
 
     protected async override Task OnInitializedAsync()
     {
@@ -41,11 +41,25 @@
 
     private async Task Loaddata()
     {
+        _lstS = await _serSub.GetAllSub("", true);
         subject = await _serSub.GetSubId(idSubject);
         isLoading = false;
     }
     private async Task Submit()
     {
+        if (string.IsNullOrEmpty(subject.Name) || string.IsNullOrWhiteSpace(subject.Name))
+        {
+            snackbar.Add("Tên không được để trống!", Severity.Error);
+            return;
+        }
+
+        var isSubject = _lstS.Any(x => x.Name.Trim().ToLower().Equals(subject.Name.Trim().ToLower()) && x.Id != subject.Id);
+        if (isSubject)
+        {
+            snackbar.Add("Đã tồn tại môn này!", Severity.Error);
+            return;
+        }
+
         var check = await _serSub.UpdateSub(subject);
         if (check == true)
         {

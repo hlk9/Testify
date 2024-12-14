@@ -47,14 +47,15 @@ namespace Testify.DAL.Reposiroties
             try
             {
                 var isNotDel = await (from exd in _context.ExamDetails
-                                  join e in _context.Exams on exd.ExamId equals e.Id
-                                  join es in _context.ExamSchedules on e.Id equals es.ExamId
-                                  where (exd.Id == id && 
-                                  (
-                                  (es.StartTime < DateTime.Now && es.EndTime > DateTime.Now) ||
-                                  es.StartTime > DateTime.Now
-                                  )
-                                  ) select exd).AnyAsync();
+                                      join e in _context.Exams on exd.ExamId equals e.Id
+                                      join es in _context.ExamSchedules on e.Id equals es.ExamId
+                                      where (exd.Id == id &&
+                                      (
+                                      (es.StartTime < DateTime.Now && es.EndTime > DateTime.Now) ||
+                                      es.StartTime > DateTime.Now
+                                      )
+                                      )
+                                      select exd).AnyAsync();
 
                 var objDelete = await _context.ExamDetails.FindAsync(id);
 
@@ -68,7 +69,7 @@ namespace Testify.DAL.Reposiroties
                 await _context.SaveChangesAsync();
                 return new ErrorResponse { Success = true };
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
@@ -93,13 +94,23 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<bool> IsExamDetailCodeExist(string code, int? idSub)
+        public async Task<bool> IsExamDetailCodeExist(string code, int? idExam, int idExamDetail)
         {
-            var obj = await (from a in _context.ExamDetails
-                          join b in _context.Exams on a.ExamId equals b.Id
-                          where a.Status != 255 && a.Code == code && b.SubjectId == idSub
-                          select a).AnyAsync();
-            return obj;
+            if (idExamDetail == -1)
+            {
+                var noExamDetail = await (from a in _context.ExamDetails
+                                 join b in _context.Exams on a.ExamId equals b.Id
+                                 where a.Status != 255 && a.Code.Trim().ToLower().Equals(code.Trim().ToLower()) && b.Id == idExam
+                                 select a).AnyAsync();
+                return noExamDetail;
+            }
+
+            var hasExamDetail = await (from a in _context.ExamDetails
+                             join b in _context.Exams on a.ExamId equals b.Id
+                             where a.Status != 255 && a.Code.Trim().ToLower().Equals(code.Trim().ToLower()) && b.Id == idExam && a.Id != idExamDetail
+                             select a).AnyAsync();
+
+            return hasExamDetail;
         }
 
 
