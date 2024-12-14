@@ -77,6 +77,7 @@
     {
         lisDThi.RemoveAt(examdetailId);
     }
+
     private async Task SubjectChanged()
     {
         listExam = await examService.GetListOfSubject(subjectCurrent.Id);
@@ -84,10 +85,7 @@
         StateHasChanged();
 
     }
-    private async Task SaveExamDetailInExam()
-    {
 
-    }
     private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
     {
 
@@ -102,9 +100,6 @@
 
     private async void SubmitValid()
     {
-       
-        
-
         if (subjectCurrent == null || exam.Name == null || exam.MaximmumMark == null || exam.PassMark == null || exam.NumberOfQuestions == null || exam.Duration == null)
         {
             Snackbar.Add("Thất bại, Vui lòng điền đầy đủ  thông tin", Severity.Warning);
@@ -112,7 +107,7 @@
         }
         else
         {
-            var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim().ToUpper().ToLower(), subjectCurrent.Id);
+            var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim(), subjectCurrent.Id, -1);
 
             if (exam.MaximmumMark <= 0)
             {
