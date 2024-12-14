@@ -1,0 +1,43 @@
+﻿@using Testify.DAL.ViewModels
+@using Testify.Web.Shared;
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body1" Class="mb-2">
+            Trước khi vào thi, vui lòng đọc kỹ và xác nhận các thông tin sau:
+        </MudText>
+        <MudList T="string">
+            <MudListItem>
+                <b>Đảm bảo kết nối mạng ổn định:</b> Trong suốt quá trình làm bài, nếu mất kết nối mạng, bài làm của bạn có thể không được lưu lại đầy đủ.
+            </MudListItem>
+            <MudListItem>
+                <b>Không rời khỏi trang thi:</b> Nếu bạn thoát khỏi trang thi, bài làm sẽ bị mất và không thể khôi phục.
+            </MudListItem>
+            <MudListItem>
+                <b>Thời gian làm bài:</b> Hệ thống sẽ tự động nộp bài khi hết thời gian làm bài.
+            </MudListItem>
+            <MudListItem>
+                <b>Cam kết thực hiện nghiêm túc:</b> Không sử dụng các công cụ hoặc phần mềm hỗ trợ không được phép.
+            </MudListItem>
+        </MudList>
+        <MudCheckBox T="bool" Label="Tôi đã đọc và đồng ý với các điều khoản trên." @bind-Value="IsChecked" Class="mt-4" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+        <MudButton OnClick="Submit" Color="Color.Primary" Disabled="!IsChecked">Xác nhận</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool IsChecked { get; set; } = false;
+    private Guid userId = Guid.NewGuid();
+    private ListExamsOfStudent _ListExamsOfStudent = new ListExamsOfStudent();
+    public Exam exam { get; set; }
+    [Parameter]
+    public int ExamScheduleId { get; set; }
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}
