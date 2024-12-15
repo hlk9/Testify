@@ -30,6 +30,14 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<List<ExamDetail>>($"ExamDetail/Get-ExamDetail-By-ExamID?examId={examId}");
         }
 
+        public async Task<List<ExamDetail>> GetExamDetailByExamIdActive(int examId)
+        {
+            var lst = await _httpClient.GetAsync($"ExamDetail/Get-ExamDetail-By-ExamID?examId={examId}");
+            var reponse = await lst.Content.ReadFromJsonAsync<List<ExamDetail>>();
+
+            return reponse.Where(x => x.Status == 1).ToList();
+        }
+
         public async Task<ExamDetail> CreateExamDetail(ExamDetail examDetail)
         {
             var objNew = await _httpClient.PostAsJsonAsync("ExamDetail/Create-Exam-Detail", examDetail);

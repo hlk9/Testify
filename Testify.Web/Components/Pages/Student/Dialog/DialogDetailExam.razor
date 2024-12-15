@@ -121,13 +121,22 @@ else
 
     private async Task Open()
     {
+        await localStorage.RemoveItemAsync("IdExam");
+        await localStorage.RemoveItemAsync("IdExamDetail");
+        await localStorage.RemoveItemAsync("ExamScheduleId");
+        await localStorage.RemoveItemAsync("_lstQAndASelect");
+        await localStorage.RemoveItemAsync("_tabCount");
+        await localStorage.RemoveItemAsync("TimeStart");
+
         var lst = await _serExamActLog.GetAllByUserAndExamIdAndScheduleId(userId, _ListExamsOfStudent.ExamId, _ListExamsOfStudent.ExamScheduleId);
         if (lst.Count >= exam.NumberOfRepeat)
         {
             await JS.InvokeVoidAsync("alert", "Hết số lần làm bài");
             return;
         }
+
         await localStorage.SetItemAsync("ExamScheduleId", ExamScheduleId);
+        await localStorage.SetItemAsync("TimeStart", DateTime.Now);
         navigation.NavigateTo($"/ExamTest/{_ListExamsOfStudent.ExamId}");
     }
 }

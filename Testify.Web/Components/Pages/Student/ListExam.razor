@@ -13,10 +13,6 @@ else
 {
     <MudContainer MaxWidth="MaxWidth.Large" Class="py-5">
         <MudPaper Elevation="0" Style="min-height: 640px; width: 100%; margin-top: 48px">
-            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Variant="Variant.Outlined"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Immediate=true></MudTextField>
-            <br />
-
             @foreach (var item in _lstExam)
             {
                 <MudPaper Elevation="2" Class="p-5 mb-4 w-100" Style="border-radius: 15px; border-left: 5px solid #29a69a">
