@@ -114,7 +114,7 @@ namespace Testify.DAL.Reposiroties
                                 ClassId = g.Key.ClassId,
                                 ClassName = g.Key.ClassName,
                                 SubjectName = string.Join(", ", g.Select(x => x.SubjectName).Distinct()),
-                                AvgScore = g.Average(x => x.AvgScore)
+                                AvgScore = Math.Round(g.Average(x => x.AvgScore), 2)
                             })
                             .ToList();
 

@@ -472,7 +472,12 @@ else
                 var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
                 await localStorage.SetItemAsync("token", ult.Token);
                 var token = await localStorage.GetItemAsync<string>("token");
-
+                await localStorage.RemoveItemAsync("IdExam");
+                await localStorage.RemoveItemAsync("IdExamDetail");
+                await localStorage.RemoveItemAsync("ExamScheduleId");
+                await localStorage.RemoveItemAsync("_lstQAndASelect");
+                await localStorage.RemoveItemAsync("_tabCount");
+                await localStorage.RemoveItemAsync("TimeStart");
                 if (ult.LevelId == 1)
                 {
                     LogService.LogInformation($"Quản trị {username} đăng nhập vào hệ thống | {ult.Id}");

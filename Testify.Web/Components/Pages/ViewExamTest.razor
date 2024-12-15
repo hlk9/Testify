@@ -6,17 +6,17 @@
 @inject NavigationManager navigation
 <style>
     .hidden-scroll {
-    overflow-y: scroll;
-    scrollbar-width: none;
+        overflow-y: scroll;
+        scrollbar-width: none;
     }
 
-    .hidden-scroll::-webkit-scrollbar {
-    display: none;
-    }
+        .hidden-scroll::-webkit-scrollbar {
+            display: none;
+        }
 
 </style>
 
-@if(isLoading)
+@if (isLoading)
 {
     <MudPaper Style="width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center">
         <Testify.Web.Shared.LoadingContext />
@@ -26,12 +26,12 @@ else
 {
     <MudDrawer @bind-Open="@_open" Width="30%" ClipMode="DrawerClipMode.Never" Elevation="3" Anchor="Anchor.End" Variant="@DrawerVariant.Responsive">
         <MudDrawerHeader Class="align-items-center">
-            <MudText Class="fs-6">Thí sinh: <b>@user.FullName</b></MudText>
-            <MudText>Số lần làm bài: <b>@numberofsubmit/@limitofsubmit</b></MudText>
+            <MudText Class="h5 fw-light m-0">Thí sinh: <b>@user.FullName</b></MudText>
         </MudDrawerHeader>
         <MudPaper Elevation="0" Class="w-100 pt-5 px-4 h-100 position-relative">
-            <MudText Class="fs-5 fw-bold text-center text-uppercase">@exam.Name</MudText>
-            <MudPaper Elevation="0" Class="w-100 d-flex justify-content-center gap-3 flex-wrap py-5 hidden-scroll" Style="min-height: 400px; max-height: 400px; overflow: scroll">
+            <MudText Class="fs-3 fw-bold text-center text-uppercase">@exam.Name</MudText>
+            <MudText Class="fs-4 text-center">@timeRemaining</MudText>
+            <MudPaper Elevation="0" Class="w-100 d-flex justify-content-start gap-3 flex-wrap py-5 hidden-scroll" Style="max-height: 400px; overflow: scroll">
                 @if (_lstQuestionWithAnswers != null)
                 {
                     @foreach (var a in _lstQuestionWithAnswers)
@@ -51,10 +51,7 @@ else
             </MudPaper>
             <MudPaper Elevation="0" Class="position-absolute bottom-0 start-0 end-0">
                 <MudGrid Class="p-0 m-0 w-100">
-                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12" Class="px-2 py-lg-3 py-0">
-                        <MudButton Class="w-100" Style="border: 1px solid #29a69a; color: #29a69a" OnClick="Cancle">Rời khỏi</MudButton>
-                    </MudItem>
-                    <MudItem xl="6" lg="6" md="12" sm="12" xs="12" Class="px-2 py-lg-3 py-2">
+                    <MudItem xl="12" lg="12" md="12" sm="12" xs="12" Class="px-2 py-lg-3 py-2">
                         <MudButton Class="w-100 text-white" Style="background-color: #29a69a" OnClick="OnSubmit">Nộp bài</MudButton>
                     </MudItem>
                 </MudGrid>
@@ -63,10 +60,7 @@ else
     </MudDrawer>
     <MudMainContent>
         <MudAppBar Elevation="2">
-            <MudText>Thời gian còn lại: <b>@timeRemaining</b></MudText>
-            <MudText>          Số lần làm bài: <b>@numberofsubmit/@limitofsubmit</b></MudText>
-
-
+            <MudText Class="h5 m-0">Thời gian còn lại: <b class="h5">@timeRemaining</b></MudText>
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Class="d-lg-none d-block" Edge="Edge.End" OnClick="@ToggleDrawer" />
         </MudAppBar>
@@ -92,8 +86,8 @@ else
                                         {
                                             <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
                                                 <MudButton Class="py-3 w-100 text-truncate text-wrap h-100"
-                                                Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2); background-color: rgba(0, 0, 0, 0.2)"
-                                                OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2); background-color: rgba(0, 0, 0, 0.2)"
+                                                           OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
                                                     <MudText Class="text-start w-100">@contentAnswer</MudText>
                                                 </MudButton>
                                             </MudItem>
@@ -102,8 +96,8 @@ else
                                         {
                                             <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
                                                 <MudButton Class="py-3 w-100 text-truncate text-wrap h-100"
-                                                Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
-                                                OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
+                                                           Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                           OnClick="@(() => IsSelectAnswerSingle(q.Id, answer.Id))">
                                                     <MudText Class="text-start w-100">@contentAnswer</MudText>
                                                 </MudButton>
                                             </MudItem>
@@ -113,8 +107,8 @@ else
                                     {
                                         <MudItem xl="6" lg="6" md="6" sm="12" xs="12" Class="px-4">
                                             <MudCheckBox T="bool" Label="@contentAnswer" @bind-Value="@isSelect" Class="py-1 text-start w-100 text-truncate text-wrap h-100"
-                                            Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
-                                            onclick="@(() => IsSelectAnswerMulti(q.Id, answer.Id))"></MudCheckBox>
+                                                         Style="border-radius: 10px; transition: 0.3s ease; border: 1px solid rgba(0, 0, 0, 0.2)"
+                                                         onclick="@(() => IsSelectAnswerMulti(q.Id, answer.Id))"></MudCheckBox>
                                         </MudItem>
                                     }
                                 }
@@ -145,9 +139,8 @@ else
     private int stt;
     private int sttList;
     private bool _open = true;
+    private bool isReload = false;
     private int _tabCount = 0;
-    private int limitofsubmit;
-    private int numberofsubmit;
     private int examscheduleId;
 
     [Parameter]
@@ -168,12 +161,7 @@ else
     {
         CheckInput();
         isLoading = true;
-        exam = await _serExam.GetExamId(idExam);
-        // countdownTime = exam.Duration * 60;
 
-        // StartCountdown();
-        numberofsubmit = await _serSubmission.NumberSubmit(_userId, examscheduleId);
-        limitofsubmit = exam.NumberOfRepeat;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -183,6 +171,15 @@ else
             try
             {
                 isLoading = true;
+                var examId = await localStorage.GetItemAsync<string>("IdExam");
+                if (string.IsNullOrEmpty(examId) || examId == "0")
+                {
+                    exam = await _serExam.GetExamId(idExam);
+                }else
+                {
+                    idExam = Convert.ToInt32(examId);
+                    exam = await _serExam.GetExamId(idExam);
+                }
                 await LoadData();
                 await LoadExam();
                 StartCountdown();
@@ -206,10 +203,7 @@ else
     {
         _tabCount++;
         await localStorage.SetItemAsync("_tabCount", _tabCount);
-        snackbar.Add($"Đã tab ra ngoài {_tabCount} lần", Severity.Warning);
-        var test = await localStorage.GetItemAsync<string>("_tabCount");
-        snackbar.Add(test);
-        JS.InvokeVoidAsync("updateTabOutCountInLocalStorage", _tabCount);      
+        JS.InvokeVoidAsync("updateTabOutCountInLocalStorage", _tabCount);
     }
 
     public void Dispose()
@@ -225,7 +219,7 @@ else
 
     }
 
-    private void CheckInput()   
+    private void CheckInput()
     {
         if (idExam <= 0)
         {
@@ -242,25 +236,9 @@ else
         var idExamSchedule = await localStorage.GetItemAsync<string>("ExamScheduleId");
 
         snackbar.Add(idExamDetailLocalStorage == null ? "chưa có" : idExamDetailLocalStorage);
-        if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null && idExamSchedule!=null)
+        if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null && idExamSchedule != null)
         {
-            ExamActivityLog examActivityLog = new ExamActivityLog();
-            examActivityLog.ExamId = idExam;
-            examActivityLog.UserId = _userId;
-            examActivityLog.ExamDetailId = Convert.ToInt32(idExamDetailLocalStorage);
-            examActivityLog.ActionTime = DateTime.Now;
-            examActivityLog.ActionType = "Mở bài thi";
-            examActivityLog.ExamScheduleId = Convert.ToInt32(idExamSchedule);
-            var logStat =  await  _serExamActLog.Create(examActivityLog);
-
-            if(logStat==false)
-            {
-                snackbar.Add("Có lỗi, không ghi được log exam", Severity.Warning);
-
-                return;
-            }
-
-
+            isReload = true;
             var lstQAndASelect = JsonSerializer.Deserialize<List<QuestionAndAnswerChoosen>>(await localStorage.GetItemAsync<string>("_lstQAndASelect"));
             idExamDetail = Convert.ToInt32(idExamDetailLocalStorage);
             if (idExamDetail == null || idExamDetail <= 0)
@@ -288,11 +266,11 @@ else
             return;
         }
 
-        _lstexamDetails = await _serExamDetail.GetExamDetailByExamId(idExam);
+        _lstexamDetails = await _serExamDetail.GetExamDetailByExamIdActive(idExam);
         if (_lstexamDetails == null || _lstexamDetails.Count == 0)
         {
             snackbar.Add("Lỗi bài thi", Severity.Warning);
-            navigation.NavigateTo("/Admin/Home");
+            navigation.NavigateTo("/Student/Home");
             return;
         }
 
@@ -301,9 +279,26 @@ else
         if (idExamDetail == null || idExamDetail <= 0)
         {
             snackbar.Add("Có lỗi", Severity.Warning);
-            navigation.NavigateTo("/Admin/Home");
+            navigation.NavigateTo("/Student/Home");
             return;
         }
+
+        ExamActivityLog examActivityLog = new ExamActivityLog();
+        examActivityLog.ExamId = idExam;
+        examActivityLog.UserId = _userId;
+        examActivityLog.ExamDetailId = idExamDetail;
+        examActivityLog.ActionTime = DateTime.Now;
+        examActivityLog.ActionType = "Mở bài thi";
+        examActivityLog.ExamScheduleId = Convert.ToInt32(idExamSchedule);
+        var logStat = await _serExamActLog.Create(examActivityLog);
+
+        if (logStat == false)
+        {
+            snackbar.Add("Có lỗi, không ghi được log exam", Severity.Warning);
+
+            return;
+        }
+
         _lstexamDetailsQuestion = await _serExamDetailQuestion.GetAllByExamDetailId(idExamDetail);
         foreach (var item in _lstexamDetailsQuestion)
         {
@@ -323,8 +318,6 @@ else
         await localStorage.SetItemAsync("IdExam", idExam);
         await localStorage.SetItemAsync("IdExamDetail", idExamDetail);
         await localStorage.SetItemAsync("_lstQAndASelect", _lstQAndASelect);
-
-
     }
 
     private async Task IsSelectAnswerSingle(int questionId, int answerId)
@@ -379,115 +372,120 @@ else
 
     private async Task ScoreExam()
     {
-        try
+        await InvokeAsync(async () =>
         {
-            isLoading = true;
-            StateHasChanged();
-            timer.Stop();
-            Submission submission = new Submission();
-            double score = 0;
-            bool isPassed = false;
-            int answered = 0;
-            foreach (var q in _lstQAndASelect)
+            try
             {
-                answered++;
-                AnswerAndQuestion QnA = await _serQuestion.GetTrueAnswerOfQuesiton(q.QuestionId, idExamDetail);
-
-                if (q.Answers.Count() == 1)
+                isLoading = true;
+                StateHasChanged();
+                timer.Stop();
+                await JS.InvokeVoidAsync("removeVisibilityChangeHandler");
+                Submission submission = new Submission();
+                double score = 0;
+                bool isPassed = false;
+                int answered = 0;
+                foreach (var q in _lstQAndASelect)
                 {
-                    foreach (var a in q.Answers)
+                    answered++;
+                    AnswerAndQuestion QnA = await _serQuestion.GetTrueAnswerOfQuesiton(q.QuestionId, idExamDetail);
+
+                    if (q.Answers.Count() == 1)
                     {
-                        if (a.IsCorrect == true)
+                        foreach (var a in q.Answers)
+                        {
+                            if (a.IsCorrect == true)
+                            {
+                                score += QnA.PointOfQuestion;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        bool allAnswerTrue = (q.Answers.Where(x => x.IsCorrect == true).Count() == QnA.LstAnswer.Count() && q.Answers.Count() == QnA.LstAnswer.Count());
+                        if (allAnswerTrue)
                         {
                             score += QnA.PointOfQuestion;
                         }
                     }
                 }
+
+                int unAswered = exam.NumberOfQuestions - answered;
+
+                if (score >= exam.PassMark)
+                {
+                    isPassed = true;
+                }
                 else
                 {
-                    bool allAnswerTrue = (q.Answers.Where(x => x.IsCorrect == true).Count() == QnA.LstAnswer.Count() && q.Answers.Count() == QnA.LstAnswer.Count());
-                    if (allAnswerTrue)
-                    {
-                        score += QnA.PointOfQuestion;
-                    }
+                    isPassed = false;
                 }
-            }
+                var exSchedule = await localStorage.GetItemAsync<string>("ExamScheduleId");
+                submission.UserId = _userId;
+                submission.ExamDetailId = idExamDetail;
+                submission.ExamScheduleId = Convert.ToInt32(exSchedule);
+                submission.SubmitTime = DateTime.Now;
+                submission.TimeTaken = TimeSpan.FromSeconds((exam.Duration * 60) - countdownTime);
+                submission.TotalMark = Math.Round(score, 2);
+                submission.IsPassed = isPassed;
+                submission.UnAnswered = unAswered;
+                submission.Answered = answered;
+                submission.Note = _tabCount > 0 ? $"Rời khỏi trang {_tabCount} lần" : "";
+                submission.Status = true;
 
-            int unAswered = exam.NumberOfQuestions - answered;
-
-            if (score >= exam.PassMark)
-            {
-                isPassed = true;
-            }
-            else
-            {
-                isPassed = false;
-            }
-            var exSchedule = await localStorage.GetItemAsync<string>("ExamScheduleId");
-            submission.UserId = _userId;
-            submission.ExamDetailId = idExamDetail;
-            submission.ExamScheduleId = Convert.ToInt32(exSchedule); ;
-            submission.SubmitTime = DateTime.Now;
-            submission.TimeTaken = TimeSpan.FromSeconds(timeDoExam);
-            submission.TotalMark = Math.Round(score, 2);
-            submission.IsPassed = isPassed;
-            submission.UnAnswered = unAswered;
-            submission.Answered = answered;
-            submission.Note = isPassed == true ? "Đạt" : "Không đạt";
-            submission.Status = true;
-
-            var objSub = await _serSubmission.CreateSubmission(submission);
-            if (objSub != null)
-            {
-                AnswerSubmission AnS = new AnswerSubmission();
-
-                foreach (var item in _lstQAndASelect)
+                var objSub = await _serSubmission.CreateSubmission(submission);
+                if (objSub != null)
                 {
-                    AnS.SubmissionId = objSub.Id;
-                    AnS.QuestionId = item.QuestionId;
-                    foreach (var a in item.Answers)
+                    AnswerSubmission AnS = new AnswerSubmission();
+
+                    foreach (var item in _lstQAndASelect)
                     {
-                        AnS.AnswerId = a.Id;
-                        await _serAnS.CreateAnswerSubmission(AnS);
+                        AnS.SubmissionId = objSub.Id;
+                        AnS.QuestionId = item.QuestionId;
+                        foreach (var a in item.Answers)
+                        {
+                            AnS.AnswerId = a.Id;
+                            await _serAnS.CreateAnswerSubmission(AnS);
+                        }
                     }
+
+                    ExamActivityLog examActivityLog = new ExamActivityLog();
+                    examActivityLog.ExamId = idExam;
+                    examActivityLog.UserId = submission.UserId;
+                    examActivityLog.ExamDetailId = submission.ExamDetailId;
+                    examActivityLog.ActionTime = DateTime.Now;
+                    examActivityLog.ActionType = "Nộp bài thi";
+                    var logStat = await _serExamActLog.Create(examActivityLog);
+
+                    if (logStat == false)
+                    {
+                        snackbar.Add("Có lỗi, không ghi được log exam", Severity.Warning);
+                        return;
+                    }
+
+                    snackbar.Add("Nộp bài thành công", Severity.Success);
+                    await localStorage.RemoveItemAsync("IdExam");
+                    await localStorage.RemoveItemAsync("IdExamDetail");
+                    await localStorage.RemoveItemAsync("ExamScheduleId");
+                    await localStorage.RemoveItemAsync("_lstQAndASelect");
+                    await localStorage.RemoveItemAsync("_tabCount");
+                    await localStorage.RemoveItemAsync("TimeStart");
+                    navigation.NavigateTo("/Student/Home");
                 }
-
-                ExamActivityLog examActivityLog = new ExamActivityLog();
-                examActivityLog.ExamId = idExam;
-                examActivityLog.UserId = submission.UserId;
-                examActivityLog.ExamDetailId = submission.ExamDetailId;
-                examActivityLog.ActionTime = DateTime.Now;
-                examActivityLog.ActionType = "Nộp bài thi";
-                var logStat = await _serExamActLog.Create(examActivityLog);
-
-                if (logStat == false)
+                else
                 {
-                    snackbar.Add("Có lỗi, không ghi được log exam", Severity.Warning);
-                    return;
+                    snackbar.Add("Nộp bài thất bại", Severity.Error);
                 }
-
-                snackbar.Add("Nộp bài thành công", Severity.Success);
-                await localStorage.RemoveItemAsync("IdExam");
-                await localStorage.RemoveItemAsync("IdExamDetail");
-                await localStorage.RemoveItemAsync("_lstQAndASelect");
-                await localStorage.RemoveItemAsync("_tabCount");
-                localStorage.RemoveItemAsync("countdownTime");
-                navigation.NavigateTo("/Student/Home");
             }
-            else
+            catch
             {
-                snackbar.Add("Nộp bài thất bại", Severity.Error);
-            }
-        }
-        catch
-        {
 
-        }
-        finally
-        {
-            isLoading = false;
-            StateHasChanged();
-        }
+            }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        });
 
     }
 
@@ -512,30 +510,35 @@ else
         {
             await ScoreExam();
         }
-
-        // var dialogParametersDetail = new DialogParameters<Student.Dialog.FinalViewExam.FinalView>
-        // {
-        //     {x => x.submissionId, id}
-        // };
-        // return DialogService.ShowAsync<Student.Dialog.FinalViewExam.FinalView>("", dialogParametersDetail, options);
     }
 
     private async void StartCountdown()
     {
-        var storedTime = await localStorage.GetItemAsync<string>("countdownTime");
-        if (storedTime != null && storedTime != "0")
+
+        timer = new System.Timers.Timer(1000);
+
+        var storedTime = await localStorage.GetItemAsync<string>("TimeStart");
+
+        if (!string.IsNullOrEmpty(storedTime) && isReload)
         {
-            countdownTime = Convert.ToInt32(storedTime);
+            var elapsedSeconds = (DateTime.Now - DateTime.Parse(storedTime)).TotalSeconds;
+            countdownTime = (exam.Duration * 60) - (int)elapsedSeconds;
+
+            if (countdownTime <= 0)
+            {
+                countdownTime = 0;
+                snackbar.Add("Thời gian làm bài đã hết. Đang nộp bài...", Severity.Warning);
+                await ScoreExam();
+                return;
+            }
         }
         else
         {
             countdownTime = exam.Duration * 60;
         }
-        timer = new System.Timers.Timer(1000);
+
         timer.Elapsed += OnTimedEvent;
         timer.Start();
-        // timer.AutoReset = true;
-        // timer.Enabled = true;
     }
 
     private void FormatTime()
@@ -558,17 +561,17 @@ else
         {
             countdownTime--;
             timeDoExam++;
-
-            localStorage.SetItemAsync("countdownTime", countdownTime);
-
-            if (countdownTime <= 0)
+            await InvokeAsync(async () =>
             {
-                timer.Stop();
-                await ScoreExam();
-            }
-
-            FormatTime();
-            InvokeAsync(StateHasChanged);
+                FormatTime();
+                InvokeAsync(StateHasChanged);
+            });
+        }
+        else
+        {
+            timer.Stop();
+            countdownTime = 0;
+            await ScoreExam();
         }
     }
 
@@ -600,12 +603,63 @@ else
     }
 }
 
-<script>
+@* <script>
     window.initVisibilityChangeHandler = function (dotNetHelper) {
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) {
                 dotNetHelper.invokeMethodAsync('ShowTabOutNotification');
             }
         });
+    };
+</script> *@
+
+@* <script>
+    let visibilityChangeListener;
+
+    window.initVisibilityChangeHandler = function (dotNetHelper) {
+        visibilityChangeListener = function () {
+            if (document.hidden) {
+                dotNetHelper.invokeMethodAsync('ShowTabOutNotification');
+            }
+        };
+        document.addEventListener('visibilitychange', visibilityChangeListener);
+    };
+
+    window.removeVisibilityChangeHandler = function () {
+        if (visibilityChangeListener) {
+            document.removeEventListener('visibilitychange', visibilityChangeListener);
+        }
+    };
+</script> *@
+
+<script>
+    let visibilityChangeListener;
+    let blurListener;
+
+    // Hàm khởi tạo các sự kiện focus, blur và visibilitychange
+    window.initVisibilityChangeHandler = function (dotNetHelper) {
+        // Lắng nghe sự kiện visibilitychange (khi người dùng chuyển tab)
+        visibilityChangeListener = function () {
+            if (document.hidden) {
+                dotNetHelper.invokeMethodAsync('ShowTabOutNotification'); // Gọi phương thức Blazor khi trang bị ẩn
+            }
+        };
+
+        // Lắng nghe sự kiện blur (khi cửa sổ bị mất focus)
+        blurListener = function () {
+            dotNetHelper.invokeMethodAsync('ShowTabOutNotification'); // Gọi phương thức Blazor khi mất focus
+        };
+
+        document.addEventListener('visibilitychange', visibilityChangeListener);
+        window.addEventListener('blur', blurListener);
+    };
+
+    window.removeVisibilityChangeHandler = function () {
+        if (visibilityChangeListener) {
+            document.removeEventListener('visibilitychange', visibilityChangeListener);
+        }
+        if (blurListener) {
+            window.removeEventListener('blur', blurListener);
+        }
     };
 </script>

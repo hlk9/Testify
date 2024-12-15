@@ -29,25 +29,12 @@
         }
 </style>
 <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
-    <MudPaper Style="padding:15px; ">
+    <MudPaper Style="padding:15px; margin-bottom: 20px">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">Phân quyền tài khoản giảng viên</MudText>
     </MudPaper>
-    <MudGrid Style="padding: 20px 0; align-items: center">
-        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-      
-        </MudItem >
-        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ExportExcel, Guid.Empty))">Export</MudButton>
-        </MudItem>
-
-        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
-        </MudItem>
-    </MudGrid>
-
     <div class="bg-white rounded-3" style="width:100%">
 
-        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 410px)">
+        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 330px)">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -132,6 +119,7 @@
 
     private async Task onChangeSearch()
     {
+        await Task.Delay(700);
         await LoadData(searchValue);
     }
 
@@ -163,32 +151,13 @@
             {x => x.UserId, id}
         };
 
-        var dialogParametersDel = new DialogParameters<Dialog.Account.DeleteAccountManagement>
-        {
-            {x => x.UserId, id}
-        };
 
         var dialogParametersUserId = new DialogParameters<Dialog.Account.DetailsAccountManagement>
         {
             {x => x.UserId, id}
         };
 
-        var dialogParametersUser = new DialogParameters<Dialog.Account.ExportExcelDialog>
-        {
-            {x => x.UserId, id}
-        };
-
-        if (name.Equals(OpenDialogType.Create))
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.Account.CreateAccountDialog>("Options Dialog", options);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await LoadData("");
-            }
-
-        }
-        else if (name.Equals(OpenDialogType.Update))
+        if (name.Equals(OpenDialogType.Update))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Permission.ModifyPermission>("Options Dialog", dialogParametersUpdate, options);
             var result = await dialog.Result;
@@ -200,24 +169,6 @@
         else if (name.Equals(OpenDialogType.Detail))
         {
             var dialog = await DialogService.ShowAsync<Dialog.Account.DetailsAccountManagement>("Options Dialog", dialogParametersUserId, options);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await LoadData("");
-            }
-        }
-        else if (name.Equals(OpenDialogType.ExportExcel))
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.Account.ExportExcelDialog>("Options Dialog", dialogParametersUser, options);
-            var result = await dialog.Result;
-            if(!result.Canceled)
-            {
-                await LoadData("");
-            }
-        }
-        else
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.Account.DeleteAccountManagement>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {

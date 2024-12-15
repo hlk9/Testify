@@ -161,7 +161,8 @@
         }
         else
         {           
-
+            DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
+            DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
             if (startDateTime < DateTime.Now.AddMinutes(10))
             {
                 Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);

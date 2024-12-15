@@ -110,10 +110,10 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<bool> IsExamCodeDuplicate_Exam(string name, int? idSub)
+        public async Task<bool> IsExamCodeDuplicate_Exam(string name, int? idSub, int examId)
         {
             //var response = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?code={name}");
-            var res = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?name={name}&idSub={idSub}");   
+            var res = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?name={name}&idSub={idSub}&examId={examId}");   
             if (res.IsSuccessStatusCode)
             {
                 var content = await res.Content.ReadAsStringAsync();

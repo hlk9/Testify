@@ -54,9 +54,9 @@ namespace Testify.DAL.Reposiroties
         {
             var data = (from a in _context.ExamDetailQuestions
                         join b in _context.Questions on a.QuestionId equals b.Id
-                        join c in _context.QuestionLevels on b.QuestionLevelId equals c.Id
+                        join c in _context.QuestionLevels on b.QuestionLevelId equals c.Id into questionLevelsGroup
+                        from c in questionLevelsGroup.DefaultIfEmpty()
                         join d in _context.QuestionTypes on b.QuestionTypeId equals d.Id
-                        join e in _context.ExamDetails on a.ExamDetailId equals e.Id
                         where a.ExamDetailId == examdetailID
                         select new QuestionInExam
                         {

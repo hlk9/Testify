@@ -15,5 +15,7 @@
         public int? Duration { get; set; }
         public int? NumberOfQuestion { get; set; }
         public int? NumberOfRepeat { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
     }
 }
