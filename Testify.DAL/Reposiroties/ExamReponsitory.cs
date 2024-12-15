@@ -42,8 +42,12 @@ namespace Testify.DAL.Reposiroties
             var listEx = await (from ex in _context.Exams
                                 join exdt in _context.ExamDetails
                                 on ex.Id equals exdt.ExamId
-                                where exdt.Status == 1 && ex.SubjectId == id
-                                select ex).ToListAsync();
+                                where _context.ExamDetails.Any(x => x.ExamId == ex.Id && x.Status == 1)
+                                      && ex.SubjectId == id
+                                      && ex.Status == 1
+                                select ex)
+                     .Distinct()
+                     .ToListAsync();
 
             return listEx;
         }
