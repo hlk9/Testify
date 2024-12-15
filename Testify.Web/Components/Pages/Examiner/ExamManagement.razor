@@ -1,5 +1,6 @@
 ﻿@page "/Examiner/ExamManagement"
 @using Testify.API.DTOs
+@using Testify.Web.Shared
 @layout ExaminerLayout
 @inject IDialogService DialogService
 @inject ExamService examService
@@ -21,6 +22,7 @@
 </style>
 
 <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
+
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">BÀI THI</MudText>
     </MudPaper>
@@ -34,7 +36,12 @@
     </MudGrid>
 
     <div class="bg-white rounded-3" style="width:100%">
-
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
         <MudTable Items="@_lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
 
             <ToolBarContent>
@@ -100,6 +107,9 @@
                 <MudTablePager />
             </PagerContent>
         </MudTable>
+            
+        }
+
     </div>
 
 
@@ -108,10 +118,38 @@
     private List<ExamWhitQusetion> _lst = new List<ExamWhitQusetion>();
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private ExamSchedule currentSchedule = new ExamSchedule();
-    protected override async Task OnInitializedAsync()
+    private List<User> lstuser = new List<User>();
+    private bool isLoading { get; set; } = true;
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await LoadData();
+    // }
+
+    private async Task LoadData()
     {
-        _lst = (await examService.GetInforBasic(null)).Where(x => x.Status == 1 || x.Status == 2).ToList();
+        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        var userId = Guid.Parse(a.Value);
+        var userED = await _serUser.GetByidUser(userId);
+        if (userED.LevelId == 1 || userED.LevelId == 2)
+        {
+            _lst = (await examService.GetInforBasic(null)).Where(x => x.Status == 1 || x.Status == 2).ToList();
+        }
+        else if (userED.LevelId == 3)
+        {
+            _lst = (await examService.GetInforBasic(null)).Where(x => x.Status != 255 && x.CreatedBy == userId).ToList();
+        }
     }
+    protected async override  Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+   
 
     [Inject] ISnackbar Snackbar { get; set; }
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };

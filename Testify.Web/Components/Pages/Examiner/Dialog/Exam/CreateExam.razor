@@ -146,7 +146,9 @@
             }
             else
             {
-                var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                var userId = Guid.Parse(a.Value);
+                exam.CreatedBy = userId;
                 exam.ScoreMethodId = null;
                 exam.SubjectId = subjectCurrent.Id;
                 exam.Status = 2;
