@@ -205,6 +205,7 @@ namespace Testify.DAL.Reposiroties
                                {
                                    ID = submis.Id,
                                    SubmitTime = submis.SubmitTime,
+                                   Note = submis.Note,
                                    UserName = u.FullName,
                                    TeacherId = c.TeacherId,
                                    Email = u.Email,
