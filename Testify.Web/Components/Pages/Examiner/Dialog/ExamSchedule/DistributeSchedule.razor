@@ -51,14 +51,14 @@
                             <HeaderContent>
                                 <MudTh>Tên Lớp</MudTh>
                                 <MudTh>Mã lớp</MudTh>
-                                <MudTh>Số lượng</MudTh>
+                                <MudTh>Số lượng thí sinh</MudTh>
                                 <MudTh>Môn</MudTh>
                                 <MudTh>Phụ trách</MudTh>
                             </HeaderContent>
                             <RowTemplate>
                                 <MudTd DataLabel="Tên Lớp">@context.Name</MudTd>
                                 <MudTd DataLabel="Mã lớp">@context.ClassCode</MudTd>
-                                <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                                <MudTd DataLabel="Số lượng">@context.CurrentCapacity</MudTd>
                                 <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
                                 <MudTd DataLabel="Phụ trách">@context.FullName</MudTd>
                             </RowTemplate>
@@ -86,7 +86,7 @@
                             <RowTemplate>
                                 <MudTd DataLabel="Tên Lớp">@context.Name</MudTd>
                                 <MudTd DataLabel="Mã lớp">@context.ClassCode</MudTd>
-                                <MudTd DataLabel="Số lượng">@context.Capacity</MudTd>
+                                <MudTd DataLabel="Số lượng">@context.CurrentCapacity</MudTd>
                                 <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
                                 <MudTd DataLabel="Phụ trách">@context.FullName</MudTd>
                             </RowTemplate>
@@ -192,6 +192,14 @@
             foreach (var item in listClassSelected)
             {
                 newClassToAdd.Add(item);
+
+                if(item.CurrentCapacity<=0)
+                {
+                    Snackbar.Add("THẤT BẠI\n Lớp " + item.Name + " Không có thí sinh nào", Severity.Error);
+                    newClassToAdd.Clear();
+                    return;
+                }
+
             }
             List<User> listStudentNotAble = new List<User>();
             listStudentNotAble = await classExamScheduleService.CheckListClassInSchedule(newClassToAdd, currentSchedule.Id);

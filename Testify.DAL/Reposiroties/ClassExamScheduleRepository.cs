@@ -38,7 +38,8 @@ namespace Testify.DAL.Reposiroties
                             FullName = cu.FullName,
                             SubjectId = c.SubjectId,
                             SubjectName = cs.Name,
-                            Status = c.Status
+                            Status = c.Status,
+                            CurrentCapacity = _context.ClassUsers.Where(x => x.ClassId == c.Id && x.Status == 1).Count()
                         }).ToList();
 
             return data;
