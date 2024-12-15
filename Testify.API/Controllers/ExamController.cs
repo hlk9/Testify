@@ -96,6 +96,8 @@ namespace Testify.API.Controllers
                     Duration = item.Duration,
                     NumberOfQuestion = item.NumberOfQuestions,
                     NumberOfRepeat = item.NumberOfRepeat,
+                    CreatedBy = item.CreatedBy,
+                    UpdatedBy = item.UpdatedBy,
                 });
             }
 
