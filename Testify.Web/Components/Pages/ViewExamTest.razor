@@ -422,9 +422,9 @@ else
                 var exSchedule = await localStorage.GetItemAsync<string>("ExamScheduleId");
                 submission.UserId = _userId;
                 submission.ExamDetailId = idExamDetail;
-                submission.ExamScheduleId = Convert.ToInt32(exSchedule); ;
+                submission.ExamScheduleId = Convert.ToInt32(exSchedule);
                 submission.SubmitTime = DateTime.Now;
-                submission.TimeTaken = TimeSpan.FromSeconds(timeDoExam);
+                submission.TimeTaken = TimeSpan.FromSeconds((exam.Duration * 60) - countdownTime);
                 submission.TotalMark = Math.Round(score, 2);
                 submission.IsPassed = isPassed;
                 submission.UnAnswered = unAswered;
@@ -526,6 +526,7 @@ else
 
             if (countdownTime <= 0)
             {
+                countdownTime = 0;
                 snackbar.Add("Thời gian làm bài đã hết. Đang nộp bài...", Severity.Warning);
                 await ScoreExam();
                 return;
@@ -568,7 +569,8 @@ else
         }
         else
         {
-            timer.Stop(); 
+            timer.Stop();
+            countdownTime = 0;
             await ScoreExam();
         }
     }
