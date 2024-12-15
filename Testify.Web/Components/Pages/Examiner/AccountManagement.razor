@@ -143,7 +143,7 @@
     private string? textSearch;
     private int levelId = -1;
     private List<Level> _lstLevel = new List<Level>();
-
+    private Guid _userId;
     [Parameter]
     public Guid idUser { get; set; }
 
@@ -152,24 +152,48 @@
     private async Task onChangeSearch()
     {
         await Task.Delay(700);
-        await LoadData(searchValue);
+        var us = await _serUser.GetByidUser(_userId);
+        if (us.LevelId == 2)
+        {
+            _userList = (await _serLevel.GetAllUserByLevelId(levelId, searchValue)).Where(x => x.LevelId == 3 || x.LevelId == 4).ToList();
+            return;
+        }
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, searchValue);
     }
 
     private async Task LoadData(string? textSearch)
     {
-        _lstLevel = await _serLevel.GetAllLevel();
+        var lstLevel = await _serLevel.GetAllLevel();
+        _lstLevel = lstLevel;
         _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
-        isLoading = false;
-        StateHasChanged();
+        var us = await _serUser.GetByidUser(_userId);
+        if(us.LevelId == 2)
+        {
+            _lstLevel = lstLevel.Where(x => x.Id == 3 || x.Id == 4).ToList();
+            _userList = (await _serLevel.GetAllUserByLevelId(levelId, textSearch)).Where(x => x.LevelId == 3 || x.LevelId == 4).ToList();
+        }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadData("");
+        if(firstRender)
+        {
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(a.Value);
+            await LoadData("");
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     private async Task ChangeValueLevel()
     {
+        var us = await _serUser.GetByidUser(_userId);
+        if (us.LevelId == 2)
+        {
+            _userList = (await _serLevel.GetAllUserByLevelId(levelId, textSearch)).Where(x => x.LevelId == 3 || x.LevelId == 4).ToList();
+            return;
+        }
         _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
     }
 
