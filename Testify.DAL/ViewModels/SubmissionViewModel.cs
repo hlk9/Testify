@@ -10,6 +10,7 @@ namespace Testify.DAL.ViewModels
     {
         public int ID { get; set; }
         public Guid TeacherId { get; set; }
+        public string Note { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
         public string ExamName { get; set; }
