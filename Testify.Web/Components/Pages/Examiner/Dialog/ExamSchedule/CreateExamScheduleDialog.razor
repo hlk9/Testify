@@ -140,8 +140,7 @@
     {
        
         
-        DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
-        DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
+        
         if (subjectCurrent == null || startDate == null || startTime == null || endDate == null || endTime == null || examCurrent == null)
         {
             Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
@@ -149,7 +148,8 @@
         }
         else
         {           
-
+            DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
+            DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
             if (startDateTime < DateTime.Now.AddMinutes(10))
             {
                 Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);

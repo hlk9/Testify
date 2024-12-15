@@ -21,220 +21,330 @@ namespace Testify.DAL.Reposiroties
         {
             var user = await _context.Users.FindAsync(userId);
 
-            if (user.LevelId == 2 || user.LevelId == 1)
+            if (user != null)
             {
-                if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
+                if (user.LevelId == 2 || user.LevelId == 1)
                 {
-                    if (subjectId == -1)
+                    if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
                     {
-                        if (questionLevelId == -1)
+                        if (subjectId == -1)
                         {
-                            if (questionTypeId == -1)
+                            if (questionLevelId == -1)
                             {
-                                return await _context.Questions.Where(x => x.Status == 1).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId).ToListAsync();
+                                }
                             }
                             else
                             {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                }
                             }
                         }
                         else
                         {
-                            if (questionTypeId == -1)
+                            if (questionLevelId == -1)
                             {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId).ToListAsync();
+                                }
                             }
                             else
                             {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                }
                             }
                         }
                     }
                     else
                     {
-                        if (questionLevelId == -1)
+                        if (subjectId == -1)
                         {
-                            if (questionTypeId == -1)
+                            if (questionLevelId == -1)
                             {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
                             }
                             else
                             {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
                             }
                         }
                         else
                         {
-                            if (questionTypeId == -1)
+                            if (questionLevelId == -1)
                             {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
                             }
                             else
                             {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId).ToListAsync();
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
+                                }
                             }
+                        }
+                    }
+                }
+                else if (user.LevelId == 3)
+                {
+                    if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
+                    {
+                        if (subjectId == -1)
+                        {
+                            if (questionLevelId == -1)
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                            else
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (questionLevelId == -1)
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                            else
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (subjectId == -1)
+                        {
+                            if (questionLevelId == -1)
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                            else
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (questionLevelId == -1)
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                            else
+                            {
+                                if (questionTypeId == -1)
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                                else
+                                {
+                                    return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
+            {
+                if (subjectId == -1)
+                {
+                    if (questionLevelId == -1)
+                    {
+                        if (questionTypeId == -1)
+                        {
+                            return await _context.Questions.Where(x => x.Status == 1).ToListAsync();
+                        }
+                        else
+                        {
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId).ToListAsync();
+                        }
+                    }
+                    else
+                    {
+                        if (questionTypeId == -1)
+                        {
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId).ToListAsync();
+                        }
+                        else
+                        {
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId).ToListAsync();
                         }
                     }
                 }
                 else
                 {
-                    if (subjectId == -1)
+                    if (questionLevelId == -1)
                     {
-                        if (questionLevelId == -1)
+                        if (questionTypeId == -1)
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId).ToListAsync();
                         }
                         else
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId).ToListAsync();
                         }
                     }
                     else
                     {
-                        if (questionLevelId == -1)
+                        if (questionTypeId == -1)
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId).ToListAsync();
                         }
                         else
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId).ToListAsync();
                         }
                     }
                 }
             }
             else
             {
-                if ((string.IsNullOrEmpty(textSearch) || textSearch.Length == 0))
+                if (subjectId == -1)
                 {
-                    if (subjectId == -1)
+                    if (questionLevelId == -1)
                     {
-                        if (questionLevelId == -1)
+                        if (questionTypeId == -1)
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                         else
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                     }
                     else
                     {
-                        if (questionLevelId == -1)
+                        if (questionTypeId == -1)
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                         else
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                     }
                 }
                 else
                 {
-                    if (subjectId == -1)
+                    if (questionLevelId == -1)
                     {
-                        if (questionLevelId == -1)
+                        if (questionTypeId == -1)
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                         else
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                     }
                     else
                     {
-                        if (questionLevelId == -1)
+                        if (questionTypeId == -1)
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                         else
                         {
-                            if (questionTypeId == -1)
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
-                            else
-                            {
-                                return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower()) && x.CreatedBy == user.Id).ToListAsync();
-                            }
+                            return await _context.Questions.Where(x => x.Status == 1 && x.QuestionTypeId == questionTypeId && x.SubjectId == subjectId && x.QuestionLevelId == questionLevelId && x.Content.ToLower().Contains(textSearch.Trim().ToLower())).ToListAsync();
                         }
                     }
                 }
