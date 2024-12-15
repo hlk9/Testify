@@ -13,25 +13,25 @@
                 <MudItem Class="w-100">
 
                     <MudAutocomplete T="Subject"
-                                     @bind-Value="subjectCurrent"
-                                     SearchFunc="@SearchSubject"
-                                     Variant="Variant.Outlined"
-                                     Label="Môn"
-                                     Placeholder="Chọn môn"
-                                     Clearable="true"
-                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                     OnFocus="SubjectChanged" />
+                    @bind-Value="subjectCurrent"
+                    SearchFunc="@SearchSubject"
+                    Variant="Variant.Outlined"
+                    Label="Môn"
+                    Placeholder="Chọn môn"
+                    Clearable="true"
+                    ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                    OnFocus="SubjectChanged" />
 
                     <MudAutocomplete T="Exam"
-                                     @bind-Value="examCurrent"
-                                     SearchFunc="@SearchExam"
-                                     Variant="Variant.Outlined"
-                                     Label="Bài thi"
-                                     Placeholder="Chọn bài thi"
-                                     Clearable="true"
-                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                     OnFocus="ExamChanged"
-                                     ResetValueOnEmptyText="true" />
+                    @bind-Value="examCurrent"
+                    SearchFunc="@SearchExam"
+                    Variant="Variant.Outlined"
+                    Label="Bài thi"
+                    Placeholder="Chọn bài thi"
+                    Clearable="true"
+                    ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                    OnFocus="ExamChanged"
+                    ResetValueOnEmptyText="true" />
 
                 </MudItem>
                 <MudItem Class="w-50">
@@ -70,7 +70,7 @@
     private List<Subject> listSubject;
     private Exam examCurrent;
     private Subject subjectCurrent;
-
+    Guid? currentUid  = new Guid();
 
     private string[] _states =
        {
@@ -88,6 +88,12 @@
 
     private async Task SubjectChanged()
     {
+        var tempCurrentUid = await ProtectedSessionStore.GetAsync<string>("userLogin");
+
+        if (tempCurrentUid.Value != null)
+        {
+            currentUid = Guid.Parse(tempCurrentUid.Value);
+        }
         listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
         listExam = listExam.Where(x => x.Status == 1).ToList();
         examCurrent = null;
@@ -107,8 +113,8 @@
         try
         {
 
-        listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
-        listExam = listExam.Where(x=>x.Status==1).ToList();
+            listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
+            listExam = listExam.Where(x=>x.Status==1).ToList();
         }
         catch
         {
@@ -138,18 +144,24 @@
 
     private async void SubmitValid()
     {
-       
-        
-        
+     
+        var tempCurrentUid = await ProtectedSessionStore.GetAsync<string>("userLogin");
+
+        if (tempCurrentUid.Value != null)
+        {
+            currentUid = Guid.Parse(tempCurrentUid.Value);
+        }
+
+        DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
+        DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
         if (subjectCurrent == null || startDate == null || startTime == null || endDate == null || endTime == null || examCurrent == null)
         {
             Snackbar.Add("Thất bại, Vui lòng kiểm tra lại thông tin", Severity.Error);
             return;
         }
         else
-        {           
-            DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
-            DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
+        {       
+          
             if (startDateTime < DateTime.Now.AddMinutes(10))
             {
                 Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);
@@ -176,7 +188,8 @@
                 Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
                 return;
             }
-
+    
+            currentSchedule.CreatedBy = currentUid;
             currentSchedule.RoomId = null;
             currentSchedule.SubjectId = subjectCurrent.Id;
             currentSchedule.ExamId = examCurrent.Id;

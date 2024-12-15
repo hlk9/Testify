@@ -541,6 +541,7 @@
                 currentUser.ClassUsers = null;
                 currentUser.UserPermissions = null;
                 currentUser.Submissions = null;
+				currentUser.LastLogin = DateTime.Now;
                 bool status =  await _serviceUser.RegisterStudent(currentUser);
 
                 if(status==true)

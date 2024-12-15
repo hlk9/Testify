@@ -12,5 +12,7 @@
         public byte? Status { get; set; }
         public int? SubjectId { get; set; }
         public string? SubjectName { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public DateTime? CreateAt { get; set; }
     }
 }
