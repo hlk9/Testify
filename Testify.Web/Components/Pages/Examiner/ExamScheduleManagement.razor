@@ -116,8 +116,6 @@
            {
                 currentUser = await _serUser.GetByidUser(Guid.Parse(tempCurrentUserId.Value));
            }
-
-
             listSchedule = await scheduleService.GetInforBasic();        
             StateHasChanged();
         }

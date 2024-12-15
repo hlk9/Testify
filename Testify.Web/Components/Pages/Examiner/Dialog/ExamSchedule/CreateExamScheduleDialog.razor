@@ -72,6 +72,8 @@
     private Subject subjectCurrent;
     Guid? currentUid  = new Guid();
 
+    User currentU = new User();
+
     private string[] _states =
        {
         "Alabama", "Alaska", "Arizona", "Arkansas", "California",
@@ -96,6 +98,14 @@
         }
         listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
         listExam = listExam.Where(x => x.Status == 1).ToList();
+
+        var urs = await _serUser.GetByidUser(Guid.Parse(currentUid.ToString()));
+        currentU = urs;
+        if (currentU.LevelId == 3)
+        {
+            listExam = listExam.Where(x => x.Status == 1 && x.CreatedBy == currentUid).ToList();
+        }
+
         examCurrent = null;
         StateHasChanged();
 
@@ -112,9 +122,17 @@
 
         try
         {
+            if (currentU.LevelId == 3)
+            {
+                listExam = listExam.Where(x => x.Status == 1 && x.CreatedBy == currentUid).ToList();
+            }
+            else
+            {
 
-            listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
-            listExam = listExam.Where(x=>x.Status==1).ToList();
+                listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
+                listExam = listExam.Where(x => x.Status == 1).ToList();
+            }
+
         }
         catch
         {
