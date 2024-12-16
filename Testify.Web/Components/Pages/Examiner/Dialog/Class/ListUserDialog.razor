@@ -256,11 +256,12 @@
 
     private async Task SendEmail(Guid userId)
     {
+        var cls = await _serClass.GetClassId(ClassId);
         var mailUser = await _serUser.GetByidUser(userId);
 
         List<EmailAddress> emails = new List<EmailAddress>();
         emails.Add(new EmailAddress { Email = mailUser.Email});
-        string content = "Em đã được thêm mới vào lớp học";
+        string content = $"Em đã được thêm mới vào lớp học {cls.Name}";
         await commonServices.sendEmail(emails, "Thông Báo", content, null);
     }
 
