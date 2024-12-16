@@ -228,7 +228,8 @@ namespace Testify.DAL.Reposiroties
                                   SubjectName = sub.Name,
                                   ExamScheduleStartTime = exsch.StartTime,
                                   ExamScheduleEndTime = exsch.EndTime,
-                                  Status = exsch.Status
+                                  Status = exsch.Status,
+                                  ClassId = cla.Id
                               }
                               ).ToListAsync();
 

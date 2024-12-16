@@ -17,7 +17,7 @@
 
             <MudTabPanel OnClick="@(() => ViewList(searchValue))" Text="Danh sách sinh viên">
                 <MudTextField T="string" Placeholder="Tìm kiếm tên học sinh, sinh viên" Adornment="Adornment.Start" @bind-Value="searchValue"
-                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate="true"></MudTextField>
                 @if (isLoading)
                 {
                     <LoadingContext />
@@ -57,7 +57,7 @@
             </MudTabPanel>
             <MudTabPanel Text="Thêm Sinh Viên">
                 <MudTextField T="string" Placeholder="Tìm kiếm tên học sinh, sinh viên" Adornment="Adornment.Start" @bind-Value="searchStudent"
-                              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch1" Immediate="true"></MudTextField>
+                AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch1" Immediate="true"></MudTextField>
                 @if (isLoading)
                 {
                     <LoadingContext />
@@ -65,7 +65,7 @@
                 else
                 {
                     <MudTable Elevation="1" Items="@Students" MultiSelection="true" Dense="true" FixedHeader="true" HorizontalScrollbar="true" Height="300px" @bind-SelectedItems="@listUserSelected">
-                        
+
                         <HeaderContent>
                             <MudTh>Tên sinh viên</MudTh>
                             <MudTh>Giới tính</MudTh>
@@ -227,6 +227,21 @@
 
     private async Task DeleteUser(Guid userId)
     {
+        var userChoice = await _serUser.GetByidUser(userId);
+        if (userChoice.LevelId == 4)
+        {
+            List<ListExamsOfStudent> listeEx = await _serLec.GetListExam(userId);
+            if (listeEx.Count > 0)
+            {
+                var isOnGoing = listeEx.FirstOrDefault(x => x.ExamScheduleStartTime < DateTime.Now && x.ExamScheduleEndTime > DateTime.Now && x.ClassId == ClassId);
+                if (isOnGoing != null)
+                {
+                    snackbar.Add("Không thể xoá, thí sinh đang thi bài "+isOnGoing.ExamName+" trong lớp học này",Severity.Error);
+                    return;
+                }
+            }
+        }
+
         var check = await _serClassUser.DeleteUserInClass(userId, ClassId);
         if (check != null)
         {
