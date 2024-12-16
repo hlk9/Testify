@@ -58,16 +58,30 @@ else
     private List<Level> _lstLevel = new List<Level>();
     private bool isLoading { get; set; } = true;
     private User users { get; set; } = new();
+    private Guid _usId;
 
-    protected override async Task OnInitializedAsync()
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        users = await _serLec.GetLecturerById(UserId);
-        await Loaddata();
+        if(firstRender)
+        {
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _usId = Guid.Parse(a.Value);
+            users = await _serLec.GetLecturerById(UserId);
+            await Loaddata();
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     private async Task Loaddata()
     {
-        _lstLevel = await _serLevel.GetAllLevel();
+        var lstLevel = await _serLevel.GetAllLevel();
+        _lstLevel = lstLevel;
+        var us = await _serUser.GetByidUser(_usId);
+        if(us.LevelId == 2)
+        {
+            _lstLevel = lstLevel.Where(x => x.Id == 3 || x.Id == 4).ToList();
+        }
         if (users.LevelId != null)
         {
             levelId = users.LevelId;
@@ -77,7 +91,7 @@ else
             levelId = -1;
         }
         _date = users.DateOfBirth;
-        isLoading = false;
+        
     }
 
     private bool ValidateForm()

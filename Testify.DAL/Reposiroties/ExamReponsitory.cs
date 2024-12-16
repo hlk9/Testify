@@ -207,13 +207,13 @@ namespace Testify.DAL.Reposiroties
         }
 
         public async Task<List<Exam>> GetExamsByUserId(Guid UserId)
-        {
+        { 
             List<Exam> lstEmpty = new List<Exam>();
             var objUser = await _context.Users.FindAsync(UserId);
 
             if (objUser.LevelId == 1 || objUser.LevelId == 2)
             {
-                lstEmpty = _context.Exams.Where(x => x.Status == 1).ToList();
+                lstEmpty = _context.Exams.Where(x => x.Status != 255).ToList();
                 return lstEmpty;
             }
             else if (objUser.LevelId == 3 || objUser.LevelId == 4)
@@ -223,7 +223,7 @@ namespace Testify.DAL.Reposiroties
                                   join ces in _context.ClassExamSchedules on c.Id equals ces.ClassId
                                   join es in _context.ExamSchedules on ces.ExamScheduleId equals es.Id
                                   join e in _context.Exams on es.ExamId equals e.Id
-                                  where (cu.UserId == UserId && c.Status == 1 && es.Status == 1 && e.Status == 1)
+                                  where (cu.UserId == UserId && c.Status == 1 && es.Status == 1 && e.Status != 255)
                                   select e
                                   ).ToListAsync();
                 return lstEmpty;
