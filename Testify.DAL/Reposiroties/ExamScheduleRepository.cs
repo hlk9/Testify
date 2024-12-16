@@ -114,14 +114,15 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> CheckIsContaintInTime(DateTime startDate, DateTime endDate, int subjectId)
         {
-            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255 && x.SubjectId == subjectId);
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x =>
+                x.SubjectId == subjectId &&
+                x.Status != 255 &&
+                (
+                    (x.StartTime < endDate && x.EndTime > startDate)
+                )
+            );
 
-            if (ojb != null)
-            {
-                return ojb;
-            }
-
-            return null;
+            return ojb;
         }
         
         public async Task<ExamSchedule> CheckIsContaintInTimeExclude(DateTime startDate, DateTime endDate, int subjectId,int currentScheduleId)
