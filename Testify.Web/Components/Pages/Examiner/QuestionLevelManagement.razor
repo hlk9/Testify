@@ -66,14 +66,14 @@
                 <MudTd DataLabel="Tên loại câu hỏi">@context.Name</MudTd>
                 <MudTd DataLabel="Mô tả">@context.Description</MudTd>
                 <MudTd DataLabel="Trạng thái">
-                        @(context.Status == true ? "Hoạt Động" : "Không Hoạt Động")
-                    </MudTd>
+                    @(context.Status == true ? "Hoạt Động" : "Không Hoạt Động")
+                </MudTd>
 
-                    <MudTd DataLabel="Thao tác">
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"", context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                    </MudTd>
-                </RowTemplate>
+                <MudTd DataLabel="Thao tác">
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"update", context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                    <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"", context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                </MudTd>
+            </RowTemplate>
 
             <NoRecordsContent>
                 <MudText></MudText>
@@ -84,10 +84,10 @@
             <PagerContent>
                 <MudTablePager />
             </PagerContent>
-            </MudTable>
+        </MudTable>
 
-        </div>
     </div>
+</div>
 
 
 @code {
@@ -95,7 +95,10 @@
     private const string V = "Không Hoạt Động";
     private string searchValue = "";
 
-    private async Task onChangeSearch() => await loadData(searchValue);
+    private async Task onChangeSearch() { 
+        await Task.Delay(700); 
+        await loadData(searchValue); 
+    }
 
     private async Task loadData(string? textSearch)
     {

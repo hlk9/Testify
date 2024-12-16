@@ -16,14 +16,14 @@ namespace Testify.Web.Services
             _httpClient.Timeout = TimeSpan.FromMinutes(60);
         }
 
-        public async Task<List<Question>> GetAllQuestions(string? textSearch, Guid? userId)
+        public async Task<List<Question>> GetAllQuestions(string? textSearch, Guid? userId, int questionLevelId, int questionTypeId, int subjectId)
         {
             string encodedContent = "";
             if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
             {
                 encodedContent = Uri.EscapeDataString(textSearch);
             }
-            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={encodedContent}&userId={userId}");
+            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={encodedContent}&userId={userId}&questionLevelId={questionLevelId}&questionTypeId={questionTypeId}&subjectId={subjectId}");
             var response = await allQuestion.Content.ReadFromJsonAsync<List<Question>>();
 
             return response;

@@ -24,7 +24,7 @@ namespace Testify.DAL.Models
         public Guid? CreatedBy { get; set; }
         public Guid? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public DateTime? CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
     }
 }

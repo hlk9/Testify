@@ -37,6 +37,21 @@ namespace Testify.DAL.Reposiroties
 
         }
 
+        public async Task<List<Exam>> GetExamHaveExDetailBySubject(int id)
+        {
+            var listEx = await (from ex in _context.Exams
+                                join exdt in _context.ExamDetails
+                                on ex.Id equals exdt.ExamId
+                                where _context.ExamDetails.Any(x => x.ExamId == ex.Id && x.Status == 1)
+                                      && ex.SubjectId == id
+                                      && ex.Status == 1
+                                select ex)
+                     .Distinct()
+                     .ToListAsync();
+
+            return listEx;
+        }
+
         public async Task<Exam> GetByIdExam(int id)
         {
             var a = await _context.Exams.FindAsync(id);
@@ -285,9 +300,14 @@ namespace Testify.DAL.Reposiroties
             };
         }
 
-        public async Task<bool> IsExamCode_Exist(string name, int? idSub)
+        public async Task<bool> IsExamCode_Exist(string name, int? idSub, int examId)
         {
-            return await _context.Exams.AnyAsync(x => x.Name == name && x.Status != 255 && x.SubjectId == idSub);
+            if(examId == -1)
+            {
+                return await _context.Exams.AnyAsync(x => x.Name.Trim().ToLower().Equals(name.Trim().ToLower()) && x.Status != 255 && x.SubjectId == idSub);
+            }
+                return await _context.Exams.AnyAsync(x => x.Name.Trim().ToLower().Equals(name.Trim().ToLower()) && x.Status != 255 && x.SubjectId == idSub && x.Id != examId);
+
         }
     }
 }

@@ -35,13 +35,13 @@
                 <MudItem Class="w-100">
                     <MudGrid>
                         <MudItem xs="3">
-                            <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Label="Điểm tối đa" Variant="Variant.Outlined"></MudTextField>
+                            <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Disabled=@(listExamDetail.Count > 0) Label="Điểm tối đa" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
                             <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Label="Tổng số câu" Variant="Variant.Outlined"></MudTextField>
+                            <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Disabled=@(listExamDetail.Count > 0) Label="Tổng số câu" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
                             <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian" Variant="Variant.Outlined"></MudTextField>
@@ -90,6 +90,7 @@
     private void Cancel() => MudDialog.Cancel();
     private Exam exam = new Exam();
     private List<Exam> listExam;
+    private List<ExamDetail> listExamDetail = new List<ExamDetail>();
     private List<Subject> listSubject;
     private Exam examCurrent;
     private Subject subjectCurrent;
@@ -99,6 +100,8 @@
     protected override async Task OnInitializedAsync()
     {
         exam = await examService.GetExamId(Id);
+        var allExamDetails = await _serExamDetail.GetExamDetailByExamId(Id);
+        listExamDetail = allExamDetails.Where(x => x.Status != 255).ToList();
         status = exam.Status;
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         listSubject = await subjectService.GetAllSub(null, true);
@@ -138,7 +141,7 @@
         {
             var lstExamDetail = await _serExamDetail.GetExamDetailByExamId(exam.Id);
             var lstExamDetailFormat = lstExamDetail.Where(x => x.Status != 255).ToList();
-            if (!lstExamDetailFormat.Any())
+            if (!lstExamDetailFormat.Any() && status == 1)
             {
                 snackbar.Add("Thất bại, Không có đề thi nên không thể công khai", Severity.Warning);
                 return;
@@ -174,6 +177,15 @@
                 return;
             }
 
+            var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim(), subjectCurrent.Id, Id);
+            if (checktrungTen_Exam)
+            {
+                Snackbar.Add("Thất bại! Tên bài thi đã tồn tại, vui lòng nhập tên khác! ", Severity.Warning);
+                return;
+            }
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userId = Guid.Parse(a.Value);
+            exam.UpdatedBy = userId;
             exam.ScoreMethodId = null;
             exam.SubjectId = subjectCurrent.Id;
             exam.AllowViewResult = examAllowViewResult;

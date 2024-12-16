@@ -72,6 +72,7 @@ else
                     <MudTh><MudTableSortLabel SortLabel="Email" T="string">Email</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Tên Bài Thi" SortBy="new Func<SubmissionViewModel, object>(x=>x.ExamName)"  T="SubmissionViewModel">Tên Bài Thi</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Ghi Chú" T="string">Ghi Chú</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<SubmissionViewModel, object>(x=>x.SubmitTime)" SortLabel="Thời gian nộp" T="SubmissionViewModel">Thời gian nộp</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
@@ -82,6 +83,7 @@ else
                     <MudTd DataLabel="Email">@context.Email</MudTd>
                     <MudTd DataLabel="Tên Bài Thi">@context.ExamName</MudTd>
                     <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                    <MudTd DataLabel="Môn">@context.Note</MudTd>
                     <MudTd DataLabel="Trạng thái">
 
                         @{

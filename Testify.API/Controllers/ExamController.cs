@@ -27,6 +27,12 @@ namespace Testify.API.Controllers
             return await _respon.GetAllActicveOfSubject(id);
         }
 
+        [HttpGet("Get-ExamHaveExDetailBySubject")]
+        public async Task<List<Exam>> GetExamHaveExDetailBySubject(int id)
+        {
+            return await _respon.GetExamHaveExDetailBySubject(id);
+        }
+
         [HttpGet("Get-Exams")]
         public async Task<ActionResult<List<ExamWhitExamDetail>>> GetAll(string? keyword, bool isActive)
         {
@@ -90,6 +96,8 @@ namespace Testify.API.Controllers
                     Duration = item.Duration,
                     NumberOfQuestion = item.NumberOfQuestions,
                     NumberOfRepeat = item.NumberOfRepeat,
+                    CreatedBy = item.CreatedBy,
+                    UpdatedBy = item.UpdatedBy,
                 });
             }
 
@@ -125,9 +133,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Check-TrungNamExam")]
-        public async Task<IActionResult> ChekTrungCodeDT_Exam(string name, int? idSub)
+        public async Task<IActionResult> ChekTrungCodeDT_Exam(string name, int? idSub, int examId)
         {
-            var isDuplicate = await _respon.IsExamCode_Exist(name,idSub);
+            var isDuplicate = await _respon.IsExamCode_Exist(name,idSub, examId);
             return Ok(isDuplicate);
         }
     }

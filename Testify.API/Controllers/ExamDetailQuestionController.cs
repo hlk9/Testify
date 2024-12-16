@@ -2,6 +2,7 @@
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Testify.API.Controllers
 {
@@ -46,12 +47,17 @@ namespace Testify.API.Controllers
         [HttpGet("Get-Question-By-ExamDetailID-Not")]
         public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID, int SubjectId, string? textSearch)
         {
+            string decodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                decodedContent = Uri.UnescapeDataString(textSearch);
+            }
             var objGetAll = await _respon.GetQuestionByExamDetailID_NOT(examdetailID,  SubjectId);
 
             if (!string.IsNullOrWhiteSpace(textSearch))
             {
                 objGetAll = objGetAll
-                    .Where(x => x.Content.Contains(textSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+                    .Where(x => x.Content.Contains(decodedContent, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             return Ok(objGetAll);
@@ -60,11 +66,16 @@ namespace Testify.API.Controllers
         [HttpGet("Get-Question-By-ExamDetailID-NotAndLevel")]
         public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID, int SubjectId, string? textSearch)
         {
+            string decodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                decodedContent = Uri.UnescapeDataString(textSearch);
+            }
             var objGetAll = await _respon.GetQuestionByExamDetailID_NOTAndLevel(examdetailID, levelID ,  SubjectId);
             if (!string.IsNullOrWhiteSpace(textSearch))
             {
                 objGetAll = objGetAll
-                    .Where(x => x.Content.Contains(textSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+                    .Where(x => x.Content.Contains(decodedContent, StringComparison.OrdinalIgnoreCase)).ToList();
             }
             return Ok(objGetAll);
         }

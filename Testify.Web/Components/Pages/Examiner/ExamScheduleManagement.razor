@@ -100,7 +100,7 @@
 @code {
     private int Index = -1;
     private List<ExamScheduleDto> listSchedule = new List<ExamScheduleDto>();
-
+    User currentUser = new User();
     protected override async Task OnInitializedAsync()
     {
 
@@ -109,7 +109,14 @@
     {
         if (firstRender)
         {
-            listSchedule = await scheduleService.GetInforBasic();
+
+           var tempCurrentUserId =  await ProtectedSessionStore.GetAsync<string>("userLogin");
+
+           if(tempCurrentUserId.Value!=null)
+           {
+                currentUser = await _serUser.GetByidUser(Guid.Parse(tempCurrentUserId.Value));
+           }
+            listSchedule = await scheduleService.GetInforBasic();        
             StateHasChanged();
         }
     }
@@ -136,6 +143,18 @@
 
     private async Task ShowDistributeDialog(DialogOptions options, int Id, string title)
     {
+
+        var tempSchedule = await _serExamSche.GetById(Id);
+
+        if (currentUser.LevelId == 3)
+        {
+            if (tempSchedule.CreatedBy != currentUser.Id)
+            {
+                snackbar.Add("Bạn không được thao tác với bài thi này", Severity.Error);
+                return;
+            }
+        }
+
         var parameters = new DialogParameters
         {
               { "Id", Id },
@@ -155,6 +174,17 @@
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
     {
+        var tempSchedule = await _serExamSche.GetById(Id);
+
+        if (currentUser.LevelId == 3)
+        {
+            if (tempSchedule.CreatedBy != currentUser.Id)
+            {
+                snackbar.Add("Bạn không được thao tác với bài thi này", Severity.Error);
+                return;
+            }
+        }
+
         var parameters = new DialogParameters
         {
               { "Id", Id }
@@ -187,6 +217,17 @@
 
     private async Task ShowUpdateDialog(DialogOptions options, int Id)
     {
+        var tempSchedule = await _serExamSche.GetById(Id);
+
+        if (currentUser.LevelId == 3)
+        {
+            if (tempSchedule.CreatedBy != currentUser.Id)
+            {
+                snackbar.Add("Bạn không được thao tác với bài thi này", Severity.Error);
+                return;
+            }
+        }
+
         var parameters = new DialogParameters
         {
               { "Id", Id }

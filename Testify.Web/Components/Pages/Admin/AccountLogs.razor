@@ -38,28 +38,10 @@
 
 </style>
 <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
-    <MudPaper Style="padding:15px;">
-        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TÀI KHOẢN</MudText>
+    <MudPaper Style="padding:15px; margin-bottom: 20px">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">NHẬT KÝ</MudText>
     </MudPaper>
-    <MudGrid Style="padding: 20px 0; align-items: center">
-        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueLevel">
-                <MudSelectItem Value="-1">Tất cả</MudSelectItem>
-                @foreach (var item in _lstLevel)
-                {
-                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-                }
-            </MudSelect>
-        </MudItem>
-        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudButton Class="button-export w-100" Variant="Variant.Outlined" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ExportExcel, Guid.Empty))">Tải danh sách tài khoản</MudButton>
-        </MudItem>
-
-        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới</MudButton>
-        </MudItem>
-    </MudGrid>
-
+    
     <div class="bg-white rounded-3" style="width:100%">
         @if (isLoading)
         {
@@ -67,12 +49,12 @@
         }
         else
         {
-            <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 410px)">
+            <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 330px)">
 
                 <ToolBarContent>
                     <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
                         <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách tài khoản</MudText>
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a"></MudText>
 
                         </MudItem>
                         <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
@@ -149,6 +131,7 @@
 
     private async Task onChangeSearch()
     {
+        await Task.Delay(700);
         await LoadData(searchValue);
     }
     
@@ -202,13 +185,3 @@
         }
     }
 }
-<script>
-    function downloadFile(fileName, contentType, content) {
-        const blob = new Blob([content], { type: contentType });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        link.click();
-        URL.revokeObjectURL(link.href);
-    }
-</script>

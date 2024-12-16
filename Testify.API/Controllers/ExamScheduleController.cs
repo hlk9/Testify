@@ -82,7 +82,7 @@ namespace Testify.API.Controllers
                     name = "Không";
                 }
 
-                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = name, Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
+                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = name, Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title,CreateAt = item.CreatedAt,CreatedBy = item.CreatedBy });
 
             }
             return listResult;

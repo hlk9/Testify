@@ -29,7 +29,7 @@ namespace Testify.Web.Services
         public async Task<Exam> GetExamId(int id)
         {
             return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
-        }
+        }      
 
         public async Task<Exam> CreateExam(Exam e)
         {
@@ -76,6 +76,13 @@ namespace Testify.Web.Services
             return lst;
         }
 
+        public async Task<List<Exam>> GetListHaveExamDetailOfSubject(int id)
+        {
+            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamHaveExDetailBySubject?id=" + id);
+
+            return lst;
+        }
+
         public async Task<List<ExamWhitQusetion>> GetInforBasic(string? textSearch)
         {
             var lst = await _httpClient.GetFromJsonAsync<List<ExamWhitQusetion>>($"Exam/Get-InfoBasic?textSearch={textSearch}");
@@ -103,10 +110,10 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<bool> IsExamCodeDuplicate_Exam(string name, int? idSub)
+        public async Task<bool> IsExamCodeDuplicate_Exam(string name, int? idSub, int examId)
         {
             //var response = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?code={name}");
-            var res = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?name={name}&idSub={idSub}");   
+            var res = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?name={name}&idSub={idSub}&examId={examId}");   
             if (res.IsSuccessStatusCode)
             {
                 var content = await res.Content.ReadAsStringAsync();

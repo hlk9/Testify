@@ -118,6 +118,23 @@
         await loadData();
     }
 
+    private async Task<bool> CheckAllowdelete()
+    {
+        var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        if (!userId.Success || userId.Value == null)
+        {
+            return false;
+        }
+        else
+        {
+            var u = await _serUser.GetByidUser(Guid.Parse(userId.Value));
+            if (u.LevelId != 1 && u.LevelId != 2)
+                return false;
+
+        }
+        return true;
+    }
+
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
 
     private readonly DialogOptions _SmallWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
@@ -151,6 +168,11 @@
         }
         else if (name.Equals(OpenDialogType.Delete))
         {
+            if (!await CheckAllowdelete())
+            {
+                await JS.InvokeVoidAsync("alert", "Bạn không có quyền xóa, hãy liên hệ cấp trên");
+                return;
+            }
             var dialog = await DialogService.ShowAsync<Dialog.Answer.DeleteAnswerDialog>("Options dialog", dialogParametersDelete, options);
             var result = await dialog.Result;
             if (!result.Canceled)

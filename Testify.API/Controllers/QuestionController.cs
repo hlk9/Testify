@@ -30,14 +30,14 @@ namespace Testify.API.Controllers
 
         [HttpGet("Get-All-Questions")]
         //[Authorize]
-        public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord, Guid? userId)
+        public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord, Guid? userId, int questionLevelId, int questionTypeId, int subjectId)
         {
             string decodedContent = "";
             if(!string.IsNullOrEmpty(keyWord) || !string.IsNullOrWhiteSpace(keyWord))
             {
                 decodedContent = Uri.UnescapeDataString(keyWord);
             }
-            var lstQuestion = await _repoQuestion.GetAllQuestions(decodedContent, userId);
+            var lstQuestion = await _repoQuestion.GetAllQuestions(decodedContent, userId, questionLevelId, questionTypeId, subjectId);
             return Ok(lstQuestion);
         }
 
@@ -359,7 +359,7 @@ namespace Testify.API.Controllers
 
             var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels("");
             var lstQuestionType = await _repoQuestionType.GetAllTypes();
-            var lstQuestion = await _repoQuestion.GetAllQuestions("", null);
+            var lstQuestion = await _repoQuestion.GetAllQuestions("", null, -1, -1, -1);
 
             var lstQuestionTemp = new List<QuestionInExcel>();
 
