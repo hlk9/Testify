@@ -201,13 +201,13 @@
         var addSuccess = await _serClassUser.UpdateStatus(classUser);
         if (addSuccess != null)
         {
-            snackbar.Add("Thêm thành công");
+            snackbar.Add("Thêm thành công", Severity.Success);
             await SendEmail(userId);
             MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            snackbar.Add("Thêm thất bại");
+            snackbar.Add("Thêm thất bại", Severity.Error);
         }
     }
 
@@ -216,12 +216,12 @@
         var check = await _serClassUser.DeleteUserInClass(userId, ClassId);
         if (check != null)
         {
-            snackbar.Add("Từ chối thành công");
+            snackbar.Add("Từ chối thành công", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            snackbar.Add("Từ chối thất bại");
+            snackbar.Add("Từ chối thất bại", Severity.Error);
         }
     }
 
@@ -245,12 +245,12 @@
         var check = await _serClassUser.DeleteUserInClass(userId, ClassId);
         if (check != null)
         {
-            snackbar.Add("Xoá thành công");
+            snackbar.Add("Xoá thành công", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            snackbar.Add("Xoá thất bại");
+            snackbar.Add("Xoá thất bại", Severity.Error);
         }
     }
 
