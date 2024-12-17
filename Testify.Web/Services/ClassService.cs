@@ -57,14 +57,23 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<bool> DeleteClass(int id)
+        public async Task<ErrorResponse> DeleteClass(int id)
         {
             var status = await _httpClient.DeleteAsync($"Class/Delete-Class?id={id}");
+
             if (status.IsSuccessStatusCode)
             {
-                return true;
+                return new ErrorResponse { Success = true };
             }
-            return false;
+
+            var error = await status.Content.ReadFromJsonAsync<ErrorResponse>();
+
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
         }
 
         public async Task<List<ClassWithUser>> GetClassBySubjectId(int? subjectId,int scheduleId)
@@ -79,6 +88,35 @@ namespace Testify.Web.Services
         {
             var count = await _httpClient.GetAsync($"Class/Get-Count-Class-By-UserId?userId={userId}");
             var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
+
+        public async Task<List<User>> GetUserInClass(int classId)
+        {
+            var listClass = await _httpClient.GetFromJsonAsync<List<User>>($"Class/Get-Users-In-Class?classId=" + classId);
+            return listClass;
+        }
+
+        public async Task<List<Class>> GetClassesByUserId(Guid userId)
+        {
+            var lst = await _httpClient.GetAsync($"Class/Get-Classes-By-UserId?userId={userId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<Class>>();
+            return response;
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionByClass(int classId)
+        {
+            var lst = await _httpClient.GetAsync($"Class/Score-Distribution-By-Class?classId={classId}");
+            var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
+            return response;
+        }
+
+
+        //2911HCX
+        public async Task<List<ClassWithUser>> GetAllClass_OfTeacher(string? textSearch, bool isActive, Guid? teacherID)
+        {
+            var allClass = await _httpClient.GetAsync($"Class/Get-Classes-OfTeacher?KeyWord={textSearch}&isActive={isActive}&teacherID={teacherID}");
+            var response = await allClass.Content.ReadFromJsonAsync<List<ClassWithUser>>();
             return response;
         }
     }

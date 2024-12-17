@@ -12,19 +12,14 @@
 }
 else
 {
-
     <MudGrid>
-        <MudItem xs="12">
-
-        </MudItem>
-
         <MudItem xs="12">
 
             <MudGrid>
 
                 <MudItem xs="9">
 
-                    <div class="overflow-auto" id="div-displayExam" style="max-height:100vh">
+                    <div class="overflow-auto" id="div-displayExam" style="max-height:100svh">
                         <MudPaper Elevation="0" Class="p-4">
                             @if (_lstQuestionWithAnswers != null)
                             {
@@ -115,14 +110,7 @@ else
                                 }
                             }
 
-                        </MudPaper>
-                        <MudScrollToTop TopOffset="100"
-                        OnScroll="OnScroll"
-                        Selector="#div-displayExam"
-                        VisibleCssClass="visible absolute"
-                        HiddenCssClass="invisible">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color">Lên trên cùng</MudButton>
-                        </MudScrollToTop>
+                        </MudPaper>                   
 
                     </div>
 
@@ -172,10 +160,12 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="fw-bold">
-                                                    @(lstAnswerSubmission
-                                                                                .Where(x => _lstQuestionWithAnswers
-                                                                                .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect)))
-                                                                                .Count())
+                                                    @(_lstQuestionWithAnswers
+                                                        .Where(q => q.Answers.Any(ans => lstAnswerSubmission
+                                                        .Any(a => a.AnswerId == ans.Id && ans.IsCorrect))
+                                                        && !q.Answers.Any(ans => lstAnswerSubmission
+                                                        .Any(a => a.AnswerId == ans.Id && !ans.IsCorrect)))
+                                                        .Count())
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-row justify-content-between mt-3">
@@ -190,10 +180,11 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="fw-bold">
-                                                    @(lstAnswerSubmission
-                                                                                .Where(x => _lstQuestionWithAnswers
-                                                                                .Any(q => q.Answers.Any(a => a.Id == x.AnswerId && a.IsCorrect == false)))
-                                                                                .Count())
+                                                    @(
+                                                        _lstQuestionWithAnswers
+                                                        .Where(q => lstAnswerSubmission.Any(a => q.Answers.Any(ans => ans.Id == a.AnswerId && ans.IsCorrect == false)))
+                                                        .Count()
+                                                        )
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-row justify-content-between mt-3">
@@ -251,7 +242,41 @@ else
                                     </div>
                                 </MudTabPanel>
                                 <MudTabPanel Text="Lịch sử" class="shadow-none">
-                                    <MudText>Content Two</MudText>
+                                    @if (lstHistory.Count>=2)
+                                    {
+                                        <table class="table table-hover">
+                                            <thead class="bg-light" style="position: sticky;top: 0">
+                                                <tr>
+                                                    <th scope="col">Lần</th>
+                                                    <th scope="col">Thời gian</th>
+                                                    <th scope="col">Điểm</th>
+                                                    <th scope="col">Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @for (int i = 0; i < lstHistory.Count; i++)
+                                                {
+                                                    <tr>
+                                                        <td>@(i + 1)</td>
+                                                        <td>@lstHistory[i].SubmitTime</td>
+                                                        <td>@lstHistory[i].TotalMark</td>
+                                                        <td>
+                                                            <MudButton class="btn btn-primary btn-outline" OnClick="() => ClickView(lstHistory[i-1].Id)">Xem</MudButton>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                              
+
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            Không có lịch sử
+                                        </div>
+                                    }
                                 </MudTabPanel>
                             </MudTabs>
                         </div>
@@ -262,11 +287,6 @@ else
             </MudGrid>
 
         </MudItem>
-
-        <MudItem xs="12">
-
-        </MudItem>
-
     </MudGrid>
 }
 
@@ -305,16 +325,9 @@ else
     private Exam currentExam = new Exam();
     Color Color = Color.Success;
     private Submission eDetail = new Submission();
-    private void OnScroll(ScrollEventArgs e)
-    {
-        Color = (e.FirstChildBoundingClientRect.Top * -1) switch
-        {
-            var x when x < 500 => Color.Primary,
-            var x when x < 1500 => Color.Secondary,
-            var x when x < 2500 => Color.Tertiary,
-            _ => Color.Error
-        };
-    }
+
+    private List<Submission> lstHistory = new List<Submission>();
+   
 
     private void CheckAccess()
     {
@@ -334,10 +347,17 @@ else
                 return;
 
             }
+           
+
+
             await LoadExam();
             StateHasChanged();
         }
 
+    }
+    private void ClickView(int id)
+    {
+        navigation.NavigateTo("/result-of-submission/" + id, forceLoad: true);
     }
 
     private async Task<bool> CheckingToken()
@@ -358,8 +378,17 @@ else
             }
             else if (modelLogin.LevelId != 1 || modelLogin.LevelId != 2)
             {
-                var eDetail = await _serSubmission.GetById(Id);
-
+                _userId = Guid.Parse(modelLogin.Id.ToString());
+                eDetail = await _serSubmission.GetById(Id);
+                if (eDetail == null)
+                {
+                    await JS.InvokeVoidAsync("alert", "Không tìm thấy bài thi");
+                    navigation.NavigateTo("/");
+                    return false;
+                }
+                else
+                {
+                }
                 if (modelLogin.LevelId == 3)
                 {
                     List<ClassUser> listClassOfStudent = await _serClassUser.GetAllClassByUserId(eDetail.UserId);
@@ -396,15 +425,24 @@ else
 
     private async Task LoadExam()
     {
+       
 
+      
         Random rad = new Random();
-        snackbar.Add("Loading..." + Id, Severity.Normal);
+        snackbar.Add("Đang tải bài làm", Severity.Normal);
         eDetail = await _serSubmission.GetById(Id);
         var eD = await _serExamDetail.GetExamDetailById(eDetail.ExamDetailId);
         currentExam = await _serExam.GetExamId(eD.ExamId);
+        if (currentExam.AllowViewResult == false)
+        {
+            await JS.InvokeVoidAsync("alert", "Bài thi này chưa cho phép xem kết quả, hãy kiểm tra lại sau");
+            navigation.NavigateTo("/",forceLoad:true);
+            return;
+        }
         string idSubmit = eDetail.ExamDetailId.ToString();
         var idExamDetailLocalStorage = idSubmit;
         var testList = await FillHistory();
+        lstHistory = await _serSubmission.GetHistory(_userId, eDetail.ExamScheduleId);
         if (idExamDetailLocalStorage != "" && idExamDetailLocalStorage != null)
         {
             var lstQAndASelect = new List<QuestionAndAnswerChoosen>();

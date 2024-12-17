@@ -114,7 +114,23 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<ExamSchedule> CheckIsContaintInTime(DateTime startDate, DateTime endDate, int subjectId)
         {
-            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 && x.SubjectId == subjectId || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255 && x.SubjectId == subjectId);
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x =>
+                x.SubjectId == subjectId &&
+                x.Status != 255 &&
+                (
+                    (x.StartTime < endDate && x.EndTime > startDate)
+                )
+            );
+
+            return ojb;
+        }
+        
+        public async Task<ExamSchedule> CheckIsContaintInTimeExclude(DateTime startDate, DateTime endDate, int subjectId,int currentScheduleId)
+        {
+            var ojb = await _context.ExamSchedules.FirstOrDefaultAsync(x => x.StartTime <= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId && x.Id!=currentScheduleId
+                                                                            || x.StartTime >= startDate && x.EndTime <= endDate && x.Status != 255 && x.SubjectId == subjectId && x.Id!=currentScheduleId 
+                                                                            || x.StartTime >= startDate && endDate <= x.EndTime && x.Status != 255 && x.SubjectId == subjectId && x.Id!=currentScheduleId
+                                                                            || startDate <= x.StartTime && endDate >= x.EndTime && x.Status != 255 && x.SubjectId == subjectId && x.Id!=currentScheduleId);
 
             if (ojb != null)
             {
@@ -172,6 +188,25 @@ namespace Testify.DAL.Reposiroties
             {
                 return null;
             }
+        }
+
+        public async Task<int> GetCountExamScheduleByUserId(Guid userId)
+        {
+            var objUser = _context.Users.Find(userId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                var lst = await _context.ExamSchedules.Where(x => x.EndTime <= DateTime.Now && x.Status == 1).ToListAsync();
+                return lst.Count;
+            }
+            return -1;
+        }
+
+
+        public async Task<bool> Check_LichTHI(int? id)
+        {
+            var a = await _context.ExamSchedules.AnyAsync(x => x.ExamId == id && x.Status != 255 && x.StartTime < DateTime.Now && x.EndTime > DateTime.Now);
+            return a;
         }
     }
 }

@@ -1,66 +1,39 @@
-﻿<MudDialog>
+﻿@using Testify.Web.Shared
+<MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
-            Chi tiết lớp học - @classes.Name
-        </MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Chi tiết lớp học</MudText>
     </TitleContent>
     <DialogContent>
-        @if(isLoading)
+        @if (isLoading)
         {
             <LoadingContext />
         }
         else
         {
-            <MudForm Spacing="4" Model="@classes" @ref="@form">
-                <div>
-                    <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" />
-                </div>
-
-                <div>
-                    <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" />
-                </div>
-
-                <div>
-                    <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" />
-                </div>
-
-                <div>
-                    <MudTextField For="@(() => classes.ClassCode)" Style="padding: 0" T="string" Label="Mã Code" @bind-Value="classes.ClassCode" />
-                </div>
-
-                <MudSelect T="Guid" @bind-Value="teacherId" Label="Giáo viên quản lý" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @if (teacherId == Guid.Empty)
-                    {
-                        <MudSelectItem Value="Guid.Empty">Không có giảng viên nào!</MudSelectItem>
-                    }
-                    else
-                    {
-                        @foreach (var itemLevel in _lstTeacher)
-                        {
-                            <MudSelectItem Value="@itemLevel.Id">@itemLevel.FullName</MudSelectItem>
-                        }
-                    }
-                </MudSelect>
-
-                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                    @if (subjectId == -1)
-                    {
-                        <MudSelectItem Value="-1">Không có môn học nào!</MudSelectItem>
-                    }
-                    else
-                    {
-                        @foreach (var itemName in _lstSubject)
-                        {
-                            <MudSelectItem Value="@itemName.Id">@itemName.Name</MudSelectItem>
-                        }
-                    }
-                </MudSelect>
+            <MudForm Model="@classes" @ref="@form" Spacing="3">
+                <MudTextField T="string" @bind-Value="@classes.Name" Label="Tên lớp học" ReadOnly="true" Variant="Variant.Outlined" />
+                <MudTextField T="int" @bind-Value="@classes.Capacity" Label="Số lượng" ReadOnly="true" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@classes.Description" Label="Mô tả" ReadOnly="true" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@classes.ClassCode" Label="Mã code lớp" ReadOnly="true" Variant="Variant.Outlined" />
+                <MudAutocomplete T="Guid" @bind-Value="teacherId" Variant="Variant.Outlined" Label="Giáo viên quản lý"
+                                 ToStringFunc="@(e => _lstTeacher.FirstOrDefault(t => t.Id == e)?.FullName ?? "Không có giảng viên nào!")"
+                                 Items="@_lstTeacher.Select(t => t.Id)"
+                                 ReadOnly="true"
+                                 ResetValueOnEmptyText="true" />
+                <MudAutocomplete T="int"
+                                 @bind-Value="subjectId"
+                                 Variant="Variant.Outlined"
+                                 Label="Môn học"
+                                 ToStringFunc="@(e => _lstSubject.FirstOrDefault(t => t.Id == e)?.Name ?? "Không có môn nào!")"
+                                 Items="@_lstSubject.Select(t => t.Id)"
+                                 ReadOnly="true"
+                                 ResetValueOnEmptyText="true" />
             </MudForm>
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Quay lại</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+
     </DialogActions>
 </MudDialog>
 @code {

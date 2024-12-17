@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using SendGrid.Helpers.Mail;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using Testify.Web.Components.Pages.Examiner;
 
 namespace Testify.Web.Services
 {
@@ -14,9 +16,14 @@ namespace Testify.Web.Services
             _httpClient.Timeout = TimeSpan.FromMinutes(60);
         }
 
-        public async Task<List<Question>> GetAllQuestions(string? textSearch, bool isActive)
+        public async Task<List<Question>> GetAllQuestions(string? textSearch, Guid? userId, int questionLevelId, int questionTypeId, int subjectId)
         {
-            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={textSearch}&isActive={isActive}");
+            string encodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                encodedContent = Uri.EscapeDataString(textSearch);
+            }
+            var allQuestion = await _httpClient.GetAsync($"Question/Get-All-Questions?keyWord={encodedContent}&userId={userId}&questionLevelId={questionLevelId}&questionTypeId={questionTypeId}&subjectId={subjectId}");
             var response = await allQuestion.Content.ReadFromJsonAsync<List<Question>>();
 
             return response;
@@ -75,7 +82,22 @@ namespace Testify.Web.Services
             return await _httpClient.GetAsync($"Question/Export-Question-By-SubjectId?subjectId={subjectId}&isAnswer={isAnswer}");
         }
 
-        public async Task<int> ImportExcelQuestion(IBrowserFile file, int subjectId)
+        public async Task<bool> Checkvalidate(string content, int questionTypeId, int subjectId, int? questionId)
+        {
+            string encodedContent = Uri.EscapeDataString(content);
+            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Validate?content={encodedContent}&questionTypeId={questionTypeId}&subjectId={subjectId}&questionId={questionId}");
+            var response = await hasQuestion.Content.ReadFromJsonAsync<bool>();
+            return response;
+        }
+
+        public async Task<bool> CheckUpdate(int questionId)
+        {
+            var hasQuestion = await _httpClient.GetAsync($"Question/Check-Update?questionId={questionId}");
+            var response = await hasQuestion.Content.ReadFromJsonAsync<bool>();
+            return response;
+        }
+
+        public async Task<int> ImportExcelQuestion(IBrowserFile file, int subjectId, Guid? userId)
         {
             using var content = new MultipartFormDataContent();
 
@@ -85,6 +107,7 @@ namespace Testify.Web.Services
 
             content.Add(new StreamContent(stream), "file", file.Name);
             content.Add(new StringContent(subjectId.ToString()), "subjectId");
+            content.Add(new StringContent(userId.ToString()), "userId");
 
             var allQuestion = await _httpClient.PostAsync("Question/Import-Excel-Question", content);
             var response = await allQuestion.Content.ReadFromJsonAsync<int>();
@@ -120,11 +143,22 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<Question> DeleteQuestion(int id)
+        public async Task<ErrorResponse> DeleteQuestion(int id)
         {
             var deleteQuestion = await _httpClient.DeleteAsync($"Question/Delete-Question?id={id}");
-            var reponse = await deleteQuestion.Content.ReadFromJsonAsync<Question>();
-            return reponse;
+
+            if (deleteQuestion.IsSuccessStatusCode)
+            {
+                return new ErrorResponse { Success = true };
+            }
+
+            var error = await deleteQuestion.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
         }
 
         public async Task<AnswerAndQuestion> GetTrueAnswerOfQuesiton(int questionId, int examdetailId)
@@ -135,6 +169,11 @@ namespace Testify.Web.Services
             return response;
         }
 
-
+        public async Task<int> GetCountByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"Question/Get-Count-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
     }
 }

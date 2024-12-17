@@ -10,19 +10,20 @@ namespace Testify.DAL.Context
 
         }
 
+
         public TestifyDbContext(DbContextOptions options) : base(options)
         {
+
         }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=172.188.18.115,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
+            optionsBuilder.UseSqlServer("Data Source=57.155.114.218,1433;Initial Catalog=TestifyDb;TrustServerCertificate=True;User Id=sa; Password=123456789Aa@");
         }
 
         public DbSet<Answer> Answers { get; set; }
         public DbSet<AnswerSubmission> AnswerSubmissions { get; set; }
-        //public DbSet<Organization> Organizations { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionAnswer> QuestionAnswers { get; set; }
         public DbSet<QuestionLevel> QuestionLevels { get; set; }
@@ -38,27 +39,31 @@ namespace Testify.DAL.Context
         public DbSet<ExamDetail> ExamDetails { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
+        public DbSet<DoingExam> DoingExams { get; set; }
         //public DbSet<OrganizationUser> OrganizationUsers { get; set; }
         public DbSet<ScoreMethod> ScoreMethods { get; set; }
         public DbSet<ClassExamSchedule> UserExamSchedules { get; set; }
         public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ExamDetailQuestion> ExamDetailQuestions { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<BlackListToken> BlackListTokens { get; set; }
+        //public DbSet<BlackListToken> BlackListTokens { get; set; }
         public DbSet<ClassExamSchedule> ClassExamSchedules { get; set; }
-        public DbSet<UserLog> UserLogs { get; set; }
+        public DbSet<LogEntity> Logs { get; set; }
         public DbSet<ExamActivityLog> ExamActivityLogs { get; set; }
-
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserLog>().ToTable("UserLogs");
-
             modelBuilder.Entity<Class>()
                 .HasIndex(c => c.ClassCode).IsUnique();
 
-            modelBuilder.Entity<Organization>()
-                .HasIndex(c => c.OrganizationCode).IsUnique();
+            modelBuilder.Entity<User>()
+             .HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<User>()
+           .HasIndex(u => u.PhoneNumber).IsUnique();
+
+            modelBuilder.Entity<User>()
+          .HasIndex(u => u.UserName).IsUnique();
 
             modelBuilder.Entity<Submission>()
             .HasOne(s => s.User)
@@ -102,17 +107,10 @@ namespace Testify.DAL.Context
 
             modelBuilder.Entity<Permission>()
                 .HasData(
-                new Permission { Id = 1, Name = "Quản Trị Viên", Description = "Quyền tối cao, cao nhất của tổ chức, có thể thi hành mọi chức năng của hệ thống", Status = 1 },
-                new Permission { Id = 2, Name = "Xem Giảng viên, Khảo thí và Sinh viên", Description = "Xem giảng viên, khảo thí, sinh viên", Status = 1 },
-                new Permission { Id = 3, Name = "Chỉnh sửa Giảng viên, Khảo thí và Sinh viên", Description = "Chỉnh sửa giảng viên, khảo thí, sinh viên", Status = 1 },
-                new Permission { Id = 4, Name = "Chỉnh sửa và Xoá Giảng viên, Khảo thí và Sinh viên", Description = "Chỉnh sửa và Xoá giảng viên, khảo thí, sinh viên", Status = 1 },
-                new Permission { Id = 5, Name = "Xem bài thi, câu hỏi, đáp án", Description = "Xem bài thi, câu hỏi, đáp án", Status = 1 },
-                new Permission { Id = 6, Name = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án", Description = "Chỉnh sửa và Xem bài thi, câu hỏi, đáp án", Status = 1 },
-                new Permission { Id = 7, Name = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án", Description = "Chỉnh sửa và Xoá bài thi, câu hỏi, đáp án", Status = 1 },
-                new Permission { Id = 8, Name = "Xem lớp, môn", Description = "Xem lớp, môn", Status = 1 },
-                new Permission { Id = 9, Name = "Chỉnh sửa và Xoá lớp, môn", Description = "Chỉnh sửa và Xoá lớp, môn", Status = 1 },
-                new Permission { Id = 10, Name = "Xem bài làm đã nộp", Description = "Xem bài làm đã nộp", Status = 1 },
-                new Permission { Id = 11, Name = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Description = "Chỉnh sửa và Xoá Xem bài làm đã nộp", Status = 1 }
+                new Permission { Id = 1, Name = "Quản lý bài thi", Description = "Quản lý bài thi", Status = 1 },
+                new Permission { Id = 2, Name = "Quản lý câu hỏi và đáp án", Description = "Quản lý câu hỏi và đáp án", Status = 1 },
+                new Permission { Id = 3, Name = "Quản lý môn học", Description = "Quản lý môn học", Status = 1 },
+                new Permission { Id = 4, Name = "Quản lý lịch thi", Description = "Quản lý lịch thi", Status = 1 }
                 );
             modelBuilder.Entity<User>()
                .HasData(
@@ -125,11 +123,6 @@ namespace Testify.DAL.Context
             modelBuilder.Entity<Subject>()
                 .HasData(
                 new Subject { Id = 1, Description = "None", Name = "Ly", Status = 1 }
-                );
-
-            modelBuilder.Entity<Class>()
-                .HasData(
-                new Class { Id = 1, Name = "Class 1", Status = 1, Capacity = 30, Description = "None", SubjectId = 1, ClassCode = "refdsw", TeacherId = Guid.NewGuid() }
                 );
         }
     }

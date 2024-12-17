@@ -27,6 +27,12 @@ namespace Testify.API.Controllers
             return await _respon.GetAllActicveOfSubject(id);
         }
 
+        [HttpGet("Get-ExamHaveExDetailBySubject")]
+        public async Task<List<Exam>> GetExamHaveExDetailBySubject(int id)
+        {
+            return await _respon.GetExamHaveExDetailBySubject(id);
+        }
+
         [HttpGet("Get-Exams")]
         public async Task<ActionResult<List<ExamWhitExamDetail>>> GetAll(string? keyword, bool isActive)
         {
@@ -46,10 +52,20 @@ namespace Testify.API.Controllers
             return Ok(addExam);
         }
         [HttpPut("Delete-Exam")]    
-        public async Task<ActionResult<Exam>> DeleteClass(int id)
+        public async Task<ActionResult> DeleteExam(int id)
         {
             var deleteEx = await _respon.DeleteExam(id);
-            return Ok(deleteEx);
+
+            if (deleteEx.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteEx.ErrorCode,
+                Message = deleteEx.Message
+            });
         }
         [HttpPut("Update-Exam")]
         public async Task<ActionResult<Exam>> UpdateClass(Exam c)
@@ -59,7 +75,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-InfoBasic")]
-        public async Task<List<ExamWhitQusetion>> GetInfoBasic()
+        public async Task<List<ExamWhitQusetion>> GetInfoBasic(string? textSearch)
         {
             List<ExamWhitQusetion> listResult = new List<ExamWhitQusetion>();
             SubjectRepository subjectRepository = new SubjectRepository();
@@ -80,13 +96,20 @@ namespace Testify.API.Controllers
                     Duration = item.Duration,
                     NumberOfQuestion = item.NumberOfQuestions,
                     NumberOfRepeat = item.NumberOfRepeat,
-
-
+                    CreatedBy = item.CreatedBy,
+                    UpdatedBy = item.UpdatedBy,
                 });
             }
-            return listResult;
 
+            if (!string.IsNullOrWhiteSpace(textSearch))
+            {
+                listResult = listResult
+                    .Where(x => x.ExamName.Contains(textSearch, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            return listResult;
         }
+
 
         [HttpGet("Get-Count-Exam-By-UserId")]
         public async Task<ActionResult<int>> GetCountExamByUserId(Guid userId)
@@ -95,6 +118,25 @@ namespace Testify.API.Controllers
             return Ok(count);
         }
 
+        [HttpGet("Get-Exams-By-UserId")]
+        public async Task<ActionResult<List<Exam>>> GetExamsByUserId(Guid UserId)
+        {
+            var lst = await _respon.GetExamsByUserId(UserId);
+            return Ok(lst);
+        }
 
+        [HttpGet("Score-Distribution-By-Exam")]
+        public async Task<ActionResult<ScoreDistribution>> ScoreDistributionByExam(int ExamId)
+        {
+            var lst = await _respon.ScoreDistributionByExam(ExamId);
+            return Ok(lst);
+        }
+
+        [HttpGet("Check-TrungNamExam")]
+        public async Task<IActionResult> ChekTrungCodeDT_Exam(string name, int? idSub, int examId)
+        {
+            var isDuplicate = await _respon.IsExamCode_Exist(name,idSub, examId);
+            return Ok(isDuplicate);
+        }
     }
 }

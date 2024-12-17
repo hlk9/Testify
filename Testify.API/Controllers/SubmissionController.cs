@@ -41,8 +41,14 @@ namespace Testify.API.Controllers
             return await _repo.CheckNumberOfSubmit(userId, examscheduleId);
         }
 
+        [HttpGet("Get-SubmitHistory")]
+        public async Task<List<Submission>> GetHistory(Guid userId, int examscheduleId)
+        {
+            return await _repo.GetHistory(userId, examscheduleId);
+        }
+
         [HttpGet("Submitted-By-User")]
-        public async Task<ActionResult<List<SubmittedByUser>>> GetSubmittedByUser(Guid userId)
+        public async Task<ActionResult<List<SubmissionWithName>>> GetSubmittedByUser(Guid userId)
         {
             return await _repo.GetAllSubmittedByUser(userId);
         }
@@ -51,6 +57,12 @@ namespace Testify.API.Controllers
         public async Task<ActionResult<List<Achievenment>>> GetAllAchievenment(Guid userId)
         {
             return await _repo.GetAllAchievenment(userId);
+        }
+
+        [HttpPost("Update-Status")]
+        public  bool UpdateStatus(Submission submission)
+        {
+            return _repo.UpdateStatus(submission);
         }
     }
 }

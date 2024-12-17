@@ -88,7 +88,7 @@ namespace Testify.API.Controllers
 
         [HttpGet("Get-All-List-Exam-By-StudentId")]
 
-        public async Task<ActionResult<List<ListExamsOfStudent>>> GetExamStudentId(Guid studentId)
+        public async Task<ActionResult<List<SubmissionWithName>>> GetExamStudentId(Guid studentId)
         {
             var lstExam = await _repo.GetListExamOfStudent(studentId);
             return Ok(lstExam);
@@ -96,10 +96,20 @@ namespace Testify.API.Controllers
 
 
         [HttpDelete("Delete-Lecturer")]
-        public async Task<ActionResult<User>> Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             var deleteLecturer = await _repo.DeleteLecturer(id);
-            return Ok(deleteLecturer);
+
+            if (deleteLecturer.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteLecturer.ErrorCode,
+                Message = deleteLecturer.Message
+            });
         }
 
 

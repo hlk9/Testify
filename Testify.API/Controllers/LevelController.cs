@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml.Style;
+using OfficeOpenXml;
+using System.Drawing;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 
@@ -28,10 +31,12 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("get-user-by-idlevel")]
-        public async Task<ActionResult<List<User>>> GetUserById(int levelId)
+        public async Task<ActionResult<List<User>>> GetUserById(int levelId, string? textSearch)
         {
-            var allUser = await _repo.GetUserByIdLevel(levelId);
+            var allUser = await _repo.GetUserByIdLevel(levelId, textSearch);
             return Ok(allUser);
         }
+
+        
     }
 }

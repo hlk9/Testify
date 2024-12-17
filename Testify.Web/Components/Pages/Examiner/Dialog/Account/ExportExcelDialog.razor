@@ -1,0 +1,80 @@
+﻿@inject IJSRuntime jsruntime
+
+<MudDialog>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tải danh sách tài khoản</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudPaper Class="my-3 w-100" Elevation="0">
+            <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Style="width: 100%;">
+                @if (levelId == -1)
+                {
+                    <MudSelectItem Value="-1">Chọn chức vụ</MudSelectItem>
+                }
+                @foreach (var item in _lstLevel)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Tải</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid UserId { get; set; }
+    private bool isAnswer = false;
+    private int levelId = -1;
+    private string? textSearch;
+    private List<Level> _lstLevel = new List<Level>();
+    private List<User> _userList = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _lstLevel = await _serLevel.GetAllLevel();
+    }
+
+    private async Task ChangeValueLevel()
+    {
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
+        StateHasChanged();
+    }
+
+    private async Task Submit()
+    {
+        if (levelId <= 0)
+        {
+            snackbar.Add("Chưa chọn chức vụ", Severity.Warning);
+            return;
+        }
+        var response = await _serUser.ExportAccountByLevelId(levelId);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var fileContent = await response.Content.ReadAsByteArrayAsync();
+            var fileName = $"List_Account.xlsx";
+
+            var base64 = Convert.ToBase64String(fileContent);
+            await JS.InvokeVoidAsync("downloadFile", fileName, base64);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
+
+<script>
+    function downloadFile(fileName, byteBase64) {
+        const link = document.createElement("a");
+        link.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + byteBase64;
+        link.download = fileName;
+        link.click();
+    }
+</script>

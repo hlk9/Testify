@@ -1,0 +1,187 @@
+ @page "/Account/Logs"
+@using Testify.Web.Shared
+@layout ExaminerLayout
+@inject IDialogService DialogService
+
+<style>
+    .input-search-end {
+        color: #8e8e8e;
+        padding-left: 15px;
+    }
+
+    .button-add-new-hover {
+        background-color: #29A69A;
+        color: white;
+        width: 100%;
+    }
+
+        .button-add-new-hover:hover {
+            background-color: white;
+            color: #29a69a;
+        }
+
+    .button-export {
+        background-color: #fff;
+        border: 1px solid #29a69a;
+        color: #29a69a
+    }
+
+        .button-export:hover {
+            background-color: #29a69a;
+            border: 1px solid #29a69a;
+            color: #fff
+        }
+
+    .icon-input-search {
+        padding-left: 100px;
+    }
+
+</style>
+<div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
+    <MudPaper Style="padding:15px; margin-bottom: 20px">
+        <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">NHẬT KÝ</MudText>
+    </MudPaper>
+    
+    <div class="bg-white rounded-3" style="width:100%">
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 330px)">
+
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a"></MudText>
+
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string">Họ và tên</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Ngày sinh" T="DateOnly">Ngày sinh</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Giới tính</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Họ và tên">@context.FullName</MudTd>
+                    <MudTd DataLabel="Ngày sinh">@context.DateOfBirth.ToString("dd/MM/yyyy")</MudTd>
+                    <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
+                    <MudTd DataLabel="Giới tính">
+                        @if (@context.Sex == true)
+                        {
+                            <span>Nam</span>
+                        }
+                        else
+                        {
+                            <span>Nữ</span>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Trạng thái">
+                        @if (@context.Status == Convert.ToByte(StatusType.isActive))
+                        {
+                            <span>Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span>Không hoạt động</span>
+                        }
+                    </MudTd>
+                    <MudTd Style="marign:3px" DataLabel="Thao tác">
+                       
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,"Logs", context.Id))" Icon="@Icons.Material.Filled.RemoveRedEye" aria-label="details"></MudIconButton>
+                    </MudTd>
+                </RowTemplate>
+
+                <NoRecordsContent>
+                    <MudText>Không có tài khoản nào!!!</MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Đang tải...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        }
+    </div>
+</div>
+@code {
+    private string searchValue = "";
+    private bool isLoading { get; set; } = true;
+    private List<User> _userList = new List<User>();
+    private string? textSearch;
+    private int levelId = -1;
+    private List<Level> _lstLevel = new List<Level>();
+
+    [Parameter]
+    public Guid idUser { get; set; }
+
+    private User user { get; set; }
+
+    private async Task onChangeSearch()
+    {
+        await Task.Delay(700);
+        await LoadData(searchValue);
+    }
+    
+    private async Task LoadData(string? textSearch)
+    {
+      
+        _lstLevel = await _serLevel.GetAllLevel();
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData("");
+    }
+
+    private async Task ChangeValueLevel()
+    {
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
+    }
+
+
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+    private async Task OpenDialogAsync(DialogOptions options, string name, Guid id)
+    {
+        var dialogParametersUserId = new DialogParameters<Testify.Web.Components.Pages.Examiner.Dialog.Account.DetailsAccountManagement>
+        {
+            {x => x.UserId, id}
+        };
+
+        if (name.Equals(OpenDialogType.Detail))
+        {
+            var dialog = await DialogService.ShowAsync<Testify.Web.Components.Pages.Examiner.Dialog.Account.DetailsAccountManagement>("Options Dialog", dialogParametersUserId, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+        
+        if (name.Equals("Logs"))
+        {
+            var dialog = await DialogService.ShowAsync<Testify.Web.Components.Pages.Admin.Dialog.ViewLogs>("Options Dialog", dialogParametersUserId, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
+    }
+}

@@ -33,9 +33,6 @@ namespace Testify.DAL.Reposiroties
                     return avaiableUser;
                 }
             }
-
-
-
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -142,6 +139,36 @@ namespace Testify.DAL.Reposiroties
                                             select u).ToListAsync();
 
             return usersWithStatusTwo;
+        }
+
+        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName, Guid? userId)
+        {
+            if (userId != null)
+            {
+                return await _context.Users.AnyAsync(a => (a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName) && a.Id != userId);
+            }
+            else
+            {
+                return await _context.Users.AnyAsync(a => a.Email == email || a.PhoneNumber == phoneNumber || a.UserName == userName);
+            }
+        }
+
+        public async Task<List<User>> GetUsersByLevelId(int levelId)
+        {
+            return await _context.Users
+                                 .Where(user => user.LevelId == levelId)
+                                 .ToListAsync();
+        }
+
+        public async Task<List<User>> GetUsersNotInClassAsync(int classId, string? textSearch)
+        {
+            var usersNotInClass = await _context.Users
+                .Where(u => u.Status == 1 && u.LevelId == 4 &&
+                            !_context.ClassUsers.Any(cu => cu.UserId == u.Id && cu.ClassId == classId) &&
+                            (string.IsNullOrEmpty(textSearch) || u.FullName.Contains(textSearch)))
+                .ToListAsync(); 
+
+            return usersNotInClass;
         }
     }
 }

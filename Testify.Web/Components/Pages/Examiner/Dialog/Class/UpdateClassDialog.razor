@@ -2,10 +2,9 @@
 @using Testify.Web.Shared
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
-            Sửa lớp học
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa lớp học</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         @if(isLoading)
@@ -16,15 +15,15 @@
         {
             <MudForm Spacing="4" Model="@classes" @ref="@form">
                 <div>
-                    <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" />
+                    <MudTextField For="@(() => classes.Name)" Style="padding: 0" T="string" Label="Tên lớp học" @bind-Value="classes.Name" Variant="Variant.Outlined" />
                 </div>
 
                 <div>
-                    <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" />
+                    <MudNumericField For="@(() => classes.Capacity)" Style="padding: 0" T="int" Label="Số Lượng" @bind-Value="classes.Capacity" Variant="Variant.Outlined" />
                 </div>
 
                 <div>
-                    <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" />
+                    <MudTextField For="@(() => classes.Description)" Style="padding: 0" T="string" Label="Mô tả" @bind-Value="classes.Description" Variant="Variant.Outlined" />
                 </div>
 
                 <MudSelect T="Guid" @bind-Value="teacherId" Label="Giáo viên quản lý" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
@@ -41,7 +40,7 @@
                     }
                 </MudSelect>
 
-                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelect T="int" @bind-Value="subjectId" Label="Môn Học" Variant="Variant.Outlined" Disabled AnchorOrigin="Origin.BottomCenter">
                     @if (subjectId == -1)
                     {
                         <MudSelectItem Value="-1">Không có môn học nào!</MudSelectItem>
@@ -58,8 +57,8 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Hủy</MudButton>
-        <MudButton Color="Color.Warning" Variant="@Variant.Filled" OnClick="Submit">Sửa</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Submit">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
 @code {

@@ -1,5 +1,6 @@
 ﻿using Testify.API.DTOs;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
 {
@@ -28,7 +29,7 @@ namespace Testify.Web.Services
         public async Task<Exam> GetExamId(int id)
         {
             return await _httpClient.GetFromJsonAsync<Exam>($"Exam/get-exams-by-id?id={id}");
-        }
+        }      
 
         public async Task<Exam> CreateExam(Exam e)
         {
@@ -52,14 +53,22 @@ namespace Testify.Web.Services
             }
         }
 
-        public async Task<bool> DeleteExam(int id)
+        public async Task<ErrorResponse> DeleteExam(int id)
         {
             var status = await _httpClient.PutAsync($"Exam/Delete-Exam?id={id}", null);
+
             if (status.IsSuccessStatusCode)
             {
-                return true;
+                return new ErrorResponse { Success = true };
             }
-            return false;
+
+            var error = await status.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
         }
         public async Task<List<Exam>> GetListOfSubject(int id)
         {
@@ -67,9 +76,16 @@ namespace Testify.Web.Services
             return lst;
         }
 
-        public async Task<List<ExamWhitQusetion>> GetInforBasic()
+        public async Task<List<Exam>> GetListHaveExamDetailOfSubject(int id)
         {
-            var lst = await _httpClient.GetFromJsonAsync<List<ExamWhitQusetion>>("Exam/Get-InfoBasic");
+            var lst = await _httpClient.GetFromJsonAsync<List<Exam>>("Exam/Get-ExamHaveExDetailBySubject?id=" + id);
+
+            return lst;
+        }
+
+        public async Task<List<ExamWhitQusetion>> GetInforBasic(string? textSearch)
+        {
+            var lst = await _httpClient.GetFromJsonAsync<List<ExamWhitQusetion>>($"Exam/Get-InfoBasic?textSearch={textSearch}");
             return lst;
         }
 
@@ -80,5 +96,34 @@ namespace Testify.Web.Services
             return response;
         }
 
+        public async Task<List<Exam>> GetExamsByUserId(Guid UserId)
+        {
+            var count = await _httpClient.GetAsync($"Exam/Get-Exams-By-UserId?UserId={UserId}");
+            var response = await count.Content.ReadFromJsonAsync<List<Exam>>();
+            return response;
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionByExam(int ExamId)
+        {
+            var lst = await _httpClient.GetAsync($"Exam/Score-Distribution-By-Exam?ExamId={ExamId}");
+            var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
+            return response;
+        }
+
+        public async Task<bool> IsExamCodeDuplicate_Exam(string name, int? idSub, int examId)
+        {
+            //var response = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?code={name}");
+            var res = await _httpClient.GetAsync($"Exam/Check-TrungNamExam?name={name}&idSub={idSub}&examId={examId}");   
+            if (res.IsSuccessStatusCode)
+            {
+                var content = await res.Content.ReadAsStringAsync();
+
+                return bool.TryParse(content, out var result) && result;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

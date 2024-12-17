@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime jsruntime;
+﻿@inject IJSRuntime jsruntime
 <MudDialog>
     <TitleContent>
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tải danh sách câu hỏi theo môn</MudText>
@@ -19,8 +19,8 @@
     </DialogContent>
     <DialogActions>
 
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error" OnClick="Submit">Tải</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Tải</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -51,15 +51,21 @@
         if (successExport.IsSuccessStatusCode)
         {
             var fileContent = await successExport.Content.ReadAsByteArrayAsync();
-            var fileName = $"Câu_hỏi_{objSub.Name}.xlsx";
+            var fileName = $"List_Question.xlsx";
 
-            // Tạo một URL Blob từ nội dung của file Excel
-            var fileUrl = $"data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{Convert.ToBase64String(fileContent)}";
-
-            // Sử dụng JavaScript để tạo link tải file
-            await jsruntime.InvokeVoidAsync("downloadFile", fileUrl, fileName);
+            var base64 = Convert.ToBase64String(fileContent);
+            await JS.InvokeVoidAsync("downloadFile", fileName, base64);
         }
     }
 
     private void Cancel() => MudDialog.Cancel();
 }
+
+<script>
+    function downloadFile(fileName, byteBase64) {
+        const link = document.createElement("a");
+        link.href = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + byteBase64;
+        link.download = fileName;
+        link.click();
+    }
+</script>

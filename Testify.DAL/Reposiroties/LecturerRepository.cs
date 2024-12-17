@@ -56,7 +56,7 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
-                user.LevelId = 3;
+                //user.LevelId = 3;
                 var addLecturer = _context.Users.Add(user).Entity;
                 await _context.SaveChangesAsync();
                 return addLecturer;
@@ -72,7 +72,7 @@ namespace Testify.DAL.Reposiroties
         {
             try
             {
-                user.LevelId = 4;
+            //    user.LevelId = 4;
                 var addStudent = _context.Users.Add(user).Entity;
                 await _context.SaveChangesAsync();
                 return addStudent;
@@ -100,9 +100,8 @@ namespace Testify.DAL.Reposiroties
                 updateLecturer.LastLogin = user.LastLogin;
                 updateLecturer.Email = user.Email;
                 updateLecturer.Status = user.Status;
-                //updateLecturer.LevelId = 3;
+                updateLecturer.Sex = user.Sex;
                 updateLecturer.LevelId = user.LevelId;
-
 
                 var objLecturer = _context.Users.Update(updateLecturer).Entity;
                 await _context.SaveChangesAsync();
@@ -135,20 +134,20 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<User> DeleteLecturer(Guid id)
+        public async Task<ErrorResponse> DeleteLecturer(Guid id)
         {
             try
             {
                 var objLecturer = await _context.Users.FindAsync(id);
 
-                _context.Users.Remove(objLecturer);
+                objLecturer.Status = 255;
+                _context.Users.Update(objLecturer);
                 await _context.SaveChangesAsync();
-                return objLecturer;
+                return new ErrorResponse { Success = true };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
 
@@ -229,7 +228,8 @@ namespace Testify.DAL.Reposiroties
                                   SubjectName = sub.Name,
                                   ExamScheduleStartTime = exsch.StartTime,
                                   ExamScheduleEndTime = exsch.EndTime,
-                                  Status = exsch.Status
+                                  Status = exsch.Status,
+                                  ClassId = cla.Id
                               }
                               ).ToListAsync();
 

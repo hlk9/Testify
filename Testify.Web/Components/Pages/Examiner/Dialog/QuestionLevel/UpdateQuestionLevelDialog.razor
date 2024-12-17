@@ -11,16 +11,16 @@
         }
         else
         {
-        <MudForm Spacing="5" Model="@questionLevel" @ref="@form">
-            <MudTextField @bind-Value="questionLevel.Name" For="@(() => questionLevel.Name)" Style="padding: 0" T="string" Label="Tên Mức Độ Câu Hỏi" />
-            <MudTextField @bind-Value="questionLevel.Description" For="@(() => questionLevel.Description)" Style="padding: 0" T="string" Label="Mô Tả" />
+        <MudForm Spacing="3" Model="@questionLevel" @ref="@form">
+                <MudTextField @bind-Value="questionLevel.Name" For="@(() => questionLevel.Name)" Style="padding: 0" T="string" Label="Tên Mức Độ Câu Hỏi" Variant="Variant.Outlined" />
+                <MudTextField @bind-Value="questionLevel.Description" For="@(() => questionLevel.Description)" Style="padding: 0" T="string" Label="Mô Tả" Variant="Variant.Outlined" />
         </MudForm>
         }
     </DialogContent>
     <DialogActions>
 
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Warning" OnClick="Submit">Cập nhật</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Submit">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -39,9 +39,11 @@
 
     private List<QuestionLevel> _lstQuestionLevel = new List<QuestionLevel>();
 
+    private string searchValue = "";
+
     protected override async Task OnInitializedAsync()
     {
-        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels();
+        _lstQuestionLevel = await _serQuestionLevel.GetAllQuestionLevels(searchValue);
         if (QuestionLevelId != null)
         {
             questionLevel = await _serQuestionLevel.GetQuestionLevelById(QuestionLevelId);
@@ -51,12 +53,13 @@
 
     private async void Submit()
     {
-        if (questionLevel.Name.Trim() == "" || questionLevel.Name == null)
+        var lstQuestionLevelNoCurrentLevel = _lstQuestionLevel.Where(x => x.Id != QuestionLevelId).ToList();
+        if (string.IsNullOrEmpty(questionLevel.Name) || string.IsNullOrWhiteSpace(questionLevel.Name))
         {
             snackbar.Add("Tên không được để trống", Severity.Warning);
             return;
         }
-        else if (_lstQuestionLevel.Any(x => x.Name.Trim().ToLower() == questionLevel.Name.Trim().ToLower()))
+        else if (lstQuestionLevelNoCurrentLevel.Any(x => x.Name.Trim().ToLower() == questionLevel.Name.Trim().ToLower()))
         {
             snackbar.Add("Đã tồn tại mức độ này", Severity.Warning);
             return;

@@ -9,30 +9,24 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">Danh sách đề thi </MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Danh sách đề thi</MudText>
     </TitleContent>
     <DialogContent>
-       <MudGrid>
+        <MudGrid>
             <MudItem xl="10" lg="9" md="8" sm="7" xs="12">
             </MudItem>
             <MudItem xl="2" lg="3" md="4" sm="5" xs="12">
                 @* <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth, subjectCurrent.Id))" Class="add-button-end" Variant="Variant.Filled">Thêm đề mới </MudButton> *@
             </MudItem>
-       </MudGrid>
+        </MudGrid>
 
         <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
-
             <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
 
                 <ToolBarContent>
                     <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
                         <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
                             <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách đề thi</MudText>
-
-                        </MudItem>
-                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
                         </MudItem>
                     </MudGrid>
                 </ToolBarContent>
@@ -44,24 +38,12 @@
                     <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Công khai</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortLabel="Ngày Cập Nhật" T="string">Ngày cập nhật</MudTableSortLabel></MudTh>
-                    @* <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh> *@
 
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="ID"> @context.Id</MudTd>
                     <MudTd DataLabel="Name"> @context.Code</MudTd>
-                    <MudTd DataLabel="Môn">
-                        @* <MudAutocomplete T="Subject"
-                                         @bind-Value="subjectCurrent"
-                                         SearchFunc="@SearchSubject"
-                                         Variant="Variant.Outlined"
-                                         Label="Môn"
-                                         Placeholder="Chọn môn"
-                                         Clearable="true"
-                                         ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                         OnFocus="SubjectChanged" /> *@
-                            @subjectCurrent.Name
-                    </MudTd>
+                    <MudTd DataLabel="Môn">@subjectCurrent.Name</MudTd>
                     <MudTd DataLabel="Người tạo">
                         @foreach (var item in user)
                         {
@@ -72,9 +54,9 @@
                                 break;
                             }
                         }
-                        
-                     </MudTd>
-                    <MudTd DataLabel="Công khai"> 
+
+                    </MudTd>
+                    <MudTd DataLabel="Công khai">
                         @if (context.Status == 0)
                         {
                             <span class="text-center btn btn-danger">Chỉ mình tôi </span>
@@ -83,45 +65,30 @@
                         {
                             <span class="text-center btn btn-success">Công khai </span>
                         }
-                        
+
                     </MudTd>
                     <MudTd DataLabel="Ngày tạo"> @context.CreateDate.ToString("dd/MM/yyyy")</MudTd>
                     <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
-                    @* <MudTd DataLabel="Thao tác">
-                        <MudTooltip Text="Sửa">
-                            <MudIconButton  Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                        </MudTooltip>
-                        <MudTooltip Text="Chi tiết">
-                            <MudIconButton  Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                        </MudTooltip>
-                        <MudTooltip Text="Xoá">
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                        </MudTooltip>
-                    </MudTd> *@
                 </RowTemplate>
                 <NoRecordsContent>
-                    <MudText>No matching records found</MudText>
+                    <MudText></MudText>
                 </NoRecordsContent>
                 <LoadingContent>
-                    <MudText>Loading...</MudText>
+                    <MudText>Đang tải...</MudText>
                 </LoadingContent>
                 <PagerContent>
                     <MudTablePager />
                 </PagerContent>
             </MudTable>
-        
         </div>
-
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
-      
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+
     </DialogActions>
 </MudDialog>
-    
+
 @code {
-
-
     [Parameter]
     public int Id { get; set; }
     [CascadingParameter]
@@ -140,7 +107,6 @@
     {
         var parameters = new DialogParameters
         {
-              // { "Id", ID_Sub },
               { "Id_Sub", ID_Sub }
         };
 
@@ -148,19 +114,13 @@
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            // listSchedule = await scheduleService.GetInforBasic();
-            // _lstDT = await examService.GetInforBasic();
-
+            
         }
-
-
     }
 
     private async Task<IEnumerable<Subject>> SearchSubject(string value, CancellationToken token)
     {
-
         listSubject = await subjectService.GetAllSub(null, true);
-
 
         if (string.IsNullOrEmpty(value))
             return listSubject;
@@ -172,28 +132,19 @@
         listExam = await examService.GetListOfSubject(subjectCurrent.Id);
         examCurrent = null;
         StateHasChanged();
-
     }
 
     private List<User> user = new List<User>();
-    //private User user { get; set; } = new();
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
     private List<Dethi> lst = new List<Dethi>();
 
     protected override async Task OnInitializedAsync()
     {
-        // user = await _serUser.GetUsers();
-        // lisDThi = await examdetailService.GetExamDetailByExamId(Id);
-
-        
-        // var examId = lisDThi.FirstOrDefault().ExamId;
-        // var exam = await examService.GetExamId(examId);
-        // subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         user = await _serUser.GetUsers();
 
         // Lọc bỏ các đề thi có trạng thái là 255
         var allExamDetails = await examdetailService.GetExamDetailByExamId(Id);
-        lisDThi = allExamDetails.Where(x => x.Status != 255).ToList(); 
+        lisDThi = allExamDetails.Where(x => x.Status != 255).ToList();
 
         if (lisDThi.Any())
         {
@@ -202,6 +153,6 @@
             subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         }
     }
-    
+
 
 }

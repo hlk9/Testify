@@ -36,9 +36,12 @@ namespace Testify.DAL.Reposiroties
             {
                 return null;
             }
+        }
 
-
-
+        public async Task<List<Submission>> GetHistory(Guid userId, int examscheduleId)
+        {
+            var data = await _context.Submissions.Where(x => x.UserId == userId && x.ExamScheduleId == examscheduleId).ToListAsync();
+            return data;
         }
         public async Task<int> CheckNumberOfSubmit(Guid userId, int examscheduleId)
         {
@@ -54,53 +57,80 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<List<SubmittedByUser>> GetAllSubmittedByUser(Guid userId)
+        public async Task<List<SubmissionWithName>> GetAllSubmittedByUser(Guid userId)
         {
-            var check = await _context.Submissions.FirstOrDefaultAsync(x => x.UserId == userId);
-            var check2 = await _context.ExamSchedules.Where(x => x.Id == check.ExamScheduleId).FirstOrDefaultAsync();
-            var check3 = await _context.ClassExamSchedules.FirstOrDefaultAsync(x => x.ExamScheduleId == check2.Id);
-
-            var data = await (from submit in _context.Submissions.Where(x => x.UserId == userId)
-                              join exs in _context.ExamSchedules on submit.ExamScheduleId equals exs.Id
-                              join clex in _context.ClassExamSchedules on exs.Id equals clex.ExamScheduleId
-                              join cl in _context.Classes on clex.ClassId equals cl.Id
-                              join sub in _context.Subjects on cl.SubjectId equals sub.Id
-                              select new SubmittedByUser
+            var data = await (from submit in _context.Submissions
+                              join u in _context.Users
+                              on submit.UserId equals u.Id
+                              join exD in _context.ExamDetails
+                              on submit.ExamDetailId equals exD.Id
+                              join ex in _context.Exams
+                              on exD.ExamId equals ex.Id
+                              join sub in _context.Subjects
+                              on ex.SubjectId equals sub.Id
+                              where submit.UserId == userId
+                              select new SubmissionWithName
                               {
-                                  UserId = submit.UserId,
-                                  SubmissionId = submit.Id,
-                                  ExamScheduleId = submit.ExamScheduleId,
-                                  NameExam = exs.Title,
-                                  ExamDate = submit.SubmitTime,
+                                  Id = submit.Id,
+                                  Name = ex.Name,
                                   SubjectName = sub.Name,
-                                  Score = submit.TotalMark,
-                                  ClassName = cl.Name,
-                                  ExamDetailId = submit.ExamDetailId,
-                                  SubmitTime = submit.SubmitTime
-                              }
-                              ).ToListAsync();
+                                  UserId = userId,
+                                  SubmitTime = submit.SubmitTime,
+                                  TimeTaken = submit.TimeTaken,
+                                  TotalMark = submit.TotalMark,
+                                  IsPassed = submit.IsPassed,
+                                  Note = submit.Note,
+                                  SubmissionId = submit.Id,
+                                  ExamDetailId = exD.Id
+
+
+                              }).ToListAsync();
 
             return data;
         }
 
         public async Task<List<Achievenment>> GetAllAchievenment(Guid userId)
         {
-            var data = await (from cls in _context.ClassUsers.Where(x => x.UserId == userId && x.Status == 1)
-                              join cl in _context.Classes on cls.ClassId equals cl.Id
-                              join clexs in _context.ClassExamSchedules on cl.Id equals clexs.ClassId
-                              join exs in _context.ExamSchedules on clexs.ExamScheduleId equals exs.Id
-                              join submission in _context.Submissions on exs.Id equals submission.ExamScheduleId
-                              join sub in _context.Subjects on cl.SubjectId equals sub.Id
-                              group submission by new { className = cl.Name, subjectName = sub.Name } into gr
+            var data = await (from sub in _context.Submissions
+                              join es in _context.ExamSchedules on sub.ExamScheduleId equals es.Id
+                              join s in _context.Subjects on es.SubjectId equals s.Id
+                              join ces in _context.ClassExamSchedules on es.Id equals ces.ExamScheduleId
+                              join c in _context.Classes on ces.ClassId equals c.Id
+                              join cu in _context.ClassUsers on c.Id equals cu.ClassId
+                              where cu.UserId == userId && sub.UserId == userId
                               select new Achievenment
                               {
-                                  ClassName = gr.Key.className,
-                                  SubjectName = gr.Key.subjectName,
-                                  AvgScore = gr.Any(x => x != null) ? gr.Average(x => x.TotalMark) : 0
+                                  ClassId = c.Id,
+                                  ClassName = c.Name,
+                                  SubjectName = s.Name,
+                                  AvgScore = sub.TotalMark
                               }
                               ).ToListAsync();
 
-            return data;
+            var groupedData = data
+                            .GroupBy(d => new { d.ClassId, d.ClassName })
+                            .Select(g => new Achievenment
+                            {
+                                ClassId = g.Key.ClassId,
+                                ClassName = g.Key.ClassName,
+                                SubjectName = string.Join(", ", g.Select(x => x.SubjectName).Distinct()),
+                                AvgScore = Math.Round(g.Average(x => x.AvgScore), 2)
+                            })
+                            .ToList();
+
+            return groupedData;
+        }
+
+        public bool UpdateStatus(Submission submission)
+        {
+            var sub = _context.Submissions.Find(submission.Id);
+            if (sub != null)
+            {
+                sub.Status = submission.Status;
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
         }
     }
 }

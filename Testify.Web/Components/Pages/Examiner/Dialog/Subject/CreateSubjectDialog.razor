@@ -1,11 +1,10 @@
 ﻿@using Testify.DAL.Models
 
-
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            Thêm mới môn học
-        </MudText>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Thêm mới môn học</MudText>
+        </TitleContent>
     </TitleContent>
     <DialogContent>
         @if (isLoading)
@@ -15,17 +14,14 @@
         else
         {
             <MudForm Spacing="3" Model="@subject" @ref="@form">
-
-                @* <MudTextField @bind-Value="@subject.Id" For="@(()=> subject.Id)" T="int" Label="Mã môn học" /> *@
-                <MudTextField @bind-Value="@subject.Name" For="@(()=> subject.Name)" T="string" Label="Tên môn học" />
-                <MudTextField @bind-Value="@subject.Description" For="@(()=> subject.Description)" T="string" Label="Mô tả" />
-               @*  <MudTextField @bind-Value="@subject.Status" For="@(()=> subject.Status)" T="byte?" Label="Trạng thái" /> *@
+                <MudTextField @bind-Value="@subject.Name" For="@(()=> subject.Name)" T="string" Label="Tên môn học" Variant="Variant.Outlined" />
+                <MudTextField @bind-Value="@subject.Description" For="@(()=> subject.Description)" T="string" Label="Mô tả" Variant="Variant.Outlined" />
             </MudForm>
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" OnClick=" Cancel">Hủy</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="AddNew">Tạo</MudButton>
+        <MudButton Color="Color.Surface" OnClick=" Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Primary" OnClick="AddNew">Tạo</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -35,6 +31,7 @@
     private bool isLoading { get; set; } = true;
     MudForm form;
     private Subject subject { get; set; } = new();
+    private List<Subject> _lstS = new List<Subject>();
 
     [Parameter]
     public int idSubject { get; set; }
@@ -45,14 +42,23 @@
     }
     private async Task LoadData()
     {
+        _lstS = await _serSub.GetAllSub("", true);
         isLoading = false;
     }
 
     private async Task AddNew()
     {
         var checkValidation = ValidateForm();
-        if(!checkValidation)
+        if (!checkValidation)
         {
+            var isSubject = _lstS.Any(x => x.Name.Trim().ToLower().Equals(subject.Name.Trim().ToLower()));
+
+            if(isSubject)
+            {
+                snackbar.Add("Đã tồn tại môn này!", Severity.Error);
+                return;
+            }
+
             subject.Status = 1;
             var check = await _serSub.CreateSub(subject);
             if (check == true)
@@ -67,13 +73,13 @@
                 snackbar.Add("Thêm thất bại", Severity.Error);
             }
         }
-        
+
     }
 
     private bool ValidateForm()
     {
         int count = 0;
-        if (subject.Name == null || subject.Name.Trim().Length == 0)
+        if (string.IsNullOrEmpty(subject.Name) || string.IsNullOrWhiteSpace(subject.Name))
         {
             snackbar.Add("Tên không được để trống!", Severity.Error);
             count += 1;

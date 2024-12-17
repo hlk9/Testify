@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavigationManager
+<title>Testify</title>
 @if (isLoading == true)
 {
     <MudOverlay Visible="isLoading" Style="background-color:white; opacity:1;" LightBackground="true" LockScroll="true" Absolute="true">
@@ -80,20 +81,33 @@
     private bool isLoading = true;
     protected async override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && isLoading == true)
+        if (firstRender)
         {
             var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            if (!userId.Success || userId.Value == null)
+            {
+                navigation.NavigateTo("/");
+                return;
+            }
             var objUser = await _serLec.GetLecturerById(Guid.Parse(userId.Value));
             string nameUser = objUser.FullName;
             string[] tu = nameUser.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             _name = tu[^1][0].ToString().ToUpper();
-            isTokenValid = await CheckingToken();
-            isLoading = false;
-            StateHasChanged();
-            if (isTokenValid == false)
+            try
             {
-                navigation.NavigateTo("/");
+                isTokenValid = await CheckingToken();
+                isLoading = false;
+                StateHasChanged();
+                if (isTokenValid == false)
+                {
+                    navigation.NavigateTo("/");
 
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -13,10 +14,23 @@ namespace Testify.DAL.Reposiroties
             _context = new TestifyDbContext();
         }
 
-        public async Task<List<QuestionLevel>> GetAllLevels()
+        public async Task<List<QuestionLevel>> GetAllLevels(string? textSearch)
         {
-            return await _context.QuestionLevels.ToListAsync();
+            if(string.IsNullOrEmpty(textSearch) || string.IsNullOrWhiteSpace(textSearch))
+            {
+                return await _context.QuestionLevels
+                .Where(x => x.Status == true)
+                .ToListAsync();
+            }
+            else
+            {
+                return await _context.QuestionLevels
+                .Where(x => x.Name.Trim().ToLower().Contains(textSearch.Trim().ToLower()) && x.Status == true)
+                .ToListAsync();
+            }
+            
         }
+
 
         public async Task<QuestionLevel> GetLevelById(int id)
         {
@@ -57,19 +71,27 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<QuestionLevel> DeleteLevel(int id)
+        public async Task<ErrorResponse> DeleteLevel(int id)
         {
             try
             {
                 var objLevel = await _context.QuestionLevels.FindAsync(id);
 
-                _context.QuestionLevels.Remove(objLevel);
+                var hasQuestionUsed = await _context.Questions.AnyAsync(x => x.QuestionLevelId == id);
+
+                if(hasQuestionUsed)
+                {
+                    return new ErrorResponse { Success = false, ErrorCode = "PERMISSION_DENIED", Message = "permission_denied" };
+                }
+
+                objLevel.Status = false;
+                _context.QuestionLevels.Update(objLevel);
                 await _context.SaveChangesAsync();
-                return objLevel;
+                return new ErrorResponse { Success = true };
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
     }

@@ -1,0 +1,231 @@
+@using Testify.DAL.Models
+@using Testify.Web.Shared
+@using MudBlazor.Utilities
+
+@if (isLoading)
+{
+    <LoadingContext />
+}
+else
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Phân quyền tài khoản @user.FullName</MudText>
+        </TitleContent>
+
+        <DialogContent>
+            <div class="d-flex flex-column mud-width-full mud-height-full">
+                @* <MudToolBar Class="gap-4"> *@
+                @*     <MudButton OnClick="LoadServerData" Variant="Variant.Filled" Color="Color.Default">Load Data</MudButton> *@
+                @*     <MudButton OnClick="SaveData" Variant="Variant.Filled" Color="Color.Primary">Save Data</MudButton> *@
+                @*     <MudSpacer /> *@
+                @*     <MudButton OnClick="Reset" Variant="Variant.Text" Color="Color.Error">Reset Example</MudButton> *@
+                @* </MudToolBar> *@
+                <MudDropContainer T="DropItem" Items="@_dropzoneItems" @ref="_container" ItemsSelector="@((item,dropzone) => item.Selector == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-wrap flex-grow-1">
+                    <ChildContent>
+                        <MudPaper Class="ma-4 flex-grow-1">
+                            <MudList T="string" Class="d-flex flex-column mud-height-full">
+                                <MudListSubheader>Quyền đang có</MudListSubheader>
+                                <MudDropZone T="DropItem" Identifier="Current" Class="flex-grow-1" AllowReorder="true" />
+                            </MudList>
+                        </MudPaper>
+
+                        <MudPaper Class="ma-4 flex-grow-1">
+                            <MudList T="string" Class="d-flex flex-column mud-height-full">
+                                <MudListSubheader>Danh sách quyền</MudListSubheader>
+                                <MudDropZone T="DropItem" Identifier="Origin" Class="flex-grow-1" AllowReorder="true" />
+                            </MudList>
+                        </MudPaper>
+                        
+                    </ChildContent>
+                    <ItemRenderer>
+                        <MudListItem T="string" Text="@($"{context.Name}")" />
+                    </ItemRenderer>
+                </MudDropContainer>
+            </div>
+          
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+            <MudButton Color="Color.Warning" OnClick="SavePermissionToDb" >Lưu</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    MudForm form;
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public Guid UserId { get; set; }
+    private DateTime? _date = new DateTime();
+    private int levelId = -1;
+    private List<Level> _lstLevel = new List<Level>();
+    private bool isLoading { get; set; } = true;
+
+    private User user { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _serLec.GetLecturerById(UserId);
+        await Loaddata();
+    }
+
+    private async Task Loaddata()
+    {
+        _lstLevel = await _serLevel.GetAllLevel();
+        if (user.LevelId != null)
+        {
+            levelId = user.LevelId;
+        }
+        else
+        {
+            levelId = -1;
+        }
+        _date = user.DateOfBirth;
+       
+        isLoading = false;
+    }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Reset();
+        }
+    }
+
+
+    private MudDropContainer<DropItem> _container = new MudDropContainer<DropItem>();
+
+    private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
+    {
+        dropItem.Item.Selector = dropItem.DropzoneIdentifier;
+
+        var indexOffset = dropItem.DropzoneIdentifier switch
+        {
+            "Origin"  => _dropzoneItems.Count(x => x.Selector == "Current"),
+            _ => 0
+        };
+
+        _dropzoneItems.UpdateOrder(dropItem, item => item.Order, indexOffset);
+        var a = _serverData;
+    }
+
+    private List<DropItem> _dropzoneItems = new();
+
+    private List<DropItem> _serverData = new List<DropItem>();
+       
+
+    private void RefreshContainer()
+    {
+        StateHasChanged();
+       _container.Refresh();
+       
+    }
+
+    private void LoadServerData()
+    {
+        _dropzoneItems = _serverData
+            .OrderBy(x => x.Order)
+            .Select(item => new DropItem
+            {
+                Order = item.Order,
+                Name = item.Name,
+                Selector = item.Selector
+            })
+            .ToList();
+        RefreshContainer();
+    }
+
+    private async Task SavePermissionToDb()
+    {
+        var listUp = await userPermissionService.GetAllByUserId(UserId);
+        List<int> listId = new List<int>();
+        foreach (var item in listUp)
+        {
+            listId.Add(item.Id);
+        }
+
+        var stats = await userPermissionService.RemoveListPermissions(listId);
+        List<UserPermission> listToAdd = new List<UserPermission>();
+        if (stats)
+        {
+            var listChoice = _serverData.Where(x => x.Selector == "Current").ToList();
+
+            if (listChoice.Count > 0)
+            {
+                foreach (var item in listChoice)
+                {
+                    listToAdd.Add((new UserPermission
+                    {
+                        UserId = UserId,
+                        PermissionId = item.Id
+                    }));
+                }
+            }
+
+            var statusAdd = await userPermissionService.AddListUserPermission(listToAdd);
+
+            if (statusAdd)
+            {
+                snackbar.Add("Phân quyền thành công",Severity.Success);
+                MudDialog.Cancel();
+                return;
+            }
+                
+            
+        }
+        snackbar.Add("Thất bại",Severity.Error);
+    }
+
+    private void SaveData()
+        => _serverData = _dropzoneItems
+            .OrderBy(x => x.Order)
+            .Select(item => new DropItem
+            {
+                Order = item.Order, Name = item.Name, Selector = item.Selector
+            })
+            .ToList();
+
+    private async Task Reset()
+    {
+        _dropzoneItems = new List<DropItem>();
+        _serverData = new List<DropItem>();
+
+        var listPer = await permissionService.GetAllPermissions();
+
+        var listCurrent = await userPermissionService.GetAllByUserId(UserId);
+
+        if (listPer.Count > 0)
+        {
+            for (int i = 0; i < listPer.Count; i++)
+            {
+                _serverData.Add(new DropItem
+                {
+                    Id = listPer[i].Id,
+                    Name = listPer[i].Name,
+                    Selector =listCurrent.Any(x=>x.PermissionId==listPer[i].Id)?"Current":"Origin",
+                    Order = i
+                });
+            }
+        }
+        
+        _dropzoneItems = _serverData;
+
+        RefreshContainer();
+    }
+    
+    public class DropItem
+    {
+        public int Id { get; set; }
+        public string Name { get; init; }
+        public string Selector { get; set; }
+        public int Order { get; set; }
+    }
+    
+    
+
+    private void Cancel() => MudDialog.Cancel();
+}

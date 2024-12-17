@@ -101,6 +101,32 @@ namespace Testify.Web.Services
             return null;
 
         }
+        
+        public async Task<ExamSchedule> GetInTimeRangeExclude(DateTime start, DateTime end, int? subjectId,int currentScheduleId)
+        {
+            var startStr = Uri.EscapeDataString(start.ToString("MM/dd/yyyy HH:mm:ss"));
+            var endStr = Uri.EscapeDataString(end.ToString("MM/dd/yyyy HH:mm:ss"));
+
+            var response = await _httpClient.GetAsync($"ExamSchedule/Get-InTime-ExcludeId?start={startStr}&end={endStr}&subjectId={subjectId}&currentScheduleId={currentScheduleId}");
+
+            if (response.StatusCode == HttpStatusCode.NoContent) // 204 No Content
+            {
+
+                return null;
+            }
+            else
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+
+                var schedule = JsonConvert.DeserializeObject<ExamSchedule>(content);
+                return schedule;
+
+            }
+
+
+
+        }
 
         public async Task<ExamSchedule> GetInTimeRange(DateTime start, DateTime end, int? subjectId)
         {
@@ -153,5 +179,28 @@ namespace Testify.Web.Services
             var response = await count.Content.ReadFromJsonAsync<List<ExamSchedule>>();
             return response;
         }
+
+        public async Task<int> GetCountByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"ExamSchedule/Get-Count-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
+
+        public async Task<bool> Check_LichTHI(int? id)
+        {
+            var res = await _httpClient.GetAsync($"ExamSchedule/Check-LT?id={id}");
+            if (res.IsSuccessStatusCode)
+            {
+                var content = await res.Content.ReadAsStringAsync();
+                
+                return bool.TryParse(content, out var result) && result;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

@@ -71,11 +71,11 @@
                                 </MudGrid>
 
                                 <div>
-                                    <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Nội dung câu hỏi" @bind-Value="question.Content" />
+                                    <MudTextField For="@(() => question.Content)" Style="padding: 0" T="string" Label="Nội dung câu hỏi" @bind-Value="question.Content" Variant="Variant.Outlined" />
                                 </div>
 
                                 <div class="d-flex justify-content-between align-items-center gap-2">
-                                    <MudTextField @bind-Value="@nameFileImageCurrent" Style="padding: 0" T="string" ReadOnly=true />
+                                    <MudTextField @bind-Value="@nameFileImageCurrent" Style="padding: 0" T="string" ReadOnly=true Variant="Variant.Outlined" />
                                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFileImage" Accept=".jpg, .png, .mp3">
                                         <ActivatorContent>
                                             <MudFab StartIcon="@Icons.Material.Filled.Image"
@@ -99,7 +99,18 @@
                                 <MudDataGrid Items="@lstAnswers" Class="my-3">
                                     <Columns>
                                         <PropertyColumn Property="x => x.Content" Title="Nội dung" />
-                                        <PropertyColumn Property="x => x.IsCorrect" Title="Đúng/Sai" />
+                                        <TemplateColumn Title="Đây là đáp án">
+                                            <CellTemplate>
+                                                @if (context.Item.IsCorrect)
+                                                {
+                                                    <MudText Color="Color.Success">Đúng</MudText>
+                                                }
+                                                else
+                                                {
+                                                    <MudText Color="Color.Error">Sai</MudText>
+                                                }
+                                            </CellTemplate>
+                                        </TemplateColumn>
                                         <TemplateColumn CellClass="d-flex justify-end">
                                             <CellTemplate>
                                                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => RemoveAnswer(context.Item.Id))" />
@@ -108,16 +119,16 @@
                                     </Columns>
                                 </MudDataGrid>
 
-                                <MudButton Class="btn p-2 text-white" Style="background-color: #29a69a" OnClick="IsShowAddAnswer">Thêm đáp án</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="IsShowAddAnswer">Thêm đáp án</MudButton>
 
                                 @if (isShowAddAnswer)
                                 {
                                     <MudPaper Elevation="3" Class="w-100 py-3 px-2 my-3">
                                         <MudForm Model="answer" @ref="form" Spacing="4">
-                                            <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" />
+                                            <MudTextField For="@(() => answer.Content)" Style="padding: 0" T="string" Label="Nội dung đáp án" @bind-Value="answer.Content" Variant="Variant.Outlined" />
                                             <MudCheckBox T="bool" @bind-Value="@answer.IsCorrect" Label="Đáp án đúng" />
                                         </MudForm>
-                                        <MudButton Class="btn p-2" Color="Color.Primary" OnClick="SaveAnswerInQuestion">Lưu đáp án</MudButton>
+                                        <MudButton Color="Color.Primary" OnClick="SaveAnswerInQuestion">Tạo</MudButton>
                                     </MudPaper>
                                 }
                             }
@@ -125,7 +136,7 @@
 
                         <MudPaper Elevation="0" Class="pt-3 text-end">
                             <MudButton OnClick="Cancel">Đóng</MudButton>
-                            <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Lưu câu hỏi</MudButton>
+                            <MudButton Color="Color.Primary" OnClick="@(() =>Submit(false))">Tạo</MudButton>
                         </MudPaper>
                     }
                 </MudTabPanel>
@@ -145,7 +156,7 @@
                     </MudPaper>
 
                     <MudPaper Elevation="0" Class="bg-transparent py-4 d-flex justify-content-between align-items-center gap-3">
-                        <MudTextField T="string" @bind-Value="@nameFileExcelCurrent"></MudTextField>
+                        <MudTextField T="string" @bind-Value="@nameFileExcelCurrent" Variant="Variant.Outlined" />
                         <MudFileUpload T="IBrowserFile" Accept=".xlsx, .xls" FilesChanged="UploadFileExcel">
                             <ActivatorContent>
                                 <MudFab StartIcon="@Icons.Material.Filled.FileUpload"
@@ -159,8 +170,8 @@
 
 
                     <MudPaper Elevation="0" Class="pt-3 text-end">
-                        <MudButton OnClick="Cancel">Cancel</MudButton>
-                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Thêm mới</MudButton>
+                        <MudButton OnClick="Cancel">Đóng</MudButton>
+                        <MudButton Color="Color.Primary" OnClick="@(() =>Submit(true))">Tạo</MudButton>
                     </MudPaper>
                 </MudTabPanel>
             </MudTabs>
@@ -172,7 +183,6 @@
     private Question question { get; set; } = new();
     private Answer answer { get; set; } = new();
 
-    private List<Question> _lstQuestion = new List<Question>();
     private List<Answer> lstAnswers = new List<Answer>();
     private List<QuestionLevel> _lstQuestionLevels = new List<QuestionLevel>();
     private List<QuestionType> _lstQuestionTypes = new List<QuestionType>();
@@ -184,6 +194,7 @@
     private int subjectId = -1;
     private int questionLevelId = -1;
     private int questionTypeId = -1;
+    private Guid _userId;
 
     private int countQuestion;
     private int countQuestionPass;
@@ -208,22 +219,31 @@
     private IDialogService _mudDialogServices { get; set; }
     MudForm form;
 
-    private async Task LoadData()
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels();
+        if (firstRender)
+        {
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(userId.Value);
+
+            await LoadData("");
+        }
+    }
+
+    private async Task LoadData(string? textSearch)
+    {
+        _lstQuestionLevels = await _serQuestionLevel.GetAllQuestionLevels(textSearch);
 
         _lstQuestionTypes = await _serQuestionType.GetAllQuestionTypes();
 
         _lstSubjects = await _serSub.GetAllSub(null, true);
 
-        _lstQuestion = await _serQuestion.GetAllQuestions("", true);
-
         isLoading = false;
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
     }
 
     private void changeValueType()
@@ -280,9 +300,14 @@
     private bool ValidationForm()
     {
         int count = 0;
-        if (question.Content == null || question.Content.Trim().Length == 0)
+        if (string.IsNullOrEmpty(question.Content) || string.IsNullOrWhiteSpace(question.Content))
         {
             snackbar.Add("Nội dung trống!", Severity.Error);
+            count += 1;
+        }
+        if (subjectId == -1 || subjectId == null)
+        {
+            snackbar.Add("Chưa chọn môn học!", Severity.Error);
             count += 1;
         }
         if (question.QuestionTypeId == -1 || question.QuestionTypeId == null)
@@ -390,6 +415,7 @@
             try
             {
                 isLoading = true;
+                StateHasChanged();
 
                 if (subjectId == null || subjectId <= 0)
                 {
@@ -401,7 +427,7 @@
                     snackbar.Add("Chưa chọn file import", Severity.Error);
                     return;
                 }
-                var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId);
+                var check = await _serQuestion.ImportExcelQuestion(selectFileExcel, subjectId, _userId);
 
                 snackbar.Add($"Thêm câu hỏi thành công, trong đó có {check} không thêm được", Severity.Info);
                 MudDialog.Close(DialogResult.Ok(true));
@@ -413,49 +439,58 @@
             finally
             {
                 isLoading = false;
+                StateHasChanged();
             }
         }
         else
         {
             var checkValidation = ValidationForm();
 
-            if (questionTypeId == (int)listQuestionTypes.YesNo)
-            {
-                lstAnswers.Clear();
-                lstAnswers.Add(new Answer { Content = "Đúng", IsCorrect = isAnswerCorrectInYesNo });
-                lstAnswers.Add(new Answer { Content = "Sai", IsCorrect = !isAnswerCorrectInYesNo });
-            }
-
-            if (lstAnswers == null || lstAnswers.Count <= 0)
-            {
-                snackbar.Add("Chưa có đáp án", Severity.Warning);
-                return;
-            }
-
-            if (lstAnswers.Count <= 1 && lstAnswers != null)
-            {
-                snackbar.Add("Tối thiểu 2 đáp án", Severity.Warning);
-            }
-
-            if (questionTypeId == (int)listQuestionTypes.MultipleChoices || questionTypeId == (int)listQuestionTypes.SingleChoice)
-            {
-                int countCorrect = lstAnswers.Count(x => x.IsCorrect);
-
-                if (countCorrect <= 0)
-                {
-                    snackbar.Add("Phải có ít nhất 1 đáp án đúng", Severity.Warning);
-                    return;
-                }
-            }
-
-            question.CreatedDate = DateTime.Now;
-            question.QuestionTypeId = questionTypeId;
-            question.QuestionLevelId = questionLevelId == -1 ? null : questionLevelId;
-            question.SubjectId = subjectId;
-            question.Status = (byte)StatusType.isActive;
-
             if (!checkValidation)
             {
+                var hasQuestion = await _serQuestion.Checkvalidate(question.Content, questionTypeId, subjectId, null);
+                if (hasQuestion)
+                {
+                    snackbar.Add("Đã tồn tại câu hỏi này!", Severity.Warning);
+                    return;
+                }
+
+                if (questionTypeId == (int)listQuestionTypes.YesNo)
+                {
+                    lstAnswers.Clear();
+                    lstAnswers.Add(new Answer { Content = "Đúng", IsCorrect = isAnswerCorrectInYesNo });
+                    lstAnswers.Add(new Answer { Content = "Sai", IsCorrect = !isAnswerCorrectInYesNo });
+                }
+
+                if (lstAnswers == null || lstAnswers.Count <= 0)
+                {
+                    snackbar.Add("Chưa có đáp án", Severity.Warning);
+                    return;
+                }
+
+
+                if (lstAnswers.Count <= 1 && lstAnswers != null)
+                {
+                    snackbar.Add("Tối thiểu 2 đáp án", Severity.Warning);
+                }
+
+                if (questionTypeId == (int)listQuestionTypes.MultipleChoices || questionTypeId == (int)listQuestionTypes.SingleChoice)
+                {
+                    int countCorrect = lstAnswers.Count(x => x.IsCorrect);
+
+                    if (countCorrect <= 0)
+                    {
+                        snackbar.Add("Câu hỏi chưa có đáp án đúng", Severity.Warning);
+                        return;
+                    }
+                }
+
+                question.CreatedDate = DateTime.Now;
+                question.QuestionTypeId = questionTypeId;
+                question.QuestionLevelId = questionLevelId == -1 ? null : questionLevelId;
+                question.SubjectId = subjectId;
+                question.CreatedBy = _userId;
+                question.Status = (byte)StatusType.isActive;
                 var checkAddNewQuestion = await _serQuestion.CreateQuestion(question);
                 if (checkAddNewQuestion != null)
                 {
@@ -477,6 +512,7 @@
                 {
                     MudDialog.Close(DialogResult.Ok(true));
                     snackbar.Add("Thêm thất bại", Severity.Error);
+                    lstAnswers.Clear();
                 }
             }
         }

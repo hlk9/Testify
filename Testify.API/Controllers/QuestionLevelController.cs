@@ -16,11 +16,12 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-All-Question-Level")]
-        public async Task<ActionResult<List<QuestionLevel>>> GetAllQuestionTypes()
+        public async Task<ActionResult<List<QuestionLevel>>> GetAllQuestionTypes(string? keyword)
         {
-            var lstQuestionLevel = await _repo.GetAllLevels();
+            var lstQuestionLevel = await _repo.GetAllLevels(keyword);
             return Ok(lstQuestionLevel);
         }
+
 
         [HttpGet("Get-Question-Level-By-Id")]
         public async Task<ActionResult<QuestionLevel>> GetQuestionTypeById(int id)
@@ -44,10 +45,20 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("Delete-Question-Level")]
-        public async Task<ActionResult<QuestionLevel>> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var deleteQuestionType = await _repo.DeleteLevel(id);
-            return Ok(deleteQuestionType);
+
+            if (deleteQuestionType.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteQuestionType.ErrorCode,
+                Message = deleteQuestionType.Message
+            });
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿@using Testify.DAL.Models
+@using Testify.Web.Shared
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            Sửa môn học
-        </MudText>
+            <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa môn học</MudText>
     </TitleContent>
     <DialogContent>
         @if (isLoading)
@@ -13,17 +12,14 @@
         else
         {
             <MudForm Model="@subject" @ref="@form" Spacing="3">
-                <MudTextField T="int" @bind-Value="@subject.Id" Disabled Label="Mã môn học" />
-                <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" />
-                <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" />
+                <MudTextField T="string" @bind-Value="@subject.Name" Label="Tên môn học" Variant="Variant.Outlined" />
+                <MudTextField T="string" @bind-Value="@subject.Description" Label="Mô tả" Variant="Variant.Outlined" />
             </MudForm>
-
-            @*   <MudTextField T="byte?" @bind-Value="@subject.Status" Label="Trạng thái"  /> *@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="Variant.Filled" OnClick="Cancel">Hủy</MudButton>
-        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="Submit">Sửa</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Submit">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -35,6 +31,7 @@
     public int idSubject { get; set; }
     private bool isLoading { get; set; } = true;
     private Subject subject { get; set; } = new();
+    private List<Subject> _lstS = new List<Subject>();
 
     protected async override Task OnInitializedAsync()
     {
@@ -44,11 +41,25 @@
 
     private async Task Loaddata()
     {
+        _lstS = await _serSub.GetAllSub("", true);
         subject = await _serSub.GetSubId(idSubject);
         isLoading = false;
     }
     private async Task Submit()
     {
+        if (string.IsNullOrEmpty(subject.Name) || string.IsNullOrWhiteSpace(subject.Name))
+        {
+            snackbar.Add("Tên không được để trống!", Severity.Error);
+            return;
+        }
+
+        var isSubject = _lstS.Any(x => x.Name.Trim().ToLower().Equals(subject.Name.Trim().ToLower()) && x.Id != subject.Id);
+        if (isSubject)
+        {
+            snackbar.Add("Đã tồn tại môn này!", Severity.Error);
+            return;
+        }
+
         var check = await _serSub.UpdateSub(subject);
         if (check == true)
         {

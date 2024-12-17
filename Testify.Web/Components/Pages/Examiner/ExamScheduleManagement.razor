@@ -1,6 +1,6 @@
 ﻿@page "/Examiner/ExamScheduleManagement"
 @using Testify.API.DTOs
-@layout AdminLayout
+@layout ExaminerLayout
 @inject IDialogService DialogService
 @inject ExamScheduleService scheduleService
 <style>
@@ -9,13 +9,14 @@
         color: white;
         width: 100%;
     }
+
         .add-button-end:hover {
             background-color: white;
             color: #29a69a;
         }
 
 </style>
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">LỊCH THI</MudText>
     </MudPaper>
@@ -28,68 +29,69 @@
         </MudItem>
     </MudGrid>
 
-    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+    <div class="bg-white rounded-3" style="width:100%;">
 
+            <MudTable Items="@listSchedule" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
 
-        <MudTable Items="@listSchedule" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách lịch thi</MudText>
 
-            <ToolBarContent>
-                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách lịch thi</MudText>
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
 
-                    </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </MudItem>
-                </MudGrid>
-
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Tên lịch thi" T="string">Tên lịch thi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Bài thi" T="string">Bài thi</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thời gian bắt đầu" T="string">Thời gian bắt đầu</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thời gian kết thúc" T="string">Thời gian kết thúc</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Tên lịch thi">@context.Title</MudTd>
-                <MudTd DataLabel="Bài thi">@context.ExamName</MudTd>
-                <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
-                <MudTd DataLabel="Thời gian bắt đầu">@context.StartTime</MudTd>
-                <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
-                <MudTd DataLabel="Trạng thái">@(DateTime.Now < context.StartTime ? "Chưa diễn ra" : DateTime.Now > context.EndTime ? "Kết thúc" : "Đang diễn ra")
-                </MudTd>
-                <MudTd DataLabel="Thao tác">
-                    <MudTooltip Text="Xếp lịch">
-                        <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
-                    </MudTooltip>
-
-                    <MudTooltip Text="Sửa"> 
-                        <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
-                    </MudTooltip>
-                    <MudTooltip Text="Chi tiết">
-                        <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
-                    </MudTooltip>
-                    <MudTooltip Text="Xoá">
-                        <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
-                    </MudTooltip>
-                </MudTd>
-            </RowTemplate>
-            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
-
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="Tên lịch thi" T="string">Tên lịch thi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Bài thi" T="string">Bài thi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thời gian bắt đầu" T="string">Thời gian bắt đầu</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thời gian kết thúc" T="string">Thời gian kết thúc</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Tên lịch thi">@context.Title</MudTd>
+                    <MudTd DataLabel="Bài thi">@context.ExamName</MudTd>
+                    <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                    <MudTd DataLabel="Thời gian bắt đầu">@context.StartTime</MudTd>
+                    <MudTd DataLabel="Thời gian kết thúc">@context.EndTime</MudTd>
+                    <MudTd DataLabel="Trạng thái">
+                        @(DateTime.Now < context.StartTime ? "Chưa diễn ra" : DateTime.Now > context.EndTime ? "Kết thúc" : "Đang diễn ra")
+                    </MudTd>
+                    <MudTd DataLabel="Thao tác">
+                        <MudTooltip Text="Xếp lịch">
+                            <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDistributeDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.CalendarMonth" aria-label="distibute"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Danh sách lớp">
+                            <MudIconButton OnClick="@(()=> ShowClassAndStudentDialog(_maxWidthLager,context.Id,context.Title) )" Icon="@Icons.Material.Filled.People" aria-label="listClass"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Sửa">
+                            <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Chi tiết">
+                            <MudIconButton OnClick="@(()=> OpenDetailAsync(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                        </MudTooltip>
+                        <MudTooltip Text="Xoá">
+                            <MudIconButton Disabled="@(context.StartTime<=DateTime.Now.AddMinutes(-5)?true:false)" OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText></MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Đang tải...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
     </div>
 
 
@@ -97,9 +99,8 @@
 </div>
 @code {
     private int Index = -1;
-
     private List<ExamScheduleDto> listSchedule = new List<ExamScheduleDto>();
-
+    User currentUser = new User();
     protected override async Task OnInitializedAsync()
     {
 
@@ -108,7 +109,14 @@
     {
         if (firstRender)
         {
-            listSchedule = await scheduleService.GetInforBasic();
+
+           var tempCurrentUserId =  await ProtectedSessionStore.GetAsync<string>("userLogin");
+
+           if(tempCurrentUserId.Value!=null)
+           {
+                currentUser = await _serUser.GetByidUser(Guid.Parse(tempCurrentUserId.Value));
+           }
+            listSchedule = await scheduleService.GetInforBasic();        
             StateHasChanged();
         }
     }
@@ -118,10 +126,35 @@
     private readonly DialogOptions _maxWidthLager = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
 
 
+    private async Task ShowClassAndStudentDialog(DialogOptions options, int Id, string title)
+    {
+        var parameters = new DialogParameters
+        {
+              { "Id", Id },
+                {"titleSchedule",title }
+        };
+        var dialog = await DialogService.ShowAsync<Dialog.ExamSchedule.ClassAndStudentSchedule>("Options Dialog", parameters, options);
+        var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+        LogService.LogInformation($"Người dùng {userNameInSession.Value} xem thí sinh trong lịch thi {title}  | {userIdInSession.Value}");
+
+    }
 
 
     private async Task ShowDistributeDialog(DialogOptions options, int Id, string title)
     {
+
+        var tempSchedule = await _serExamSche.GetById(Id);
+
+        if (currentUser.LevelId == 3)
+        {
+            if (tempSchedule.CreatedBy != currentUser.Id)
+            {
+                snackbar.Add("Bạn không được thao tác với bài thi này", Severity.Error);
+                return;
+            }
+        }
+
         var parameters = new DialogParameters
         {
               { "Id", Id },
@@ -131,6 +164,9 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã xếp lịch thi {title}  | {userIdInSession.Value}");
             listSchedule = await scheduleService.GetInforBasic();
         }
     }
@@ -138,6 +174,17 @@
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
     {
+        var tempSchedule = await _serExamSche.GetById(Id);
+
+        if (currentUser.LevelId == 3)
+        {
+            if (tempSchedule.CreatedBy != currentUser.Id)
+            {
+                snackbar.Add("Bạn không được thao tác với bài thi này", Severity.Error);
+                return;
+            }
+        }
+
         var parameters = new DialogParameters
         {
               { "Id", Id }
@@ -147,6 +194,9 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã vô hiệu hóa lịch thi có id =  {Id}  | {userIdInSession.Value}");
             listSchedule = await scheduleService.GetInforBasic();
         }
     }
@@ -167,6 +217,17 @@
 
     private async Task ShowUpdateDialog(DialogOptions options, int Id)
     {
+        var tempSchedule = await _serExamSche.GetById(Id);
+
+        if (currentUser.LevelId == 3)
+        {
+            if (tempSchedule.CreatedBy != currentUser.Id)
+            {
+                snackbar.Add("Bạn không được thao tác với bài thi này", Severity.Error);
+                return;
+            }
+        }
+
         var parameters = new DialogParameters
         {
               { "Id", Id }
@@ -175,6 +236,9 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã cập nhật lịch thi có id =  {Id}  | {userIdInSession.Value}");
             listSchedule = await scheduleService.GetInforBasic();
         }
     }
@@ -190,6 +254,9 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
+                var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+                LogService.LogInformation($"Người dùng {userNameInSession.Value} đã tạo lịch thi {name}  | {userIdInSession.Value}");
                 listSchedule = await scheduleService.GetInforBasic();
             }
 

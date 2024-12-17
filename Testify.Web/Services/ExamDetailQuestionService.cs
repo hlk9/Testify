@@ -40,16 +40,26 @@ namespace Testify.Web.Services
             return response;
         }
 
-        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOT(int examDetailID)
+        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOT(int examDetailID, int SubjectId, string? textSearch)
         {
-            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-Not?examdetailID={examDetailID}");
+            string encodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                encodedContent = Uri.EscapeDataString(textSearch);
+            }
+            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-Not?examdetailID={examDetailID}&SubjectId={SubjectId}&textSearch={encodedContent}");
             var response = await lst.Content.ReadFromJsonAsync<List<QuestionInExam>>();
             return response;
         }
 
-        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOTAndLevel(int examDetailID, int levelID)
+        public async Task<List<QuestionInExam>> GetAllQuestionByExamDetailIDAsync_NOTAndLevel(int examDetailID, int levelID, int SubjectId, string? textSearch)
         {
-            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-NotAndLevel?examdetailID={examDetailID}&levelID={levelID}");
+            string encodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                encodedContent = Uri.EscapeDataString(textSearch);
+            }
+            var lst = await _httpClient.GetAsync($"ExamDetailQuestion/Get-Question-By-ExamDetailID-NotAndLevel?examdetailID={examDetailID}&levelID={levelID}&SubjectId={SubjectId}&textSearch={encodedContent}");
             var response = await lst.Content.ReadFromJsonAsync<List<QuestionInExam>>();
             return response;
         }
@@ -57,7 +67,7 @@ namespace Testify.Web.Services
 
         public async Task<bool> AddListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
         {
-            var a = await _httpClient.PostAsJsonAsync("ExamDetailQuestion/Add-ListQuestionToExam?idExamDetail=" + idExamDetail, data);
+            var a = await _httpClient.PostAsJsonAsync("ExamDetailQuestion/AddListQuestionToExam_New?idExamDetail=" + idExamDetail, data);
             if (a.IsSuccessStatusCode)
             {
                 return true;

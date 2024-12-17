@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -29,9 +30,14 @@ namespace Testify.API.Controllers
 
         [HttpGet("Get-All-Questions")]
         //[Authorize]
-        public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord, bool isActive)
+        public async Task<ActionResult<List<Question>>> GetlAllQuestions(string? keyWord, Guid? userId, int questionLevelId, int questionTypeId, int subjectId)
         {
-            var lstQuestion = await _repoQuestion.GetAllQuestions(keyWord, isActive);
+            string decodedContent = "";
+            if(!string.IsNullOrEmpty(keyWord) || !string.IsNullOrWhiteSpace(keyWord))
+            {
+                decodedContent = Uri.UnescapeDataString(keyWord);
+            }
+            var lstQuestion = await _repoQuestion.GetAllQuestions(decodedContent, userId, questionLevelId, questionTypeId, subjectId);
             return Ok(lstQuestion);
         }
 
@@ -40,6 +46,21 @@ namespace Testify.API.Controllers
         {
             var question = await _repoQuestion.GetQuestionById(id);
             return Ok(question);
+        }
+
+        [HttpGet("Check-Validate")]
+        public async Task<ActionResult<bool>> CheckValidate(string content, int questionTypeId, int subjectId, int? questionId)
+        {
+            string decodedContent = Uri.UnescapeDataString(content);
+            var hasQuestion = await _repoQuestion.CheckValidate(decodedContent, questionTypeId, subjectId, questionId);
+            return Ok(hasQuestion);
+        }
+
+        [HttpGet("Check-Update")]
+        public async Task<ActionResult<bool>> CheckUpdate(int questionId)
+        {
+            var hasQuestion = await _repoQuestion.CheckUpdateIsExamSchedule(questionId);
+            return Ok(hasQuestion);
         }
 
         [HttpPost("Create-Question")]
@@ -71,10 +92,20 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("Delete-Question")]
-        public async Task<ActionResult<Question>> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var deleteQuestion = await _repoQuestion.DeleteQuestion(id);
-            return Ok(deleteQuestion);
+
+            if (deleteQuestion.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteQuestion.ErrorCode,
+                Message = deleteQuestion.Message
+            });
         }
 
         [HttpGet("Get-AnswerIsTrue-Point-Question")]
@@ -85,9 +116,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Export-Excel-Template-Question")]
-        public async Task<ActionResult> ExportExcel()
+        public async Task<ActionResult> ExportExcel(string? textSearch)
         {
-            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
+            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels(textSearch);
             var lstQuestionType = await _repoQuestionType.GetAllTypes();
 
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
@@ -167,10 +198,10 @@ namespace Testify.API.Controllers
             worksheetQ.Cells[1, 4].Style.Font.Size = 12;
 
             //giá trị demo
-            worksheetQ.Cells[2, 1].Value = "1";
+            worksheetQ.Cells[2, 1].Value = 1;
             worksheetQ.Cells[2, 2].Value = "1 + 1 = ?";
-            worksheetQ.Cells[2, 3].Value = "1";
-            worksheetQ.Cells[2, 4].Value = "4";
+            worksheetQ.Cells[2, 3].Value = 1;
+            worksheetQ.Cells[2, 4].Value = 2;
 
             //bảng chỉ dẫn questionlevel
             worksheetQ.Cells[1, 6].Value = "Mã mức độ câu hỏi";
@@ -293,18 +324,18 @@ namespace Testify.API.Controllers
             worksheetA.Cells[1, 3].Style.Font.Bold = true;
             worksheetA.Cells[1, 3].Style.Font.Size = 12;
 
-            worksheetA.Cells[2, 1].Value = "1";
-            worksheetA.Cells[2, 2].Value = "2";
-            worksheetA.Cells[2, 3].Value = "1";
+            worksheetA.Cells[2, 1].Value = 1;
+            worksheetA.Cells[2, 2].Value = 2;
+            worksheetA.Cells[2, 3].Value = 1;
 
 
-            worksheetA.Cells[3, 1].Value = "1";
-            worksheetA.Cells[3, 2].Value = "3";
-            worksheetA.Cells[3, 3].Value = "0";
+            worksheetA.Cells[3, 1].Value = 1;
+            worksheetA.Cells[3, 2].Value = 3;
+            worksheetA.Cells[3, 3].Value = 0;
 
-            worksheetA.Cells[4, 1].Value = "1";
-            worksheetA.Cells[4, 2].Value = "4";
-            worksheetA.Cells[4, 3].Value = "0";
+            worksheetA.Cells[4, 1].Value = 1;
+            worksheetA.Cells[4, 2].Value = 4;
+            worksheetA.Cells[4, 3].Value = 0;
 
             var excelByBytes = package.GetAsByteArray();
 
@@ -312,7 +343,7 @@ namespace Testify.API.Controllers
         }
 
         [HttpPost("Import-Excel-Question")]
-        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int subjectId)
+        public async Task<ActionResult<int>> UploadFile(IFormFile file, [FromForm] int subjectId, [FromForm] Guid? userId)
         {
             if (file == null || file.Length == 0)
             {
@@ -326,9 +357,9 @@ namespace Testify.API.Controllers
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             var package = new ExcelPackage(stream);
 
-            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels();
+            var lstQuestionLevel = await _repoQuestionLevel.GetAllLevels("");
             var lstQuestionType = await _repoQuestionType.GetAllTypes();
-            var lstQuestion = await _repoQuestion.GetAllQuestions("", true);
+            var lstQuestion = await _repoQuestion.GetAllQuestions("", null, -1, -1, -1);
 
             var lstQuestionTemp = new List<QuestionInExcel>();
 
@@ -337,28 +368,32 @@ namespace Testify.API.Controllers
             var worksheetsQ = package.Workbook.Worksheets[0];
             var worksheetsA = package.Workbook.Worksheets[1];
 
-            int batchSize = 100;
-            int totalRows = worksheetsQ.Dimension.Rows;
-            for (int rowQ = 2; rowQ <= totalRows; rowQ++)
+            for (int rowQ = 2; rowQ <= worksheetsQ.Dimension.Rows; rowQ++)
             {
                 if (worksheetsQ.Cells[rowQ, 1].Value == null ||
                     worksheetsQ.Cells[rowQ, 2].Value == null ||
-                    worksheetsQ.Cells[rowQ, 4].Value == null)
+                    worksheetsQ.Cells[rowQ, 4].Value == null || 
+                    string.IsNullOrEmpty(worksheetsQ.Cells[rowQ, 1].Value.ToString()) || 
+                    string.IsNullOrWhiteSpace(worksheetsQ.Cells[rowQ, 1].Value.ToString()) ||
+                    string.IsNullOrEmpty(worksheetsQ.Cells[rowQ, 2].Value.ToString()) ||
+                    string.IsNullOrWhiteSpace(worksheetsQ.Cells[rowQ, 2].Value.ToString()) ||
+                    string.IsNullOrEmpty(worksheetsQ.Cells[rowQ, 4].Value.ToString()) ||
+                    string.IsNullOrWhiteSpace(worksheetsQ.Cells[rowQ, 4].Value.ToString()))
                 {
                     questionFailCount++;
                     continue;
                 }
-                else if ((lstQuestionTemp.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower())) || lstQuestion.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.SubjectId == subjectId)))
+                else if ((lstQuestionTemp.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.QuestionTypeId == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value)) || lstQuestion.Any(x => x.Content.Trim().ToLower().Equals(worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim().ToLower()) && x.QuestionTypeId == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) && x.SubjectId == subjectId)))
                 {
                     questionFailCount++;
                     continue;
                 }
-                else if (worksheetsQ.Cells[rowQ, 3].Value != null && !lstQuestionLevel.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value)))
+                else if (worksheetsQ.Cells[rowQ, 3].Value != null && !lstQuestionLevel.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim())))
                 {
                     questionFailCount++;
                     continue;
                 }
-                else if (!lstQuestionType.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value)))
+                else if (!lstQuestionType.Any(x => x.Id == Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim())))
                 {
                     questionFailCount++;
                     continue;
@@ -378,14 +413,19 @@ namespace Testify.API.Controllers
                     if (worksheetsQ.Cells[rowQ, 1].Value.ToString().Trim() == worksheetsA.Cells[rowA, 1].Value.ToString().Trim())
                     {
                         countAnswer++;
-                        if (worksheetsA.Cells[rowA, 2].Value == null || worksheetsA.Cells[rowA, 3].Value == null)
+                        if (worksheetsA.Cells[rowA, 2].Value == null || 
+                            worksheetsA.Cells[rowA, 3].Value == null || 
+                            string.IsNullOrEmpty(worksheetsA.Cells[rowA, 2].Value.ToString()) ||
+                            string.IsNullOrWhiteSpace(worksheetsA.Cells[rowA, 2].Value.ToString()) ||
+                            string.IsNullOrEmpty(worksheetsA.Cells[rowA, 3].Value.ToString()) ||
+                            string.IsNullOrWhiteSpace(worksheetsA.Cells[rowA, 3].Value.ToString()))
                         {
                             isValid = false;
                             break;
                         }
 
                         Answer answer = new Answer();
-                        answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString();
+                        answer.Content = worksheetsA.Cells[rowA, 2].Value.ToString().Trim();
                         answer.IsCorrect = worksheetsA.Cells[rowA, 3].Value.ToString().Trim() == "1" ? true : false;
                         lstAnswer.Add(answer);
                     }
@@ -400,7 +440,7 @@ namespace Testify.API.Controllers
                         questionFailCount++;
                         continue;
                     }
-                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 2 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 3) && lstAnswer.Count < 2)
+                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 2 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 3) && lstAnswer.Count < 2)
                     {
                         questionFailCount++;
                         continue;
@@ -410,59 +450,49 @@ namespace Testify.API.Controllers
                         questionFailCount++;
                         continue;
                     }
-                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 1 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value) == 2) && countAnswerCorrect > 1)
+                    else if ((Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 1 || Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()) == 2) && countAnswerCorrect > 1)
                     {
                         questionFailCount++;
                         continue;
                     }
 
                     QuestionInExcel QnA = new QuestionInExcel();
-                    QnA.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString();
-                    QnA.QuestionLevelId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value);
-                    QnA.QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value);
+                    QnA.Content = worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim();
+                    QnA.QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim());
                     QnA.Answers = lstAnswer;
                     lstQuestionTemp.Add(QnA);
 
-                    if (lstQuestionTemp.Count == batchSize || rowQ == totalRows)
+                    var question = new Question
                     {
-                        await AddQuestionSuccessInDb(lstQuestionTemp, subjectId);
-                        lstQuestionTemp.Clear();
+                        Content = worksheetsQ.Cells[rowQ, 2].Value.ToString().Trim(),
+                        QuestionLevelId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim()) == 0 ? null : Convert.ToInt32(worksheetsQ.Cells[rowQ, 3].Value.ToString().Trim()),
+                        QuestionTypeId = Convert.ToInt32(worksheetsQ.Cells[rowQ, 4].Value.ToString().Trim()),
+                        CreatedDate = DateTime.Now,
+                        Status = 1,
+                        SubjectId = subjectId,
+                        CreatedBy = userId
+                    };
+
+                    var successAddQuestion = await _repoQuestion.CreateQuestion(question);
+
+                    if (successAddQuestion != null)
+                    {
+                        foreach (var answer in lstAnswer)
+                        {
+                            answer.QuestionId = successAddQuestion.Id;
+                            answer.Status = 1;
+                            await _repoAnswer.CreateAnswer(answer);
+                        }
                     }
+
                 }
                 else
                 {
                     questionFailCount++;
                 }
             }
+            lstQuestionTemp.Clear();
             return questionFailCount;
-        }
-
-        private async Task AddQuestionSuccessInDb(List<QuestionInExcel> lstQuestionTemp, int subjectId)
-        {
-            foreach (var item in lstQuestionTemp)
-            {
-                var question = new Question
-                {
-                    Content = item.Content,
-                    QuestionLevelId = item.QuestionLevelId == 0 ? null : item.QuestionLevelId,
-                    QuestionTypeId = item.QuestionTypeId,
-                    CreatedDate = DateTime.Now,
-                    Status = 1,
-                    SubjectId = subjectId
-                };
-
-                var successAddQuestion = await _repoQuestion.CreateQuestion(question);
-
-                if (successAddQuestion != null)
-                {
-                    foreach (var answer in item.Answers)
-                    {
-                        answer.QuestionId = successAddQuestion.Id;
-                        answer.Status = 1;
-                        await _repoAnswer.CreateAnswer(answer);
-                    }
-                }
-            }
         }
 
         [HttpGet("Export-Question-By-SubjectId")]
@@ -576,7 +606,7 @@ namespace Testify.API.Controllers
 
                     var excelByBytes = package.GetAsByteArray();
 
-                    return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Question_in_{objSubject.Name}.xlsx");
+                    return File(excelByBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"List_Question.xlsx");
                 }
                 else
                 {
@@ -606,6 +636,11 @@ namespace Testify.API.Controllers
             return Ok(lstQuestion);
         }
 
-
+        [HttpGet("Get-Count-By-UserId")]
+        public async Task<ActionResult<int>> GetCountByUserId(Guid userId)
+        {
+            var count = await _repoQuestion.GetCountQuestionByUserId(userId);
+            return Ok(count);
+        }
     }
 }

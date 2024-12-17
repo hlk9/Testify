@@ -1,25 +1,24 @@
 ﻿@using Testify.DAL.Models
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">
-            <MudIcon Class="mr-3 mb-n1" />
-            Chi Tiết Học Sinh
-        </MudText>
+    <TitleContent>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Chi tiết học sinh</MudText>
+    </TitleContent>
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="3" Model="@users">
-            <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" ReadOnly=true />
-            <MudTextField T="DateTime" @bind-Value="@users.DateOfBirth" Label="Ngày sinh" ReadOnly=true />
-            <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" ReadOnly=true />
-            <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" ReadOnly=true />
-            <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" ReadOnly=true />
-            <MudTextField T="string" @bind-Value="@users.Email" Label="Email" ReadOnly=true />
+            <MudTextField T="string" @bind-Value="@users.FullName" Label="Họ và tên" ReadOnly=true Variant="Variant.Outlined" />
+            <MudTextField T="DateTime" @bind-Value="@users.DateOfBirth" Label="Ngày sinh" ReadOnly=true Variant="Variant.Outlined" />
+            <MudTextField T="string" @bind-Value="@users.PhoneNumber" Label="Số điện thoại" ReadOnly=true Variant="Variant.Outlined" />
+            <MudTextField T="string" @bind-Value="@users.Address" Label="Địa chỉ" ReadOnly=true Variant="Variant.Outlined" />
+            <MudTextField T="string" @bind-Value="@users.UserName" Label="Tên tài khoản" ReadOnly=true Variant="Variant.Outlined" />
+            <MudTextField T="string" @bind-Value="@users.Email" Label="Email" ReadOnly=true Variant="Variant.Outlined" />
         </MudForm>
 
 
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Surface" Variant="@Variant.Filled" OnClick="Cancel">Quay lại</MudButton>
+        <MudButton Color="Color.Surface" OnClick="Cancel">Đóng</MudButton>
 
     </DialogActions>
 </MudDialog>

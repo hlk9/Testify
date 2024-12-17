@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Testify.DAL;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
@@ -65,10 +66,20 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("Delete-Class")]
-        public async Task<ActionResult<Class>> DeleteClass(int id)
+        public async Task<ActionResult> DeleteClass(int id)
         {
             var deleteClass = await classRepository.DeleteClass(id);
-            return Ok(deleteClass);
+
+            if (deleteClass.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteClass.ErrorCode,
+                Message = deleteClass.Message
+            });
         }
 
         [HttpPut("Update-Class")]
@@ -91,6 +102,34 @@ namespace Testify.API.Controllers
             var count = await classRepository.GetAllClassByUserId(userId);
 
             return Ok(count);
+        }
+
+        [HttpGet("Get-Users-In-Class")]
+        public async Task<List<User>> GetUsersInClassById(int classId)
+        {
+            return classRepository.GetUserInClass(classId);
+        }
+
+        [HttpGet("Get-Classes-By-UserId")]
+        public async Task<ActionResult<List<Class>>> GetClassesByUserId(Guid userId)
+        {
+            var lst = await classRepository.GetClassesByUserId(userId);
+            return Ok(lst);
+        }
+
+        [HttpGet("Score-Distribution-By-Class")]
+        public async Task<ActionResult<ScoreDistribution>> ScoreDistributionByClass(int classId)
+        {
+            var lst = await classRepository.ScoreDistributionByClass(classId);
+            return Ok(lst);
+        }
+
+        //29_11hcx
+        [HttpGet("Get-Classes-OfTeacher")]
+        public async Task<ActionResult<List<ClassWithUser>>> GetAllClass_OfTeacher(string? keyword, bool isActive, Guid? teacherID)
+        {
+            var lstClass = await classRepository.GetClassWithUser_OfTeacher(keyword, isActive, teacherID);
+            return Ok(lstClass);
         }
     }
 }

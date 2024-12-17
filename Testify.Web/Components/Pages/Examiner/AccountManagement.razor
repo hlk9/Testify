@@ -1,47 +1,50 @@
-﻿ @page "/Examiner/AccountManagement" 
+﻿ @page "/Examiner/AccountManagement"
 @using Testify.DAL.Models
 @using Testify.Web.Data.Commons
-@layout AdminLayout
+@using Testify.Web.Shared
+@layout ExaminerLayout
 @inject IDialogService DialogService
-<style>
 
-    .add-button-end {
+<style>
+    .input-search-end {
+        color: #8e8e8e;
+        padding-left: 15px;
+    }
+
+    .button-add-new-hover {
         background-color: #29A69A;
         color: white;
         width: 100%;
     }
 
-        .add-button-end:hover {
+        .button-add-new-hover:hover {
             background-color: white;
             color: #29a69a;
         }
 
-    .button-import {
-        background-color: red;
-        color: #fff;
-        width: 100%;
+    .button-export {
+        background-color: #fff;
+        border: 1px solid #29a69a;
+        color: #29a69a
     }
 
-        .button-import:hover {
-            background-color: transparent;
-            color: red;
-            width: 100%;
+        .button-export:hover {
+            background-color: #29a69a;
+            border: 1px solid #29a69a;
+            color: #fff
         }
+
+    .icon-input-search {
+        padding-left: 100px;
+    }
+
 </style>
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TÀI KHOẢN</MudText>
     </MudPaper>
-    <MudGrid Style="padding:20px 0 ">
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
-            @* <MudSelect Dense="true" T="int" Label="Danh sách tài khoản" Variant="Variant.Outlined">
-                <MudSelectItem Value="1">Admin</MudSelectItem>
-                <MudSelectItem Value="2">Khảo thí</MudSelectItem>
-                <MudSelectItem Value="3">Giáo viên</MudSelectItem>
-                <MudSelectItem Value="4">Sinh viên</MudSelectItem>
-
-            </MudSelect> *@
-
+    <MudGrid Style="padding: 20px 0; align-items: center">
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
             <MudSelect T="int" @bind-Value="levelId" Label="Vui lòng chọn chức vụ" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="ChangeValueLevel">
                 <MudSelectItem Value="-1">Tất cả</MudSelectItem>
                 @foreach (var item in _lstLevel)
@@ -49,86 +52,98 @@
                     <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
                 }
             </MudSelect>
-        
-        </MudItem >
-        <MudItem xl="3" lg="3" md="2" sm="12" xs="12">
-            <MudButton Class="bg-info text-white w-100" Variant="Variant.Filled">Export</MudButton>
         </MudItem>
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
-            <MudButton Class="button-import" Variant="Variant.Filled" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ImportExcel, Guid.Empty))">Import</MudButton>
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
+            <MudButton Class="button-export w-100" Variant="Variant.Outlined" OnClick="@(() => OpenDialogAsync(_maxWidth, OpenDialogType.ExportExcel, Guid.Empty))">Tải danh sách tài khoản</MudButton>
         </MudItem>
-        <MudItem xl="3" lg="3" md="3" sm="12" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="add-button-end" Variant="Variant.Filled">Thêm mới</MudButton>
+
+        <MudItem xl="4" lg="4" md="4" sm="12" xs="12">
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth , OpenDialogType.Create, Guid.Empty ))" Class="button-add-new-hover" Variant="Variant.Filled">Thêm mới</MudButton>
         </MudItem>
     </MudGrid>
 
-    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+    <div class="bg-white rounded-3" style="width:100%">
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 410px)">
 
-        <MudTable Items="@_userList" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách tài khoản</MudText>
 
-            <ToolBarContent>
-                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách tài khoản</MudText>
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
+                        </MudItem>
+                    </MudGrid>
 
-                    </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                       @*  <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField> *@
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
-                    </MudItem>
-                </MudGrid>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string">Họ và tên</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Ngày sinh" T="DateOnly">Ngày sinh</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Giới tính</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Họ và tên">@context.FullName</MudTd>
+                    <MudTd DataLabel="Ngày sinh">@context.DateOfBirth.ToString("dd/MM/yyyy")</MudTd>
+                    <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
+                    <MudTd DataLabel="Giới tính">
+                        @if (@context.Sex == true)
+                        {
+                            <span>Nam</span>
+                        }
+                        else
+                        {
+                            <span>Nữ</span>
+                        }
+                    </MudTd>
+                    <MudTd DataLabel="Trạng thái">
+                        @if (@context.Status == Convert.ToByte(StatusType.isActive))
+                        {
+                            <span>Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span>Không hoạt động</span>
+                        }
+                    </MudTd>
+                    <MudTd Style="marign:3px" DataLabel="Thao tác">
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
+                    </MudTd>
+                </RowTemplate>
 
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Họ và tên" T="string">Họ và tên</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Ngày sinh" T="DateOnly">Ngày sinh</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Số điện thoại" T="string">Số điện thoại</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Họ và tên">@context.FullName</MudTd>
-                <MudTd DataLabel="Ngày sinh">@context.DateOfBirth</MudTd>
-                <MudTd DataLabel="Số điện thoại">@context.PhoneNumber</MudTd>
-                <MudTd DataLabel="Trạng thái">@context.Status</MudTd>
-
-                <MudTd Style="marign:3px" DataLabel="Thao tác">
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
-                    <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
-
-                </MudTd>
-            </RowTemplate>
-
-            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
-
+                <NoRecordsContent>
+                    <MudText>Không có tài khoản nào!!!</MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Đang tải...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        }
     </div>
-
-
-
 </div>
 @code {
-    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.
     private string searchValue = "";
     private bool isLoading { get; set; } = true;
-    private List<User>? _lstUser { get; set; }
-    private List<User>? _userList = new List<User>();
-
-    private Level level { get; set; }
-    private int levelId =-1;
+    private List<User> _userList = new List<User>();
+    private string? textSearch;
+    private int levelId = -1;
     private List<Level> _lstLevel = new List<Level>();
-
+    private Guid _userId;
     [Parameter]
     public Guid idUser { get; set; }
 
@@ -136,33 +151,54 @@
 
     private async Task onChangeSearch()
     {
-
-        await LoadData(searchValue);
-
+        await Task.Delay(700);
+        var us = await _serUser.GetByidUser(_userId);
+        if (us.LevelId == 2)
+        {
+            _userList = (await _serLevel.GetAllUserByLevelId(levelId, searchValue)).Where(x => x.LevelId == 3 || x.LevelId == 4).ToList();
+            return;
+        }
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, searchValue);
     }
-
-
 
     private async Task LoadData(string? textSearch)
     {
-        _lstLevel = await _serLevel.GetAllLevel();
-      
-        _userList = await _serLevel.GetAllUserByLevelId(levelId);
-        isLoading = false;
+        var lstLevel = await _serLevel.GetAllLevel();
+        _lstLevel = lstLevel;
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
+        var us = await _serUser.GetByidUser(_userId);
+        if(us.LevelId == 2)
+        {
+            _lstLevel = lstLevel.Where(x => x.Id == 3 || x.Id == 4).ToList();
+            _userList = (await _serLevel.GetAllUserByLevelId(levelId, textSearch)).Where(x => x.LevelId == 3 || x.LevelId == 4).ToList();
+        }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadData("");
+        if(firstRender)
+        {
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(a.Value);
+            await LoadData("");
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     private async Task ChangeValueLevel()
     {
-        _userList = await _serLevel.GetAllUserByLevelId(levelId);
+        var us = await _serUser.GetByidUser(_userId);
+        if (us.LevelId == 2)
+        {
+            _userList = (await _serLevel.GetAllUserByLevelId(levelId, textSearch)).Where(x => x.LevelId == 3 || x.LevelId == 4).ToList();
+            return;
+        }
+        _userList = await _serLevel.GetAllUserByLevelId(levelId, textSearch);
     }
 
 
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
 
     private async Task OpenDialogAsync(DialogOptions options, string name, Guid id)
     {
@@ -182,11 +218,16 @@
             {x => x.UserId, id}
         };
 
-
-
+        var dialogParametersUser = new DialogParameters<Dialog.Account.ExportExcelDialog>
+        {
+            {x => x.UserId, id}
+        };
 
         if (name.Equals(OpenDialogType.Create))
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã mở bảng thêm tài khoản | {userIdInSession.Value}");
             var dialog = await DialogService.ShowAsync<Dialog.Account.CreateAccountDialog>("Options Dialog", options);
             var result = await dialog.Result;
             if (!result.Canceled)
@@ -196,18 +237,11 @@
 
         }
         else if (name.Equals(OpenDialogType.Update))
-        {
+        {           
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã mở bảng cập nhật tài khoản | {userIdInSession.Value}");
             var dialog = await DialogService.ShowAsync<Dialog.Account.UpdateAccountManagement>("Options Dialog", dialogParametersUpdate, options);
-            var result = await dialog.Result;
-            if (!result.Canceled)
-            {
-                await LoadData("");
-            }
-
-        }
-        else if (name.Equals(OpenDialogType.ImportExcel))
-        {
-            var dialog = await DialogService.ShowAsync<Dialog.Account.ImportFileExcelDialog>("Options Dialog", options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
@@ -223,17 +257,36 @@
                 await LoadData("");
             }
         }
+        else if (name.Equals(OpenDialogType.ExportExcel))
+        {
+            var dialog = await DialogService.ShowAsync<Dialog.Account.ExportExcelDialog>("Options Dialog", dialogParametersUser, options);
+            var result = await dialog.Result;
+            if (!result.Canceled)
+            {
+                await LoadData("");
+            }
+        }
         else
         {
+            var userIdInSession = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userNameInSession = await ProtectedSessionStore.GetAsync<string>("userName");
+            LogService.LogInformation($"Người dùng {userNameInSession.Value} đã mở bảng xóa tài khoản | {userIdInSession.Value}");
             var dialog = await DialogService.ShowAsync<Dialog.Account.DeleteAccountManagement>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)
             {
                 await LoadData("");
             }
-         
         }
     }
 }
-
-        
+<script>
+    function downloadFile(fileName, contentType, content) {
+        const blob = new Blob([content], { type: contentType });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+</script>

@@ -7,7 +7,7 @@
     </TitleContent>
     <DialogContent>
         <MudForm Spacing="4" Model="@answer" @ref="@form">
-            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" ReadOnly=@checkContentAnswer/>
+            <MudTextField T="string" @bind-Value="answer.Content" Style="padding: 0" Label="Tên Câu Hỏi" ReadOnly=@checkContentAnswer Variant="Variant.Outlined" />
             <MudRadioGroup T="bool" @bind-Value="@valueIsCorrect">
                 <MudRadio Value="true">Đúng</MudRadio>
                 <MudRadio Value="false">Sai</MudRadio>
@@ -16,8 +16,8 @@
     </DialogContent>
     <DialogActions>
 
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Warning" OnClick="Submit">Cập nhật</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Submit">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -38,6 +38,17 @@
 
     private bool valueIsCorrect;
     private bool checkContentAnswer = false;
+    private Guid _userId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            _userId = Guid.Parse(userId.Value);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,6 +68,18 @@
 
         var correct = lstNoCurrentAnswer.Count(x => x.IsCorrect);
         var isCorrect = lstNoCurrentAnswer.Count(x => !x.IsCorrect);
+
+        if (string.IsNullOrEmpty(answer.Content) || string.IsNullOrWhiteSpace(answer.Content))
+        {
+            snackbar.Add("Nội dung trống", Severity.Warning);
+            return true;
+        }
+
+        if (lstNoCurrentAnswer.Any(a => a.Content.Trim().ToLower().Equals(answer.Content.Trim().ToLower())))
+        {
+            snackbar.Add("Đã có nội dung này", Severity.Warning);
+            return true;
+        }
 
         if (question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.SingleChoice) || question.QuestionTypeId == Convert.ToInt32(listQuestionTypes.YesNo))
         {
@@ -89,7 +112,15 @@
 
         if(!checkIcorrect)
         {
+            var hasExamSchedule = await _serQuestion.CheckUpdate(answer.QuestionId);
+            if (hasExamSchedule)
+            {
+                snackbar.Add("Không thể sửa do có bài thi đang diễn ra có câu hỏi chứa đáp án này!", Severity.Warning);
+                return;
+            }
             answer.IsCorrect = valueIsCorrect;
+            answer.UpdatedBy = _userId;
+            answer.UpdatedAt = DateTime.Now;
             var updateAnswer = await _serAnswer.Update(answer);
             if (updateAnswer != null)
             {

@@ -1,0 +1,256 @@
+﻿@page "/Examiner/ViewDetailExam"
+@using Testify.DAL.ViewModels
+@layout ExaminerLayout
+@inject IDialogService DialogService
+
+@if (isLoading)
+{
+    <MudPaper Elevation="0" Style="width: 100%; height: calc(100svh - 64px); display: flex; justify-content: center; align-items: center; background-color: transparent">
+
+    </MudPaper>
+    <Testify.Web.Shared.LoadingContext />
+}
+else
+{
+    <div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
+        <MudPaper Style="padding:15px;">
+            <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">DANH SÁCH BÀI ĐÃ THI</MudText>
+        </MudPaper>
+
+        <MudGrid Style="padding:20px 0; margin:0; width:100%">
+            <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
+                @if(_levelId == 1 || _levelId == 2)
+                {
+                    <MudSelect T="int" Class="w-100" Label="Chọn môn" @bind-Value="@subjectId" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="SelectValueSubjectChanged">
+                        <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                        @foreach (var item in _lstSubject)
+                        {
+                            <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+            </MudItem>
+
+            <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
+                <MudSelect T="int" Class="w-100" Label="Chọn lớp" @bind-Value="@classId" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" SelectedValuesChanged="SelectValueLevelChanged">
+                    <MudSelectItem Value="-1">Tất cả</MudSelectItem>
+                    @foreach (var item in _lstClass)
+                    {
+                        <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
+                <MudDatePicker Date="@startTime" Label="Ngày bắt đầu" DateChanged="@selectStartChanged" Variant="Variant.Outlined" />
+            </MudItem>
+
+            <MudItem xl="3" lg="3" md="3" sm="6" xs="12" Style="padding:0px 10px;">
+                <MudDatePicker Date="endTime" Label="Ngày kết thúc" DateChanged="selectEndChanged" Variant="Variant.Outlined" />
+            </MudItem>
+        </MudGrid>
+
+
+
+        <div class="bg-white rounded-3" style="width:100%">
+
+            <MudTable Items="@_lstSubmission" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 410px)">
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh bài đã làm</MudText>
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
+                        </MudItem>
+                    </MudGrid>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="Tên"  T="string">Tên</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Lớp" T="string">Lớp</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Email" T="string">Email</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Tên Bài Thi" SortBy="new Func<SubmissionViewModel, object>(x=>x.ExamName)"  T="SubmissionViewModel">Tên Bài Thi</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Ghi Chú" T="string">Ghi Chú</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<SubmissionViewModel, object>(x=>x.SubmitTime)" SortLabel="Thời gian nộp" T="SubmissionViewModel">Thời gian nộp</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Tên">@context.UserName</MudTd>
+                    <MudTd DataLabel="Lớp">@context.ClassName</MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Tên Bài Thi">@context.ExamName</MudTd>
+                    <MudTd DataLabel="Môn">@context.SubjectName</MudTd>
+                    <MudTd DataLabel="Môn">@context.Note</MudTd>
+                    <MudTd DataLabel="Trạng thái">
+
+                        @{
+                            if (context.Status == true)
+                            {
+                                <MudChip T="string" Variant="Variant.Text" Color="Color.Success">Chấp nhận</MudChip>
+                            }
+                            else if (context.Status == false)
+                            {
+                                <MudChip T="string" Variant="Variant.Text" Color="Color.Error">Không công nhận</MudChip>
+                            }
+                            else
+                            {
+                                <MudChip T="string" Variant="Variant.Text" Color="Color.Warning">Cần kiểm tra</MudChip>
+                            }
+                        }
+                    </MudTd>
+   
+                   
+                    <MudTd DataLabel="Thời gian nộp">@context.SubmitTime.ToString("dd/MM/yyyy HH:mm")</MudTd>
+                    <MudTd DataLabel="Thao tác">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => ViewSubmision(context.ID)">Xem</MudButton>
+                        <MudTooltip Text="Hành động">
+                            <MudIconButton OnClick="@(()=> OpenDialogAsync(@context.ID,@context.ExamName) )" Icon="@Icons.Material.Filled.Settings" aria-label="hd"></MudIconButton>
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText></MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Đang tải...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </div>
+    </div>
+}
+
+@code {
+    private int subjectId = -1;
+    private int classId = -1;
+    private bool isLoading = false;
+    private Guid _userId;
+    private int _levelId = -1;
+    private List<Subject> _lstSubject = new List<Subject>();
+    private List<Class> _lstClass = new List<Class>();
+    private List<SubmissionViewModel> _lstSubmission = new List<SubmissionViewModel>();
+    private string? textSearch;
+    private string searchValue;
+    private DateTime? startTime;
+    private DateTime? endTime;
+
+    
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                isLoading = true;
+
+                var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                _userId = Guid.Parse(userId.Value);
+                var user = await _serLec.GetLecturerById(_userId);
+                _levelId = user.LevelId;
+                startTime = DateTime.Now.AddDays(-7).Date.AddHours(00).AddMinutes(00).AddMilliseconds(00);
+                endTime = DateTime.Now.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+                await LoadData();
+                StateHasChanged();
+            }
+            catch { }
+            finally
+            {
+
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+    
+    private async Task  OpenDialogAsync(int Id, string title)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small    , FullWidth = true };
+        var parameters = new DialogParameters
+        {
+            { "Id", Id },
+            {"titleExam",title }
+        };
+      var  dialog = await DialogService.ShowAsync<Dialog.ViewExamDetail.SetStatusSubmit>("Simple Dialog",parameters, options);
+      var result = await dialog.Result;
+      if (!result.Canceled)
+      {
+          _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+          StateHasChanged();
+      }
+      
+    }
+
+    private async Task LoadData()
+    {
+        _lstSubject = await _serSub.GetAllSub(null, true);
+        var lst = await _serClass.GetClassList(null, true);
+        if(_levelId == 3)
+        {
+            _lstClass = lst.Where(x => x.TeacherId == _userId).ToList();
+        }
+        else
+        {
+            _lstClass = lst;
+        }
+        _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+    }
+
+    private async Task onChangeSearch()
+    {
+        _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+    }
+
+    private void ViewSubmision(int id)
+    {
+        navigation.NavigateTo("/result-of-submission/" + id, forceLoad: true);
+    }
+
+    private async Task SelectValueSubjectChanged()
+    {
+        if(subjectId != -1)
+        {
+            var lst = await _serClass.GetClassList(null, true);
+            _lstClass = lst.Where(x => x.SubjectId == subjectId).ToList();
+        } 
+        else
+        {
+            _lstClass = await _serClass.GetClassList(null, true);
+        }
+
+        _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+    }
+
+    private async Task SelectValueLevelChanged()
+    {
+        _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+    }
+
+    private async Task selectStartChanged(DateTime? newDate)
+    {
+        if(newDate > endTime)
+        {
+            snackbar.Add("Thời gian bắt đàu không hợp lệ", Severity.Warning);
+            return;
+        }
+        startTime = newDate?.Date.AddHours(00).AddMinutes(00).AddSeconds(00);
+        _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+    }
+
+    private async Task selectEndChanged(DateTime? newDate)
+    {
+        if (newDate < startTime)
+        {
+            snackbar.Add("Thời gian kết thúc không hợp lệ", Severity.Warning);
+            return;
+        }
+        endTime = newDate?.Date.AddHours(23).AddMinutes(59).AddSeconds(59); 
+        _lstSubmission = await _serSub.GetAllBySubjectId(subjectId, searchValue, _userId, classId, startTime, endTime);
+    }
+    
+    
+}

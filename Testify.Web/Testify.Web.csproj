@@ -32,6 +32,15 @@
     <None Include="wwwroot\*" />
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="Components\Pages\ViewDetailExam.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\Asset\static\" />
     <Folder Include="wwwroot\Uploads\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Components\Pages\Examiner\PermissionManagement.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 </Project>

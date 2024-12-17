@@ -1,4 +1,6 @@
 ﻿using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
+using Testify.Web.Components.Pages.Examiner.Dialog.DeThi;
 
 namespace Testify.Web.Services
 {
@@ -28,6 +30,14 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<List<ExamDetail>>($"ExamDetail/Get-ExamDetail-By-ExamID?examId={examId}");
         }
 
+        public async Task<List<ExamDetail>> GetExamDetailByExamIdActive(int examId)
+        {
+            var lst = await _httpClient.GetAsync($"ExamDetail/Get-ExamDetail-By-ExamID?examId={examId}");
+            var reponse = await lst.Content.ReadFromJsonAsync<List<ExamDetail>>();
+
+            return reponse.Where(x => x.Status == 1).ToList();
+        }
+
         public async Task<ExamDetail> CreateExamDetail(ExamDetail examDetail)
         {
             var objNew = await _httpClient.PostAsJsonAsync("ExamDetail/Create-Exam-Detail", examDetail);
@@ -36,17 +46,52 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<bool> DeleteExamDetail(int id)
+        public async Task<ErrorResponse> DeleteExamDetail(int id)
         {
-            var response = await _httpClient.PutAsync($"ExamDetail/Delete-ExamDetail?id={id}", null);
+            var response = await _httpClient.DeleteAsync($"ExamDetail/Delete-ExamDetail?id={id}");
+
             if (response.IsSuccessStatusCode)
+            {
+                return new ErrorResponse { Success = true };
+            }
+
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
+        }
+
+        
+
+        public async Task<bool> UpdateStatusExamDetail(ExamDetail e)
+        {
+            var updateExamDetail = await _httpClient.PutAsJsonAsync("ExamDetail/Update-satus", e);
+            if (updateExamDetail.IsSuccessStatusCode)
             {
                 return true;
             }
             else
             {
                 return false;
-            };
+            }
+        }
+
+        public async Task<bool> IsExamDetailCodeDuplicate(string code, int? idExam, int idExamDetail)
+        {
+            var response = await _httpClient.GetAsync($"ExamDetail/CheckTrungCodeDT?code={code}&idExam={idExam}&idExamDetail={idExamDetail}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+
+                return bool.TryParse(content, out var result) && result;
+            }
+            else
+            {
+                return false;
+            }
         }
 
     }

@@ -21,9 +21,9 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("GetAllByUidAndEid")]
-        public List<ExamActivityLog> GetAllByUidAndEid(Guid Uid,int Eid)
+        public List<ExamActivityLog> GetAllByUidAndEid(Guid Uid,int Eid,int examScheduleId)
         {
-            return _repo.GetAllByUserIdAndExamId(Uid, Eid);
+            return _repo.GetAllByUserIdAndExamIdSheduleId(Uid, Eid, examScheduleId);
         }
 
         [HttpPost("AddExamLog")]

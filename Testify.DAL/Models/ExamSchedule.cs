@@ -21,6 +21,10 @@ namespace Testify.DAL.Models
         [ForeignKey("RoomId")]
         public int? RoomId { get; set; }
         public virtual Room? Room { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public Guid? UpdatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
     }
 }

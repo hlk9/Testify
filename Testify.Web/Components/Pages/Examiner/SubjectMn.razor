@@ -1,7 +1,8 @@
 ﻿ @page "/Examiner/SubjectManagement"
 @using Testify.DAL.Models
 @using Testify.Web.Data.Commons
-@layout AdminLayout
+@using Testify.Web.Shared
+@layout ExaminerLayout
 @inject IDialogService DialogService
 <style>
 
@@ -17,7 +18,9 @@
         }
 
 </style>
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+
+
+<div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">MÔN HỌC</MudText>
     </MudPaper>
@@ -30,75 +33,65 @@
         </MudItem>
     </MudGrid>
 
-    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
+    <div class="bg-white rounded-3" style="width:100%;">
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+            <MudTable Items="@subject" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
 
-        <MudTable Items="@subject" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+                <ToolBarContent>
+                    <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
+                        <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
+                            <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách môn học</MudText>
 
-            <ToolBarContent>
-                <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
-                    <MudItem xl="6" lg="6" md="6" sm="4" xs="12" Style="padding:0px; margin:0;">
-                        <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách môn học</MudText>
+                        </MudItem>
+                        <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
+                            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
+                                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
+                        </MudItem>
+                    </MudGrid>
 
-                    </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" @bind-Value="searchValue"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" TextChanged="onChangeSearch" Immediate=true></MudTextField>
-                    </MudItem>
-                </MudGrid>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortLabel="Tên môn học" T="string">Tên môn học</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Mô tả</MudTableSortLabel></MudTh>
+                    <MudTh Style="text-align:center"><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
+                </HeaderContent>
 
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Mã môn học" T="string">Mã môn học</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Tên môn học" T="string">Tên môn học</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Mô tả" T="string">Mô tả</MudTableSortLabel></MudTh>
-                @* <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh> *@
-                <MudTh Style="text-align:center"><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-            </HeaderContent>
-
-            <RowTemplate>
-                @if (isLoading)
-                {
-                    <Testify.Web.Shared.LoadingContext />
-                }
-                else
-                {
-                    <MudTd DataLabel="Mã môn học">@context.Id</MudTd>
+                <RowTemplate>
                     <MudTd DataLabel="Tên môn học">@context.Name</MudTd>
                     <MudTd DataLabel="Mô tả">@context.Description</MudTd>
-                    @*  <MudTd DataLabel="Trạng thái">@context.Status</MudTd> *@
                     <MudTd Class="py-3 text-center" DataLabel="Thao tác">
-                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update,context.Id))" Color="Color.Warning" StartIcon="@Icons.Material.Filled.Edit" />
-                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail,context.Id))" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Notes" />
-                        <MudFab OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete,context.Id))" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" />
+                        @* <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Update, context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton> *@
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Detail, context.Id))" Icon="@Icons.Material.Filled.Notes" aria-label="details"></MudIconButton>
+                        <MudIconButton OnClick="@(()=> OpenDialogAsync(_maxWidth,OpenDialogType.Delete, context.Id))" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTd>
-                }
-            </RowTemplate>
-            <NoRecordsContent>
-                <MudText>No matching records found</MudText>
-            </NoRecordsContent>
-            <LoadingContent>
-                <MudText>Loading...</MudText>
-            </LoadingContent>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
-
-
+                </RowTemplate>
+                <NoRecordsContent>
+                    <MudText></MudText>
+                </NoRecordsContent>
+                <LoadingContent>
+                    <MudText>Đang tải...</MudText>
+                </LoadingContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        }
     </div>
-
-
-
 </div>
+
 @code {
     private List<Subject> subject = new();
-
     private string searchValue = "";
     private bool isLoading { get; set; } = true;
 
     private async Task onChangeSearch()
     {
-
+        await Task.Delay(700);
         await LoadData(searchValue);
 
     }
@@ -112,6 +105,22 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadData("");
+    }
+    private async Task<bool> CheckAllowdelete()
+    {
+        var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        if (!userId.Success || userId.Value == null)
+        {
+            return false;
+        }
+        else
+        {
+            var u = await _serUser.GetByidUser(Guid.Parse(userId.Value));
+            if (u.LevelId != 1 && u.LevelId != 2)
+                return false;
+           
+        }
+        return true;
     }
 
     [Parameter]
@@ -142,11 +151,11 @@
             var dialog = await DialogService.ShowAsync<Dialog.Subject.CreateSubjectDialog>("Options Dialog", options);
             var result = await dialog.Result;
 
-            if(!result.Canceled)
+            if (!result.Canceled)
             {
                 await LoadData("");
             }
-            
+
         }
         else if (name.Equals(OpenDialogType.Update))
         {
@@ -169,6 +178,11 @@
         }
         else
         {
+            if (!await CheckAllowdelete())
+            {
+                await JS.InvokeVoidAsync("alert", "Bạn không có quyền xóa, hãy liên hệ cấp trên");
+                return;
+            }
             var dialog = await DialogService.ShowAsync<Dialog.Subject.DeleteSubjectDialog>("Options Dialog", dialogParametersDel, options);
             var result = await dialog.Result;
             if (!result.Canceled)

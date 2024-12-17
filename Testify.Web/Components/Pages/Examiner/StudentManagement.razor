@@ -1,5 +1,5 @@
 ﻿@page "/Student/StudentManagement"
-@layout AdminLayout
+@layout ExaminerLayout
 @inject IDialogService DialogService
 <style>
     .add-button-end {
@@ -14,7 +14,7 @@
         }
 
 </style>
-<div style="font-family:Roboto; padding:30px; height:calc(100vh-(100vh-64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding:30px; height:calc(100vh - (100vh - 64px)); background-color:#fafafa">
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">SINH VIÊN</MudText>
     </MudPaper>
@@ -66,10 +66,10 @@
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
-                <MudText>No matching records found</MudText>
+                <MudText></MudText>
             </NoRecordsContent>
             <LoadingContent>
-                <MudText>Loading...</MudText>
+                <MudText>Đang tải...</MudText>
             </LoadingContent>
             <PagerContent>
                 <MudTablePager />

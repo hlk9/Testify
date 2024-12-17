@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Xml;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -33,6 +35,21 @@ namespace Testify.DAL.Reposiroties
             }
             return await qr.ToListAsync();
 
+        }
+
+        public async Task<List<Exam>> GetExamHaveExDetailBySubject(int id)
+        {
+            var listEx = await (from ex in _context.Exams
+                                join exdt in _context.ExamDetails
+                                on ex.Id equals exdt.ExamId
+                                where _context.ExamDetails.Any(x => x.ExamId == ex.Id && x.Status == 1)
+                                      && ex.SubjectId == id
+                                      && ex.Status == 1
+                                select ex)
+                     .Distinct()
+                     .ToListAsync();
+
+            return listEx;
         }
 
         public async Task<Exam> GetByIdExam(int id)
@@ -94,9 +111,8 @@ namespace Testify.DAL.Reposiroties
             {
                 var objUpdateExam = await _context.Exams.FindAsync(exam.Id);
 
-
-
                 objUpdateExam.Name = exam.Name;
+                objUpdateExam.AllowViewResult = exam.AllowViewResult;
                 objUpdateExam.NumberOfQuestions = exam.NumberOfQuestions;
                 objUpdateExam.NumberOfRepeat = exam.NumberOfRepeat;
                 objUpdateExam.Status = exam.Status;
@@ -105,6 +121,7 @@ namespace Testify.DAL.Reposiroties
                 objUpdateExam.MaximmumMark = exam.MaximmumMark;
                 objUpdateExam.PassMark = exam.PassMark;
                 objUpdateExam.SubjectId = exam.SubjectId;
+                objUpdateExam.Status = exam.Status;
 
                 var updateExam = _context.Exams.Update(objUpdateExam).Entity;
                 await _context.SaveChangesAsync();
@@ -116,20 +133,37 @@ namespace Testify.DAL.Reposiroties
             }
         }
 
-        public async Task<Exam> DeleteExam(int id)
+        public async Task<ErrorResponse> DeleteExam(int id)
         {
             try
             {
                 var objDeleteExam = await _context.Exams.FindAsync(id);
+
+                var hasExamSchedule = await _context.ExamSchedules.AnyAsync(x => x.ExamId == id);
+
+                if(hasExamSchedule)
+                {
+                    return new ErrorResponse { Success = false, ErrorCode = "PERMISSION_DENIED", Message = "permission_denied" };
+                }    
+
                 objDeleteExam.Status = 255;
 
                 _context.Exams.Update(objDeleteExam);
+
+                var lstExamDetail = await _context.ExamDetails.Where(x => x.ExamId == id).ToListAsync();
+
+                foreach (var item in lstExamDetail)
+                {
+                    item.Status = 255;
+                    _context.ExamDetails.Update(item);
+                }
+
                 await _context.SaveChangesAsync();
-                return objDeleteExam;
+                return new ErrorResponse { Success = true };
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                return new ErrorResponse { Success = false, ErrorCode = "SERVER_ERROR", Message = ex.Message.ToString() };
             }
         }
 
@@ -137,7 +171,7 @@ namespace Testify.DAL.Reposiroties
 
         public async Task<List<Exam>> GetAllActicve()
         {
-            return _context.Exams.Where(x => x.Status == 1).ToList();
+            return _context.Exams.Where(x => x.Status == 1 || x.Status == 2).ToList();
         }
 
         public async Task<List<Exam>> GetAllActicveOfSubject(int subjectId)
@@ -170,6 +204,110 @@ namespace Testify.DAL.Reposiroties
             {
                 return -1;
             }
+        }
+
+        public async Task<List<Exam>> GetExamsByUserId(Guid UserId)
+        { 
+            List<Exam> lstEmpty = new List<Exam>();
+            var objUser = await _context.Users.FindAsync(UserId);
+
+            if (objUser.LevelId == 1 || objUser.LevelId == 2)
+            {
+                lstEmpty = _context.Exams.Where(x => x.Status != 255).ToList();
+                return lstEmpty;
+            }
+            else if (objUser.LevelId == 3 || objUser.LevelId == 4)
+            {
+                lstEmpty = await (from cu in _context.ClassUsers
+                                  join c in _context.Classes on cu.ClassId equals c.Id
+                                  join ces in _context.ClassExamSchedules on c.Id equals ces.ClassId
+                                  join es in _context.ExamSchedules on ces.ExamScheduleId equals es.Id
+                                  join e in _context.Exams on es.ExamId equals e.Id
+                                  where (cu.UserId == UserId && c.Status == 1 && es.Status == 1 && e.Status != 255)
+                                  select e
+                                  ).ToListAsync();
+                return lstEmpty;
+            }
+            return lstEmpty;
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionByExam(int ExamId)
+        {
+            var data = await (from submission in _context.Submissions
+                              join examschedule in _context.ExamSchedules on submission.ExamScheduleId equals examschedule.Id
+                              join exam in _context.Exams on examschedule.ExamId equals exam.Id
+                              where (exam.Id == ExamId && submission.Status == true && exam.Status == 1 && examschedule.Status == 1)
+                              select new
+                              {
+                                  Score = submission.TotalMark,
+                                  MaxScore = exam.MaximmumMark,
+                                  IsPass = submission.IsPassed,
+                              }).ToListAsync();
+
+            var scores = new List<double>();
+            double totalPass = 0;
+            double totalFail = 0;
+
+            foreach (var item in data)
+            {
+                double normalizedScore = item.MaxScore != 10
+                    ? (item.Score / item.MaxScore) * 10
+                    : item.Score;
+
+                scores.Add(Math.Round(normalizedScore, 2));
+
+                if (item.IsPass)
+                {
+                    totalPass++;
+                }
+                else
+                {
+                    totalFail++;
+                }
+            }
+
+            var fixedScoreList = Enumerable.Range(0, 11)
+                        .Select(i => (double)i)
+                        .Union(scores.Distinct().Where(score => score % 1 != 0))
+                        .Distinct()
+                        .OrderBy(score => score)
+                        .ToList();
+
+            var result = fixedScoreList.Select(score => new ScoreData
+            {
+                Score = score,
+                CountScore = scores.Count(s => s == score)
+            }).ToList();
+
+            double totalCountScore = totalPass + totalFail;
+            double percentPass = 0;
+            double percentFail = 0;
+            if (totalCountScore != 0)
+            {
+                percentPass = (totalPass / totalCountScore) * 100;
+
+                percentFail = (totalFail / totalCountScore) * 100;
+            }
+            
+            return new ScoreDistribution
+            {
+                Data = result,
+                Summary = new SummaryData
+                {
+                    PercentPass = Math.Round(percentPass, 2),
+                    PercentFail = Math.Round(percentFail, 2),
+                }
+            };
+        }
+
+        public async Task<bool> IsExamCode_Exist(string name, int? idSub, int examId)
+        {
+            if(examId == -1)
+            {
+                return await _context.Exams.AnyAsync(x => x.Name.Trim().ToLower().Equals(name.Trim().ToLower()) && x.Status != 255 && x.SubjectId == idSub);
+            }
+                return await _context.Exams.AnyAsync(x => x.Name.Trim().ToLower().Equals(name.Trim().ToLower()) && x.Status != 255 && x.SubjectId == idSub && x.Id != examId);
+
         }
     }
 }

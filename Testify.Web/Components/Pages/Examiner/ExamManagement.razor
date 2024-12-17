@@ -1,9 +1,11 @@
 ﻿@page "/Examiner/ExamManagement"
 @using Testify.API.DTOs
-@layout AdminLayout
+@using Testify.Web.Shared
+@layout ExaminerLayout
 @inject IDialogService DialogService
 @inject ExamService examService
 @inject ExamDetailService examdetailService
+@inject ExamScheduleService scheduleService
 
 <style>
     .add-button-end {
@@ -19,7 +21,8 @@
 
 </style>
 
-<div style="font-family:Roboto; padding:30px; height:calc(100vh - (100vh - 64px)); background-color:#fafafa">
+<div style="font-family:Roboto; padding: 30px; height:calc(100svh - 64px); background-color:#fafafa">
+
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">BÀI THI</MudText>
     </MudPaper>
@@ -32,9 +35,14 @@
         </MudItem>
     </MudGrid>
 
-    <div class="bg-white rounded-3 mb-4" style="width:100%; margin-top:10px;">
-
-        <MudTable Items="@_lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="500px">
+    <div class="bg-white rounded-3" style="width:100%">
+        @if (isLoading)
+        {
+            <LoadingContext />
+        }
+        else
+        {
+        <MudTable Items="@_lst" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 384px)">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -42,10 +50,10 @@
                         <MudText Style="font-size: 22px; font-weight: bold;color:#29a69a">Danh sách bài thi</MudText>
 
                     </MudItem>
-                    <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-                    </MudItem>
+                    <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"
+                                  Class="mt-0" ValueChanged="OnSearchChanged" Immediate="true">
+                    </MudTextField>
                 </MudGrid>
             </ToolBarContent>
             <HeaderContent>
@@ -54,10 +62,8 @@
                 <MudTh><MudTableSortLabel SortLabel="Thời gian" T="int">Thời gian làm bài</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số câu hỏi" T="int">Số câu hỏi</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Số lần làm bài" T="int">Số lần làm bài</MudTableSortLabel></MudTh>
-
                 <MudTh><MudTableSortLabel SortLabel="Trạng thái" T="string">Trạng thái</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
-
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Tên bài thi">@context.ExamName </MudTd>
@@ -65,8 +71,16 @@
                 <MudTd DataLabel="Thời gian">@context.Duration </MudTd>
                 <MudTd DataLabel="Số câu hỏi">@context.NumberOfQuestion </MudTd>
                 <MudTd DataLabel="Số lần làm bài">@context.NumberOfRepeat </MudTd>
-
-                <MudTd DataLabel="Trạng thái">@context.Status </MudTd>
+                <MudTd DataLabel="Trạng thái">
+                    @if (context.Status == 1)
+                    {
+                        <span>Công khai</span>
+                    }
+                    else
+                    {
+                        <span>Chưa công khai</span>
+                    }
+                </MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
                         <MudIconButton OnClick="@(()=> ShowUpdateDialog(_maxWidth,context.Id))" Icon="@Icons.Material.Filled.BorderColor" aria-label="update"></MudIconButton>
@@ -79,22 +93,23 @@
                         <MudIconButton OnClick="@(()=> ShowDeleteDialog(_maxWidth,context.Id) )" Icon="@Icons.Material.Filled.Delete" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                     <MudTooltip Text="Xem đề thi">
-                        
-                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end" Variant="Variant.Filled">Xem đề </MudButton>
-
+                            <MudButton OnClick="@(() => ShowDeThiDialog(_maxWidth,context.Id))" Class="add-button-end">Xem đề</MudButton>
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
-                <MudText>No matching records found</MudText>
+                <MudText></MudText>
             </NoRecordsContent>
             <LoadingContent>
-                <MudText>Loading...</MudText>
+                <MudText>Đang tải...</MudText>
             </LoadingContent>
             <PagerContent>
                 <MudTablePager />
             </PagerContent>
         </MudTable>
+            
+        }
+
     </div>
 
 
@@ -102,20 +117,81 @@
 @code {
     private List<ExamWhitQusetion> _lst = new List<ExamWhitQusetion>();
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
-    protected override async Task OnInitializedAsync()
+    private ExamSchedule currentSchedule = new ExamSchedule();
+    private List<User> lstuser = new List<User>();
+    private bool isLoading { get; set; } = true;
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     await LoadData();
+    // }
+
+    private async Task LoadData()
     {
-        //_lst = await examService.GetInforBasic();
-        _lst = (await examService.GetInforBasic()).Where(x => x.Status != 255).ToList();
-
-
+        var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        var userId = Guid.Parse(a.Value);
+        var userED = await _serUser.GetByidUser(userId);
+        if (userED.LevelId == 1 || userED.LevelId == 2)
+        {
+            _lst = (await examService.GetInforBasic(null)).Where(x => x.Status == 1 || x.Status == 2).ToList();
+        }
+        else if (userED.LevelId == 3)
+        {
+            _lst = (await examService.GetInforBasic(null)).Where(x => x.Status != 255 && x.CreatedBy == userId).ToList();
+        }
+    }
+    protected async override  Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
-    [Inject] ISnackbar Snackbar { get; set; }
-    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+   
 
+    [Inject] ISnackbar Snackbar { get; set; }
+    private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
+
+    private async Task OnSearchChanged(string searchText)
+    {
+        await Task.Delay(700);
+        _lst = (await examService.GetInforBasic(searchText)).Where(x => x.Status == 1 || x.Status == 2).ToList();
+        StateHasChanged();
+    }
+
+    private async Task<bool> CheckAllowdelete()
+    {
+        var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+        if (!userId.Success || userId.Value == null)
+        {
+            return false;
+        }
+        else
+        {
+            var u = await _serUser.GetByidUser(Guid.Parse(userId.Value));
+            if (u.LevelId != 1 && u.LevelId != 2)
+                return false;
+           
+        }
+        return true;
+    }
 
     private async Task ShowDeleteDialog(DialogOptions options, int Id)
     {
+        var checkLTTT = await scheduleService.Check_LichTHI(Id);
+        if (checkLTTT)
+        {
+            snackbar.Add("Bài thi này đang diễn ra, không thể thao tác", Severity.Warning);
+            return;
+
+        }
+        if (!await CheckAllowdelete())
+        {
+            await JS.InvokeVoidAsync("alert", "Bạn không có quyền xóa, hãy liên hệ cấp trên");
+            return;
+        }
         var parameters = new DialogParameters
         {
               { "Id", Id }
@@ -124,9 +200,10 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            _lst = await examService.GetInforBasic(null);
         }
+        
+
     }
 
     private async Task OpenDetailAsync(DialogOptions options, int Id)
@@ -139,24 +216,36 @@
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            _lst = await examService.GetInforBasic(null);
         }
     }
 
     private async Task ShowUpdateDialog(DialogOptions options, int Id)
     {
-        var parameters = new DialogParameters
+        var checkLTTT = await scheduleService.Check_LichTHI(Id);
+
+        if (checkLTTT)
         {
-              { "Id", Id }
-        };
+                snackbar.Add("Bài thi này đang diễn ra, không thể thao tác", Severity.Warning);
+                return;
+            
+        }
+        var parameters = new DialogParameters
+                {
+                      { "Id", Id }
+                };
         var dialog = await DialogService.ShowAsync<Dialog.Exam.UpdateExam>("Options Dialog", parameters, options);
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
-            //listSchedule = await scheduleService.GetInforBasic();
-            _lst = await examService.GetInforBasic();
+            _lst = await examService.GetInforBasic(null);
         }
+
+        StateHasChanged();
+                
+        
+        
+
     }
 
     private async Task OpenDialogAsync(DialogOptions options, string name)
@@ -168,9 +257,7 @@
             var result = await dialog.Result;
             if (!result.Canceled)
             {
-                // listSchedule = await scheduleService.GetInforBasic();
-                _lst = await examService.GetInforBasic();
-
+                _lst = await examService.GetInforBasic(null);
             }
 
         }
@@ -204,7 +291,7 @@
             var result = await dialog.Result;
             if (result == null || !result.Canceled)
             {
-                _lst = await examService.GetInforBasic();
+                _lst = await examService.GetInforBasic(null);
             }
             else
             {

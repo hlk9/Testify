@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Buffers;
+using System.Xml.Schema;
 using Testify.DAL.Context;
 using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
 
 namespace Testify.DAL.Reposiroties
 {
@@ -11,8 +14,6 @@ namespace Testify.DAL.Reposiroties
         {
             _context = new TestifyDbContext();
         }
-
-
 
         public async Task<List<Level>> GetAllLevels()
         {
@@ -75,17 +76,22 @@ namespace Testify.DAL.Reposiroties
             return await _context.Levels.Where(x => x.Id == id).ToListAsync();
         }
 
-        public async Task<List<User>> GetUserByIdLevel(int levelId)
+        public async Task<List<User>> GetUserByIdLevel(int levelId, string? textSearch)
         {
-            if (levelId < 0)
+            var query = _context.Users.AsQueryable();
+
+            if (levelId >= 0)
             {
-                return await _context.Users.ToListAsync();
-            }
-            else
-            {
-                return await _context.Users.Where(x => x.LevelId == levelId).ToListAsync();
+                query = query.Where(x => x.LevelId == levelId && x.Status == 1);
             }
 
+            if (!string.IsNullOrWhiteSpace(textSearch))
+            {
+                query = query.Where(x => x.FullName.Contains(textSearch) || x.Email.Contains(textSearch) || x.PhoneNumber.Contains(textSearch) || x.UserName.Contains(textSearch) && x.Status == 1);
+            }
+
+            return await query.Where(x => x.Status == 1).ToListAsync();
         }
     }
+
 }

@@ -1,15 +1,17 @@
 ﻿@page "/Examiner/CreateExamDetail"
 @using Testify.API.DTOs
 @using Testify.DAL.ViewModels
-@layout AdminLayout
+@using Testify.Web.Shared
+@layout ExaminerLayout
 @inject IDialogService DialogService
 @inject ExamService examService
 @inject SubjectService subjectService
 @inject ExamDetailService examdetailService
+@inject ExamScheduleService scheduleService
 
 
 
-<div style="font-family:Roboto; padding:30px; height: calc(100vh - 64px); background-color:#fafafa">
+<div style="font-family:Roboto; padding:30px; height: calc(100svh - 64px); background-color:#fafafa">
 
     <MudPaper Style="padding:15px;">
         <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">TẠO ĐỀ THI</MudText>
@@ -25,17 +27,17 @@
             <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
         }
     </MudSelect>
-    <MudGrid Style="padding:20px 0 ">
+    <MudGrid Style="padding:20px 0;">
         <MudItem xl="10" lg="10" md="8" sm="6" xs="12">
         </MudItem>
         <MudItem xl="2" lg="2" md="4" sm="6" xs="12">
-            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth))" Class="w-100 btn btn-success" Variant="Variant.Filled">Thêm đề mới </MudButton>
+            <MudButton OnClick="@(() => OpenDialogAsync(_maxWidth))" Color="Color.Primary" Variant="Variant.Filled" Class="w-100">Thêm đề mới </MudButton>
         </MudItem>
     </MudGrid>
 
-    @if (ExamID > 0 && lisDThi.Count > 0 )
+    @if (ExamID > 0 && lisDThi.Count > 0)
     {
-        <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="450px">
+        <MudTable Items="@lisDThi" Dense="true" Hover="true" Virtualize="true" FixedHeader="true" HorizontalScrollbar="true" Height="calc(100svh - 467px)">
 
             <ToolBarContent>
                 <MudGrid Style="align-items:center;padding:0px; margin:0;width:100%">
@@ -44,23 +46,22 @@
 
                     </MudItem>
                     <MudItem xl="6" lg="6" md="6" sm="8" xs="12" Style="padding:0px; margin:0;">
-                        <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
-                                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+
                     </MudItem>
                 </MudGrid>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="ID" T="string">Mã đề</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="ID" T="string">Tên đề</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Môn" T="string">Môn</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Người tạo" T="string">Người tạo</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Công khai</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Công khai" T="bool">Sử dụng trong bài thi</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Ngày tạo" T="string">Ngày tạo</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Ngày Cập Nhật" T="string">Ngày cập nhật</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Thao tác" T="string">Thao tác</MudTableSortLabel></MudTh>
 
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="ID"> @context.Id</MudTd>
+                <MudTd DataLabel="ID"> @context.Code</MudTd>
                 <MudTd DataLabel="Môn">
                     @subjectCurrent.Name
                 </MudTd>
@@ -74,37 +75,38 @@
                             break;
                         }
                     }
-                    </MudTd>
+                </MudTd>
                 <MudTd DataLabel="Công khai">
-                    @if (context.Status == 0)
+                    @if (context.Status == 2)
                     {
-                        <span class="text-center btn btn-danger">Chỉ mình tôi </span>
+
+                        <MudText> Không cho phép </MudText>
                     }
                     else
                     {
-                        <span class="text-center btn btn-success">Công khai </span>
+
+                        <MudText> Cho phép </MudText>
                     }
 
+
                 </MudTd>
+
                 <MudTd DataLabel="Ngày tạo"> @context.CreateDate.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Ngày Cập Nhật">@context.UpdateDate.ToString("dd/MM/yyyy")</MudTd>
                 <MudTd DataLabel="Thao tác">
                     <MudTooltip Text="Sửa">
-                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" OnClick="@(() => UpdateDethiDialog(_maxWidthUpdate,context.Id,ExamID))" aria-label="update"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.BorderColor" OnClick="@(() => UpdateDethiDialog(_maxWidthUpdate,context.Id,ExamID, subjectCurrent.Id))" aria-label="update"></MudIconButton>
                     </MudTooltip>
-                    @* <MudTooltip Text="Chi tiết">
-                        <MudIconButton Icon="@Icons.Material.Filled.Notes" OnClick="@(() => UpdateDethiDialog(_maxWidth,context.Id))" aria-label="details"></MudIconButton>
-                    </MudTooltip> *@
                     <MudTooltip Text="Xoá">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteDeThiDialog(_maxWidth,context.Id))" aria-label="delete"></MudIconButton>
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
-                <MudText>No matching records found</MudText>
+                <MudText></MudText>
             </NoRecordsContent>
             <LoadingContent>
-                <MudText>Loading...</MudText>
+                <MudText>Đang tải...</MudText>
             </LoadingContent>
             <PagerContent>
                 <MudTablePager />
@@ -115,6 +117,8 @@
     {
         <MudText Class="w-100 py-4 text-center">Chưa chọn bài thi hoặc không có đề thi nào</MudText>
     }
+
+
 </div>
 
 @code {
@@ -130,8 +134,11 @@
     private void Cancel() => MudDialog.Cancel();
     private readonly DialogOptions _maxWidth = new() { MaxWidth = MaxWidth.Large, FullWidth = true };
     private readonly DialogOptions _maxWidthUpdate = new() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true, BackdropClick = false };
+    public bool CheckBox_True { get; set; } = true;
+    public bool CheckBox_False { get; set; } = false;
 
     private List<ExamDetail> lisDThi = new List<ExamDetail>();
+    private ExamSchedule currentSchedule = new ExamSchedule();
     private List<User> user = new List<User>();
 
 
@@ -142,12 +149,10 @@
         // subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         // GetHashCode();
         var allExamDetails = await examdetailService.GetExamDetailByExamId(ExamID);
-        lisDThi = allExamDetails.Where(x => x.Status != 255).ToList(); 
+        lisDThi = allExamDetails.Where(x => x.Status != 255).ToList();
         var exam = await examService.GetExamId(ExamID);
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         GetHashCode();
-
-
     }
 
     private async void SelectValueChanged()
@@ -163,6 +168,12 @@
             throw;
         }
     }
+    private void ToggleStatus(ExamDetail context, bool isChecked)
+    {
+        context.Status = isChecked ? (byte?)1 : (byte?)0;
+
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -171,7 +182,7 @@
     }
     private async Task OpenDialogAsync(DialogOptions options)
     {
-        if(ExamID == -1)
+        if (ExamID == -1)
         {
             snackbar.Add("Vui lòng chọn bài thi", Severity.Warning);
             return;
@@ -193,11 +204,19 @@
 
     private async Task DeleteDeThiDialog(DialogOptions options, int IdExamDetail)
     {
-        var parameters = new DialogParameters
-        {
-              { "IdExamDetail", IdExamDetail }
+        var checkLTTT = await scheduleService.Check_LichTHI(ExamID);
 
-        };
+        if (checkLTTT)
+        {
+            snackbar.Add("Bài thi này đang diễn ra, không thể thao tác", Severity.Warning);
+            return;
+
+        }
+        var parameters = new DialogParameters
+            {
+                  { "IdExamDetail", IdExamDetail }
+
+            };
         var dialog = await DialogService.ShowAsync<Dialog.DeThi.DeleteExamDetail>("Options Dialog", parameters, options);
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
@@ -205,6 +224,8 @@
             //listSchedule = await scheduleService.GetInforBasic();
             await LoadData();
         }
+
+
     }
 
     private class IsCheckQuestion
@@ -214,22 +235,35 @@
         public bool IsChecked { get; set; }
     }
 
-    private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID)
+    private async Task UpdateDethiDialog(DialogOptions options, int ExamDetailID, int ExamID, int Sub_id)
     {
-        var parameters = new DialogParameters
+
+        var checkLTTT = await scheduleService.Check_LichTHI(ExamID);
+
+        if (checkLTTT)
         {
+            snackbar.Add("Bài thi này đang diễn ra, không thể thao tác", Severity.Warning);
+            return;
 
-              { "ExamDetailID", ExamDetailID },
-              { "ExamID", ExamID}
+        }
+        var parameters = new DialogParameters
+            {
+                  { "ExamDetailID", ExamDetailID },
+                  { "ExamID", ExamID},
+                  {"SubjectId",Sub_id }
 
-        };
+            };
         var dialog = await DialogService.ShowAsync<Dialog.DeThi.UpdateExamDetail>("Options Dialog", parameters, options);
         var result = await dialog.Result;
         if (result == null || !result.Canceled)
         {
             await LoadData();
         }
+
+
+
+
     }
-    
+
 
 }

@@ -1,4 +1,7 @@
-﻿using Testify.DAL.Models;
+﻿using System.Web;
+using Testify.DAL.Models;
+using Testify.DAL.ViewModels;
+using Testify.Web.Components.Layout;
 
 namespace Testify.Web.Services
 {
@@ -43,14 +46,49 @@ namespace Testify.Web.Services
             return false;
         }
 
-        public async Task<bool> DeleteSub(int id)
+        public async Task<ErrorResponse> DeleteSub(int id)
         {
             var status = await _httpClient.DeleteAsync($"Subject/delete-subject?id={id}");
+
             if (status.IsSuccessStatusCode)
             {
-                return true;
+                return new ErrorResponse { Success = true };
             }
-            return false;
+
+            var error = await status.Content.ReadFromJsonAsync<ErrorResponse>();
+            return new ErrorResponse
+            {
+                Success = false,
+                ErrorCode = error?.ErrorCode ?? "UNKNOWN_ERROR",
+                Message = error?.Message ?? "UNKNOWN_ERROR"
+            };
         }
+
+        public async Task<int> GetCountByUserId(Guid userId)
+        {
+            var count = await _httpClient.GetAsync($"Subject/Get-Count-By-UserId?userId={userId}");
+            var response = await count.Content.ReadFromJsonAsync<int>();
+            return response;
+        }
+
+        public async Task<ScoreDistribution> ScoreDistributionBySubject(int subjectId)
+        {
+            var lst = await _httpClient.GetAsync($"Subject/Score-Distribution-By-Subject?subjectId={subjectId}");
+            var response = await lst.Content.ReadFromJsonAsync<ScoreDistribution>();
+            return response;
+        }
+
+        public async Task<List<SubmissionViewModel>> GetAllBySubjectId(int? subjectId, string? textSearch, Guid? usersID, int? classId, DateTime? startTime, DateTime? endTime)
+        {
+            string startDateFormat = startTime?.ToString("yyyy/MM/dd HH:mm:ss");
+            string endDateFormat = endTime?.ToString("yyyy/MM/dd HH:mm:ss");
+
+
+            var lstUser = await _httpClient.GetAsync($"Subject/get-all-by-subjectId?subjectId={subjectId}&textSearch={textSearch}&usersID={usersID}&classId={classId}&startTime={HttpUtility.UrlEncode(startDateFormat)}&endTime={HttpUtility.UrlEncode(endDateFormat)}");
+            var response = await lstUser.Content.ReadFromJsonAsync<List<SubmissionViewModel>>();
+            return response;
+        }
+
+
     }
 }

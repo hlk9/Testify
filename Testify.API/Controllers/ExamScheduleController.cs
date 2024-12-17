@@ -66,7 +66,7 @@ namespace Testify.API.Controllers
 
             var lstSchedule = await repos.GetSchedulesActive();
             var lstSubject = await subjectRepository.GetAllSubject(null, true);
-            var lstExams =  new ExamRepository().GetAllActive();
+            var lstExams = new ExamRepository().GetAllActive();
             //var lstExam = 
 
             foreach (var item in lstSchedule)
@@ -74,7 +74,7 @@ namespace Testify.API.Controllers
                 string name;
                 try
                 {
-                     name = lstExams.FirstOrDefault(x => x.Id == item.ExamId).Name;
+                    name = lstExams.FirstOrDefault(x => x.Id == item.ExamId).Name;
 
                 }
                 catch
@@ -82,7 +82,7 @@ namespace Testify.API.Controllers
                     name = "Không";
                 }
 
-                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = name, Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title });
+                listResult.Add(new ExamScheduleDto { Id = item.Id, Description = item.Description, EndTime = item.EndTime, StartTime = item.StartTime, ExamId = item.ExamId, ExamName = name, Status = item.Status, SubjectId = item.SubjectId, SubjectName = lstSubject.FirstOrDefault(x => x.Id == item.SubjectId).Name, Title = item.Title,CreateAt = item.CreatedAt,CreatedBy = item.CreatedBy });
 
             }
             return listResult;
@@ -107,6 +107,12 @@ namespace Testify.API.Controllers
         public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end, int subjectId)
         {
             return await repos.CheckIsContaintInTime(start, end, subjectId);
+        }
+        
+        [HttpGet("Get-InTime-ExcludeId")]
+        public async Task<ExamSchedule> GetInTime(DateTime start, DateTime end, int subjectId, int currentScheduleId)
+        {
+            return await repos.CheckIsContaintInTimeExclude(start, end, subjectId, currentScheduleId);
         }
 
         [HttpGet("Get-InTime-NoSubject")]
@@ -162,8 +168,24 @@ namespace Testify.API.Controllers
             var lst = await repos.GetAllExamScheduleByUserId(userId);
             return Ok(lst);
         }
+
+        [HttpGet("Get-Count-By-UserId")]
+        public async Task<ActionResult<int>> GetCountByUserId(Guid userId)
+        {
+            var count = await repos.GetCountExamScheduleByUserId(userId);
+            return Ok(count);
+        }
+
+        [HttpGet("Check-LT")]
+        public async Task<IActionResult> Check_LichTHI(int? id)
+        {
+            var res = await repos.Check_LichTHI(id);
+            
+            return Ok(res); 
+        }
+
+
+
     }
-
-
 }
 

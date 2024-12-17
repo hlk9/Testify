@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
+using Testify.DAL.ViewModels;
 
 namespace Testify.API.Controllers
 {
@@ -43,11 +44,40 @@ namespace Testify.API.Controllers
         }
 
         [HttpDelete("delete-subject")]
-        public async Task<ActionResult<Subject>> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var deleteSubject = await _repo.DeleteSubject(id);
-            return Ok(deleteSubject);
+
+            if (deleteSubject.Success)
+            {
+                return NoContent();
+            }
+
+            return BadRequest(new
+            {
+                ErrorCode = deleteSubject.ErrorCode,
+                Message = deleteSubject.Message
+            });
         }
 
+        [HttpGet("Get-Count-By-UserId")]
+        public async Task<ActionResult<int>> GetCountByUserId(Guid userId)
+        {
+            var count = await _repo.GetCountSubjectByUserId(userId);
+            return Ok(count);
+        }
+
+        [HttpGet("Score-Distribution-By-Subject")]
+        public async Task<ActionResult<ScoreDistributionBy>> ScoreDistributionBySubject(int subjectId)
+        {
+            var lst = await _repo.ScoreDistributionBySubject(subjectId);
+            return Ok(lst);
+        }
+
+        [HttpGet("get-all-by-subjectId")]
+        public async Task<List<SubmissionViewModel>> GetAllSubmissionsAsync(int? subjectId, string? textSearch, Guid? usersID, int? classId, string? startTime, string? endTime)
+        {
+            return await _repo.GetSubmissionDetails(subjectId, textSearch, usersID, classId, startTime, endTime);
+        }
     }
 }

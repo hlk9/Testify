@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Testify.DAL.Models;
 
 namespace Testify.Web.Services
@@ -34,6 +36,10 @@ namespace Testify.Web.Services
             return await _httpClient.GetFromJsonAsync<List<User>>("User/get-all-users");
         }
 
+        public async Task<HttpResponseMessage> ExportExcelTemplateAccount()
+        {
+            return await _httpClient.GetAsync("User/Export-Excel-Template-Account");
+        }
 
         public async Task<int> ImportExcelUser(IBrowserFile file, int levelId)
         {
@@ -69,5 +75,23 @@ namespace Testify.Web.Services
         {
             return await _httpClient.GetFromJsonAsync<User>($"User/Get-By-idUser?id={id}");
         }
+
+        public async Task<bool> CheckEmailOrPhone(string email, string phoneNumber, string userName, Guid? userId)
+        {
+            return await _httpClient.GetFromJsonAsync<bool>($"User/Check-Email-Or-Phone?email={email}&phoneNumber={phoneNumber}&userName={userName}&userId={userId}");
+        }
+
+        public async Task<HttpResponseMessage> ExportAccountByLevelId(int levelId)
+        {
+            return await _httpClient.GetAsync($"User/Export-Account-By-LevelId?levelId={levelId}");
+        }
+
+        public async Task<List<User>> GetUsersNotInClassAsync(int classId, string? textSearch)
+        {
+            var lst = await _httpClient.GetAsync($"User/Get-Users-Not-In-Class?classId={classId}&textSearch={textSearch}");
+            var response = await lst.Content.ReadFromJsonAsync<List<User>>();
+            return response;
+        }
     }
 }
+

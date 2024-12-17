@@ -1,0 +1,115 @@
+<MudDialog>
+    <TitleContent>
+        Thao tác cho bài thi @titleExam
+    </TitleContent>
+    <DialogContent>
+       @if (currentSubmission.Id!=null)
+       {
+           <div class="d-flex align-end justify-space-between mud-width-full">
+               <div class="d-flex flex-column">
+                   <MudText><b>Tên: </b> @currentUser.FullName</MudText>
+                   <MudText><b>Emai: </b> @currentUser.Email</MudText>
+                   <MudText><b>SDT: </b> @currentUser.PhoneNumber</MudText>
+                   <MudText><b>Nộp ngày: </b>@currentSubmission.SubmitTime</MudText>
+                   <MudText><b>Thời gian làm bài: </b>   @(currentSubmission.TimeTaken.Hours) giờ @(currentSubmission.TimeTaken.Minutes) phút @(currentSubmission.TimeTaken.Seconds) giây </MudText>
+                   <MudText><b>Điểm: </b>@currentSubmission.TotalMark</MudText>
+               </div>
+           </div>
+           <div>
+               <MudSelect @bind-Value="statusChange" T="int" Label="Sửa trạng thái bài thi" Variant="Variant.Outlined">
+                   <MudSelectItem Value="1">Chấp nhận</MudSelectItem>
+                   <MudSelectItem Value="0">Không công nhận</MudSelectItem>
+                   <MudSelectItem Value="-1">Cần kiểm tra</MudSelectItem>
+               </MudSelect>
+
+           </div>
+       }
+       else
+       {
+           <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+       }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="SaveSubmit">Lưu</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string titleExam { get; set; }
+
+
+    private int statusChange;
+
+    private User currentUser = new User();
+
+    private Submission currentSubmission = new Submission();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var sub =  await _serSubmission.GetById(Id);
+      
+        if (sub != null)
+        {
+            var usr = await _serUser.GetByidUser(sub.UserId);
+            currentSubmission = sub;
+            currentUser = usr;
+            switch (currentSubmission.Status )
+            {
+                case true:
+                    statusChange = 1;
+                    break;
+                case false:
+                    statusChange = 0;
+                    break;
+                default:
+                    statusChange = -1;
+                    break;
+            }
+            StateHasChanged();
+        }
+    }
+
+    public async void SaveSubmit()
+    {
+        switch (statusChange)
+        {
+            case 1:
+                currentSubmission.Status = true;
+                break;
+            case 0:
+                currentSubmission.Status = false;
+                break;
+            default:
+                currentSubmission.Status = null;
+                break;
+        }
+        bool stats = await _serSubmission.UpdateStatus(currentSubmission);
+        if (stats)
+        {
+            snackbar.Add("Cập nhật thành công", Severity.Info);
+            MudDialog.Close(DialogResult.Ok(true));
+            StateHasChanged();
+        }
+        else
+        {
+            snackbar.Add("Cập nhật thất bại", Severity.Error);
+        }
+    }
+    
+    // public class StatusOption
+    // {
+    //     public bool? Value { get; set; }
+    //     public string Text { get; set; }
+    // }
+    
+   
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}

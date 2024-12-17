@@ -2,6 +2,7 @@
 using Testify.DAL.Models;
 using Testify.DAL.Reposiroties;
 using Testify.DAL.ViewModels;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Testify.API.Controllers
 {
@@ -44,24 +45,49 @@ namespace Testify.API.Controllers
         }
 
         [HttpGet("Get-Question-By-ExamDetailID-Not")]
-        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID)
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOT(int examdetailID, int SubjectId, string? textSearch)
         {
-            var objGetAll = await _respon.GetQuestionByExamDetailID_NOT(examdetailID);
+            string decodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                decodedContent = Uri.UnescapeDataString(textSearch);
+            }
+            var objGetAll = await _respon.GetQuestionByExamDetailID_NOT(examdetailID,  SubjectId);
+
+            if (!string.IsNullOrWhiteSpace(textSearch))
+            {
+                objGetAll = objGetAll
+                    .Where(x => x.Content.Contains(decodedContent, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
             return Ok(objGetAll);
         }
 
         [HttpGet("Get-Question-By-ExamDetailID-NotAndLevel")]
-        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID)
+        public async Task<ActionResult<List<QuestionInExam>>> GetAllQuestionByExamDetailID_NOTAndLevel(int examdetailID, int levelID, int SubjectId, string? textSearch)
         {
-            var objGetAll = await _respon.GetQuestionByExamDetailID_NOTAndLevel(examdetailID, levelID);
+            string decodedContent = "";
+            if (!string.IsNullOrEmpty(textSearch) || !string.IsNullOrWhiteSpace(textSearch))
+            {
+                decodedContent = Uri.UnescapeDataString(textSearch);
+            }
+            var objGetAll = await _respon.GetQuestionByExamDetailID_NOTAndLevel(examdetailID, levelID ,  SubjectId);
+            if (!string.IsNullOrWhiteSpace(textSearch))
+            {
+                objGetAll = objGetAll
+                    .Where(x => x.Content.Contains(decodedContent, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
             return Ok(objGetAll);
         }
 
-        [HttpPost("Add-ListQuestionToExam")]
+        [HttpPost("AddListQuestionToExam_New")]
         public bool AddListQuestionToExam(List<QuestionInExam> data, int idExamDetail)
         {
             return _respon.AddListQuestionToExam(data, idExamDetail);
         }
+
+       
+
 
         [HttpPost("Remove-ListQuestionToExam")]
         public bool RemoveFromListQuestionToExam(List<QuestionInExam> data, int idExamDetail)

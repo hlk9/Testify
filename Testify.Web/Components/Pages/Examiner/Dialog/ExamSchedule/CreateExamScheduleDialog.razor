@@ -3,7 +3,7 @@
 @inject SubjectService subjectService
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">Tạo lịch thi mới</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Tạo lịch thi mới</MudText>
     </TitleContent>
     <DialogContent>
         <EditForm Model="@currentSchedule" OnInvalidSubmit="SubmitValid">
@@ -13,25 +13,25 @@
                 <MudItem Class="w-100">
 
                     <MudAutocomplete T="Subject"
-                                     @bind-Value="subjectCurrent"
-                                     SearchFunc="@SearchSubject"
-                                     Variant="Variant.Outlined"
-                                     Label="Môn"
-                                     Placeholder="Chọn môn"
-                                     Clearable="true"
-                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                     OnFocus="SubjectChanged" />
+                    @bind-Value="subjectCurrent"
+                    SearchFunc="@SearchSubject"
+                    Variant="Variant.Outlined"
+                    Label="Môn"
+                    Placeholder="Chọn môn"
+                    Clearable="true"
+                    ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                    OnFocus="SubjectChanged" />
 
                     <MudAutocomplete T="Exam"
-                                     @bind-Value="examCurrent"
-                                     SearchFunc="@SearchExam"
-                                     Variant="Variant.Outlined"
-                                     Label="Bài thi"
-                                     Placeholder="Chọn bài thi"
-                                     Clearable="true"
-                                     ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                     OnFocus="ExamChanged"
-                                     ResetValueOnEmptyText="true" />
+                    @bind-Value="examCurrent"
+                    SearchFunc="@SearchExam"
+                    Variant="Variant.Outlined"
+                    Label="Bài thi"
+                    Placeholder="Chọn bài thi"
+                    Clearable="true"
+                    ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                    OnFocus="ExamChanged"
+                    ResetValueOnEmptyText="true" />
 
                 </MudItem>
                 <MudItem Class="w-50">
@@ -52,7 +52,7 @@
 
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
         <MudButton Color="Color.Primary" OnClick="SubmitValid">Tạo</MudButton>
     </DialogActions>
 </MudDialog>
@@ -70,7 +70,9 @@
     private List<Subject> listSubject;
     private Exam examCurrent;
     private Subject subjectCurrent;
+    Guid? currentUid  = new Guid();
 
+    User currentU = new User();
 
     private string[] _states =
        {
@@ -88,7 +90,22 @@
 
     private async Task SubjectChanged()
     {
-        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        var tempCurrentUid = await ProtectedSessionStore.GetAsync<string>("userLogin");
+
+        if (tempCurrentUid.Value != null)
+        {
+            currentUid = Guid.Parse(tempCurrentUid.Value);
+        }
+        listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
+        listExam = listExam.Where(x => x.Status == 1).ToList();
+
+        var urs = await _serUser.GetByidUser(Guid.Parse(currentUid.ToString()));
+        currentU = urs;
+        if (currentU.LevelId == 3)
+        {
+            listExam = listExam.Where(x => x.Status == 1 && x.CreatedBy == currentUid).ToList();
+        }
+
         examCurrent = null;
         StateHasChanged();
 
@@ -103,7 +120,24 @@
     private async Task<IEnumerable<Exam>> SearchExam(string value, CancellationToken token)
     {
 
-        listExam = await examService.GetListOfSubject(subjectCurrent.Id);
+        try
+        {
+            if (currentU.LevelId == 3)
+            {
+                listExam = listExam.Where(x => x.Status == 1 && x.CreatedBy == currentUid).ToList();
+            }
+            else
+            {
+
+                listExam = await examService.GetListHaveExamDetailOfSubject(subjectCurrent.Id);
+                listExam = listExam.Where(x => x.Status == 1).ToList();
+            }
+
+        }
+        catch
+        {
+
+        }
 
 
         if (string.IsNullOrEmpty(value))
@@ -128,6 +162,14 @@
 
     private async void SubmitValid()
     {
+     
+        var tempCurrentUid = await ProtectedSessionStore.GetAsync<string>("userLogin");
+
+        if (tempCurrentUid.Value != null)
+        {
+            currentUid = Guid.Parse(tempCurrentUid.Value);
+        }
+
         DateTime startDateTime = startDate.Value.Date.Add(startTime.Value);
         DateTime endDateTime = endDate.Value.Date.Add(endTime.Value);
         if (subjectCurrent == null || startDate == null || startTime == null || endDate == null || endTime == null || examCurrent == null)
@@ -136,11 +178,18 @@
             return;
         }
         else
-        {
-
+        {       
+          
             if (startDateTime < DateTime.Now.AddMinutes(10))
             {
                 Snackbar.Add("Thất bại, Thời gian bắt đầu phải trước 10 phút kể từ thời điểm hiện tại", Severity.Error);
+                return;
+            }
+
+            TimeSpan duration = endDateTime - startDateTime;
+            if (duration.TotalMinutes < examCurrent.Duration + 10)
+            {
+                Snackbar.Add("Thất bại, Thời gian thi phải lớn hơn thời gian làm bài thi ít nhất 10 phút", Severity.Error);
                 return;
             }
 
@@ -157,7 +206,8 @@
                 Snackbar.Add("Thất bại, Thời gian xung đột với lịch thi " + ojb.Title + ", hãy kiểm tra lại", Severity.Error);
                 return;
             }
-
+    
+            currentSchedule.CreatedBy = currentUid;
             currentSchedule.RoomId = null;
             currentSchedule.SubjectId = subjectCurrent.Id;
             currentSchedule.ExamId = examCurrent.Id;

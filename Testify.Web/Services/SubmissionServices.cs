@@ -1,4 +1,5 @@
-﻿using Testify.DAL.Models;
+﻿using System.Net;
+using Testify.DAL.Models;
 using Testify.DAL.ViewModels;
 
 namespace Testify.Web.Services
@@ -44,10 +45,10 @@ namespace Testify.Web.Services
             return reponse;
         }
 
-        public async Task<List<SubmittedByUser>> GetAllSubmittedByUser(Guid userId)
+        public async Task<List<SubmissionWithName>> GetAllSubmittedByUser(Guid userId)
         {
             var lst = await _httpClient.GetAsync($"submission/Submitted-By-User?userId={userId}");
-            var response = await lst.Content.ReadFromJsonAsync<List<SubmittedByUser>>();
+            var response = await lst.Content.ReadFromJsonAsync<List<SubmissionWithName>>();
             return response;
         }
 
@@ -56,6 +57,23 @@ namespace Testify.Web.Services
             var lst = await _httpClient.GetAsync($"submission/Achievenments?userId={userId}");
             var response = await lst.Content.ReadFromJsonAsync<List<Achievenment>>();
             return response;
+        }
+
+        public async Task<List<Submission>> GetHistory(Guid userId, int examscheduleId)
+        {
+            var lst = await _httpClient.GetAsync($"submission/Get-SubmitHistory?userId={userId}&examscheduleId={examscheduleId}");
+            var response = await lst.Content.ReadFromJsonAsync<List<Submission>>();
+            return response;
+        }
+
+        public async Task<bool> UpdateStatus(Submission submission)
+        {
+            var stats = await _httpClient.PostAsJsonAsync($"submission/Update-Status", submission);
+            if (stats.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

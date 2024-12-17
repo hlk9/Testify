@@ -1,30 +1,114 @@
-﻿<MudPaper Width="100%" Class="d-inline-flex py-3" Elevation="0">
+﻿@using Testify.Web.Shared
+<MudPaper Width="100%" Class="d-inline-flex py-3" Elevation="0">
     <MudNavMenu Class="mud-width-full" Color="Color.Primary" Bordered="true">
         <MudText Typo="Typo.h6" Class="px-4">Testify</MudText>
-        <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Quản trị</MudText>
+        <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">@roleTitle</MudText>
         <MudDivider Class="my-2" />
-        <MudNavGroup Title="Dasboard" Icon="@Icons.Material.Filled.ManageAccounts" Expanded="true">
-            <MudNavLink Href="/Admin/Home" Icon="@Icons.Material.Filled.Home">Dashboard Admin</MudNavLink>
-            <MudNavLink Href="/Examiner/Home" Icon="@Icons.Material.Filled.Home">Dashboard Examiner</MudNavLink>
-            <MudNavLink Href="/Student/Home" Icon="@Icons.Material.Filled.Home">Dashboard Student</MudNavLink>
-        </MudNavGroup>
-        <MudNavLink Href="/Examiner/ExamScheduleManagement" Icon="@Icons.Material.Filled.CalendarToday">Lịch Thi</MudNavLink>
-        <MudNavLink Href="/Examiner/ClassManagement" Icon="@Icons.Material.Filled.Subject">Lớp Học</MudNavLink>
-        <MudNavLink Href="/Examiner/AccountManagement" Icon="@Icons.Material.Filled.ManageAccounts">Tài Khoản</MudNavLink>
-        <MudNavGroup Title="Quản lý đề thi" Icon="@Icons.Material.Filled.ManageAccounts" Expanded="true">
-            
+        <MudNavLink hidden="@showDashboardAdmin" Href="/Admin/Home" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
+        <MudNavLink hidden="@showDashboardExaminer" Href="/Examiner/Home" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
+        <MudNavLink hidden="@showDashboardStudent" Href="/Student/Home" Icon="@Icons.Material.Filled.Home">Trang chủ</MudNavLink>
+        <MudNavLink hidden="@showSchedule" Href="/Examiner/ExamScheduleManagement" Icon="@Icons.Material.Filled.CalendarToday">Quản Lý Lịch Thi</MudNavLink>
+        <MudNavLink Href="/Examiner/ClassManagement" Icon="@Icons.Material.Filled.Class">Quản Lý Lớp Học</MudNavLink>
+        <MudNavLink hidden="@showAccount" Href="/Examiner/AccountManagement" Icon="@Icons.Material.Filled.ManageAccounts">Quản Lý Tài Khoản</MudNavLink>
+        <MudNavGroup hidden="@showExamManagement" Title="Quản lý đề thi" Icon="@Icons.Material.Filled.Article" Expanded="true">
             <MudNavLink Href="/Examiner/ExamManagement" Icon="@Icons.Material.Filled.FilterNone">Bài Thi</MudNavLink>
-            <MudNavLink Href="/Examiner/CreateExamDetail" Icon="@Icons.Material.Filled.Home"> Thêm đề thi</MudNavLink>
+            <MudNavLink Href="/Examiner/CreateExamDetail" Icon="@Icons.Material.Filled.Iso">Đề thi</MudNavLink>
         </MudNavGroup>
-        
-        <MudNavLink Href="/Examiner/SubjectManagement" Icon="@Icons.Material.Filled.MenuBook">Môn Học</MudNavLink>
-        @* <MudNavLink Href="/Examiner/RoomManagement" Icon="@Icons.Material.Filled.DoorFront">Phòng Học</MudNavLink> *@
-        @* <MudNavLink Href="/Examiner/StaffManagement" Icon="@Icons.Material.Filled.PeopleOutline">Nhân Viên</MudNavLink>
-        <MudNavLink Href="/Student/StudentManagement" Icon="@Icons.Material.Filled.People">Học Sinh/Sinh Viên</MudNavLink>
-        <MudNavLink Href="/Admin/Report" Icon="@Icons.Material.Filled.Equalizer">Báo Cáo Admin</MudNavLink> *@
-        <MudNavGroup Title="Quản lý câu hỏi" Icon="@Icons.Material.Filled.QuestionAnswer" Expanded="true">
+        <MudNavLink hidden="@showSubject" Href="/Examiner/SubjectManagement" Icon="@Icons.Material.Filled.Subject">Quản Lý Môn Học</MudNavLink>
+        <MudNavGroup hidden="@showQuestionAndAnswerManagement" Title="Quản lý câu hỏi" Icon="@Icons.Material.Filled.AutoStories" Expanded="true">
             <MudNavLink Href="/Examiner/QuestionManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Câu Hỏi Và Đáp Án</MudNavLink>
-            <MudNavLink Href="/Examiner/QuestionLevelManagement" Icon="@Icons.Material.Filled.QuestionAnswer">Mức độ câu hỏi</MudNavLink>
+            <MudNavLink Href="/Examiner/QuestionLevelManagement" Icon="@Icons.Material.Filled.Calculate">Mức độ câu hỏi</MudNavLink>
         </MudNavGroup>
+        <MudNavGroup hidden="@showChart" Title="Phổ điểm" Icon="@Icons.Material.Filled.InsertChartOutlined" Expanded="true">
+            <MudNavLink Href="/ScoreDistribution-Exam" Icon="@Icons.Material.Filled.FormatListNumberedRtl">Bài thi</MudNavLink>
+            <MudNavLink Href="/ScoreDistribution-Class" Icon="@Icons.Material.Filled.MeetingRoom">Lớp</MudNavLink>
+            <MudNavLink Href="/ScoreDistribution-Subject" Icon="@Icons.Material.Filled.MenuBook">Môn</MudNavLink>
+        </MudNavGroup>
+        <MudNavLink Href="/Examiner/ViewDetailExam" Icon="@Icons.Material.Filled.CalendarToday">Danh sách bài làm</MudNavLink>
+        <MudNavLink hidden="@showPermission" Href="/Examiner/PermissionManagement" Icon="@Icons.Material.Filled.FrontHand">Phân quyền</MudNavLink>
+        <MudNavLink hidden="@showDashboardAdmin" Href="/Account/Logs" Icon="@Icons.Material.Filled.Pentagon">Nhật ký</MudNavLink>
     </MudNavMenu>
-</MudPaper> 
+</MudPaper>
+@code
+{
+    private User user = new User();
+
+    private bool showSchedule = false;
+    private bool showDashboard = false;
+    private bool showClass = false;
+    private bool showAccount = false;
+    private bool showSubject = false;
+    private bool showQuestionAndAnswerManagement = false;
+    private bool showQuestionLevel = false;
+    private bool showChart = false;
+    private bool showExamManagement = false;
+    private bool showPermission = false;
+    private string roleTitle = "Quản trị";
+    private bool showDashboardAdmin = false;
+    private bool showDashboardExaminer = false;
+    private bool showDashboardStudent = false;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var sessionResult = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            if (sessionResult.Success && sessionResult.Value != null)
+            {
+
+                user = await _serUser.GetByidUser(Guid.Parse(sessionResult.Value.ToString()));
+                if (user == null)
+                {
+                    navigation.NavigateTo("/");
+                }
+                else
+                {
+                    HideElement();
+                    StateHasChanged();
+                }
+            }
+        }
+    }
+
+    protected override async void OnInitialized()
+    {
+
+
+    }
+
+    private async Task HideElement()
+    {
+        if (user.LevelId == 3)
+        {
+            showAccount = true;
+            showDashboardAdmin = true;
+            showDashboardStudent = true;
+            showChart = true;
+            showDashboard = true;
+            showPermission = true;
+            roleTitle = "Giảng viên";
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageExam))
+                showExamManagement = true;
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageQuestionAndAnswer))
+                showQuestionAndAnswerManagement = true;
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageSchedule))
+                showSchedule = true;
+            if(! await userPermissionService.CheckHasPermission(user.Id,PermissionLookup.ManageSubject))
+                showSubject = true;
+            StateHasChanged();
+        }
+        else if (user.LevelId == 2)
+        {
+            roleTitle = "Khảo thí";
+            showDashboardAdmin = true;
+            showDashboardStudent = true;
+        }
+        else if (user.LevelId == 1)
+        {
+            roleTitle = "Quản trị";
+            showDashboardStudent = true;
+            showDashboardExaminer = true;
+        }
+    }
+}

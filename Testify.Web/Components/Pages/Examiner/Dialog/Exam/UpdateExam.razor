@@ -3,7 +3,7 @@
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">Sửa bài thi</MudText>
+        <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Sửa bài thi</MudText>
     </TitleContent>
     <DialogContent>
         <EditForm Model="@exam" OnInvalidSubmit="SubmitValid">
@@ -12,18 +12,21 @@
                 <MudItem Class="w-100">
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudTextField T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này"></MudTextField>
+                            <MudTextField T="string" @bind-Value="exam.Name" For="@(() => exam.Name)" Label="Tên bài thi này" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
-                        <MudItem xs="6">
+                        <MudItem xs="3">
                             <MudAutocomplete T="Subject"
-                                             @bind-Value="subjectCurrent"
-                                             SearchFunc="@SearchSubject"
-                                             Variant="Variant.Outlined"
-                                             Label="Môn"
-                                             Placeholder="Chọn môn"
-                                             Clearable="true"
-                                             ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
-                                             OnFocus="SubjectChanged" />
+                            @bind-Value="subjectCurrent"
+                            SearchFunc="@SearchSubject"
+                            Variant="Variant.Outlined"
+                            Label="Môn"
+                            Placeholder="Chọn môn"
+                            Clearable="true"
+                            ToStringFunc="@(e=> e==null?null : $"{e.Name}")"
+                            OnFocus="SubjectChanged" />
+                        </MudItem>
+                        <MudItem xs="3">
+                            <MudCheckBox @bind-Value="examAllowViewResult" Label="Cho phép xem kết quả" Color="Color.Primary"></MudCheckBox>
                         </MudItem>
                     </MudGrid>
 
@@ -32,16 +35,16 @@
                 <MudItem Class="w-100">
                     <MudGrid>
                         <MudItem xs="3">
-                            <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Label="Điểm tối đa"></MudTextField>
+                            <MudTextField T="double" @bind-Value="exam.MaximmumMark" For="@(() => exam.MaximmumMark)" Disabled=@(listExamDetail.Count > 0) Label="Điểm tối đa" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt"></MudTextField>
+                            <MudTextField T="double" @bind-Value="exam.PassMark" For="@(() => exam.PassMark)" Label="Điểm đạt" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Label="Tổng số câu"></MudTextField>
+                            <MudTextField T="int" @bind-Value="exam.NumberOfQuestions" For="@(() => exam.NumberOfQuestions)" Disabled=@(listExamDetail.Count > 0) Label="Tổng số câu" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                         <MudItem xs="3">
-                            <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian"></MudTextField>
+                            <MudTextField T="int" @bind-Value="exam.Duration" For="@(() => exam.Duration)" Label="Thời gian" Variant="Variant.Outlined"></MudTextField>
                         </MudItem>
                     </MudGrid>
                 </MudItem>
@@ -50,17 +53,29 @@
             <MudItem Class="w-100">
                 <MudGrid>
                     <MudItem xs="6">
-                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài"></MudTextField>
+                        <MudTextField T="int" @bind-Value="exam.NumberOfRepeat" For="@(() => exam.NumberOfRepeat)" Label="Số lần làm bài" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                     <MudItem xs="6">
-                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả"></MudTextField>
+                        <MudTextField T="string" @bind-Value="exam.Description" For="@(() => exam.Description)" Label="Mô tả" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                 </MudGrid>
             </MudItem>
+
+
+            <MudPaper Elevation="0">
+                <MudRadioGroup T="byte" @bind-value="@status">
+                    <MudRadio T="byte" Value="1">
+                        Công khai
+                    </MudRadio>
+                    <MudRadio T="byte" Value="2">
+                        Chưa công khai
+                    </MudRadio>
+                </MudRadioGroup>
+                </MudPaper>
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Đóng/Huỷ</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
         <MudButton Color="@Color.Warning" OnClick="SubmitValid">Sửa</MudButton>
     </DialogActions>
 </MudDialog>
@@ -75,13 +90,19 @@
     private void Cancel() => MudDialog.Cancel();
     private Exam exam = new Exam();
     private List<Exam> listExam;
+    private List<ExamDetail> listExamDetail = new List<ExamDetail>();
     private List<Subject> listSubject;
     private Exam examCurrent;
     private Subject subjectCurrent;
+    private byte status = 1;
+    private bool examAllowViewResult { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
         exam = await examService.GetExamId(Id);
+        var allExamDetails = await _serExamDetail.GetExamDetailByExamId(Id);
+        listExamDetail = allExamDetails.Where(x => x.Status != 255).ToList();
+        status = exam.Status;
         subjectCurrent = await subjectService.GetSubId((int)exam.SubjectId);
         listSubject = await subjectService.GetAllSub(null, true);
     }
@@ -118,6 +139,13 @@
         }
         else
         {
+            var lstExamDetail = await _serExamDetail.GetExamDetailByExamId(exam.Id);
+            var lstExamDetailFormat = lstExamDetail.Where(x => x.Status != 255).ToList();
+            if (!lstExamDetailFormat.Any() && status == 1)
+            {
+                snackbar.Add("Thất bại, Không có đề thi nên không thể công khai", Severity.Warning);
+                return;
+            }
             if (exam.MaximmumMark <= 0)
             {
                 Snackbar.Add("Thất bại, Điểm tối đa không được nhỏ hơn 0", Severity.Error);
@@ -143,14 +171,25 @@
                 Snackbar.Add("Thất bại, Thời gian cho bài thi không được nhỏ hơn 0", Severity.Error);
                 return;
             }
-            if (exam.NumberOfRepeat <= 0)
+            if (exam.NumberOfRepeat < 1)
             {
-                Snackbar.Add("Thất bại, Số lần làm bài thi không được nhỏ hơn 0", Severity.Error);
+                Snackbar.Add("Thất bại, Số lần làm bài thi không được nhỏ hơn 1", Severity.Error);
                 return;
             }
-            
+
+            var checktrungTen_Exam = await _serExam.IsExamCodeDuplicate_Exam(exam.Name.Trim(), subjectCurrent.Id, Id);
+            if (checktrungTen_Exam)
+            {
+                Snackbar.Add("Thất bại! Tên bài thi đã tồn tại, vui lòng nhập tên khác! ", Severity.Warning);
+                return;
+            }
+            var a = await ProtectedSessionStore.GetAsync<string>("userLogin");
+            var userId = Guid.Parse(a.Value);
+            exam.UpdatedBy = userId;
             exam.ScoreMethodId = null;
             exam.SubjectId = subjectCurrent.Id;
+            exam.AllowViewResult = examAllowViewResult;
+            exam.Status = status;
             bool stats = await examService.UpdateExam(exam);
             if (stats == true)
             {

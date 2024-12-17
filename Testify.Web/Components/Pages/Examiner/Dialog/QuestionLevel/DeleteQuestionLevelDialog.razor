@@ -5,11 +5,11 @@
         <MudText Style="font-size: 18px; font-weight: bold; text-transform: uppercase">Xóa mức độ câu hỏi</MudText>
     </TitleContent>
     <DialogContent>
-        <MudText>Bạn chắc chắn muốn xóa mức độ câu hỏi <MudText Style="font-weight: bold">@questionLevel?.Name</MudText> không?</MudText>
+        <MudText>Bạn chắc chắn muốn xóa mức độ câu hỏi <span Style="font-weight: bold">@questionLevel?.Name</span> không?</MudText>
     </DialogContent>
     <DialogActions>
 
-        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton OnClick="Cancel">Đóng</MudButton>
         <MudButton Color="Color.Error" OnClick="Submit">Xóa</MudButton>
     </DialogActions>
 </MudDialog>
@@ -35,15 +35,23 @@
     private async void Submit()
     {
         var check = await _serQuestionLevel.DeleteQuestionLevel(QuestionLevelId);
-        if (check == true)
+        if (check.Success)
         {
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thành công", Severity.Success);
+            snackbar.Add("Xóa hóa thành công", Severity.Success);
+
         }
         else
         {
+            if (check.ErrorCode == "PERMISSION_DENIED")
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+                snackbar.Add("Không thể xóa", Severity.Warning);
+                return;
+            }
+
             MudDialog.Close(DialogResult.Ok(true));
-            snackbar.Add("Xóa thất bại", Severity.Error);
+            snackbar.Add("Xóa không thành công", Severity.Error);
         }
     }
 

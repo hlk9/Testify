@@ -1,0 +1,136 @@
+﻿@page "/ScoreDistribution-Class"
+@layout AdminLayout
+@using Testify.DAL.ViewModels
+
+@if (isLoading)
+{
+
+}
+else
+{
+    <MudPaper Elevation="0" style="font-family:Roboto; padding:30px; max-height:calc(100svh - 64px); background-color:#fafafa">
+        <MudPaper Style="padding:15px">
+            <MudText Class="fw-bold" Style="font-size:22px; color:#29A69A">PHỔ ĐIỂM THEO LỚP</MudText>
+        </MudPaper>
+        <MudPaper Elevation="0" Style="width: 100%; margin: 1.25rem 0rem;">
+            <MudSelect T="int" @bind-Value="@_ClassId" SelectedValuesChanged="handleChangeExam" Variant="Variant.Outlined">
+                @if (_ClassId == -1)
+                {
+                    <MudSelectItem Value="-1">Chọn bài thi</MudSelectItem>
+                }
+                @foreach (var item in _lstClass)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudPaper>
+
+        <MudPaper Class="p-3 w-100" Style="max-height: calc(100svh - 295px) !important">
+            <MudGrid Class="p-0 m-0 w-full">
+                <MudItem xl="8" lg="8" md="7" sm="12" xs="12" Class="p-0">
+                    @if (_ClassId > -1)
+                    {
+                        <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="calc(100svh - 385px)" ChartOptions="ChartOption"></MudChart>
+                    }
+                </MudItem>
+                <MudItem xl="4" lg="4" md="5" sm="12" xs="12" Class="p-0">
+                    @if (_ClassId > -1)
+                    {
+                        <MudChart ChartType="ChartType.Donut" InputData="@_lstDataDonutCharts.ToArray()" InputLabels="@LabelDonutCharts" SelectedIndexChanged="handleShowValue">
+                            <CustomGraphics>
+                                <text class="donut-inner-text" x="47%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="black" font-family="Helvetica" font-size="3">@labelDetailChartDonut</text>
+                            </CustomGraphics>
+                        </MudChart>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudPaper>
+}
+
+@code {
+    private List<Class> _lstClass = new List<Class>();
+    private ScoreDistribution _scoreDistribution = new ScoreDistribution();
+    private List<double> _lstAccountScore = new List<double>();
+    private List<double> _lstDataDonutCharts = new List<double>();
+    public List<ChartSeries> Series;
+
+    private Guid _UserId = Guid.Empty;
+    private string labelDetailChartDonut ="";
+    private bool isLoading = false;
+    private int _ClassId = -1;
+
+    public string[] XAxisLabels;
+    private string[] LabelDonutCharts = { "Đạt", "Trượt" };
+    public ChartOptions ChartOption { get; set; } = new ChartOptions();
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                isLoading = true;
+                StateHasChanged();
+                var userId = await ProtectedSessionStore.GetAsync<string>("userLogin");
+                _UserId = Guid.Parse(userId.Value);
+                await LoadData();
+                await LoadDataChart();
+            }
+            catch { }
+            finally
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task LoadData()
+    {
+        _lstClass = await _serClass.GetClassesByUserId(_UserId);
+        _ClassId = _lstClass[0].Id;
+    }
+
+    private async Task handleShowValue(int index)
+    {
+
+        labelDetailChartDonut = "";
+        labelDetailChartDonut = $"{LabelDonutCharts[index]}: {_lstDataDonutCharts[index]}%";
+
+    }
+
+    private async Task handleChangeExam()
+    {
+        await LoadDataChart();
+    }
+
+    private async Task LoadDataChart()
+    {
+        _lstDataDonutCharts.Clear();
+        _scoreDistribution = await _serClass.ScoreDistributionByClass(_ClassId);
+        _lstAccountScore = _scoreDistribution.Data.Select(x => (double)x.CountScore).ToList();
+
+        var percenIsPass = _scoreDistribution.Summary.PercentPass;
+        var percenIsFail = _scoreDistribution.Summary.PercentFail;
+
+        _lstDataDonutCharts.Add(percenIsPass);
+        _lstDataDonutCharts.Add(percenIsFail);
+
+        labelDetailChartDonut = $"{LabelDonutCharts[0]}: {_lstDataDonutCharts[0]}%";
+
+        XAxisLabels = _scoreDistribution.Data.Select(x => x.Score.ToString()).ToList().ToArray();
+
+        Series = new List<ChartSeries>()
+        {
+            new ChartSeries() {Name = "Tổng số bài thi đạt điểm tương ứng", Data = _lstAccountScore.ToArray() },
+        };
+
+        ChartOption = new ChartOptions()
+            {
+                YAxisTicks = 1
+            };
+
+        isLoading = false;
+    }
+}
